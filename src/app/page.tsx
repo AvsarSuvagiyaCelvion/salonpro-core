@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import StatsCounter from '@/components/landing/StatsCounter';
 
+import LandingNavbar from '@/components/landing/LandingNavbar';
+
 export const metadata = {
   title: 'SalonPro - The Modern Operating System for Salons & Spas',
   description: 'Transform your salon with zero double-bookings, 10-second GST billing, live chair kanban, and automated WhatsApp confirmations.',
@@ -24,84 +26,46 @@ export const metadata = {
 
 export default function MarketingLandingPage() {
   return (
-    <div className="min-h-screen bg-[#fafbfc] text-slate-900 font-sans selection:bg-pink-500 selection:text-white">
+    <div className="min-h-screen bg-[#fafbfc] text-slate-900 font-sans selection:bg-pink-500 selection:text-white w-full max-w-full overflow-x-hidden">
       {/* Background Soft Glow */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[550px] bg-gradient-to-b from-pink-100/70 via-purple-50/50 to-transparent rounded-full blur-[120px]" />
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[90vw] max-w-[650px] h-[400px] sm:h-[550px] bg-gradient-to-b from-pink-100/70 via-purple-50/50 to-transparent rounded-full blur-[100px]" />
       </div>
 
       {/* Top Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-md px-4 sm:px-6 py-3.5 sm:py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] flex items-center justify-center font-black text-lg sm:text-xl text-white shadow-md shadow-pink-900/10 shrink-0">
-              ✂
-            </div>
-            <div>
-              <div className="font-black text-lg sm:text-xl text-slate-900 tracking-tight flex items-center gap-1.5 sm:gap-2">
-                <span>SalonPro</span>
-                <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-50 text-[#b3135b] border border-pink-200">
-                  Cloud SaaS
-                </span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
-            <a href="#problems" className="hover:text-[#b3135b] transition-colors">Problems We Solve</a>
-            <a href="#features" className="hover:text-[#b3135b] transition-colors">Features & POS</a>
-            <a href="#how-it-works" className="hover:text-[#b3135b] transition-colors">How It Works</a>
-          </div>
-
-          {/* Action CTAs */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
-            <Link
-              href="/salon-owner"
-              className="px-2.5 sm:px-3.5 py-2 rounded-xl text-slate-700 hover:text-[#b3135b] hover:bg-pink-50 text-xs font-bold transition-all whitespace-nowrap"
-            >
-              Owner Sign In
-            </Link>
-            <Link
-              href="/register-salon"
-              className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap"
-            >
-              Register Salon ➔
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <LandingNavbar />
 
       {/* Hero Section */}
-      <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-semibold mb-6 shadow-xs max-w-full truncate">
+      <section className="relative z-10 max-w-5xl mx-auto px-3.5 sm:px-6 pt-10 sm:pt-18 lg:pt-22 pb-10 sm:pb-16 text-center w-full">
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-[11px] sm:text-xs font-semibold mb-5 sm:mb-6 shadow-xs max-w-full">
           <Sparkles className="w-3.5 h-3.5 text-[#b3135b] shrink-0" />
-          <span className="truncate">The #1 All-in-One Salon & Spa Management Software</span>
+          <span className="hidden sm:inline">The #1 All-in-One Salon & Spa Management Software</span>
+          <span className="sm:hidden">The #1 Salon Management Software</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.18] sm:leading-[1.15] max-w-4xl mx-auto">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.22] sm:leading-[1.15] max-w-4xl mx-auto break-normal">
           Stop Losing Revenue to <br className="hidden sm:block" />
           <span className="bg-gradient-to-r from-[#b3135b] via-[#d62475] to-purple-600 bg-clip-text text-transparent">
             Paper Registers & Double-Bookings
           </span>
         </h1>
 
-        <p className="text-xs sm:text-base lg:text-lg text-slate-600 mt-4 sm:mt-6 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xs sm:text-base lg:text-lg text-slate-600 mt-3 sm:mt-5 max-w-2xl mx-auto leading-relaxed px-1">
           Upgrade your salon with <strong>automated online client bookings</strong>, live chair status, 10-second GST billing, staff commission tracking, and instant WhatsApp receipts.
         </p>
 
         {/* Hero CTAs */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
           <Link
             href="/register-salon"
-            className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
           >
             <span>Register Your Salon (Free Setup) ➔</span>
           </Link>
 
           <Link
             href="/salon-owner"
-            className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
+            className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
           >
             <span>🔐 Salon Owner Sign In</span>
           </Link>

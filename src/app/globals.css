@@ -18,10 +18,13 @@
   --color-border: #f0e6ed;
 }
 
-body {
+html, body {
   font-family: var(--font-dm-sans), sans-serif;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
 }
 
 h1, h2, h3, h4, .font-display {

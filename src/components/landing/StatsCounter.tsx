@@ -118,31 +118,31 @@ function CounterCard({ item }: { item: StatItem }) {
   return (
     <div
       ref={cardRef}
-      className={`group relative p-4 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm border ${item.borderClass} shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between`}
+      className={`group relative p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm border ${item.borderClass} shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between`}
     >
       {/* Top micro badge */}
-      <div className="flex items-center justify-between mb-3">
-        <span className={`w-8 h-8 rounded-xl ${item.bgLightClass} flex items-center justify-center transition-transform group-hover:scale-110`}>
-          <Icon className={`w-4 h-4 ${item.colorClass}`} />
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl ${item.bgLightClass} flex items-center justify-center transition-transform group-hover:scale-110`}>
+          <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${item.colorClass}`} />
         </span>
-        <span className="w-2 h-2 rounded-full bg-emerald-500/80 animate-ping" />
+        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500/80 animate-ping" />
       </div>
 
       {/* Counter value */}
-      <div className="my-1">
-        <div className={`text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight ${item.colorClass} flex items-baseline justify-center sm:justify-start gap-0.5`}>
+      <div className="my-0.5 sm:my-1">
+        <div className={`text-2xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight ${item.colorClass} flex items-baseline justify-center sm:justify-start gap-0.5`}>
           <span>{item.prefix || ''}</span>
           <span className="tabular-nums">{count}</span>
-          <span className="text-xl sm:text-2xl lg:text-3xl font-extrabold">{item.suffix || ''}</span>
+          <span className="text-lg sm:text-2xl lg:text-3xl font-extrabold">{item.suffix || ''}</span>
         </div>
       </div>
 
       {/* Label & Description */}
-      <div className="mt-2 text-center sm:text-left">
-        <div className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#b3135b] transition-colors leading-tight">
+      <div className="mt-1.5 sm:mt-2 text-center sm:text-left">
+        <div className="text-[11px] sm:text-sm font-bold text-slate-900 group-hover:text-[#b3135b] transition-colors leading-snug">
           {item.label}
         </div>
-        <div className="text-[11px] text-slate-500 mt-0.5 hidden xs:block sm:block font-medium">
+        <div className="text-[10px] sm:text-[11px] text-slate-500 mt-0.5 hidden xs:block font-medium">
           {item.subtext}
         </div>
       </div>

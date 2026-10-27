@@ -378,7 +378,7 @@ export default function CustomerPortalPage() {
       {/* Main Content Area */}
       <div className="max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-6">
         {/* Navigation Tabs */}
-        <div className="flex gap-2 border-b border-neutral-800 pb-2 overflow-x-auto">
+        <div className="flex gap-2 border-b border-neutral-800 pb-2 overflow-x-auto touch-scroll no-scrollbar">
           {[
             { id: 'appointments', label: `My Appointments (${upcomingAppts.length})`, icon: Calendar },
             { id: 'bills', label: `Bills & Receipts (${invoices.length})`, icon: Receipt },
@@ -390,9 +390,9 @@ export default function CustomerPortalPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer active:scale-95 ${
                   isActive
-                    ? 'bg-pink-500 text-white shadow-md shadow-pink-500/20'
+                    ? 'bg-pink-500 text-white shadow-md shadow-pink-500/20 scale-102'
                     : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
                 }`}
               >
@@ -405,7 +405,7 @@ export default function CustomerPortalPage() {
 
         {/* ================= TAB 1: APPOINTMENTS ================= */}
         {activeTab === 'appointments' && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fade-in">
             {/* Upcoming Appointments */}
             <div>
               <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">
@@ -511,7 +511,7 @@ export default function CustomerPortalPage() {
 
         {/* ================= TAB 2: INVOICES & BILLS ================= */}
         {activeTab === 'bills' && (
-          <div>
+          <div className="animate-fade-in">
             <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">
               Your Digital Salon Invoices
             </h2>
@@ -527,7 +527,7 @@ export default function CustomerPortalPage() {
                 {invoices.map((inv) => (
                   <div
                     key={inv.id}
-                    className="bg-neutral-900 border border-neutral-800 rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className="bg-neutral-900 border border-neutral-800 rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-neutral-700 transition-colors"
                   >
                     <div>
                       <div className="flex items-center gap-2">
@@ -574,7 +574,7 @@ export default function CustomerPortalPage() {
                     <Link
                       href={`/b/${inv.number}`}
                       target="_blank"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition-all self-end sm:self-auto border border-neutral-700"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition-all self-end sm:self-auto border border-neutral-700 active:scale-95"
                     >
                       <ExternalLink className="w-3.5 h-3.5 text-pink-400" />
                       <span>View Receipt / PDF</span>
@@ -588,7 +588,7 @@ export default function CustomerPortalPage() {
 
         {/* ================= TAB 3: MEMBERSHIPS & PACKAGES ================= */}
         {activeTab === 'memberships' && (
-          <div>
+          <div className="animate-fade-in">
             <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">
               Your VIP Subscriptions & Packages
             </h2>
@@ -653,6 +653,52 @@ export default function CustomerPortalPage() {
               </div>
             )}
           </div>
+        )}
+      </div>
+
+      {/* Mobile Bottom Dock for Customer Portal */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/95 backdrop-blur-md border-t border-neutral-800 px-4 py-2 flex items-center justify-around shadow-2xl">
+        <button
+          type="button"
+          onClick={() => setActiveTab('appointments')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
+            activeTab === 'appointments' ? 'text-pink-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span className="text-[10px]">Visits</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('bills')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
+            activeTab === 'bills' ? 'text-pink-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Receipt className="w-4 h-4" />
+          <span className="text-[10px]">Bills</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('memberships')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
+            activeTab === 'memberships' ? 'text-pink-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Award className="w-4 h-4" />
+          <span className="text-[10px]">VIP</span>
+        </button>
+
+        {salon?.slug && (
+          <Link
+            href={`/${salon.slug}`}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl text-xs font-bold shadow-md shadow-pink-500/30"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>Book</span>
+          </Link>
         )}
       </div>
     </div>

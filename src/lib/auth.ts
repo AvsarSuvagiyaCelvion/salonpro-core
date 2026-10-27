@@ -54,3 +54,30 @@ export async function verifyCustomerSessionToken(token: string) {
   }
 }
 
+// -------------------------------------------------------------
+// MAIN ADMIN (SUPER ADMIN) AUTHENTICATION REALM
+// -------------------------------------------------------------
+export const ADMIN_COOKIE_NAME = 'salonpro_admin_session';
+
+export async function createAdminSessionToken(payload: { email: string; role?: string }) {
+  return await new SignJWT({ ...payload, role: 'super_admin' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(SECRET_KEY);
+}
+
+export async function verifyAdminSessionToken(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, SECRET_KEY);
+    if (payload.role !== 'super_admin') return null;
+    return payload as unknown as {
+      email: string;
+      role: string;
+    };
+  } catch {
+    return null;
+  }
+}
+
+

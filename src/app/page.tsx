@@ -55,13 +55,19 @@ export default function MarketingLandingPage() {
           </div>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <a
-              href="#features"
-              className="px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap"
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            <Link
+              href="/salon-owner"
+              className="px-2.5 sm:px-3.5 py-2 rounded-xl text-slate-700 hover:text-[#b3135b] hover:bg-pink-50 text-xs font-bold transition-all whitespace-nowrap"
             >
-              Explore Features →
-            </a>
+              Owner Sign In
+            </Link>
+            <Link
+              href="/register-salon"
+              className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap"
+            >
+              Register Salon ➔
+            </Link>
           </div>
         </div>
       </nav>
@@ -86,19 +92,19 @@ export default function MarketingLandingPage() {
 
         {/* Hero CTAs */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
-          <a
-            href="#features"
+          <Link
+            href="/register-salon"
             className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            <span>Explore SalonPro Features ➔</span>
-          </a>
+            <span>Register Your Salon (Free Setup) ➔</span>
+          </Link>
 
-          <a
-            href="#how-it-works"
+          <Link
+            href="/salon-owner"
             className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
           >
-            <span>See How It Works</span>
-          </a>
+            <span>🔐 Salon Owner Sign In</span>
+          </Link>
         </div>
 
         {/* Animated Social Proof Stats Counter */}
@@ -336,27 +342,41 @@ export default function MarketingLandingPage() {
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-            <a
-              href="#problems"
-              className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-pink-900/20 transition-all active:scale-95"
+            <Link
+              href="/register-salon"
+              className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
             >
-              See Problems Solved by SalonPro ➔
-            </a>
+              <span>Create Your Salon Account ➔</span>
+            </Link>
+
+            <Link
+              href="/salon-owner"
+              className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2"
+            >
+              <span>Already Registered? Sign In ➔</span>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-8 sm:py-10 text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
           <div className="flex items-center gap-2.5">
             <span className="font-extrabold text-sm text-slate-900">SalonPro</span>
             <span>·</span>
             <span>Multi-Tenant Cloud Salon & Spa Suite</span>
           </div>
 
-          <div className="flex items-center gap-5 text-slate-500 font-medium">
-            <span>© 2026 SalonPro Platform. All rights reserved.</span>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-slate-600 font-semibold text-xs">
+            <Link href="/register-salon" className="hover:text-[#b3135b] transition-colors">Register Salon</Link>
+            <Link href="/salon-owner" className="hover:text-[#b3135b] transition-colors">Salon Owner Sign In</Link>
+            <Link href="/portal" className="hover:text-[#b3135b] transition-colors">Client Portal</Link>
+            <Link href="/admin/login" className="hover:text-[#b3135b] transition-colors">Super Admin</Link>
+          </div>
+
+          <div className="text-slate-400 text-[11px]">
+            © 2026 SalonPro Platform. All rights reserved.
           </div>
         </div>
       </footer>

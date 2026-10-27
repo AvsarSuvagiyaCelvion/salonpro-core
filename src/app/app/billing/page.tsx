@@ -15,6 +15,8 @@ import {
   FileText,
   DollarSign,
   TrendingUp,
+  Eye,
+  Printer,
 } from 'lucide-react';
 
 interface InvoiceItem {
@@ -57,6 +59,9 @@ export default function BillingPage() {
   // WhatsApp Preview Modal
   const [whatsappInvoice, setWhatsappInvoice] = useState<Invoice | null>(null);
   const [sendingWhatsapp, setSendingWhatsapp] = useState(false);
+
+  // Full Receipt View Modal
+  const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
     fetchInvoices();
@@ -342,6 +347,14 @@ export default function BillingPage() {
                         )}
                       </td>
                       <td className="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
+                        <button
+                          onClick={() => setViewInvoice(inv)}
+                          className="p-1.5 text-neutral-500 hover:text-[#b3135b] hover:bg-pink-50 rounded-lg inline-flex items-center cursor-pointer transition-colors"
+                          title="View Full Bill Receipt"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+
                         {!isPaid && (
                           <button
                             onClick={() => {
@@ -593,6 +606,146 @@ export default function BillingPage() {
                   <span>{sendingWhatsapp ? 'Marking...' : 'Mark as sent (Show ✓✓ Blue Ticks)'}</span>
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ================= MODAL: FULL BILL RECEIPT ================= */}
+      {viewInvoice && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                Official Bill Receipt
+              </span>
+              <button
+                onClick={() => setViewInvoice(null)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Printable Receipt Body */}
+            <div className="py-4 space-y-4 flex-1 overflow-y-auto">
+              {/* Salon Brand Header */}
+              <div className="text-center pb-3 border-b border-dashed border-neutral-200">
+                <h2 className="text-xl font-black text-[#2a1630] tracking-tight">
+                  GLOW STUDIO
+                </h2>
+                <p className="text-[11px] text-neutral-500">
+                  Luxury Salon & Wellness Spa
+                </p>
+                <p className="text-[10px] text-neutral-400 mt-0.5">
+                  Open 10:00 - 19:00 • Contact: +91 98250 12345
+                </p>
+              </div>
+
+              {/* Invoice & Client Info */}
+              <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-200/80 text-xs space-y-1 font-mono">
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Invoice:</span>
+                  <span className="font-bold text-[#b3135b]">{viewInvoice.number}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Date:</span>
+                  <span>{new Date(viewInvoice.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Client:</span>
+                  <span className="font-semibold text-neutral-900">{viewInvoice.customer_name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-neutral-500">Mobile:</span>
+                  <span>+91 {viewInvoice.customer_mobile}</span>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-neutral-200">
+                  <span className="text-neutral-500">Status:</span>
+                  <span className={`font-bold uppercase ${viewInvoice.status === 'paid' ? 'text-emerald-700' : 'text-red-600'}`}>
+                    {viewInvoice.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Items Table */}
+              <div>
+                <div className="text-xs font-bold text-neutral-700 uppercase tracking-wide mb-2">
+                  Services & Products:
+                </div>
+                {viewInvoice.items && viewInvoice.items.length > 0 ? (
+                  <div className="divide-y divide-neutral-100 text-xs">
+                    {viewInvoice.items.map((item, idx) => (
+                      <div key={idx} className="py-2 flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-neutral-800">{item.name}</p>
+                          <p className="text-[10px] text-neutral-400">
+                            Qty: {item.qty} × ₹{item.unit_price}
+                          </p>
+                        </div>
+                        <span className="font-bold text-neutral-900">
+                          ₹{Number(item.unit_price) * Number(item.qty)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-neutral-400 italic py-2">
+                    Standard Salon Treatment Service
+                  </p>
+                )}
+              </div>
+
+              {/* Bill Totals */}
+              <div className="pt-3 border-t border-dashed border-neutral-200 space-y-1.5 text-xs">
+                <div className="flex justify-between text-neutral-600">
+                  <span>Subtotal:</span>
+                  <span>₹{viewInvoice.subtotal}</span>
+                </div>
+                {Number(viewInvoice.discount_amount) > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-medium">
+                    <span>Discount Applied:</span>
+                    <span>-₹{viewInvoice.discount_amount}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-black text-sm text-[#2a1630] pt-1 border-t border-neutral-200">
+                  <span>Net Bill Total:</span>
+                  <span className="text-[#b3135b]">₹{Number(viewInvoice.total).toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex justify-between text-emerald-700 font-semibold">
+                  <span>Amount Paid:</span>
+                  <span>₹{Number(viewInvoice.paid_amount).toLocaleString('en-IN')}</span>
+                </div>
+                {Number(viewInvoice.due_amount) > 0 && (
+                  <div className="flex justify-between text-red-600 font-bold">
+                    <span>Balance Due:</span>
+                    <span>₹{Number(viewInvoice.due_amount).toLocaleString('en-IN')}</span>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-[11px] text-neutral-400 text-center italic pt-2">
+                "Thank you for choosing Glow Studio!"
+              </p>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-neutral-200 text-neutral-700 hover:bg-neutral-50 text-xs font-semibold cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Bill</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewInvoice(null)}
+                className="px-4 py-2 text-xs font-semibold bg-[#2a1630] text-white hover:bg-[#3f2248] rounded-xl cursor-pointer"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

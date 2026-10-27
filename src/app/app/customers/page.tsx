@@ -15,6 +15,12 @@ import {
   X,
   CreditCard,
   History,
+  Receipt,
+  Scissors,
+  Package,
+  Printer,
+  Sparkles,
+  Check,
 } from 'lucide-react';
 
 interface Customer {
@@ -29,12 +35,32 @@ interface Customer {
   created_at: string;
 }
 
+interface InvoiceItem {
+  name: string;
+  kind: 'service' | 'product';
+  qty: number;
+  unit_price: string | number;
+  staff_name: string | null;
+}
+
+interface CustomerInvoice {
+  id: string;
+  number: string;
+  total: string | number;
+  paid_amount: string | number;
+  due_amount: string | number;
+  discount_amount: string | number;
+  status: 'paid' | 'partial' | 'pending';
+  created_at: string;
+  items: InvoiceItem[];
+}
+
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
-  // Modal states
+  // Modal 1: Add/Edit Customer
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [saving, setSaving] = useState(false);
@@ -46,6 +72,11 @@ export default function CustomersPage() {
   const [formEmail, setFormEmail] = useState('');
   const [formNote, setFormNote] = useState('');
   const [formBirthday, setFormBirthday] = useState('');
+
+  // Modal 2: Customer Bills & Services History Modal
+  const [selectedCustomerForBills, setSelectedCustomerForBills] = useState<Customer | null>(null);
+  const [customerInvoices, setCustomerInvoices] = useState<CustomerInvoice[]>([]);
+  const [loadingBills, setLoadingBills] = useState(false);
 
   useEffect(() => {
     fetchCustomers();
@@ -64,6 +95,24 @@ export default function CustomersPage() {
       setMessage({ type: 'error', text: 'Failed to load customers' });
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function openCustomerBillsModal(c: Customer) {
+    setSelectedCustomerForBills(c);
+    setCustomerInvoices([]);
+    setLoadingBills(true);
+
+    try {
+      const res = await fetch(`/api/customers/${c.id}/invoices`);
+      const data = await res.json();
+      if (res.ok) {
+        setCustomerInvoices(data.invoices || []);
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to load customer bill history' });
+    } finally {
+      setLoadingBills(false);
     }
   }
 
@@ -160,7 +209,7 @@ export default function CustomersPage() {
             Client Directory
           </h1>
           <p className="text-sm text-neutral-500 mt-0.5">
-            View customer profiles, visit history, total spending, and notes
+            View customer profiles, visits, invoice histories, and services received
           </p>
         </div>
 
@@ -228,6 +277,7 @@ export default function CustomersPage() {
                   <th className="py-3 px-4">Notes & Birthday</th>
                   <th className="py-3 px-4 text-center">Visits</th>
                   <th className="py-3 px-4 text-right">Total Spent</th>
+                  <th className="py-3 px-4 text-center">Bill History</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -290,6 +340,17 @@ export default function CustomersPage() {
                         Invoiced total
                       </div>
                     </td>
+                    {/* View Bills Button */}
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        onClick={() => openCustomerBillsModal(c)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-pink-200 bg-pink-50 hover:bg-pink-100/70 text-[#b3135b] font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
+                        title="View all bills & services for this customer"
+                      >
+                        <Receipt className="w-3.5 h-3.5" />
+                        <span>View Bills ({c.visits})</span>
+                      </button>
+                    </td>
                     <td className="py-3 px-4 text-right space-x-1">
                       <button
                         onClick={() => openEditModal(c)}
@@ -314,7 +375,156 @@ export default function CustomersPage() {
         )}
       </div>
 
-      {/* Add / Edit Customer Modal */}
+      {/* ================= MODAL: CUSTOMER BILLS & SERVICES HISTORY ================= */}
+      {selectedCustomerForBills && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-2xl w-full p-6 animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between pb-3 border-b border-neutral-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-pink-50 text-[#b3135b] flex items-center justify-center font-bold text-sm">
+                  <Receipt className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-[#2a1630]">
+                    Bill History: {selectedCustomerForBills.name}
+                  </h2>
+                  <p className="text-xs text-neutral-500 flex items-center gap-1.5 mt-0.5">
+                    <Phone className="w-3 h-3" />
+                    <span>+91 {selectedCustomerForBills.mobile}</span>
+                    <span>•</span>
+                    <span>Total Spent: <strong>₹{selectedCustomerForBills.total_spent}</strong></span>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedCustomerForBills(null)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Invoices List */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-4">
+              {loadingBills ? (
+                <div className="p-8 text-center text-neutral-400 text-sm">
+                  Loading invoices and services for {selectedCustomerForBills.name}...
+                </div>
+              ) : customerInvoices.length === 0 ? (
+                <div className="p-8 text-center text-neutral-400 text-sm">
+                  No previous bills found for this customer.
+                </div>
+              ) : (
+                customerInvoices.map((inv) => (
+                  <div
+                    key={inv.id}
+                    className="p-4 rounded-xl border border-neutral-200 bg-neutral-50/40 hover:bg-white hover:shadow-xs transition-all space-y-3"
+                  >
+                    {/* Invoice top summary */}
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-sm text-[#b3135b]">
+                          {inv.number}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            inv.status === 'paid'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-red-50 text-red-700 border border-red-200'
+                          }`}
+                        >
+                          {inv.status}
+                        </span>
+                      </div>
+                      <span className="text-neutral-500">
+                        {new Date(inv.created_at).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+
+                    {/* Services & Products breakdown */}
+                    <div className="bg-white rounded-lg p-2.5 border border-neutral-200/70 text-xs space-y-1.5">
+                      <div className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
+                        Services & Items Given:
+                      </div>
+                      {inv.items.length === 0 ? (
+                        <div className="text-neutral-400 italic text-[11px]">
+                          Salon Service Treatment
+                        </div>
+                      ) : (
+                        inv.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-1.5">
+                              {item.kind === 'service' ? (
+                                <Scissors className="w-3 h-3 text-[#b3135b]" />
+                              ) : (
+                                <Package className="w-3 h-3 text-purple-600" />
+                              )}
+                              <span className="font-semibold text-neutral-800">
+                                {item.name} {item.qty > 1 ? `(x${item.qty})` : ''}
+                              </span>
+                              {item.staff_name && (
+                                <span className="text-[10px] text-neutral-500 bg-neutral-100 px-1.5 py-0.2 rounded">
+                                  Stylist: {item.staff_name}
+                                </span>
+                              )}
+                            </div>
+                            <span className="font-bold text-neutral-900">
+                              ₹{Number(item.unit_price) * Number(item.qty)}
+                            </span>
+                          </div>
+                        ))
+                      )}
+
+                      {/* Totals & Discounts */}
+                      <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
+                        <div className="text-neutral-500">
+                          {Number(inv.discount_amount) > 0 && (
+                            <span className="text-emerald-600 font-medium">
+                              Discount: -₹{inv.discount_amount} •{' '}
+                            </span>
+                          )}
+                          <span>Paid: <strong className="text-emerald-700">₹{inv.paid_amount}</strong></span>
+                          {Number(inv.due_amount) > 0 && (
+                            <span className="text-red-600 font-bold ml-1">
+                              (Due: ₹{inv.due_amount})
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm font-black text-[#2a1630]">
+                          Bill Total: ₹{Number(inv.total).toLocaleString('en-IN')}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between">
+              <span className="text-xs text-neutral-500">
+                Showing {customerInvoices.length} invoice(s) for this client
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedCustomerForBills(null)}
+                className="px-4 py-2 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL: ADD / EDIT CUSTOMER ================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">

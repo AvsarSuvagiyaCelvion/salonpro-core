@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { query } from '@/lib/db';
 import {
   ADMIN_COOKIE_NAME,
   createAdminSessionToken,
@@ -39,34 +40,52 @@ export async function POST(request: Request) {
     const cleanEmail = email?.trim().toLowerCase();
     const cleanPassword = password?.trim();
 
-    // Accepted Super Admin credentials
-    const validAdmins = [
-      { email: 'admin@salonpro.com', pass: 'Admin@2136' },
-      { email: 'avsarsuvagiya968@gmail.com', pass: 'Av$@r2136' },
-    ];
-
-    const match = validAdmins.find(
-      (a) => a.email === cleanEmail && a.pass === cleanPassword
-    );
-
-    if (!match) {
+    if (!cleanEmail || !cleanPassword) {
       return NextResponse.json(
-        { error: 'Invalid Super Admin credentials. Please check your email and password.' },
+        { error: 'Email and password are required' },
+        { status: 400 }
+      );
+    }
+
+    // 1. Check platform_admins table in database
+    let adminUser = null;
+    try {
+      const dbRes = await query(
+        `SELECT id, email, name, role FROM platform_admins WHERE LOWER(email) = $1 AND password = $2 LIMIT 1`,
+        [cleanEmail, cleanPassword]
+      );
+      if (dbRes.rows.length > 0) {
+        adminUser = dbRes.rows[0];
+      }
+    } catch {}
+
+    // 2. Strict Super Admin Check (Adminsalonpro@gmail.com / Admin@123)
+    if (!adminUser && cleanEmail === 'adminsalonpro@gmail.com' && cleanPassword === 'Admin@123') {
+      adminUser = {
+        email: 'adminsalonpro@gmail.com',
+        name: 'Avsar Suvagiya',
+        role: 'super_admin',
+      };
+    }
+
+    if (!adminUser) {
+      return NextResponse.json(
+        { error: 'Invalid Super Admin credentials. Access denied.' },
         { status: 401 }
       );
     }
 
     const token = await createAdminSessionToken({
-      email: match.email,
+      email: adminUser.email,
     });
 
     const response = NextResponse.json({
       success: true,
       message: 'Master Admin authenticated successfully',
       admin: {
-        email: match.email,
+        email: adminUser.email,
         role: 'super_admin',
-        name: 'Master Platform Admin',
+        name: adminUser.name || 'Master Admin',
       },
     });
 

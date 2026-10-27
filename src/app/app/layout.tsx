@@ -79,19 +79,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf8fa] text-[#2a1630]">
-      {/* Top Demo Banner */}
+      {/* Top Production Banner */}
       <div className="bg-[#2a1630] text-pink-200 text-xs py-1.5 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-950/40">
         <div className="flex items-center gap-2 mx-auto sm:mx-0">
           <Sparkles className="w-3.5 h-3.5 text-[#b3135b]" />
-          <span>Demo with sample data & live Supabase database</span>
+          <span>SalonPro Operating System · Live Cloud Connected</span>
         </div>
         <div className="hidden sm:flex items-center gap-3 text-[11px] text-pink-300">
           <Link
-            href="/book/glow-studio"
+            href="/glow-studio"
             target="_blank"
             className="flex items-center gap-1 hover:text-white transition-colors"
           >
-            <span>Client Booking Page</span>
+            <span>Customer Booking Page</span>
             <ExternalLink className="w-3 h-3" />
           </Link>
         </div>
@@ -192,16 +192,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="pt-4 border-t border-neutral-100 px-3 space-y-2.5">
-            <button
-              onClick={handleResetDemo}
-              disabled={resetting}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-neutral-100 hover:bg-rose-50 text-neutral-600 hover:text-rose-600 text-xs font-semibold border border-neutral-200 transition-all cursor-pointer disabled:opacity-50"
-            >
-              <RotateCcw className={`w-3.5 h-3.5 ${resetting ? 'animate-spin text-rose-600' : ''}`} />
-              <span>{resetting ? 'Resetting Data...' : 'Reset demo data'}</span>
-            </button>
-
+          <div className="pt-4 border-t border-neutral-100 px-3">
             <div>
               <div className="text-xs text-neutral-500 mb-0.5">Signed in as:</div>
               <div className="text-xs font-semibold text-[#2a1630] truncate">

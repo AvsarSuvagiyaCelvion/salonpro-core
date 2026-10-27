@@ -46,10 +46,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-gradient-to-br from-[#faf6f8] via-[#f7eef3] to-[#f4e4ed]">
-      {/* Top Demo Banner */}
+      {/* Top Banner */}
       <div className="fixed top-0 left-0 right-0 bg-[#2a1630] text-pink-200 text-xs py-1.5 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2 z-50">
         <Sparkles className="w-3.5 h-3.5 text-[#b3135b]" />
-        <span>Demo Environment with Sample Data & Live Supabase Cloud Database</span>
+        <span>SalonPro Cloud ERP · Official Manager & Staff Portal</span>
       </div>
 
       <div className="w-full max-w-md mt-8">

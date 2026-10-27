@@ -46,6 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/salons', label: 'Salons Directory', icon: Building2 },
     { href: '/admin/owners', label: 'Owners & Staff', icon: Users },
     { href: '/admin/analytics', label: 'Platform Analytics', icon: BarChart3 },
+    { href: '/admin/security', label: 'Admins & Security', icon: ShieldCheck },
   ];
 
   return (
@@ -219,8 +220,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 A
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold text-slate-900 truncate">Master Admin</div>
-                <div className="text-[10px] text-slate-500 font-mono truncate">admin@salonpro.com</div>
+                <div className="text-xs font-bold text-slate-900 truncate">Super Admin</div>
+                <div className="text-[10px] text-slate-500 font-mono truncate">Adminsalonpro@gmail.com</div>
               </div>
             </div>
           </div>

@@ -7,8 +7,8 @@ import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, Sparkles, Building2, 
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@salonpro.com');
-  const [password, setPassword] = useState('Admin@2136');
+  const [email, setEmail] = useState('Adminsalonpro@gmail.com');
+  const [password, setPassword] = useState('Admin@123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@salonpro.com"
+                  placeholder="Adminsalonpro@gmail.com"
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-11 pr-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all font-mono"
                 />
               </div>
@@ -97,14 +97,14 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            {/* Demo Credentials Box */}
+            {/* Admin Credentials Info Box */}
             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
               <div className="font-bold text-[11px] uppercase tracking-wider text-amber-800">
-                Default Master Admin Credentials:
+                Super Admin Access:
               </div>
               <div className="flex justify-between font-mono text-[11px]">
-                <span>Email: <strong className="text-slate-900">admin@salonpro.com</strong></span>
-                <span>Pass: <strong className="text-slate-900">Admin@2136</strong></span>
+                <span>Email: <strong className="text-slate-900">Adminsalonpro@gmail.com</strong></span>
+                <span>Pass: <strong className="text-slate-900">Admin@123</strong></span>
               </div>
             </div>
 

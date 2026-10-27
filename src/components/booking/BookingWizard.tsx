@@ -129,14 +129,16 @@ export default function BookingWizard({ slug }: { slug: string }) {
   useEffect(() => {
     if (!salon || !selectedService || !selectedDate) return;
 
+    let isMounted = true;
     async function fetchSlots() {
       setSlotsLoading(true);
-      setSelectedSlot(null);
       setSlotNotice(null);
       try {
         const url = `/api/public/${slug}/slots?service_id=${selectedService!.id}&staff_id=${selectedStaffId}&date=${selectedDate}`;
         const res = await fetch(url);
         const data = await res.json();
+
+        if (!isMounted) return;
 
         if (!res.ok) {
           throw new Error(data.error || 'Failed to fetch slots');
@@ -152,17 +154,20 @@ export default function BookingWizard({ slug }: { slug: string }) {
           setAvailableSlots(data.slots);
         }
       } catch (err: any) {
+        if (!isMounted) return;
         setSlotNotice(err.message || 'Unable to calculate free slots');
         setAvailableSlots([]);
       } finally {
-        setSlotsLoading(false);
+        if (isMounted) setSlotsLoading(false);
       }
     }
 
-    if (currentStep >= 3) {
-      fetchSlots();
-    }
-  }, [salon, selectedService, selectedStaffId, selectedDate, currentStep, slug]);
+    fetchSlots();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [salon, selectedService?.id, selectedStaffId, selectedDate, slug]);
 
   if (loading) {
     return (
@@ -224,14 +229,29 @@ export default function BookingWizard({ slug }: { slug: string }) {
   // Handle booking form submission
   async function handleBookAppointment(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedService || !selectedSlot || !selectedDate) return;
-
-    if (!customerName.trim() || !customerMobile.trim()) {
-      setSubmitError('Please enter your full name and mobile number.');
+    if (!selectedService) {
+      setSubmitError('Please select a service first.');
+      setCurrentStep(1);
       return;
     }
 
-    if (verificationCode !== '1234') {
+    if (!selectedSlot || !selectedDate) {
+      setSubmitError('Please select an available time slot.');
+      setCurrentStep(3);
+      return;
+    }
+
+    if (!customerName.trim()) {
+      setSubmitError('Please enter your full name.');
+      return;
+    }
+
+    if (!customerMobile.trim() || customerMobile.trim().length < 10) {
+      setSubmitError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    if (verificationCode.trim() !== '1234') {
       setSubmitError('Verification code must be 1234 (Demo code)');
       return;
     }
@@ -781,6 +801,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   For this live client demo, enter 1234 to verify.
                 </p>
               </div>
+
+              {/* Inline Error if validation fails */}
+              {submitError && (
+                <div className="bg-rose-500/15 border border-rose-500/40 text-rose-300 p-3 rounded-xl text-xs font-semibold flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{submitError}</span>
+                </div>
+              )}
 
               {/* Submit Button */}
               <div className="pt-2">

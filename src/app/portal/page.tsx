@@ -88,7 +88,7 @@ export default function CustomerPortalPage() {
   const [authName, setAuthName] = useState('');
   const [authMobile, setAuthMobile] = useState('');
   const [authEmail, setAuthEmail] = useState('');
-  const [authPin, setAuthPin] = useState('1234');
+  const [authPin, setAuthPin] = useState('');
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -284,19 +284,14 @@ export default function CustomerPortalPage() {
             )}
 
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-bold text-neutral-300">
-                  4-Digit PIN / Password
-                </label>
-                <span className="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full font-mono font-bold">
-                  Demo PIN: 1234
-                </span>
-              </div>
+              <label className="block text-xs font-bold text-neutral-300 mb-1.5">
+                4-Digit PIN / Password <span className="text-pink-500">*</span>
+              </label>
               <input
                 type="password"
                 maxLength={6}
                 required
-                placeholder="1234"
+                placeholder="Enter 4-digit PIN"
                 value={authPin}
                 onChange={(e) => setAuthPin(e.target.value)}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-2xl px-4 py-3 text-sm font-mono text-white placeholder-neutral-500 focus:outline-none focus:border-pink-500"

@@ -6,8 +6,8 @@ import { Sparkles, Lock, Mail, AlertCircle, ArrowRight, CheckCircle2 } from 'luc
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('avsarsuvagiya968@gmail.com');
-  const [password, setPassword] = useState('Av$@r2136');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,12 +36,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function handleAutoFill() {
-    setEmail('avsarsuvagiya968@gmail.com');
-    setPassword('Av$@r2136');
-    setError(null);
   }
 
   return (
@@ -133,34 +127,10 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Pre-filled Helper Info Box */}
-          <div className="mt-6 pt-5 border-t border-neutral-100 bg-pink-50/60 -mx-7 -mb-7 p-5 rounded-b-2xl border-t-pink-100">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-[#2a1630] uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#b3135b]" />
-                Demo Credentials (Pre-filled)
-              </span>
-              <button
-                type="button"
-                onClick={handleAutoFill}
-                className="text-xs text-[#b3135b] hover:underline font-semibold cursor-pointer"
-              >
-                Reset values
-              </button>
-            </div>
-            <div className="text-xs text-neutral-600 space-y-1 font-mono bg-white p-2.5 rounded-lg border border-pink-100">
-              <div className="flex justify-between">
-                <span className="text-neutral-500">Email:</span>
-                <span className="font-semibold text-neutral-800">avsarsuvagiya968@gmail.com</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">Password:</span>
-                <span className="font-semibold text-neutral-800">Av$@r2136</span>
-              </div>
-            </div>
-            <p className="text-[11px] text-neutral-500 mt-2 text-center">
-              Contact your branch administrator for login assistance.
-            </p>
+          {/* Footer Info & Panel Nav */}
+          <div className="mt-6 pt-5 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
+            <span className="text-neutral-400">Panel 2 of 3 · Salon ERP</span>
+            <span className="text-neutral-400">Branch Manager Access</span>
           </div>
         </div>
       </div>

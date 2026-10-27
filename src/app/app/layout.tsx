@@ -20,6 +20,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  RotateCcw,
 } from 'lucide-react';
 
 interface NavItem {
@@ -47,6 +48,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -56,6 +58,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       router.refresh();
     } catch {
       router.push('/login');
+    }
+  }
+
+  async function handleResetDemo() {
+    if (!confirm('Reset all demo data back to clean sample state? Any newly added test bookings or invoices will be reset.')) return;
+    setResetting(true);
+    try {
+      const res = await fetch('/api/demo/reset', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      alert('Demo data successfully reset! Refreshing page...');
+      window.location.reload();
+    } catch (err: any) {
+      alert(`Reset failed: ${err.message}`);
+    } finally {
+      setResetting(false);
     }
   }
 
@@ -174,14 +192,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="pt-4 border-t border-neutral-100 px-3">
-            <div className="text-xs text-neutral-500 mb-1">Signed in as:</div>
-            <div className="text-xs font-semibold text-[#2a1630] truncate">
-              avsarsuvagiya968@gmail.com
-            </div>
-            <div className="text-[11px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Owner Account
+          <div className="pt-4 border-t border-neutral-100 px-3 space-y-2.5">
+            <button
+              onClick={handleResetDemo}
+              disabled={resetting}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-neutral-100 hover:bg-rose-50 text-neutral-600 hover:text-rose-600 text-xs font-semibold border border-neutral-200 transition-all cursor-pointer disabled:opacity-50"
+            >
+              <RotateCcw className={`w-3.5 h-3.5 ${resetting ? 'animate-spin text-rose-600' : ''}`} />
+              <span>{resetting ? 'Resetting Data...' : 'Reset demo data'}</span>
+            </button>
+
+            <div>
+              <div className="text-xs text-neutral-500 mb-0.5">Signed in as:</div>
+              <div className="text-xs font-semibold text-[#2a1630] truncate">
+                avsarsuvagiya968@gmail.com
+              </div>
+              <div className="text-[11px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Owner Account
+              </div>
             </div>
           </div>
         </aside>

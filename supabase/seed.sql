@@ -3,7 +3,7 @@ TRUNCATE TABLE customer_plans, package_plan_items, package_plans, membership_pla
 
 -- 1. Seed Salon "Glow Studio"
 INSERT INTO salons (
-  id, name, slug, brand_color, logo_url, open_time, close_time, working_days, slot_minutes, buffer_minutes, min_advance_hours, max_advance_days, send_reminders
+  id, name, slug, brand_color, logo_url, open_time, close_time, working_days, slot_minutes, buffer_minutes, min_advance_hours, max_advance_days, send_reminders, address, phone, booking_enabled
 ) VALUES (
   'e0a1b2c3-d4e5-4a5b-8c9d-0e1f2a3b4c5d',
   'Glow Studio',
@@ -17,6 +17,9 @@ INSERT INTO salons (
   10,
   1,
   14,
+  true,
+  '101, Titanium Square, Thaltej, Ahmedabad',
+  '+91 98250 12345',
   true
 );
 

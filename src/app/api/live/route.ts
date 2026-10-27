@@ -17,12 +17,23 @@ export async function GET() {
       [salonId]
     );
 
-    // 2. Active Sessions with items
+    // 2. Active Sessions with items and customer active membership details
     const sessionsRes = await query(
       `SELECT s.id, s.started_at, s.status,
-              c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile
+              c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile,
+              mp.name as membership_plan_name,
+              mp.services_discount_pct as membership_services_discount,
+              mp.products_discount_pct as membership_products_discount
        FROM sessions s
        JOIN customers c ON s.customer_id = c.id
+       LEFT JOIN LATERAL (
+         SELECT mp_inner.name, mp_inner.services_discount_pct, mp_inner.products_discount_pct
+         FROM customer_plans cp
+         JOIN membership_plans mp_inner ON cp.plan_id = mp_inner.id
+         WHERE cp.customer_id = c.id AND cp.kind = 'membership' AND cp.expires_on >= CURRENT_DATE
+         ORDER BY cp.expires_on DESC
+         LIMIT 1
+       ) mp ON true
        WHERE s.salon_id = $1 AND s.status = 'active'
        ORDER BY s.started_at ASC`,
       [salonId]

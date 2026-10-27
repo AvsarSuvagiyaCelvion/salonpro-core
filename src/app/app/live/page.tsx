@@ -50,6 +50,9 @@ interface ActiveSession {
   customer_name: string;
   customer_mobile: string;
   items: SessionItem[];
+  membership_plan_name?: string | null;
+  membership_services_discount?: number | string | null;
+  membership_products_discount?: number | string | null;
 }
 
 interface ToCollectInvoice {
@@ -638,10 +641,27 @@ export default function LiveStudioPage() {
                       <button
                         onClick={() => {
                           setCompleteModalSession(s);
-                          setSrvDiscType('none');
-                          setSrvDiscValue('0');
-                          setProdDiscType('none');
-                          setProdDiscValue('0');
+                          if (s.membership_plan_name) {
+                            if (Number(s.membership_services_discount) > 0) {
+                              setSrvDiscType('percent');
+                              setSrvDiscValue(Number(s.membership_services_discount).toString());
+                            } else {
+                              setSrvDiscType('none');
+                              setSrvDiscValue('0');
+                            }
+                            if (Number(s.membership_products_discount) > 0) {
+                              setProdDiscType('percent');
+                              setProdDiscValue(Number(s.membership_products_discount).toString());
+                            } else {
+                              setProdDiscType('none');
+                              setProdDiscValue('0');
+                            }
+                          } else {
+                            setSrvDiscType('none');
+                            setSrvDiscValue('0');
+                            setProdDiscType('none');
+                            setProdDiscValue('0');
+                          }
                         }}
                         disabled={s.items.length === 0}
                         className="w-full py-2 px-3 rounded-lg bg-[#2a1630] hover:bg-[#3f2248] text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors"
@@ -1052,6 +1072,19 @@ export default function LiveStudioPage() {
                       <span className="font-semibold text-neutral-800">₹{productsTotal}</span>
                     </div>
                   </div>
+
+                  {/* VIP Membership Banner if active */}
+                  {completeModalSession.membership_plan_name && (
+                    <div className="bg-gradient-to-r from-amber-50 to-pink-50 border border-amber-200 text-amber-900 p-2.5 rounded-xl text-xs flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                      <div>
+                        <span className="font-bold">⭐ VIP Member: {completeModalSession.membership_plan_name}</span>
+                        <span className="block text-[11px] text-amber-700">
+                          Auto-applied {completeModalSession.membership_services_discount}% on services & {completeModalSession.membership_products_discount}% on products!
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Services Discount */}
                   <div>

@@ -15,6 +15,7 @@ import {
   Building2,
   Award,
 } from 'lucide-react';
+import StatsCounter from '@/components/landing/StatsCounter';
 
 export const metadata = {
   title: 'SalonPro - The Modern Operating System for Salons & Spas',
@@ -30,16 +31,16 @@ export default function MarketingLandingPage() {
       </div>
 
       {/* Top Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-md px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] flex items-center justify-center font-black text-xl text-white shadow-md shadow-pink-900/10">
+      <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/85 backdrop-blur-md px-4 sm:px-6 py-3.5 sm:py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] flex items-center justify-center font-black text-lg sm:text-xl text-white shadow-md shadow-pink-900/10 shrink-0">
               ✂
             </div>
             <div>
-              <div className="font-black text-xl text-slate-900 tracking-tight flex items-center gap-2">
+              <div className="font-black text-lg sm:text-xl text-slate-900 tracking-tight flex items-center gap-1.5 sm:gap-2">
                 <span>SalonPro</span>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-50 text-[#b3135b] border border-pink-200">
+                <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-pink-50 text-[#b3135b] border border-pink-200">
                   Cloud SaaS
                 </span>
               </div>
@@ -54,10 +55,10 @@ export default function MarketingLandingPage() {
           </div>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <a
               href="#features"
-              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
+              className="px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap"
             >
               Explore Features →
             </a>
@@ -66,87 +67,70 @@ export default function MarketingLandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 max-w-5xl mx-auto px-4 pt-16 sm:pt-24 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-semibold mb-6 shadow-xs">
-          <Sparkles className="w-3.5 h-3.5 text-[#b3135b]" />
-          <span>The #1 All-in-One Salon & Spa Management Software</span>
+      <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 text-center">
+        <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-semibold mb-6 shadow-xs max-w-full truncate">
+          <Sparkles className="w-3.5 h-3.5 text-[#b3135b] shrink-0" />
+          <span className="truncate">The #1 All-in-One Salon & Spa Management Software</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] max-w-4xl mx-auto">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.18] sm:leading-[1.15] max-w-4xl mx-auto">
           Stop Losing Revenue to <br className="hidden sm:block" />
           <span className="bg-gradient-to-r from-[#b3135b] via-[#d62475] to-purple-600 bg-clip-text text-transparent">
             Paper Registers & Double-Bookings
           </span>
         </h1>
 
-        <p className="text-sm sm:text-lg text-slate-600 mt-6 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xs sm:text-base lg:text-lg text-slate-600 mt-4 sm:mt-6 max-w-2xl mx-auto leading-relaxed">
           Upgrade your salon with <strong>automated online client bookings</strong>, live chair status, 10-second GST billing, staff commission tracking, and instant WhatsApp receipts.
         </p>
 
         {/* Hero CTAs */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
           <a
             href="#features"
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
           >
             <span>Explore SalonPro Features ➔</span>
           </a>
 
           <a
             href="#how-it-works"
-            className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
           >
             <span>See How It Works</span>
           </a>
         </div>
 
-        {/* Social Proof Stats */}
-        <div className="mt-14 pt-8 border-t border-slate-200/80 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div>
-            <div className="text-3xl sm:text-4xl font-black text-slate-900 font-mono">0%</div>
-            <div className="text-xs text-slate-500 mt-1">Double-Bookings</div>
-          </div>
-          <div>
-            <div className="text-3xl sm:text-4xl font-black text-[#b3135b] font-mono">10 Sec</div>
-            <div className="text-xs text-slate-500 mt-1">GST POS Checkout</div>
-          </div>
-          <div>
-            <div className="text-3xl sm:text-4xl font-black text-purple-700 font-mono">100%</div>
-            <div className="text-xs text-slate-500 mt-1">WhatsApp Confirmations</div>
-          </div>
-          <div>
-            <div className="text-3xl sm:text-4xl font-black text-emerald-600 font-mono">35%+</div>
-            <div className="text-xs text-slate-500 mt-1">Repeat Visits with VIP Plans</div>
-          </div>
-        </div>
+        {/* Animated Social Proof Stats Counter */}
+        <StatsCounter />
       </section>
 
       {/* ================= SECTION: PROBLEMS VS SALONPRO SOLUTION ================= */}
-      <section id="problems" className="relative z-10 max-w-6xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
+      <section id="problems" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div className="text-center mb-10 sm:mb-14">
           <h2 className="text-xs font-bold uppercase tracking-wider text-rose-600 mb-2">Common Salon Headaches</h2>
-          <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900">
+          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
             Running a Salon Shouldn&apos;t Feel Like Chaos
           </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto leading-relaxed">
             Traditional salons waste hours on manual registers and lose clients due to poor booking coordination. Here is how SalonPro solves every pain point:
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Pain Point 1 */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
-            <div className="flex items-start gap-4">
+          <div className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-start gap-3.5 sm:gap-4">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center font-bold text-lg shrink-0">
                 ❌
               </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900">The Headache: Double-Bookings & Angry Walk-Ins</h4>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm sm:text-base font-bold text-slate-900">The Headache: Double-Bookings & Angry Walk-Ins</h4>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                   Two clients show up for the same hair stylist at 4:00 PM. Stylists are stressed, waiting areas are packed, and clients leave bad reviews.
                 </p>
-                <div className="mt-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="mt-3.5 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span><strong>SalonPro Solution:</strong> Automated exclusion engine guarantees zero overlapping slots. Stylist buffers are computed automatically.</span>
                 </div>
               </div>
@@ -154,18 +138,18 @@ export default function MarketingLandingPage() {
           </div>
 
           {/* Pain Point 2 */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
-            <div className="flex items-start gap-4">
+          <div className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-start gap-3.5 sm:gap-4">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center font-bold text-lg shrink-0">
                 ❌
               </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900">The Headache: Messy Paper Books & Lost Bills</h4>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm sm:text-base font-bold text-slate-900">The Headache: Messy Paper Books & Lost Bills</h4>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                   When a client asks for their previous treatment shade or invoice history, staff scrambles through stacks of handwritten paper diaries.
                 </p>
-                <div className="mt-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="mt-3.5 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span><strong>SalonPro Solution:</strong> Instant client profile lookup showing past visits, used treatments, and complete invoice receipts.</span>
                 </div>
               </div>
@@ -173,18 +157,18 @@ export default function MarketingLandingPage() {
           </div>
 
           {/* Pain Point 3 */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
-            <div className="flex items-start gap-4">
+          <div className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-start gap-3.5 sm:gap-4">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center font-bold text-lg shrink-0">
                 ❌
               </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900">The Headache: End-of-Day Cash & Commission Confusion</h4>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm sm:text-base font-bold text-slate-900">The Headache: End-of-Day Cash & Commission Confusion</h4>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                   Calculating how much each hair stylist earned in commissions and reconciling UPI vs Cash payments takes the salon owner hours every night.
                 </p>
-                <div className="mt-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="mt-3.5 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span><strong>SalonPro Solution:</strong> Automated daily reports showing cash collected, UPI payments, and exact staff commission amounts.</span>
                 </div>
               </div>
@@ -192,18 +176,18 @@ export default function MarketingLandingPage() {
           </div>
 
           {/* Pain Point 4 */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
-            <div className="flex items-start gap-4">
+          <div className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <div className="flex items-start gap-3.5 sm:gap-4">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center font-bold text-lg shrink-0">
                 ❌
               </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900">The Headache: Clients Forget Appointments</h4>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm sm:text-base font-bold text-slate-900">The Headache: Clients Forget Appointments</h4>
                 <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                   Over 25% of verbal phone appointments result in no-shows because clients simply forget their booked time slot.
                 </p>
-                <div className="mt-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="mt-3.5 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span><strong>SalonPro Solution:</strong> Instant WhatsApp Cloud confirmation sent to client with date, time, stylist, and salon location.</span>
                 </div>
               </div>
@@ -213,124 +197,127 @@ export default function MarketingLandingPage() {
       </section>
 
       {/* ================= SECTION: HOW IT WORKS (THE PRIYA SALON EXAMPLE) ================= */}
-      <section id="how-it-works" className="relative z-10 max-w-6xl mx-auto px-4 py-16 border-t border-slate-200">
-        <div className="text-center mb-12">
+      <section id="how-it-works" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 border-t border-slate-200/80">
+        <div className="text-center mb-10 sm:mb-14">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#b3135b] mb-2">Simple Multi-Tenant Workflow</h2>
-          <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900">
+          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
             How SalonPro Works in Your Salon (Example: &quot;Priya Salon&quot;)
           </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto leading-relaxed">
             Clean segregation between your internal salon operations and what your customers see.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Step 1 */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+          <div className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-black text-xl mb-4">
                 1
               </div>
-              <h4 className="text-base font-bold text-slate-900">Salon Owner Portal</h4>
+              <h4 className="text-sm sm:text-base font-bold text-slate-900">Salon Owner Portal</h4>
               <div className="text-xs font-mono text-amber-700 font-semibold mt-0.5">domain.com/salon-owner</div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
                 Priya Salon logs in daily using their password. They see their private Live Kanban chairs, appointment calendar, billing terminal, and cash drawer.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-amber-800 font-semibold">
-              🔒 Strictly Private to Salon Staff
+            <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-amber-800 font-semibold flex items-center gap-1.5">
+              <span>🔒</span>
+              <span>Strictly Private to Salon Staff</span>
             </div>
           </div>
 
           {/* Step 2 */}
-          <div className="bg-white border border-pink-300 rounded-3xl p-6 shadow-sm flex flex-col justify-between ring-2 ring-pink-100">
+          <div className="bg-white border border-pink-300 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between ring-2 ring-pink-100">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-pink-50 border border-pink-200 text-[#b3135b] flex items-center justify-center font-black text-xl mb-4">
                 2
               </div>
-              <h4 className="text-base font-bold text-slate-900">Unique Customer Link</h4>
+              <h4 className="text-sm sm:text-base font-bold text-slate-900">Unique Customer Link</h4>
               <div className="text-xs font-mono text-[#b3135b] font-semibold mt-0.5">domain.com/priya-salon</div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
                 Priya Salon puts their unique link on their Instagram bio and Google Maps profile. Customers click and see ONLY Priya Salon&apos;s brand, services, and available stylists.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-[#b3135b] font-semibold">
-              🌐 Public Client Booking Page
+            <div className="mt-6 pt-4 border-t border-pink-100 text-[11px] text-[#b3135b] font-semibold flex items-center gap-1.5">
+              <span>🌐</span>
+              <span>Public Client Booking Page</span>
             </div>
           </div>
 
           {/* Step 3 */}
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+          <div className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center font-black text-xl mb-4">
                 3
               </div>
-              <h4 className="text-base font-bold text-slate-900">Instant Client Sync</h4>
+              <h4 className="text-sm sm:text-base font-bold text-slate-900">Instant Client Sync</h4>
               <div className="text-xs font-mono text-emerald-700 font-semibold mt-0.5">domain.com/portal</div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
                 When a customer books, it instantly pops up on Priya Salon&apos;s Kanban. The client gets a WhatsApp confirmation and can view their digital bill anytime at /portal.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-emerald-800 font-semibold">
-              ✨ Permanent Client Records
+            <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-emerald-800 font-semibold flex items-center gap-1.5">
+              <span>✨</span>
+              <span>Permanent Client Records</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ================= SECTION: CORE FEATURES & CAPABILITIES ================= */}
-      <section id="features" className="relative z-10 max-w-6xl mx-auto px-4 py-16 border-t border-slate-200">
-        <div className="text-center mb-12">
+      <section id="features" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 border-t border-slate-200/80">
+        <div className="text-center mb-10 sm:mb-14">
           <h2 className="text-xs font-bold uppercase tracking-wider text-purple-600 mb-2">Everything Included</h2>
-          <h3 className="text-2xl sm:text-4xl font-extrabold text-slate-900">
+          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
             Built from Ground Up for Beauty & Wellness Studios
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
             <Calendar className="w-8 h-8 text-[#b3135b] mb-4" />
-            <h4 className="font-bold text-base text-slate-900">Smart Appointments Calendar</h4>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">Smart Appointments Calendar</h4>
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               Day, week, and list views. Filter by stylist, mark customer arrivals with 1-click, and reschedule effortlessly.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
             <Scissors className="w-8 h-8 text-purple-600 mb-4" />
-            <h4 className="font-bold text-base text-slate-900">Live Studio Kanban</h4>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">Live Studio Kanban</h4>
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               Track walk-in waiting queues, currently seated chairs, and completed sessions ready for POS billing.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
             <Receipt className="w-8 h-8 text-emerald-600 mb-4" />
-            <h4 className="font-bold text-base text-slate-900">POS Billing with GST</h4>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">POS Billing with GST</h4>
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               Itemized service and product checkout. Handles CGST (9%) + SGST (9%), discounts, and split payments (Cash + UPI).
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
             <Users className="w-8 h-8 text-amber-600 mb-4" />
-            <h4 className="font-bold text-base text-slate-900">Staff Commission Automation</h4>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">Staff Commission Automation</h4>
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               Set separate commission percentages for services and retail products. Export transparent payroll reports.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
             <Award className="w-8 h-8 text-[#b3135b] mb-4" />
-            <h4 className="font-bold text-base text-slate-900">VIP Memberships & Discounts</h4>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">VIP Memberships & Discounts</h4>
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               Sell Gold or Platinum annual memberships. Member discounts are automatically pre-filled during billing checkout.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-xs">
+          <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300">
             <TrendingUp className="w-8 h-8 text-teal-600 mb-4" />
-            <h4 className="font-bold text-base text-slate-900">Daily Cash & Sales Reports</h4>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">Daily Cash & Sales Reports</h4>
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               End-of-day tally with cash breakdown, UPI payments, gross profit, and top revenue-generating treatments.
             </p>
@@ -339,19 +326,19 @@ export default function MarketingLandingPage() {
       </section>
 
       {/* ================= BOTTOM CTA BANNER ================= */}
-      <section className="relative z-10 max-w-5xl mx-auto px-4 py-16 text-center">
-        <div className="bg-gradient-to-r from-pink-50 via-purple-50 to-amber-50 border border-pink-200/80 rounded-3xl p-8 sm:p-12 shadow-sm relative overflow-hidden">
-          <h3 className="text-2xl sm:text-4xl font-black text-slate-900">
+      <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center">
+        <div className="bg-gradient-to-r from-pink-50 via-purple-50 to-amber-50 border border-pink-200/80 rounded-2xl sm:rounded-3xl p-6 sm:p-12 shadow-sm relative overflow-hidden">
+          <h3 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
             Ready to Automate Your Salon Operations?
           </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-3 max-w-lg mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600 mt-3 max-w-lg mx-auto leading-relaxed">
             Join hundreds of forward-thinking salons running with SalonPro. Setup takes less than 3 minutes.
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
             <a
               href="#problems"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-sm shadow-md shadow-pink-900/20 transition-all active:scale-95"
+              className="w-full sm:w-auto px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-pink-900/20 transition-all active:scale-95"
             >
               See Problems Solved by SalonPro ➔
             </a>
@@ -360,9 +347,9 @@ export default function MarketingLandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-10 text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
+      <footer className="border-t border-slate-200 bg-white py-8 sm:py-10 text-xs text-slate-500">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex items-center gap-2.5">
             <span className="font-extrabold text-sm text-slate-900">SalonPro</span>
             <span>·</span>
             <span>Multi-Tenant Cloud Salon & Spa Suite</span>

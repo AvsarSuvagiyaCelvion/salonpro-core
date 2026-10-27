@@ -51,28 +51,16 @@ export default function MarketingLandingPage() {
             <a href="#problems" className="hover:text-[#b3135b] transition-colors">Problems We Solve</a>
             <a href="#features" className="hover:text-[#b3135b] transition-colors">Features & POS</a>
             <a href="#how-it-works" className="hover:text-[#b3135b] transition-colors">How It Works</a>
-            <Link href="/portal" className="hover:text-[#b3135b] transition-colors flex items-center gap-1">
-              <span>Customer Portal (Panel 3)</span>
-              <span className="text-[10px] bg-pink-100 text-[#b3135b] px-1.5 py-0.5 rounded font-bold">Live</span>
-            </Link>
           </div>
 
           {/* Action CTAs */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/salon-owner"
-              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold border border-slate-200 transition-all flex items-center gap-1.5"
+            <a
+              href="#features"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
             >
-              <Building2 className="w-3.5 h-3.5 text-[#b3135b]" />
-              <span>Salon Owner Login</span>
-            </Link>
-
-            <Link
-              href="/salon-owner"
-              className="hidden sm:inline-flex px-4 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-extrabold shadow-md shadow-pink-900/15 transition-all"
-            >
-              Start Free Trial →
-            </Link>
+              Explore Features →
+            </a>
           </div>
         </div>
       </nav>
@@ -95,22 +83,21 @@ export default function MarketingLandingPage() {
           Upgrade your salon with <strong>automated online client bookings</strong>, live chair status, 10-second GST billing, staff commission tracking, and instant WhatsApp receipts.
         </p>
 
-        {/* CTA Buttons */}
+        {/* Hero CTAs */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-          <Link
-            href="/salon-owner"
+          <a
+            href="#features"
             className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-sm sm:text-base shadow-lg shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            <span>Launch Salon Owner ERP ➔</span>
-          </Link>
+            <span>Explore SalonPro Features ➔</span>
+          </a>
 
-          <Link
-            href="/portal"
+          <a
+            href="#how-it-works"
             className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2"
           >
-            <span>Explore Customer Portal</span>
-            <ArrowRight className="w-4 h-4 text-[#b3135b]" />
-          </Link>
+            <span>See How It Works</span>
+          </a>
         </div>
 
         {/* Social Proof Stats */}
@@ -362,18 +349,12 @@ export default function MarketingLandingPage() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-            <Link
-              href="/salon-owner"
+            <a
+              href="#problems"
               className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-sm shadow-md shadow-pink-900/20 transition-all active:scale-95"
             >
-              Sign In as Salon Owner ➔
-            </Link>
-            <Link
-              href="/portal"
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-300 transition-all shadow-xs"
-            >
-              Open Customer Portal
-            </Link>
+              See Problems Solved by SalonPro ➔
+            </a>
           </div>
         </div>
       </section>
@@ -387,18 +368,8 @@ export default function MarketingLandingPage() {
             <span>Multi-Tenant Cloud Salon & Spa Suite</span>
           </div>
 
-          <div className="flex items-center gap-5 text-slate-600 font-medium">
-            <Link href="/salon-owner" className="hover:text-[#b3135b] transition-colors">
-              Salon Owner Portal (/salon-owner)
-            </Link>
-            <span>·</span>
-            <Link href="/portal" className="hover:text-emerald-600 transition-colors">
-              Customer Portal (/portal)
-            </Link>
-            <span>·</span>
-            <Link href="/admin" className="hover:text-amber-600 transition-colors">
-              Master Admin (/admin)
-            </Link>
+          <div className="flex items-center gap-5 text-slate-500 font-medium">
+            <span>© 2026 SalonPro Platform. All rights reserved.</span>
           </div>
         </div>
       </footer>

@@ -1291,10 +1291,10 @@ export default function LiveStudioPage() {
             <div className="bg-[#075e54] text-white p-3.5 flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-emerald-700 flex items-center justify-center text-xs font-bold">
-                  GS
+                  SP
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold leading-tight">Glow Studio</h3>
+                  <h3 className="text-xs font-bold leading-tight">Salon Operating System</h3>
                   <p className="text-[10px] text-emerald-200">Official Salon WhatsApp</p>
                 </div>
               </div>
@@ -1310,7 +1310,7 @@ export default function LiveStudioPage() {
             <div className="p-4 space-y-3">
               <div className="bg-white rounded-xl p-3.5 shadow-xs text-xs space-y-2 border border-neutral-200/50">
                 <p className="font-bold text-[#075e54]">
-                  ✨ Glow Studio - Bill Receipt
+                  ✨ Salon Bill Receipt
                 </p>
                 <p className="text-neutral-700 text-[11px]">
                   Dear <strong>{whatsappInvoice.customer_name}</strong>, thank you for your visit today!

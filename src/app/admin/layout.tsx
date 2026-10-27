@@ -199,13 +199,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </Link>
 
                 <Link
-                  href="/glow-studio"
+                  href="/portal"
                   target="_blank"
                   className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100/80 transition-colors border border-emerald-200/60"
                 >
                   <span className="flex items-center gap-2">
-                    <span>✨</span>
-                    <span>Customer Booking</span>
+                    <span>📱</span>
+                    <span>Customer Portal</span>
                   </span>
                   <ExternalLink className="w-3 h-3 text-emerald-500" />
                 </Link>

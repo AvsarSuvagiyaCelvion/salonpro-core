@@ -51,9 +51,9 @@ export default function MarketingLandingPage() {
             <a href="#problems" className="hover:text-[#b3135b] transition-colors">Problems We Solve</a>
             <a href="#features" className="hover:text-[#b3135b] transition-colors">Features & POS</a>
             <a href="#how-it-works" className="hover:text-[#b3135b] transition-colors">How It Works</a>
-            <Link href="/glow-studio" target="_blank" className="hover:text-[#b3135b] transition-colors flex items-center gap-1">
-              <span>Client Booking Demo</span>
-              <span className="text-[10px] bg-pink-100 text-[#b3135b] px-1.5 py-0.5 rounded font-bold">New</span>
+            <Link href="/portal" className="hover:text-[#b3135b] transition-colors flex items-center gap-1">
+              <span>Customer Portal (Panel 3)</span>
+              <span className="text-[10px] bg-pink-100 text-[#b3135b] px-1.5 py-0.5 rounded font-bold">Live</span>
             </Link>
           </div>
 
@@ -105,11 +105,10 @@ export default function MarketingLandingPage() {
           </Link>
 
           <Link
-            href="/glow-studio"
-            target="_blank"
+            href="/portal"
             className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2"
           >
-            <span>Experience Customer Booking Demo</span>
+            <span>Explore Customer Portal</span>
             <ArrowRight className="w-4 h-4 text-[#b3135b]" />
           </Link>
         </div>
@@ -370,11 +369,10 @@ export default function MarketingLandingPage() {
               Sign In as Salon Owner ➔
             </Link>
             <Link
-              href="/glow-studio"
-              target="_blank"
+              href="/portal"
               className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-300 transition-all shadow-xs"
             >
-              View Client Booking Page Demo
+              Open Customer Portal
             </Link>
           </div>
         </div>

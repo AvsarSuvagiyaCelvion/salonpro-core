@@ -15,8 +15,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'SalonPro - Glow Studio Management',
-  description: 'Salon operating system and client management portal.',
+  title: 'SalonPro - Multi-Tenant Cloud Salon ERP',
+  description: 'Next-generation salon operating system and client management portal.',
 };
 
 export default function RootLayout({

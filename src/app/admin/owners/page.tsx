@@ -28,6 +28,23 @@ export default function AdminOwnersPage() {
         <h1 className="text-2xl font-black text-slate-900">Salon Owners & Staff Directory</h1>
         <p className="text-xs text-slate-500">Master account directory of all registered salon owners and assigned stylists</p>
       </div>
+      {salons.length === 0 && !loading && (
+        <div className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-xs my-8">
+          <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+            👥
+          </div>
+          <h3 className="text-lg font-black text-slate-900">0 Salon Owners Listed</h3>
+          <p className="text-xs text-slate-500 mt-1.5 mb-6 leading-relaxed">
+            Register your client&apos;s salon in the Salons Directory to assign an owner and manage their staff team!
+          </p>
+          <a
+            href="/admin/salons"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20"
+          >
+            <span>Go to Salons Directory ➔</span>
+          </a>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {salons.map((s) => (

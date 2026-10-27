@@ -309,10 +309,10 @@ export default function CustomerPortalPage() {
 
           <div className="mt-6 pt-5 border-t border-neutral-800 text-center">
             <Link
-              href="/glow-studio"
+              href="/"
               className="text-xs text-neutral-400 hover:text-pink-400 transition-colors inline-flex items-center gap-1"
             >
-              <span>← Back to Salon Booking</span>
+              <span>← Back to Home</span>
             </Link>
           </div>
         </div>
@@ -354,13 +354,15 @@ export default function CustomerPortalPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              href={`/${salon?.slug || 'glow-studio'}`}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold shadow-md transition-all active:scale-95"
-            >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span>Book Appointment</span>
-            </Link>
+            {salon?.slug && (
+              <Link
+                href={`/${salon.slug}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold shadow-md transition-all active:scale-95"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>Book Appointment</span>
+              </Link>
+            )}
 
             <button
               onClick={handleLogout}
@@ -415,12 +417,21 @@ export default function CustomerPortalPage() {
                   <Calendar className="w-10 h-10 text-neutral-600 mx-auto mb-2" />
                   <p className="text-sm font-semibold text-neutral-300">No upcoming appointments scheduled</p>
                   <p className="text-xs text-neutral-500 mt-1">Book your next beauty session in seconds</p>
-                  <Link
-                    href={`/${salon?.slug || 'glow-studio'}`}
-                    className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-pink-500 text-white text-xs font-bold shadow-md"
-                  >
-                    <span>Book Slot Now →</span>
-                  </Link>
+                  {salon?.slug ? (
+                    <Link
+                      href={`/${salon.slug}`}
+                      className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-pink-500 text-white text-xs font-bold shadow-md"
+                    >
+                      <span>Book Slot Now →</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/"
+                      className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-neutral-800 text-white text-xs font-bold"
+                    >
+                      <span>Explore Services</span>
+                    </Link>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">

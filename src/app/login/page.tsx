@@ -54,7 +54,7 @@ export default function LoginPage() {
             <Sparkles className="w-8 h-8" />
           </div>
           <h1 className="text-3xl font-extrabold text-[#2a1630] tracking-tight">
-            Glow Studio
+            SalonPro
           </h1>
           <p className="text-sm text-neutral-600 mt-1.5">
             Salon Operating System & Manager Portal

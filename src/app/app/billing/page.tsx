@@ -518,10 +518,10 @@ export default function BillingPage() {
             <div className="bg-[#075e54] text-white p-3.5 flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-emerald-700 flex items-center justify-center text-xs font-bold ring-1 ring-white/30">
-                  GS
+                  SP
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold leading-tight">Glow Studio</h3>
+                  <h3 className="text-xs font-bold leading-tight">Salon Operating System</h3>
                   <p className="text-[10px] text-emerald-200">
                     Recipient: +91 {whatsappInvoice.customer_mobile}
                   </p>
@@ -539,7 +539,7 @@ export default function BillingPage() {
             <div className="p-4 space-y-3">
               <div className="bg-white rounded-xl p-3.5 shadow-xs text-xs space-y-2 border border-neutral-200/50">
                 <p className="font-bold text-[#075e54] text-sm">
-                  ✨ Glow Studio - Bill Receipt
+                  ✨ Salon Bill Receipt
                 </p>
                 <p className="text-neutral-700 text-xs">
                   Dear <strong>{whatsappInvoice.customer_name}</strong>, thank you for your visit today!
@@ -579,7 +579,7 @@ export default function BillingPage() {
                 </div>
 
                 <p className="text-[11px] text-neutral-600 italic text-center pt-1 font-sans">
-                  "Thank you for visiting Glow Studio!" 💖
+                  &quot;Thank you for your visit!&quot; 💖
                 </p>
 
                 <div className="text-right text-[10px] text-neutral-400 flex items-center justify-end gap-1 pt-1">
@@ -632,13 +632,13 @@ export default function BillingPage() {
               {/* Salon Brand Header */}
               <div className="text-center pb-3 border-b border-dashed border-neutral-200">
                 <h2 className="text-xl font-black text-[#2a1630] tracking-tight">
-                  GLOW STUDIO
+                  SALON BILL RECEIPT
                 </h2>
                 <p className="text-[11px] text-neutral-500">
-                  Luxury Salon & Wellness Spa
+                  Authorized Payment Receipt
                 </p>
                 <p className="text-[10px] text-neutral-400 mt-0.5">
-                  Open 10:00 - 19:00 • Contact: +91 98250 12345
+                  Tax Invoice & Client Statement
                 </p>
               </div>
 
@@ -725,7 +725,7 @@ export default function BillingPage() {
               </div>
 
               <p className="text-[11px] text-neutral-400 text-center italic pt-2">
-                "Thank you for choosing Glow Studio!"
+                &quot;Thank you for your visit!&quot;
               </p>
             </div>
 

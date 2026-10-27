@@ -48,10 +48,10 @@ export default function SettingsPage() {
 
   // Form fields
   const [salonId, setSalonId] = useState('');
-  const [slug, setSlug] = useState('glow-studio');
-  const [name, setName] = useState('Glow Studio');
-  const [address, setAddress] = useState('101, Titanium Square, Thaltej, Ahmedabad');
-  const [phone, setPhone] = useState('+91 98250 12345');
+  const [slug, setSlug] = useState('');
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
   const [brandColor, setBrandColor] = useState('#b3135b');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
@@ -80,7 +80,7 @@ export default function SettingsPage() {
 
         if (s) {
           setSalonId(s.id);
-          setSlug(s.slug || 'glow-studio');
+          setSlug(s.slug || '');
           setName(s.name || '');
           setAddress(s.address || '');
           setPhone(s.phone || '');

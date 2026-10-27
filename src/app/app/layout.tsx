@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -48,7 +48,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [resetting, setResetting] = useState(false);
+  const [salon, setSalon] = useState<{ name: string; slug: string } | null>(null);
+
+  useEffect(() => {
+    async function loadSalonDetails() {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data.salon) {
+          setSalon({ name: data.salon.name, slug: data.salon.slug });
+        }
+      } catch {}
+    }
+    loadSalonDetails();
+  }, []);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -61,22 +74,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  async function handleResetDemo() {
-    if (!confirm('Reset all demo data back to clean sample state? Any newly added test bookings or invoices will be reset.')) return;
-    setResetting(true);
-    try {
-      const res = await fetch('/api/demo/reset', { method: 'POST' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      alert('Demo data successfully reset! Refreshing page...');
-      window.location.reload();
-    } catch (err: any) {
-      alert(`Reset failed: ${err.message}`);
-    } finally {
-      setResetting(false);
-    }
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-[#faf8fa] text-[#2a1630]">
       {/* Top Production Banner */}
@@ -86,14 +83,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <span>SalonPro Operating System · Live Cloud Connected</span>
         </div>
         <div className="hidden sm:flex items-center gap-3 text-[11px] text-pink-300">
-          <Link
-            href="/glow-studio"
-            target="_blank"
-            className="flex items-center gap-1 hover:text-white transition-colors"
-          >
-            <span>Customer Booking Page</span>
-            <ExternalLink className="w-3 h-3" />
-          </Link>
+          {salon?.slug ? (
+            <Link
+              href={`/${salon.slug}`}
+              target="_blank"
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
+              <span>Customer Booking Page (/{salon.slug})</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          ) : (
+            <span className="text-pink-300/70">No Salon Configured</span>
+          )}
         </div>
       </div>
 
@@ -114,10 +115,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <span className="font-extrabold text-lg text-[#2a1630] tracking-tight block leading-tight">
-                Glow Studio
+                {salon?.name || 'Salon Operating System'}
               </span>
               <span className="text-[11px] text-neutral-500 block -mt-0.5">
-                Salon Operating System
+                Salon Business ERP
               </span>
             </div>
           </Link>

@@ -366,6 +366,17 @@ export default function BookingWizard({ slug }: { slug: string }) {
           background: `radial-gradient(ellipse at top, ${brandColor}40 0%, #0a0a0a 75%)`,
         }}
       >
+        {/* Top Left Staff / Owner Login */}
+        <div className="absolute top-4 left-4 z-20">
+          <Link
+            href="/salon-owner"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm"
+            title="Salon Owner & Staff ERP Login"
+          >
+            <span>🔐 Staff Login</span>
+          </Link>
+        </div>
+
         {/* Top Right Portal Button */}
         <div className="absolute top-4 right-4 z-20">
           <Link

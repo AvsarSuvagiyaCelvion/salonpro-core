@@ -44,8 +44,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // If already logged in as salon owner, redirect /login to /app
-  if (pathname === '/login') {
+  // If already logged in as salon owner, redirect /login or /salon-owner to /app
+  if (pathname === '/login' || pathname === '/salon-owner') {
     if (session) {
       return NextResponse.redirect(new URL('/app', request.url));
     }
@@ -56,5 +56,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/app/:path*', '/login'],
+  matcher: ['/admin/:path*', '/app/:path*', '/login', '/salon-owner'],
 };

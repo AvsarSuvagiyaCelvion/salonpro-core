@@ -24,9 +24,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
     }
 
+    const appt = res.rows[0];
+
+    // If marked arrived, add to waiting queue
+    if (status === 'arrived') {
+      await query(
+        `INSERT INTO waiting (salon_id, customer_id)
+         VALUES ($1, $2)`,
+        [appt.salon_id, appt.customer_id]
+      );
+    }
+
     return NextResponse.json({
-      appointment: res.rows[0],
-      message: `Appointment marked as ${status}`,
+      appointment: appt,
+      message: `Appointment marked as ${status}${status === 'arrived' ? ' and added to Waiting queue' : ''}`,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

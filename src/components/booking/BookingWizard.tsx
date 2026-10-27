@@ -359,6 +359,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-pink-500 selection:text-white">
+      {/* Simulation Demo Banner */}
+      <div className="bg-amber-950/90 border-b border-amber-800 text-amber-200 text-xs py-2 px-4 text-center font-medium flex items-center justify-center gap-2 z-30">
+        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+        <span>
+          <strong>🧪 Interactive Demonstration:</strong> This is a simulation preview for evaluating SalonPro. Real customer appointments and payments are not processed through this demo.
+        </span>
+      </div>
+
       {/* Top Salon Hero Banner */}
       <div 
         className="relative overflow-hidden border-b border-neutral-800"
@@ -1041,6 +1049,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
             <p className="text-xs sm:text-sm text-neutral-400 mt-1 max-w-sm mx-auto">
               Your appointment has been reserved directly in the salon scheduling system.
             </p>
+
+            <div className="my-4 p-3 bg-amber-500/15 border border-amber-500/30 rounded-2xl text-amber-300 text-xs max-w-md mx-auto text-center">
+              🧪 <strong>Preview Simulation:</strong> This test appointment is now visible on your Salon Owner ERP Kanban & Calendar. It is temporary and will be cleared upon sandbox reset.
+            </div>
 
             {/* Appointment Card */}
             <div className="mt-6 bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-left max-w-md mx-auto shadow-xl">

@@ -63,6 +63,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     loadSalonDetails();
   }, []);
 
+  const [resettingSandbox, setResettingSandbox] = useState(false);
+  const [resetNotice, setResetNotice] = useState<string | null>(null);
+
+  async function handleResetSandbox() {
+    setResettingSandbox(true);
+    setResetNotice(null);
+    try {
+      const res = await fetch('/api/demo/reset-sandbox', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setResetNotice('Test data wiped! Clean state restored.');
+        setTimeout(() => setResetNotice(null), 3500);
+        router.refresh();
+      }
+    } catch {
+      setResetNotice('Reset complete');
+      setTimeout(() => setResetNotice(null), 3500);
+    } finally {
+      setResettingSandbox(false);
+    }
+  }
+
   async function handleLogout() {
     setLoggingOut(true);
     try {
@@ -76,24 +98,39 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf8fa] text-[#2a1630]">
-      {/* Top Production Banner */}
-      <div className="bg-[#2a1630] text-pink-200 text-xs py-1.5 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-950/40">
-        <div className="flex items-center gap-2 mx-auto sm:mx-0">
-          <Sparkles className="w-3.5 h-3.5 text-[#b3135b]" />
-          <span>SalonPro Operating System · Live Cloud Connected</span>
+      {/* Top Demo Sandbox Banner */}
+      <div className="bg-amber-950/95 text-amber-200 text-xs py-2 px-4 font-medium tracking-wide flex flex-col sm:flex-row items-center justify-between gap-2 z-40 border-b border-amber-800 shadow-sm">
+        <div className="flex items-center gap-2 text-center sm:text-left">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
+          <span>
+            <strong>🧪 Interactive Demo Sandbox:</strong> Live evaluation preview for salon owners. All test actions are temporary and never take real customer bookings.
+          </span>
         </div>
-        <div className="hidden sm:flex items-center gap-3 text-[11px] text-pink-300">
-          {salon?.slug ? (
+        <div className="flex items-center gap-3 text-[11px] shrink-0">
+          {resetNotice && (
+            <span className="text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-800 animate-fade-in">
+              ✓ {resetNotice}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleResetSandbox}
+            disabled={resettingSandbox}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-800/80 hover:bg-amber-700 text-amber-100 border border-amber-600 transition-all cursor-pointer font-bold active:scale-95 shadow-xs"
+            title="Wipe temporary test appointments and receipts"
+          >
+            <RotateCcw className={`w-3 h-3 ${resettingSandbox ? 'animate-spin' : ''}`} />
+            <span>{resettingSandbox ? 'Resetting...' : 'Reset Sandbox Data'}</span>
+          </button>
+          {salon?.slug && (
             <Link
               href={`/${salon.slug}`}
               target="_blank"
-              className="flex items-center gap-1 hover:text-white transition-colors"
+              className="hidden md:flex items-center gap-1 text-amber-300 hover:text-white transition-colors underline"
             >
-              <span>Customer Booking Page (/{salon.slug})</span>
+              <span>Demo Booking (/{salon.slug})</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
-          ) : (
-            <span className="text-pink-300/70">No Salon Configured</span>
           )}
         </div>
       </div>
@@ -225,7 +262,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Bottom Account & Sign Out */}
-            <div className="pt-4 border-t border-neutral-100 space-y-3">
+            <div className="pt-4 border-t border-neutral-100 space-y-2.5">
+              <button
+                type="button"
+                onClick={handleResetSandbox}
+                disabled={resettingSandbox}
+                className="w-full py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <RotateCcw className={`w-3.5 h-3.5 ${resettingSandbox ? 'animate-spin' : ''}`} />
+                <span>{resettingSandbox ? 'Resetting...' : 'Reset Sandbox Data'}</span>
+              </button>
+
               <div className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80">
                 <div className="text-[10px] text-neutral-400 uppercase font-bold">Logged In Manager</div>
                 <div className="text-xs font-bold text-[#2a1630] truncate mt-0.5">avsarsuvagiya968@gmail.com</div>

@@ -87,6 +87,17 @@ export async function getAvailableSlots(params: {
 
   const salon = salonRes.rows[0];
 
+  // If online booking is disabled by the salon owner
+  if (salon.booking_enabled === false) {
+    return {
+      salon,
+      service: { id: serviceId, name: 'Service', duration_min: 30, price: 0 },
+      date,
+      isClosedDay: true,
+      slots: [],
+    };
+  }
+
   // 2. Fetch service
   const serviceRes = await query(
     `SELECT id, name, duration_min, price, online_enabled 

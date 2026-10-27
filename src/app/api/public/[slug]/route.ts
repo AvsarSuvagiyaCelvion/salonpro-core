@@ -10,8 +10,8 @@ export async function GET(
 
     // Fetch salon
     const salonRes = await query(
-      `SELECT id, name, slug, brand_color, logo_url, open_time, close_time, 
-              working_days, slot_minutes, buffer_minutes, min_advance_hours, max_advance_days
+      `SELECT id, name, slug, address, phone, brand_color, logo_url, open_time, close_time, 
+              booking_enabled, working_days, slot_minutes, buffer_minutes, min_advance_hours, max_advance_days
        FROM salons 
        WHERE slug = $1 
        LIMIT 1`,

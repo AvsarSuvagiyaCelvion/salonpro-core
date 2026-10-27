@@ -30,6 +30,8 @@ interface Salon {
   buffer_minutes: number;
   min_advance_hours: number;
   max_advance_days: number;
+  phone?: string;
+  booking_enabled?: boolean;
 }
 
 interface Slot {
@@ -178,7 +180,27 @@ export default function BookingWizard({ slug }: { slug: string }) {
           !
         </div>
         <h1 className="text-xl font-bold text-white mb-2">Salon Not Found</h1>
-        <p className="text-neutral-400 text-sm max-w-sm">{error || 'This salon does not exist or booking is disabled.'}</p>
+        <p className="text-neutral-400 text-sm max-w-sm">{error || 'This salon does not exist.'}</p>
+      </div>
+    );
+  }
+
+  if (salon.booking_enabled === false) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6 text-center text-white">
+        <div className="w-20 h-20 rounded-3xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-3xl mb-4 shadow-xl">
+          🔒
+        </div>
+        <h1 className="text-2xl font-extrabold text-white mb-2">Booking is closed</h1>
+        <p className="text-sm text-neutral-400 max-w-sm mb-6">
+          Online appointments for {salon.name} are currently paused by the salon manager.
+        </p>
+        <div className="bg-neutral-900 p-4 rounded-2xl border border-neutral-800 text-xs text-neutral-300">
+          For inquiries or appointments, please call the salon at:
+          <span className="block text-sm font-bold text-pink-400 mt-1 font-mono">
+            {salon.phone || '+91 98250 12345'}
+          </span>
+        </div>
       </div>
     );
   }

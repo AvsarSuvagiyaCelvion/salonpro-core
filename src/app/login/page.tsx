@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showForgotNotice, setShowForgotNotice] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -95,9 +96,18 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1.5 uppercase tracking-wider">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotNotice(!showForgotNotice)}
+                  className="text-xs text-[#b3135b] hover:underline font-semibold cursor-pointer"
+                >
+                  Forgot Password?
+                </button>
+              </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
@@ -109,6 +119,18 @@ export default function LoginPage() {
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] focus:ring-2 focus:ring-[#b3135b]/20 outline-none text-sm transition-all bg-neutral-50/50 focus:bg-white text-neutral-900"
                 />
               </div>
+
+              {showForgotNotice && (
+                <div className="mt-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs animate-in fade-in">
+                  <div className="font-bold flex items-center gap-1.5 mb-1">
+                    <span>🔑 Password Recovery:</span>
+                  </div>
+                  <p className="leading-relaxed text-[11px] text-amber-800">
+                    Salon accounts are managed by the Platform Super Admin. If you forgot your password, please contact{' '}
+                    <strong className="font-mono text-amber-950">Adminsalonpro@gmail.com</strong> or your system administrator to issue a secure password reset.
+                  </p>
+                </div>
+              )}
             </div>
 
             <button

@@ -223,7 +223,7 @@ export default function CustomerPortalPage() {
                 authMode === 'signup' ? 'bg-pink-500 text-white shadow-sm' : 'text-neutral-400 hover:text-white'
               }`}
             >
-              New Account
+              New Account / Reset PIN
             </button>
           </div>
 

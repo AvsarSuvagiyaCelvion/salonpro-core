@@ -21,10 +21,10 @@ export async function POST(
       note,
     } = body;
 
-    // 1. Verify demo 4-digit code
-    if (code !== '1234') {
+    const cleanPin = (code || '').trim();
+    if (!cleanPin || cleanPin.length < 4) {
       return NextResponse.json(
-        { error: 'Invalid verification code. Please enter demo code 1234.' },
+        { error: 'Please enter a 4-digit security PIN for your customer portal access.' },
         { status: 400 }
       );
     }
@@ -107,7 +107,6 @@ export async function POST(
     let customerId: string;
     const cleanMobile = mobile.trim();
     const cleanName = name.trim();
-    const cleanPin = (code || '1234').trim();
 
     const existingCust = await query(
       `SELECT id, name, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
@@ -116,7 +115,14 @@ export async function POST(
 
     if (existingCust.rows.length > 0) {
       customerId = existingCust.rows[0].id;
-      // Update name and maintain PIN
+      // If customer already has a PIN and supplied PIN doesn't match, verify
+      if (existingCust.rows[0].pin && existingCust.rows[0].pin !== cleanPin) {
+        return NextResponse.json(
+          { error: 'Incorrect customer PIN for this mobile number. Please enter your existing PIN or log in first.' },
+          { status: 401 }
+        );
+      }
+      // Update name and set/keep PIN
       await query(
         `UPDATE customers SET name = $1, pin = COALESCE(pin, $2) WHERE id = $3`,
         [cleanName, cleanPin, customerId]
@@ -200,6 +206,7 @@ export async function POST(
       cleanName,
       cleanMobile,
       customerId,
+      customerPin: cleanPin,
     });
 
     response.cookies.set({

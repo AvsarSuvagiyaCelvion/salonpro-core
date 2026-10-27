@@ -68,14 +68,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [customerName, setCustomerName] = useState<string>('');
   const [customerMobile, setCustomerMobile] = useState<string>('');
   const [bookingNote, setBookingNote] = useState<string>('');
-  const [verificationCode, setVerificationCode] = useState<string>('1234');
+  const [verificationCode, setVerificationCode] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Customer Session & Auth
   const [activeCustomer, setActiveCustomer] = useState<{ id: string; name: string; mobile: string } | null>(null);
   const [customerAuthMode, setCustomerAuthMode] = useState<'new' | 'existing'>('new');
-  const [loginPin, setLoginPin] = useState<string>('1234');
+  const [loginPin, setLoginPin] = useState<string>('');
   const [verifyingLogin, setVerifyingLogin] = useState<boolean>(false);
 
   // Confirmed booking state
@@ -266,7 +266,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
         body: JSON.stringify({
           action: 'login',
           mobile: clean,
-          pin: loginPin || '1234',
+          pin: loginPin,
         }),
       });
       const data = await res.json();
@@ -276,7 +276,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
       setActiveCustomer(data.customer);
       setCustomerName(data.customer.name);
       setCustomerMobile(data.customer.mobile);
-      setVerificationCode(loginPin || '1234');
+      setVerificationCode(loginPin);
       setSubmitError(null);
     } catch (err: any) {
       setSubmitError(err.message);
@@ -310,8 +310,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
       return;
     }
 
-    if (verificationCode.trim() !== '1234') {
-      setSubmitError('Verification code must be 1234 (Demo code)');
+    if (!verificationCode.trim() || verificationCode.trim().length < 4) {
+      setSubmitError('Please set a 4-digit security PIN for your customer portal access.');
       return;
     }
 
@@ -911,12 +911,11 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           <label className="block text-[11px] font-semibold text-neutral-300">
                             4-Digit Security PIN
                           </label>
-                          <span className="text-[10px] text-pink-400 font-mono">Demo: 1234</span>
                         </div>
                         <input
-                          type="text"
-                          maxLength={4}
-                          placeholder="1234"
+                          type="password"
+                          maxLength={6}
+                          placeholder="Enter PIN"
                           value={loginPin}
                           onChange={(e) => setLoginPin(e.target.value)}
                           className="w-full bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-sm text-white text-center font-mono focus:outline-none focus:border-pink-500"
@@ -982,26 +981,24 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 />
               </div>
 
-              {/* 4-digit verification code with demo indicator */}
+              {/* 4-digit verification code / portal PIN */}
               <div className="bg-pink-500/10 border border-pink-500/30 rounded-2xl p-4">
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs font-bold text-pink-300">
-                    4-Digit Verification PIN
+                    Set 4-Digit Security PIN <span className="text-pink-500">*</span>
                   </label>
-                  <span className="text-[10px] font-mono bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full font-bold">
-                    Demo PIN: 1234
-                  </span>
                 </div>
                 <input
-                  type="text"
-                  maxLength={4}
+                  type="password"
+                  maxLength={6}
                   required
+                  placeholder="Enter 4-digit PIN"
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   className="w-full bg-neutral-900/90 border border-pink-500/40 rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest text-white focus:outline-none focus:border-pink-500"
                 />
                 <p className="text-[10px] text-neutral-400 mt-1">
-                  This PIN logs you into the Customer Portal (/portal) to access past visits and bills. Enter 1234 for demo.
+                  You can use this 4-digit PIN to log into your Customer Portal (/portal) to view your visits, invoices, and rewards.
                 </p>
               </div>
 
@@ -1143,7 +1140,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 Your customer record is permanently stored! You can log in anytime at{' '}
                 <Link href="/portal" className="text-pink-400 underline font-semibold">/portal</Link> with mobile{' '}
                 <strong className="text-white font-mono">{confirmedBooking.cleanMobile}</strong> and PIN{' '}
-                <strong className="text-white font-mono">1234</strong> to review your past visits, itemized bills, and VIP benefits.
+                <strong className="text-white font-mono">{confirmedBooking.customerPin || '••••'}</strong> to review your past visits, itemized bills, and VIP benefits.
               </span>
             </div>
           </div>

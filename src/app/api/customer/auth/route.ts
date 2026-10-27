@@ -46,11 +46,18 @@ export async function POST(request: Request) {
     const { action, name, mobile, email, pin } = body;
 
     const cleanMobile = mobile?.trim().replace(/\D/g, '');
-    const cleanPin = pin?.trim() || '1234';
+    const cleanPin = pin?.trim() || '';
 
     if (!cleanMobile || cleanMobile.length < 10) {
       return NextResponse.json(
         { error: 'Valid 10-digit mobile number is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!cleanPin || cleanPin.length < 4) {
+      return NextResponse.json(
+        { error: 'Please enter a valid 4-digit PIN / password.' },
         { status: 400 }
       );
     }
@@ -130,10 +137,10 @@ export async function POST(request: Request) {
 
       const customer = custRes.rows[0];
 
-      // Validate PIN/Password (default demo PIN 1234 supported)
-      if (customer.pin && customer.pin !== cleanPin && cleanPin !== '1234') {
+      // Validate customer's secret PIN
+      if (customer.pin && customer.pin !== cleanPin) {
         return NextResponse.json(
-          { error: 'Incorrect PIN / password. (Demo PIN: 1234)' },
+          { error: 'Incorrect PIN. If you forgot your PIN, please select "New Account" to reset it.' },
           { status: 401 }
         );
       }

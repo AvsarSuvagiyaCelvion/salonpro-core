@@ -17,6 +17,7 @@ import {
   X,
   Phone,
   Clock,
+  ArrowRight,
 } from 'lucide-react';
 
 interface Metrics {
@@ -129,17 +130,17 @@ export default function AdminOverviewPage() {
 
   return (
     <div className="space-y-8">
-      {/* Page Title & Add Salon Button */}
+      {/* Page Title & Register Salon Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Main Admin Dashboard</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              Panel 1
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Main Admin Dashboard</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+              Super Admin
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-            Platform-wide governance across all multi-tenant salons, owners, customers & revenue.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Global governance across all multi-tenant salons, owners, customers & revenue.
           </p>
         </div>
 
@@ -148,7 +149,7 @@ export default function AdminOverviewPage() {
             setModalMessage(null);
             setIsModalOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-neutral-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all active:scale-95 self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all active:scale-95 self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Register New Salon Branch</span>
@@ -158,137 +159,145 @@ export default function AdminOverviewPage() {
       {/* 4 Primary Platform KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Salons */}
-        <div className="bg-neutral-900/70 border border-neutral-800 rounded-3xl p-5 shadow-sm">
-          <div className="flex items-center justify-between text-neutral-400 mb-2">
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Total Salons</span>
-            <Building2 className="w-4 h-4 text-amber-400" />
+            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Building2 className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">
+          <div className="text-2xl sm:text-3xl font-black text-slate-900">
             {loading ? '...' : metrics?.totalSalons}
           </div>
-          <div className="text-[11px] text-emerald-400 mt-1 font-medium flex items-center gap-1">
-            <span>● 100% active</span>
+          <div className="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center gap-1">
+            <span>● 100% active branches</span>
           </div>
         </div>
 
         {/* Platform Revenue */}
-        <div className="bg-neutral-900/70 border border-neutral-800 rounded-3xl p-5 shadow-sm">
-          <div className="flex items-center justify-between text-neutral-400 mb-2">
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Gross Platform Volume</span>
-            <CreditCard className="w-4 h-4 text-emerald-400" />
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <CreditCard className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
+          <div className="text-2xl sm:text-3xl font-black text-emerald-600 font-mono">
             {loading ? '...' : `₹${metrics?.totalRevenue?.toLocaleString('en-IN')}`}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-1 font-medium">
+          <div className="text-[11px] text-slate-500 mt-1 font-medium">
             Collected: ₹{metrics?.totalPaid?.toLocaleString('en-IN')}
           </div>
         </div>
 
         {/* Total Appointments */}
-        <div className="bg-neutral-900/70 border border-neutral-800 rounded-3xl p-5 shadow-sm">
-          <div className="flex items-center justify-between text-neutral-400 mb-2">
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Total Appointments</span>
-            <Calendar className="w-4 h-4 text-pink-400" />
+            <div className="w-8 h-8 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
+              <Calendar className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">
+          <div className="text-2xl sm:text-3xl font-black text-slate-900">
             {loading ? '...' : metrics?.totalAppointments}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-1 font-medium">
+          <div className="text-[11px] text-slate-500 mt-1 font-medium">
             Across all salon branches
           </div>
         </div>
 
         {/* Total Customers */}
-        <div className="bg-neutral-900/70 border border-neutral-800 rounded-3xl p-5 shadow-sm">
-          <div className="flex items-center justify-between text-neutral-400 mb-2">
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Registered Clients</span>
-            <Users className="w-4 h-4 text-purple-400" />
+            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+              <Users className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">
+          <div className="text-2xl sm:text-3xl font-black text-slate-900">
             {loading ? '...' : metrics?.totalCustomers}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-1 font-medium">
+          <div className="text-[11px] text-slate-500 mt-1 font-medium">
             Permanent client profiles
           </div>
         </div>
       </div>
 
       {/* Salons Directory Table */}
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-3xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-white">Managed Salon Branches ({salons.length})</h2>
-            <p className="text-xs text-neutral-400">All active tenant salons registered on SalonPro platform</p>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900">Managed Salon Branches ({salons.length})</h2>
+            <p className="text-xs text-slate-500">All active tenant salons registered on the platform</p>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-neutral-800 text-neutral-400 font-bold uppercase tracking-wider text-[10px]">
-                <th className="pb-3 px-3">Salon & Branding</th>
-                <th className="pb-3 px-3">Booking Slug</th>
-                <th className="pb-3 px-3">Working Hours</th>
-                <th className="pb-3 px-3 text-center">Staff</th>
-                <th className="pb-3 px-3 text-center">Clients</th>
-                <th className="pb-3 px-3 text-center">Bookings</th>
-                <th className="pb-3 px-3 text-right">Gross Revenue</th>
-                <th className="pb-3 px-3 text-right">Quick Access</th>
+              <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px] bg-slate-50/50">
+                <th className="py-3 px-3">Salon & Branding</th>
+                <th className="py-3 px-3">Booking Slug</th>
+                <th className="py-3 px-3">Hours</th>
+                <th className="py-3 px-3 text-center">Stylists</th>
+                <th className="py-3 px-3 text-center">Clients</th>
+                <th className="py-3 px-3 text-center">Bookings</th>
+                <th className="py-3 px-3 text-right">Gross Revenue</th>
+                <th className="py-3 px-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-800/60">
+            <tbody className="divide-y divide-slate-100">
               {salons.map((s) => (
-                <tr key={s.id} className="hover:bg-neutral-800/40 transition-colors">
-                  <td className="py-3 px-3">
+                <tr key={s.id} className="hover:bg-slate-50/60 transition-colors">
+                  <td className="py-3.5 px-3">
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-white text-xs shadow-sm"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-xs shadow-sm"
                         style={{ backgroundColor: s.brand_color || '#b3135b' }}
                       >
                         {s.name.charAt(0)}
                       </div>
                       <div>
-                        <div className="font-bold text-white text-sm">{s.name}</div>
-                        <div className="text-[10px] text-neutral-500">ID: {s.id.slice(0, 8)}...</div>
+                        <div className="font-bold text-slate-900 text-sm">{s.name}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">ID: {s.id.slice(0, 8)}...</div>
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 px-3">
-                    <span className="font-mono text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded-md font-semibold">
+                  <td className="py-3.5 px-3">
+                    <span className="font-mono text-pink-700 bg-pink-50 border border-pink-200/60 px-2 py-0.5 rounded-md font-semibold">
                       /{s.slug}
                     </span>
                   </td>
-                  <td className="py-3 px-3 text-neutral-400">
+                  <td className="py-3.5 px-3 text-slate-600">
                     {s.open_time?.slice(0, 5)} - {s.close_time?.slice(0, 5)}
                   </td>
-                  <td className="py-3 px-3 text-center font-semibold text-neutral-200">
+                  <td className="py-3.5 px-3 text-center font-semibold text-slate-800">
                     {s.staff_count}
                   </td>
-                  <td className="py-3 px-3 text-center font-semibold text-neutral-200">
+                  <td className="py-3.5 px-3 text-center font-semibold text-slate-800">
                     {s.customer_count}
                   </td>
-                  <td className="py-3 px-3 text-center font-semibold text-neutral-200">
+                  <td className="py-3.5 px-3 text-center font-semibold text-slate-800">
                     {s.appointment_count}
                   </td>
-                  <td className="py-3 px-3 text-right font-bold font-mono text-emerald-400">
+                  <td className="py-3.5 px-3 text-right font-bold font-mono text-emerald-700">
                     ₹{Number(s.total_revenue || 0).toLocaleString('en-IN')}
                   </td>
-                  <td className="py-3 px-3 text-right">
+                  <td className="py-3.5 px-3 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <a
                         href={`/${s.slug}`}
                         target="_blank"
-                        className="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-[11px] font-semibold transition-all"
-                        title="View Public Booking Page"
+                        className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition-all border border-slate-200"
+                        title="View Customer Booking Page"
                       >
                         Public Page ↗
                       </a>
                       <a
                         href="/app"
                         target="_blank"
-                        className="px-2.5 py-1 rounded-lg bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/30 text-[11px] font-bold transition-all"
-                        title="Manage as Owner"
+                        className="px-2.5 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-[11px] font-bold transition-all"
+                        title="Manage as Salon Owner"
                       >
                         Owner ERP ➔
                       </a>
@@ -302,36 +311,38 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* Recent Platform Appointments Stream */}
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-3xl p-6 shadow-sm">
-        <h2 className="text-base sm:text-lg font-bold text-white mb-1">Live Platform Activity Stream</h2>
-        <p className="text-xs text-neutral-400 mb-4">Latest bookings scheduled across all tenant salons</p>
+      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
+        <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-1">Live Platform Activity Stream</h2>
+        <p className="text-xs text-slate-500 mb-4">Latest bookings scheduled across all tenant salons</p>
 
         {recentAppointments.length === 0 ? (
-          <div className="text-center py-8 text-neutral-500 text-xs">No bookings recorded yet</div>
+          <div className="text-center py-8 text-slate-400 text-xs">No bookings recorded yet</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {recentAppointments.map((a) => (
               <div
                 key={a.id}
-                className="bg-neutral-950/70 border border-neutral-800/80 rounded-2xl p-4 flex flex-col justify-between"
+                className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between text-[10px] text-neutral-500 mb-1.5 font-bold uppercase tracking-wider">
-                    <span className="text-amber-400">{a.salon_name}</span>
-                    <span className="text-emerald-400 capitalize">{a.status}</span>
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5 font-bold uppercase tracking-wider">
+                    <span className="text-amber-800 font-extrabold">{a.salon_name}</span>
+                    <span className="text-emerald-700 capitalize bg-emerald-100 px-2 py-0.5 rounded-full font-bold">
+                      {a.status}
+                    </span>
                   </div>
-                  <div className="font-bold text-sm text-white">{a.service_name}</div>
-                  <div className="text-xs text-neutral-400 mt-1">
-                    Client: <span className="text-neutral-200 font-medium">{a.customer_name}</span> (+91 {a.customer_mobile})
+                  <div className="font-bold text-sm text-slate-900">{a.service_name}</div>
+                  <div className="text-xs text-slate-600 mt-1">
+                    Client: <span className="text-slate-900 font-semibold">{a.customer_name}</span> (+91 {a.customer_mobile})
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-neutral-800/60 flex justify-between items-center text-xs">
-                  <span className="text-neutral-500 font-mono text-[11px]">
+                <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
+                  <span className="text-slate-500 font-mono text-[11px]">
                     {new Date(a.starts_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{' '}
                     at {new Date(a.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                  <span className="font-bold text-white font-mono">₹{Number(a.service_price).toLocaleString('en-IN')}</span>
+                  <span className="font-bold text-slate-900 font-mono">₹{Number(a.service_price).toLocaleString('en-IN')}</span>
                 </div>
               </div>
             ))}
@@ -341,22 +352,22 @@ export default function AdminOverviewPage() {
 
       {/* Modal: Register New Salon */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-5 right-5 text-neutral-400 hover:text-white"
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
                 👑
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Register New Salon Branch</h3>
-                <p className="text-xs text-neutral-400">Adds an independent tenant salon into the platform</p>
+                <h3 className="font-bold text-slate-900 text-base">Register New Salon Branch</h3>
+                <p className="text-xs text-slate-500">Adds an independent tenant salon into the platform</p>
               </div>
             </div>
 
@@ -364,8 +375,8 @@ export default function AdminOverviewPage() {
               <div
                 className={`mb-4 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
                   modalMessage.type === 'success'
-                    ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
-                    : 'bg-rose-500/15 border border-rose-500/30 text-rose-300'
+                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                    : 'bg-rose-50 border border-rose-200 text-rose-800'
                 }`}
               >
                 {modalMessage.type === 'success' ? '✓' : '⚠️'}
@@ -375,7 +386,7 @@ export default function AdminOverviewPage() {
 
             <form onSubmit={handleCreateSalon} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">Salon Name *</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Salon Name *</label>
                 <input
                   type="text"
                   required
@@ -387,30 +398,30 @@ export default function AdminOverviewPage() {
                       setNewSalonSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '-'));
                     }
                   }}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-amber-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Public Booking URL Slug *
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-2.5 text-neutral-500 font-mono text-xs">salonpro.app/</span>
+                  <span className="absolute left-3.5 top-2.5 text-slate-400 font-mono text-xs">salonpro.app/</span>
                   <input
                     type="text"
                     required
                     placeholder="velvet-lounge"
                     value={newSalonSlug}
                     onChange={(e) => setNewSalonSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl pl-28 pr-3.5 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-28 pr-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">Brand Accent Color</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Brand Accent Color</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
@@ -422,19 +433,19 @@ export default function AdminOverviewPage() {
                       type="text"
                       value={newBrandColor}
                       onChange={(e) => setNewBrandColor(e.target.value)}
-                      className="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-2.5 py-2 text-xs font-mono text-white"
+                      className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-mono text-slate-900"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1">WhatsApp / Phone</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">WhatsApp / Phone</label>
                   <input
                     type="tel"
                     placeholder="9898012345"
                     value={newPhone}
                     onChange={(e) => setNewPhone(e.target.value)}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
@@ -442,7 +453,7 @@ export default function AdminOverviewPage() {
               <button
                 type="submit"
                 disabled={savingSalon}
-                className="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-neutral-950 font-black text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 mt-2"
+                className="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
                 {savingSalon ? 'Creating Salon...' : 'Register Salon Branch ➔'}
               </button>

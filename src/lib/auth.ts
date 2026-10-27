@@ -22,3 +22,35 @@ export async function verifySessionToken(token: string) {
     return null;
   }
 }
+
+export const CUSTOMER_COOKIE_NAME = 'salonpro_customer_session';
+
+export async function createCustomerSessionToken(payload: {
+  customerId: string;
+  mobile: string;
+  name: string;
+  salonId: string;
+}) {
+  return await new SignJWT({ ...payload, role: 'customer' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('30d')
+    .sign(SECRET_KEY);
+}
+
+export async function verifyCustomerSessionToken(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, SECRET_KEY);
+    if (payload.role !== 'customer') return null;
+    return payload as unknown as {
+      customerId: string;
+      mobile: string;
+      name: string;
+      salonId: string;
+      role: string;
+    };
+  } catch {
+    return null;
+  }
+}
+

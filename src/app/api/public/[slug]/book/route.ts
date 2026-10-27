@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth';
 
 export async function POST(
   request: Request,
@@ -106,20 +107,24 @@ export async function POST(
     let customerId: string;
     const cleanMobile = mobile.trim();
     const cleanName = name.trim();
+    const cleanPin = (code || '1234').trim();
 
     const existingCust = await query(
-      `SELECT id, name FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
+      `SELECT id, name, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
       [salon.id, cleanMobile]
     );
 
     if (existingCust.rows.length > 0) {
       customerId = existingCust.rows[0].id;
-      // Optional: update name if changed
-      await query(`UPDATE customers SET name = $1 WHERE id = $2`, [cleanName, customerId]);
+      // Update name and maintain PIN
+      await query(
+        `UPDATE customers SET name = $1, pin = COALESCE(pin, $2) WHERE id = $3`,
+        [cleanName, cleanPin, customerId]
+      );
     } else {
       const newCust = await query(
-        `INSERT INTO customers (salon_id, name, mobile) VALUES ($1, $2, $3) RETURNING id`,
-        [salon.id, cleanName, cleanMobile]
+        `INSERT INTO customers (salon_id, name, mobile, pin) VALUES ($1, $2, $3, $4) RETURNING id`,
+        [salon.id, cleanName, cleanMobile, cleanPin]
       );
       customerId = newCust.rows[0].id;
     }
@@ -176,7 +181,14 @@ export async function POST(
 
     const whatsappMessage = `Hi ${cleanName.split(' ')[0]}, your appointment for *${service.name}* at *${salon.name}* is confirmed for *${formattedDate} at ${formattedTime}* with *${staffName}*. See you soon! ✨`;
 
-    return NextResponse.json({
+    const token = await createCustomerSessionToken({
+      customerId,
+      mobile: cleanMobile,
+      name: cleanName,
+      salonId: salon.id,
+    });
+
+    const response = NextResponse.json({
       success: true,
       appointment: newAppt,
       salonName: salon.name,
@@ -187,7 +199,20 @@ export async function POST(
       whatsappMessage,
       cleanName,
       cleanMobile,
+      customerId,
     });
+
+    response.cookies.set({
+      name: CUSTOMER_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

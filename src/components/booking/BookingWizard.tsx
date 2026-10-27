@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface Service {
   id: string;
@@ -71,8 +72,30 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Customer Session & Auth
+  const [activeCustomer, setActiveCustomer] = useState<{ id: string; name: string; mobile: string } | null>(null);
+  const [customerAuthMode, setCustomerAuthMode] = useState<'new' | 'existing'>('new');
+  const [loginPin, setLoginPin] = useState<string>('1234');
+  const [verifyingLogin, setVerifyingLogin] = useState<boolean>(false);
+
   // Confirmed booking state
   const [confirmedBooking, setConfirmedBooking] = useState<any | null>(null);
+
+  // Check if customer is already logged in
+  useEffect(() => {
+    async function checkCustomerAuth() {
+      try {
+        const res = await fetch('/api/customer/auth');
+        const data = await res.json();
+        if (data.loggedIn && data.customer) {
+          setActiveCustomer(data.customer);
+          setCustomerName(data.customer.name);
+          setCustomerMobile(data.customer.mobile);
+        }
+      } catch {}
+    }
+    checkCustomerAuth();
+  }, []);
 
   // 1. Fetch Salon info
   useEffect(() => {
@@ -226,6 +249,42 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
   const brandColor = salon.brand_color || '#b3135b';
 
+  // Quick Customer Login Handler
+  async function handleCustomerQuickLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitError(null);
+    const clean = customerMobile.trim().replace(/\D/g, '');
+    if (!clean || clean.length < 10) {
+      setSubmitError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    setVerifyingLogin(true);
+    try {
+      const res = await fetch('/api/customer/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'login',
+          mobile: clean,
+          pin: loginPin || '1234',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Customer not found or invalid PIN. Please check details or select Sign Up.');
+      }
+      setActiveCustomer(data.customer);
+      setCustomerName(data.customer.name);
+      setCustomerMobile(data.customer.mobile);
+      setVerificationCode(loginPin || '1234');
+      setSubmitError(null);
+    } catch (err: any) {
+      setSubmitError(err.message);
+    } finally {
+      setVerifyingLogin(false);
+    }
+  }
+
   // Handle booking form submission
   async function handleBookAppointment(e: React.FormEvent) {
     e.preventDefault();
@@ -307,6 +366,23 @@ export default function BookingWizard({ slug }: { slug: string }) {
           background: `radial-gradient(ellipse at top, ${brandColor}40 0%, #0a0a0a 75%)`,
         }}
       >
+        {/* Top Right Portal Button */}
+        <div className="absolute top-4 right-4 z-20">
+          <Link
+            href="/portal"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm"
+          >
+            {activeCustomer ? (
+              <>
+                <span>👤 {activeCustomer.name.split(' ')[0]}</span>
+                <span className="text-[10px] text-pink-300 font-bold">My Records</span>
+              </>
+            ) : (
+              <span>Client Portal / Login →</span>
+            )}
+          </Link>
+        </div>
+
         <div className="max-w-2xl mx-auto px-4 pt-8 pb-6 text-center">
           <div 
             className="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center font-bold text-3xl shadow-xl border border-white/20 mb-3"
@@ -733,6 +809,122 @@ export default function BookingWizard({ slug }: { slug: string }) {
               </div>
             </div>
 
+            {/* Customer Authentication State & Options */}
+            {activeCustomer ? (
+              <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-pink-500/10 border border-emerald-500/30 rounded-3xl p-5 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xl border border-emerald-500/30">
+                    ✓
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                      <span>Verified Customer Account</span>
+                    </div>
+                    <div className="text-base font-extrabold text-white">
+                      {activeCustomer.name}{' '}
+                      <span className="font-mono text-neutral-400 text-xs font-normal">
+                        (+91 {activeCustomer.mobile})
+                      </span>
+                    </div>
+                    <div className="text-xs text-neutral-400 mt-0.5">
+                      Your booking and digital invoice will automatically save to your customer portal.
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await fetch('/api/customer/logout', { method: 'POST' });
+                    setActiveCustomer(null);
+                    setCustomerName('');
+                    setCustomerMobile('');
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-semibold self-start sm:self-auto transition-all"
+                >
+                  Switch / Log Out
+                </button>
+              </div>
+            ) : (
+              <div className="mb-5">
+                <div className="flex rounded-2xl bg-neutral-900 border border-neutral-800 p-1 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCustomerAuthMode('new');
+                      setSubmitError(null);
+                    }}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+                      customerAuthMode === 'new'
+                        ? 'bg-pink-500 text-white shadow-md'
+                        : 'text-neutral-400 hover:text-white'
+                    }`}
+                  >
+                    ✨ New Customer (Sign Up & Book)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCustomerAuthMode('existing');
+                      setSubmitError(null);
+                    }}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+                      customerAuthMode === 'existing'
+                        ? 'bg-pink-500 text-white shadow-md'
+                        : 'text-neutral-400 hover:text-white'
+                    }`}
+                  >
+                    🔑 Returning Customer (Login)
+                  </button>
+                </div>
+
+                {customerAuthMode === 'existing' && (
+                  <div className="bg-neutral-900/90 border border-neutral-800 rounded-3xl p-5 mb-4 space-y-3">
+                    <div className="text-xs font-bold text-pink-400 uppercase tracking-wider">
+                      Quick Login to Autofill Profile
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                          Registered Mobile Number
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="9898023456"
+                          value={customerMobile}
+                          onChange={(e) => setCustomerMobile(e.target.value)}
+                          className="w-full bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:border-pink-500"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="block text-[11px] font-semibold text-neutral-300">
+                            4-Digit Security PIN
+                          </label>
+                          <span className="text-[10px] text-pink-400 font-mono">Demo: 1234</span>
+                        </div>
+                        <input
+                          type="text"
+                          maxLength={4}
+                          placeholder="1234"
+                          value={loginPin}
+                          onChange={(e) => setLoginPin(e.target.value)}
+                          className="w-full bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-sm text-white text-center font-mono focus:outline-none focus:border-pink-500"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={verifyingLogin}
+                      onClick={handleCustomerQuickLogin}
+                      className="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 border border-neutral-700"
+                    >
+                      {verifyingLogin ? 'Verifying...' : 'Verify & Load My Profile ➔'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Input Form */}
             <form onSubmit={handleBookAppointment} className="space-y-4">
               <div>
@@ -783,10 +975,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div className="bg-pink-500/10 border border-pink-500/30 rounded-2xl p-4">
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs font-bold text-pink-300">
-                    4-Digit Verification Code
+                    4-Digit Verification PIN
                   </label>
                   <span className="text-[10px] font-mono bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full font-bold">
-                    Demo Code: 1234
+                    Demo PIN: 1234
                   </span>
                 </div>
                 <input
@@ -798,7 +990,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   className="w-full bg-neutral-900/90 border border-pink-500/40 rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest text-white focus:outline-none focus:border-pink-500"
                 />
                 <p className="text-[10px] text-neutral-400 mt-1">
-                  For this live client demo, enter 1234 to verify.
+                  This PIN logs you into the Customer Portal (/portal) to access past visits and bills. Enter 1234 for demo.
                 </p>
               </div>
 
@@ -820,10 +1012,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   {submitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Confirming Slot...</span>
+                      <span>Confirming & Saving Record...</span>
                     </>
                   ) : (
-                    <span>Complete Booking ✨</span>
+                    <span>Complete Booking & Save to Account ✨</span>
                   )}
                 </button>
               </div>
@@ -910,8 +1102,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
               </div>
             </div>
 
-            {/* Book Another Appointment Button */}
-            <div className="mt-8">
+            {/* Customer Portal Link & Action Buttons */}
+            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <Link
+                href="/portal"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+              >
+                <span>👤 Go to My Account & Invoices Portal →</span>
+              </Link>
               <button
                 type="button"
                 onClick={() => {
@@ -921,10 +1119,21 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   setConfirmedBooking(null);
                   setSubmitError(null);
                 }}
-                className="px-6 py-3 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-bold border border-neutral-800 transition-all active:scale-95"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-bold border border-neutral-800 transition-all active:scale-95"
               >
                 Book Another Appointment ↺
               </button>
+            </div>
+
+            {/* Account Records Reminder Card */}
+            <div className="mt-5 p-4 rounded-2xl bg-neutral-900/80 border border-neutral-800 text-neutral-400 text-xs flex items-center justify-center gap-2 max-w-md mx-auto text-center leading-relaxed">
+              <span>💡</span>
+              <span>
+                Your customer record is permanently stored! You can log in anytime at{' '}
+                <Link href="/portal" className="text-pink-400 underline font-semibold">/portal</Link> with mobile{' '}
+                <strong className="text-white font-mono">{confirmedBooking.cleanMobile}</strong> and PIN{' '}
+                <strong className="text-white font-mono">1234</strong> to review your past visits, itemized bills, and VIP benefits.
+              </span>
             </div>
           </div>
         )}

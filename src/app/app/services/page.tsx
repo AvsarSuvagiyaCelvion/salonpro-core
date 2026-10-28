@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import SkeletonTable from '@/components/ui/SkeletonTable';
 import {
   Scissors,
   Plus,
@@ -258,8 +259,8 @@ export default function ServicesPage() {
       {/* Services Table Card */}
       <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-neutral-400 text-sm">
-            Loading service catalog from Supabase...
+          <div className="p-4">
+            <SkeletonTable rows={5} columns={5} />
           </div>
         ) : filteredServices.length === 0 ? (
           <div className="p-12 text-center text-neutral-400 text-sm">

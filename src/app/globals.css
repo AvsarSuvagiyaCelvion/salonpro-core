@@ -105,6 +105,22 @@ h1, h2, h3, h4, .font-display {
   animation: pulseGlow 3s ease-in-out infinite;
 }
 
+@keyframes loadingBar {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-loading-bar {
+  animation: loadingBar 1.5s ease-in-out infinite;
+}
+
 /* Smooth mobile scrolling */
 .touch-scroll {
   -webkit-overflow-scrolling: touch;

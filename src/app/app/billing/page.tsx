@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import SkeletonTable from '@/components/ui/SkeletonTable';
 import {
   Receipt,
   Search,
@@ -269,8 +270,8 @@ export default function BillingPage() {
       {/* Invoices Table Card */}
       <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-neutral-400 text-sm">
-            Loading invoices from Supabase database...
+          <div className="p-4">
+            <SkeletonTable rows={6} columns={8} />
           </div>
         ) : invoices.length === 0 ? (
           <div className="p-12 text-center text-neutral-400 text-sm">

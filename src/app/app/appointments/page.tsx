@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import SkeletonTable from '@/components/ui/SkeletonTable';
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -389,8 +390,8 @@ export default function AppointmentsPage() {
 
       {/* Appointments Grid */}
       {loading ? (
-        <div className="bg-white rounded-2xl border border-neutral-200/80 p-12 text-center text-neutral-400 text-sm">
-          Loading appointments schedule from Supabase...
+        <div className="bg-white rounded-2xl border border-neutral-200/80 p-4">
+          <SkeletonTable rows={5} columns={6} />
         </div>
       ) : appointments.length === 0 ? (
         <div className="bg-white rounded-2xl border border-neutral-200/80 p-12 text-center text-neutral-400 text-sm">

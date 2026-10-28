@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import BrandLoader from '@/components/ui/BrandLoader';
 import {
   Radio,
   Clock,
@@ -441,7 +442,15 @@ export default function LiveStudioPage() {
       )}
 
       {/* 3 COLUMNS WORKSPACE */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+      {loading ? (
+        <div className="bg-white rounded-3xl border border-neutral-200/80 p-12">
+          <BrandLoader
+            message="Loading Live Studio Floor & Active Sessions..."
+            submessage="Syncing styling chairs, waiting lounge, and ready checkouts"
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
         {/* ================= COLUMN 1: WAITING AREA ================= */}
         <div className="bg-neutral-50/70 rounded-2xl border border-neutral-200/80 p-4 min-h-[500px] flex flex-col">
           <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80 mb-3">
@@ -792,6 +801,7 @@ export default function LiveStudioPage() {
           )}
         </div>
       </div>
+      )}
 
       {/* ================= MODAL: ADD CUSTOMER TO WAITING ================= */}
       {isWaitModalOpen && (

@@ -12,12 +12,14 @@ const pool =
     ssl: {
       rejectUnauthorized: false,
     },
-    max: 5,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+    allowExitOnIdle: false,
   });
 
-if (process.env.NODE_ENV !== 'production') {
-  global.__dbPool = pool;
-}
+// Cache connection pool across warm serverless lambdas in production and dev
+global.__dbPool = pool;
 
 export default pool;
 

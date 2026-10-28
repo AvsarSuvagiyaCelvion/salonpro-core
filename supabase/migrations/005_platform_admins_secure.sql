@@ -9,10 +9,13 @@ CREATE TABLE IF NOT EXISTS platform_admins (
   password_hash TEXT,
   name TEXT NOT NULL DEFAULT 'Super Admin',
   role TEXT NOT NULL DEFAULT 'super_admin' CHECK (role IN ('super_admin', 'platform_admin')),
+  is_active BOOLEAN NOT NULL DEFAULT true,
   must_change_password BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE platform_admins ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
 
 -- Migrate legacy schema from wipe-fake-data.js if plain text 'password' column exists
 DO $$

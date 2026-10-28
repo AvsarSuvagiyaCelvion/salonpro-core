@@ -23,6 +23,13 @@ interface StaffMember {
   active: boolean;
   show_online: boolean;
   services: { id: string; name: string }[];
+  services_count?: number;
+  service_revenue?: number;
+  service_commission_earned?: number;
+  products_sold_count?: number;
+  product_sales_revenue?: number;
+  product_commission_earned?: number;
+  total_commission_earned?: number;
 }
 
 interface ServiceOption {
@@ -253,7 +260,9 @@ export default function StaffPage() {
                 <tr>
                   <th className="py-3 px-4">Staff Member</th>
                   <th className="py-3 px-4">Role</th>
-                  <th className="py-3 px-4">Commission</th>
+                  <th className="py-3 px-4">Commission Rates</th>
+                  <th className="py-3 px-4">Retail Products Sold</th>
+                  <th className="py-3 px-4">Total Commission</th>
                   <th className="py-3 px-4">Services Done</th>
                   <th className="py-3 px-4 text-center">Duty Status</th>
                   <th className="py-3 px-4 text-center">Online Booking</th>
@@ -287,9 +296,25 @@ export default function StaffPage() {
                           Services: <span className="font-bold text-[#b3135b]">{staff.service_commission_pct}%</span>
                         </div>
                         <div className="text-neutral-500">
-                          Products: <span className="font-bold text-neutral-700">{staff.product_commission_pct}%</span>
+                          Products: <span className="font-bold text-emerald-700">{staff.product_commission_pct}%</span>
                         </div>
                       </div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <strong className="text-sm font-black text-neutral-900 block">
+                        {staff.products_sold_count || 0} units
+                      </strong>
+                      <span className="text-[11px] text-neutral-400">
+                        ₹{Number(staff.product_sales_revenue || 0).toLocaleString('en-IN')} revenue
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <strong className="text-sm font-black text-emerald-700 block">
+                        ₹{Number(staff.total_commission_earned || 0).toLocaleString('en-IN')}
+                      </strong>
+                      <span className="text-[10px] text-neutral-400">
+                        ₹{Number(staff.product_commission_earned || 0).toFixed(0)} retail + ₹{Number(staff.service_commission_earned || 0).toFixed(0)} svc
+                      </span>
                     </td>
                     <td className="py-3.5 px-4 max-w-xs">
                       <div className="flex flex-wrap gap-1">

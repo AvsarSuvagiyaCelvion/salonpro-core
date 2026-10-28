@@ -17,12 +17,36 @@ export async function GET(request: Request) {
                   json_build_object('id', sv.id, 'name', sv.name)
                 ) FILTER (WHERE sv.id IS NOT NULL), 
                 '[]'
-              ) as services
+              ) as services,
+              COALESCE(serv.services_done, 0)::int as services_count,
+              COALESCE(serv.service_revenue, 0)::numeric(10,2) as service_revenue,
+              (COALESCE(serv.service_revenue, 0) * (s.service_commission_pct / 100))::numeric(10,2) as service_commission_earned,
+              COALESCE(prod.products_sold, 0)::int as products_sold_count,
+              COALESCE(prod.product_revenue, 0)::numeric(10,2) as product_sales_revenue,
+              (COALESCE(prod.product_revenue, 0) * (s.product_commission_pct / 100))::numeric(10,2) as product_commission_earned,
+              ((COALESCE(serv.service_revenue, 0) * (s.service_commission_pct / 100)) + 
+               (COALESCE(prod.product_revenue, 0) * (s.product_commission_pct / 100)))::numeric(10,2) as total_commission_earned
        FROM staff s
        LEFT JOIN staff_services ss ON s.id = ss.staff_id
        LEFT JOIN services sv ON ss.service_id = sv.id
+       LEFT JOIN LATERAL (
+         SELECT 
+           COUNT(si.id) as services_done,
+           SUM(si.qty * si.unit_price) as service_revenue
+         FROM session_items si
+         JOIN sessions sess ON si.session_id = sess.id
+         WHERE si.staff_id = s.id AND si.kind = 'service' AND sess.salon_id = s.salon_id
+       ) serv ON true
+       LEFT JOIN LATERAL (
+         SELECT 
+           SUM(si.qty) as products_sold,
+           SUM(si.qty * si.unit_price) as product_revenue
+         FROM session_items si
+         JOIN sessions sess ON si.session_id = sess.id
+         WHERE si.staff_id = s.id AND si.kind = 'product' AND sess.salon_id = s.salon_id
+       ) prod ON true
        WHERE s.salon_id = $1
-       GROUP BY s.id
+       GROUP BY s.id, serv.services_done, serv.service_revenue, prod.products_sold, prod.product_revenue
        ORDER BY s.created_at ASC`,
       [salonId]
     );

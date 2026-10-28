@@ -51,16 +51,33 @@ export async function DELETE(
     const salonId = auth.session.salonId;
     const { id } = await params;
 
+    // Check if customer exists in this salon
+    const checkCust = await query('SELECT id, name FROM customers WHERE id = $1 AND salon_id = $2', [id, salonId]);
+    if (checkCust.rows.length === 0) {
+      return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
+    }
+
+    // Safety Guard: Check if customer has transaction or appointment history
+    const historyCheck = await query(`
+      SELECT 
+        (SELECT count(*) FROM appointments WHERE customer_id = $1) as appts_count,
+        (SELECT count(*) FROM invoices WHERE customer_id = $1) as invoices_count,
+        (SELECT count(*) FROM sessions WHERE customer_id = $1) as sessions_count
+    `, [id]);
+
+    const { appts_count, invoices_count, sessions_count } = historyCheck.rows[0];
+    if (parseInt(appts_count) > 0 || parseInt(invoices_count) > 0 || parseInt(sessions_count) > 0) {
+      return NextResponse.json({
+        error: `Customer "${checkCust.rows[0].name}" has ${invoices_count} invoices and ${appts_count} appointments. All customer records are permanently preserved for commercial accounting integrity and cannot be deleted.`,
+      }, { status: 400 });
+    }
+
     const res = await query(
       'DELETE FROM customers WHERE id = $1 AND salon_id = $2 RETURNING id',
       [id, salonId]
     );
 
-    if (res.rows.length === 0) {
-      return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true, message: 'Customer deleted' });
+    return NextResponse.json({ success: true, message: 'Customer removed' });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

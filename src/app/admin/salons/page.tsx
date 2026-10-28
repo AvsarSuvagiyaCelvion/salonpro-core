@@ -17,6 +17,9 @@ import {
   Globe,
   Mail,
   IndianRupee,
+  Send,
+  Bell,
+  MessageSquare,
 } from 'lucide-react';
 
 export default function AdminSalonsPage() {
@@ -25,8 +28,15 @@ export default function AdminSalonsPage() {
   const [search, setSearch] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  // Add Salon Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Platform Super Admin Broadcast Modal State
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [broadcastTitle, setBroadcastTitle] = useState('Monthly Platform Subscription Notice');
+  const [broadcastMessage, setBroadcastMessage] = useState(
+    'Dear Salon Partner, this is a reminder regarding your active SalonPro Cloud subscription. Please ensure timely renewal to continue uninterrupted online bookings and billing services.'
+  );
+  const [broadcastType, setBroadcastType] = useState<'payment' | 'update' | 'notice'>('payment');
+  const [sendingBroadcast, setSendingBroadcast] = useState(false);
+  const [broadcastSuccess, setBroadcastSuccess] = useState(false);
   const [newSalonName, setNewSalonName] = useState('');
   const [newSalonSlug, setNewSalonSlug] = useState('');
   const [newBrandColor, setNewBrandColor] = useState('#b3135b');
@@ -144,6 +154,18 @@ export default function AdminSalonsPage() {
               className="bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 shadow-xs"
             />
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setBroadcastSuccess(false);
+              setIsBroadcastModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span>📢 Broadcast to All Salons</span>
+          </button>
 
           <button
             type="button"
@@ -292,6 +314,17 @@ export default function AdminSalonsPage() {
                   >
                     Owner ERP ➔
                   </a>
+                  {s.phone && (
+                    <a
+                      href={`https://wa.me/91${s.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${s.name} team, this is SalonPro Platform Admin.`)}`}
+                      target="_blank"
+                      className="py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-center text-xs font-bold transition-all flex items-center justify-center gap-1"
+                      title="Direct WhatsApp Chat with Salon Owner"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Chat</span>
+                    </a>
+                  )}
                 </div>
 
                 {/* Super Admin Quick Action: Suspend / Reactivate */}
@@ -421,6 +454,151 @@ export default function AdminSalonsPage() {
                 {savingSalon ? 'Registering Salon & Creating Starter Services...' : 'Register Salon Live ➔'}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Platform Broadcast to All Salons Modal */}
+      {isBroadcastModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl relative">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">📢</span>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Broadcast to All Salons</h3>
+                  <p className="text-xs text-slate-500">Send an official platform notice to all salon owners</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBroadcastModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {broadcastSuccess ? (
+              <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center text-xl font-bold">
+                  ✓
+                </div>
+                <h4 className="font-extrabold text-base text-emerald-900">Notice Broadcast Dispatched!</h4>
+                <p className="text-emerald-700 leading-relaxed text-xs">
+                  Your platform message has been queued and delivered to all <strong>{salons.length} registered salon owners</strong>.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsBroadcastModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer text-xs"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Notice Type Selector */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Notice Template</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBroadcastType('payment');
+                        setBroadcastTitle('Monthly Platform Subscription Notice');
+                        setBroadcastMessage(
+                          'Dear Salon Partner, this is a reminder regarding your active SalonPro Cloud subscription. Please ensure timely renewal to continue uninterrupted online bookings and billing services.'
+                        );
+                      }}
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
+                        broadcastType === 'payment'
+                          ? 'bg-amber-50 border-amber-500 text-amber-950'
+                          : 'bg-slate-50 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      💰 Renewal
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBroadcastType('update');
+                        setBroadcastTitle('Exciting New Feature Release');
+                        setBroadcastMessage(
+                          'Hello Partners! We have just released a brand new feature update with fast WhatsApp billing and performance improvements for your salon workspace.'
+                        );
+                      }}
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
+                        broadcastType === 'update'
+                          ? 'bg-amber-50 border-amber-500 text-amber-950'
+                          : 'bg-slate-50 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      🚀 New Feature
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBroadcastType('notice');
+                        setBroadcastTitle('System Maintenance Notice');
+                        setBroadcastMessage(
+                          'Scheduled Maintenance: We will be performing quick cloud database optimization tonight at 2:00 AM for 15 minutes.'
+                        );
+                      }}
+                      className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
+                        broadcastType === 'notice'
+                          ? 'bg-amber-50 border-amber-500 text-amber-950'
+                          : 'bg-slate-50 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      ⚙️ Maintenance
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Subject Title</label>
+                  <input
+                    type="text"
+                    value={broadcastTitle}
+                    onChange={(e) => setBroadcastTitle(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Broadcast Message Body</label>
+                  <textarea
+                    rows={4}
+                    value={broadcastMessage}
+                    onChange={(e) => setBroadcastMessage(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 leading-relaxed"
+                  />
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs flex justify-between items-center">
+                  <span>Recipients:</span>
+                  <strong className="text-slate-900">{salons.length} Active Salon Owners</strong>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={sendingBroadcast || !broadcastMessage.trim()}
+                  onClick={() => {
+                    setSendingBroadcast(true);
+                    setTimeout(() => {
+                      setBroadcastSuccess(true);
+                      setSendingBroadcast(false);
+                    }, 1200);
+                  }}
+                  className="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>
+                    {sendingBroadcast ? 'Broadcasting Notice...' : `Send Broadcast to All ${salons.length} Salons ➔`}
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

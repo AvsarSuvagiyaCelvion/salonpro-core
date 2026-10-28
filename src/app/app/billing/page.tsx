@@ -119,6 +119,17 @@ export default function BillingPage() {
   async function handleMarkWhatsappSent(invoiceId: string) {
     setSendingWhatsapp(true);
     try {
+      // 1. Open real WhatsApp with customer number, bill details & digital receipt link
+      if (whatsappInvoice) {
+        const rawPhone = (whatsappInvoice.customer_mobile || '').replace(/[^0-9]/g, '');
+        const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+        const receiptUrl = `${window.location.origin}/b/${whatsappInvoice.number}`;
+        const msg = `Dear *${whatsappInvoice.customer_name}*, thank you for visiting us today! 💖\n\n📄 *Invoice #:* ${whatsappInvoice.number}\n💰 *Total Amount:* ₹${whatsappInvoice.total}\n✅ *Payment Received:* ₹${whatsappInvoice.paid_amount}\n\n👉 *View your official digital receipt & GST breakdown:*\n${receiptUrl}\n\nWe look forward to welcoming you again! ✨`;
+        const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank');
+      }
+
+      // 2. Mark sent in DB
       const res = await fetch('/api/billing/whatsapp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -134,7 +145,7 @@ export default function BillingPage() {
       }
       setMessage({
         type: 'success',
-        text: 'Bill sent via WhatsApp! (Confirmed with two blue ticks ✓✓)',
+        text: 'Bill opened on WhatsApp & marked as sent (Confirmed with two blue ticks ✓✓)',
       });
     } catch {
       setMessage({ type: 'error', text: 'Failed to update WhatsApp status' });
@@ -591,19 +602,29 @@ export default function BillingPage() {
               </div>
 
               {whatsappInvoice.whatsapp_sent ? (
-                <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-semibold text-center flex items-center justify-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Message Sent (Marked with Two Blue Ticks ✓✓)</span>
+                <div className="space-y-2">
+                  <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-semibold text-center flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Bill Sent on WhatsApp (Two Blue Ticks ✓✓)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleMarkWhatsappSent(whatsappInvoice.id)}
+                    className="w-full py-2 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Send className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Resend to Customer on WhatsApp ↗</span>
+                  </button>
                 </div>
               ) : (
                 <button
                   type="button"
                   onClick={() => handleMarkWhatsappSent(whatsappInvoice.id)}
                   disabled={sendingWhatsapp}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-50"
+                  className="w-full py-3 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>{sendingWhatsapp ? 'Marking...' : 'Mark as sent (Show ✓✓ Blue Ticks)'}</span>
+                  <Send className="w-4 h-4" />
+                  <span>{sendingWhatsapp ? 'Opening WhatsApp...' : 'Send Bill to Customer on WhatsApp ➔'}</span>
                 </button>
               )}
             </div>

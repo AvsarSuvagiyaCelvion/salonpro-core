@@ -28,6 +28,7 @@ const RESERVED_SUBDOMAINS = new Set([
 const PUBLIC_API_PREFIXES = [
   '/api/public/',
   '/api/health',
+  '/api/plans',
   '/api/login',
   '/api/register',
   '/api/logout',

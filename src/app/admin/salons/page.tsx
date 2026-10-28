@@ -20,6 +20,7 @@ import {
   Send,
   Bell,
   MessageSquare,
+  Sparkles,
 } from 'lucide-react';
 
 export default function AdminSalonsPage() {
@@ -90,6 +91,48 @@ export default function AdminSalonsPage() {
       await fetchSalons();
     } catch (err: any) {
       alert(`Error updating salon: ${err.message}`);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleExtendTrial(salonId: string, days: number, salonName: string) {
+    if (!window.confirm(`Extend 7-day free trial for "${salonName}" by +${days} days?`)) return;
+    try {
+      setUpdatingId(salonId);
+      const res = await fetch(`/api/admin/salons/${salonId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ extend_trial_days: days }),
+      });
+      if (res.ok) {
+        await fetchSalons();
+      } else {
+        alert('Failed to extend trial');
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleGrantActive(salonId: string, salonName: string) {
+    if (!window.confirm(`Mark "${salonName}" as an Active Paid Subscriber?`)) return;
+    try {
+      setUpdatingId(salonId);
+      const res = await fetch(`/api/admin/salons/${salonId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription_status: 'active' }),
+      });
+      if (res.ok) {
+        await fetchSalons();
+      } else {
+        alert('Failed to activate subscription');
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
     } finally {
       setUpdatingId(null);
     }
@@ -297,6 +340,49 @@ export default function AdminSalonsPage() {
                   <div>
                     <span className="block text-[10px] uppercase font-bold text-slate-400">Revenue</span>
                     <strong className="text-emerald-700">₹{Number(s.total_revenue || 0).toLocaleString('en-IN')}</strong>
+                  </div>
+                </div>
+
+                {/* Subscription & Trial Status */}
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                  {s.subscription_status === 'active' ? (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-black flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-emerald-600" />
+                      <span>Paid ({s.subscription_plan_name || 'Pro'})</span>
+                    </span>
+                  ) : s.trial_ends_at && new Date(s.trial_ends_at).getTime() <= Date.now() ? (
+                    <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 text-[10px] font-black flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-600"></span>
+                      <span>Trial Expired</span>
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-black flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+                      <span>
+                        Trial: {s.trial_ends_at ? Math.max(1, Math.ceil((new Date(s.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 7}d left
+                      </span>
+                    </span>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleExtendTrial(s.id, 7, s.name)}
+                      className="text-[10px] text-pink-700 hover:text-pink-900 font-extrabold hover:underline cursor-pointer"
+                      title="Grant +7 days free trial extension"
+                    >
+                      +7d Trial
+                    </button>
+                    {s.subscription_status !== 'active' && (
+                      <button
+                        type="button"
+                        onClick={() => handleGrantActive(s.id, s.name)}
+                        className="text-[10px] text-emerald-700 hover:text-emerald-900 font-extrabold hover:underline cursor-pointer"
+                        title="Manually mark as Paid Subscriber"
+                      >
+                        Grant Paid
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

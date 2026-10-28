@@ -11,6 +11,8 @@ export async function GET(request: Request) {
     const salons = await query(`
       SELECT 
         s.*,
+        sp.name as subscription_plan_name,
+        sp.billing_interval as subscription_plan_interval,
         u.email as owner_email,
         u.full_name as owner_name,
         u.phone as owner_phone,
@@ -20,6 +22,7 @@ export async function GET(request: Request) {
         COUNT(DISTINCT a.id) as appointments_count,
         COALESCE(SUM(i.total), 0)::numeric(10,2) as total_revenue
       FROM salons s
+      LEFT JOIN subscription_plans sp ON s.subscription_plan_id = sp.id
       LEFT JOIN LATERAL (
         SELECT email, full_name, phone FROM users WHERE salon_id = s.id AND role = 'owner' LIMIT 1
       ) u ON true
@@ -28,7 +31,7 @@ export async function GET(request: Request) {
       LEFT JOIN customers c ON s.id = c.salon_id
       LEFT JOIN appointments a ON s.id = a.salon_id
       LEFT JOIN invoices i ON s.id = i.salon_id
-      GROUP BY s.id, u.email, u.full_name, u.phone
+      GROUP BY s.id, sp.name, sp.billing_interval, u.email, u.full_name, u.phone
       ORDER BY s.created_at ASC
     `);
 

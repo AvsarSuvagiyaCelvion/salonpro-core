@@ -11,7 +11,8 @@ export async function GET(request: Request) {
     const res = await query(
       `SELECT id, name, slug, address, phone, brand_color, logo_url,
               booking_enabled, open_time, close_time, slot_minutes, buffer_minutes,
-              working_days, min_advance_hours, max_advance_days, send_reminders
+              working_days, min_advance_hours, max_advance_days, send_reminders,
+              trial_ends_at, subscription_status, subscription_ends_at, subscription_plan_id
        FROM salons
        WHERE id = $1
        LIMIT 1`,

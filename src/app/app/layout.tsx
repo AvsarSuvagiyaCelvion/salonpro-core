@@ -20,7 +20,12 @@ import {
   Menu,
   X,
   ExternalLink,
-  RotateCcw,
+  CreditCard,
+  AlertTriangle,
+  Clock,
+  CheckCircle2,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 
 interface NavItem {
@@ -40,6 +45,7 @@ const navItems: NavItem[] = [
   { name: 'Products', href: '/app/products', icon: Package },
   { name: 'Memberships & packages', href: '/app/memberships', icon: Award },
   { name: 'Reports', href: '/app/reports', icon: BarChart3 },
+  { name: 'Subscription & Plans', href: '/app/subscription', icon: CreditCard },
   { name: 'Settings', href: '/app/settings', icon: Settings },
 ];
 
@@ -49,44 +55,97 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [salon, setSalon] = useState<{ name: string; slug: string } | null>(null);
-
   const [user, setUser] = useState<{ email: string; role: string } | null>(null);
 
+  // Subscription & 7-Day Trial State
+  const [subscription, setSubscription] = useState<{
+    status: string;
+    isActive: boolean;
+    isTrial: boolean;
+    isTrialExpired: boolean;
+    trialDaysRemaining: number;
+    currentPlan: any;
+  } | null>(null);
+
+  const [availablePlans, setAvailablePlans] = useState<any[]>([]);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [activatingPlan, setActivatingPlan] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
   useEffect(() => {
-    async function loadSalonDetails() {
+    async function loadData() {
       try {
         const res = await fetch('/api/settings');
+        if (!res.ok) {
+          router.push('/login');
+          return;
+        }
         const data = await res.json();
         if (data.salon) {
           setSalon({ name: data.salon.name, slug: data.salon.slug });
+        } else {
+          router.push('/login');
+          return;
         }
         if (data.user) {
           setUser(data.user);
         }
-      } catch {}
-    }
-    loadSalonDetails();
-  }, []);
 
-  const [resettingSandbox, setResettingSandbox] = useState(false);
-  const [resetNotice, setResetNotice] = useState<string | null>(null);
+        // Fetch Subscription details
+        const subRes = await fetch('/api/subscription');
+        if (subRes.ok) {
+          const subData = await subRes.json();
+          if (subData.subscription) {
+            setSubscription(subData.subscription);
+          }
+        }
 
-  async function handleResetSandbox() {
-    setResettingSandbox(true);
-    setResetNotice(null);
-    try {
-      const res = await fetch('/api/demo/reset-sandbox', { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        setResetNotice('Test data wiped! Clean state restored.');
-        setTimeout(() => setResetNotice(null), 3500);
-        router.refresh();
+        // Fetch Public Plans for upgrade modal
+        const plansRes = await fetch('/api/plans');
+        if (plansRes.ok) {
+          const plansData = await plansRes.json();
+          setAvailablePlans(plansData.plans || []);
+          if (plansData.plans?.length > 0) {
+            setSelectedPlanId(plansData.plans[0].id);
+          }
+        }
+      } catch {
+        router.push('/login');
       }
-    } catch {
-      setResetNotice('Reset complete');
-      setTimeout(() => setResetNotice(null), 3500);
+    }
+    loadData();
+  }, [router]);
+
+  async function handleActivatePlan(planId: string) {
+    setActivatingPlan(true);
+    try {
+      const res = await fetch('/api/subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId,
+          paymentMethod: 'Instant UPI / Card Payment',
+          transactionId: `TXN-${Date.now()}`,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setPaymentSuccess(true);
+        setTimeout(() => {
+          setPaymentSuccess(false);
+          setShowPlanModal(false);
+          // Refresh state
+          window.location.reload();
+        }, 1500);
+      } else {
+        alert(data.error || 'Failed to process plan subscription.');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Payment processing failed.');
     } finally {
-      setResettingSandbox(false);
+      setActivatingPlan(false);
     }
   }
 
@@ -101,44 +160,45 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const isExpiredLockout = subscription?.isTrialExpired && !subscription?.isActive;
+
   return (
     <div className="min-h-screen flex flex-col bg-[#faf8fa] text-[#2a1630]">
-      {/* Top Demo Sandbox Banner */}
-      <div className="bg-amber-950/95 text-amber-200 text-xs py-2 px-4 font-medium tracking-wide flex flex-col sm:flex-row items-center justify-between gap-2 z-40 border-b border-amber-800 shadow-sm">
-        <div className="flex items-center gap-2 text-center sm:text-left">
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
-          <span>
-            <strong>🧪 Interactive Demo Sandbox:</strong> Live evaluation preview for salon owners. All test actions are temporary and never take real customer bookings.
-          </span>
-        </div>
-        <div className="flex items-center gap-3 text-[11px] shrink-0">
-          {resetNotice && (
-            <span className="text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-800 animate-fade-in">
-              ✓ {resetNotice}
+      {/* Top Professional Trial Notification Banner (Only shown if on active 7-Day trial) */}
+      {subscription?.isTrial && !subscription?.isTrialExpired && (
+        <div className="bg-gradient-to-r from-purple-900 via-pink-900 to-[#b3135b] text-white text-xs py-2 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-700 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>
+              <strong>🎁 7-Day Free Trial Active:</strong> You have{' '}
+              <span className="font-extrabold text-amber-300 underline decoration-amber-400">
+                {subscription.trialDaysRemaining} day{subscription.trialDaysRemaining === 1 ? '' : 's'} remaining
+              </span>{' '}
+              to explore all pro ERP features.
             </span>
-          )}
-          <button
-            type="button"
-            onClick={handleResetSandbox}
-            disabled={resettingSandbox}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-800/80 hover:bg-amber-700 text-amber-100 border border-amber-600 transition-all cursor-pointer font-bold active:scale-95 shadow-xs"
-            title="Wipe temporary test appointments and receipts"
-          >
-            <RotateCcw className={`w-3 h-3 ${resettingSandbox ? 'animate-spin' : ''}`} />
-            <span>{resettingSandbox ? 'Resetting...' : 'Reset Sandbox Data'}</span>
-          </button>
-          {salon?.slug && (
-            <Link
-              href={`/${salon.slug}`}
-              target="_blank"
-              className="hidden md:flex items-center gap-1 text-amber-300 hover:text-white transition-colors underline"
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowPlanModal(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-pink-900 font-extrabold text-[11px] shadow-sm hover:bg-pink-50 transition-all cursor-pointer active:scale-95"
             >
-              <span>Demo Booking (/{salon.slug})</span>
-              <ExternalLink className="w-3 h-3" />
-            </Link>
-          )}
+              <Zap className="w-3 h-3 text-pink-700 fill-pink-600" />
+              <span>Upgrade Plan</span>
+            </button>
+            {salon?.slug && (
+              <Link
+                href={`/${salon.slug}`}
+                target="_blank"
+                className="hidden sm:inline-flex items-center gap-1 text-[11px] text-pink-200 hover:text-white transition-colors underline ml-2"
+              >
+                <span>Live Booking Link</span>
+                <ExternalLink className="w-3 h-3" />
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Top Header */}
       <header className="h-16 bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
@@ -270,12 +330,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="pt-4 border-t border-neutral-100 space-y-2.5">
               <button
                 type="button"
-                onClick={handleResetSandbox}
-                disabled={resettingSandbox}
-                className="w-full py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setShowPlanModal(true);
+                }}
+                className="w-full py-2.5 px-3 rounded-xl bg-pink-50 hover:bg-pink-100 text-[#b3135b] border border-pink-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <RotateCcw className={`w-3.5 h-3.5 ${resettingSandbox ? 'animate-spin' : ''}`} />
-                <span>{resettingSandbox ? 'Resetting...' : 'Reset Sandbox Data'}</span>
+                <Zap className="w-3.5 h-3.5 text-pink-700" />
+                <span>Subscription Plan & Billing</span>
               </button>
 
               <div className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80">
@@ -365,9 +427,208 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Main Content Viewport */}
         <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8 animate-fade-in">
-          {children}
+          {isExpiredLockout ? (
+            <div className="max-w-4xl mx-auto py-8">
+              {/* Paywall Lockout Screen */}
+              <div className="bg-white rounded-3xl border-2 border-red-200 shadow-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-red-600 to-[#b3135b] p-6 sm:p-8 text-white text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center mb-4 ring-4 ring-white/20">
+                    <Clock className="w-8 h-8 text-white" />
+                  </div>
+                  <span className="inline-block px-3 py-1 rounded-full bg-red-950/40 text-red-200 text-xs font-bold uppercase tracking-wider mb-2">
+                    7-Day Free Trial Ended
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
+                    Your 7-Day Free Trial Has Concluded
+                  </h2>
+                  <p className="text-pink-100 text-xs sm:text-sm mt-2 max-w-xl mx-auto">
+                    All salon records, appointments, and staff settings for{' '}
+                    <strong className="underline text-white">{salon?.name || 'your salon'}</strong> are safely preserved.
+                    Select an official subscription plan below to immediately re-enable your portal and online bookings.
+                  </p>
+                </div>
+
+                <div className="p-6 sm:p-8 bg-slate-50">
+                  <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-700 text-center mb-6">
+                    Choose Your Subscription Plan to Reactivate
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    {availablePlans.map((plan) => {
+                      const isSelected = selectedPlanId === plan.id;
+                      return (
+                        <div
+                          key={plan.id}
+                          onClick={() => setSelectedPlanId(plan.id)}
+                          className={`relative rounded-2xl p-5 border-2 transition-all cursor-pointer bg-white flex flex-col justify-between ${
+                            isSelected
+                              ? 'border-[#b3135b] ring-4 ring-pink-100 shadow-lg scale-102'
+                              : 'border-slate-200 hover:border-slate-300'
+                          }`}
+                        >
+                          {plan.is_popular && (
+                            <span className="absolute -top-3 right-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-xs">
+                              Recommended
+                            </span>
+                          )}
+
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-extrabold text-slate-900 text-base">{plan.name}</h4>
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                  isSelected ? 'border-[#b3135b] bg-[#b3135b]' : 'border-slate-300'
+                                }`}
+                              >
+                                {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                              </div>
+                            </div>
+
+                            <p className="text-xs text-slate-500 mb-4 min-h-[32px]">{plan.description}</p>
+
+                            <div className="mb-4">
+                              <span className="text-2xl font-black text-slate-900">₹{Number(plan.price).toLocaleString()}</span>
+                              <span className="text-xs text-slate-500 ml-1">/{plan.billing_interval}</span>
+                            </div>
+
+                            <div className="space-y-2 border-t border-slate-100 pt-3">
+                              {(Array.isArray(plan.features) ? plan.features : []).map((feat: string, i: number) => (
+                                <div key={i} className="flex items-start gap-2 text-xs text-slate-600">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                                  <span>{feat}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleActivatePlan(plan.id);
+                            }}
+                            disabled={activatingPlan}
+                            className={`w-full mt-5 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-sm cursor-pointer flex items-center justify-center gap-2 ${
+                              isSelected
+                                ? 'bg-[#b3135b] hover:bg-[#9c0f4e] text-white shadow-pink-900/20'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                            }`}
+                          >
+                            <CreditCard className="w-3.5 h-3.5" />
+                            <span>{activatingPlan && isSelected ? 'Activating...' : 'Select & Pay'}</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-center gap-3 pt-4 border-t border-slate-200">
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="text-xs text-slate-500 hover:text-red-600 font-semibold flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign out of Workspace</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            children
+          )}
         </main>
       </div>
+
+      {/* Plan Upgrade / Subscription Modal (When clicked from top bar or settings) */}
+      {showPlanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-pink-600">
+                  SalonPro Cloud Subscriptions
+                </span>
+                <h3 className="text-xl font-black text-slate-900">
+                  Upgrade or Manage Your Subscription Plan
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPlanModal(false)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {paymentSuccess && (
+              <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800 text-sm font-bold animate-fade-in">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                <span>Payment verified! Your plan has been activated successfully.</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {availablePlans.map((plan) => {
+                const isSelected = selectedPlanId === plan.id;
+                return (
+                  <div
+                    key={plan.id}
+                    onClick={() => setSelectedPlanId(plan.id)}
+                    className={`relative rounded-2xl p-5 border-2 transition-all cursor-pointer bg-white flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-[#b3135b] ring-4 ring-pink-100 shadow-lg'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    {plan.is_popular && (
+                      <span className="absolute -top-3 right-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs">
+                        Popular
+                      </span>
+                    )}
+
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-base mb-1">{plan.name}</h4>
+                      <p className="text-xs text-slate-500 mb-3 min-h-[30px]">{plan.description}</p>
+                      <div className="mb-4">
+                        <span className="text-2xl font-black text-slate-900">₹{Number(plan.price).toLocaleString()}</span>
+                        <span className="text-xs text-slate-500 ml-1">/{plan.billing_interval}</span>
+                      </div>
+                      <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                        {(Array.isArray(plan.features) ? plan.features : []).map((feat: string, i: number) => (
+                          <div key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleActivatePlan(plan.id);
+                      }}
+                      disabled={activatingPlan}
+                      className={`w-full mt-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                        isSelected
+                          ? 'bg-[#b3135b] text-white hover:bg-[#9c0f4e]'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <CreditCard className="w-3.5 h-3.5" />
+                      <span>{activatingPlan && isSelected ? 'Processing...' : 'Pay & Activate'}</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Bottom Dock Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-neutral-200/90 px-3 py-1.5 flex items-center justify-around shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">

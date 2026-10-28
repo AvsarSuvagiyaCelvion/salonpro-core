@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   ChevronRight,
   Plus,
+  CreditCard,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -58,6 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { href: '/admin', label: 'Platform Overview', icon: LayoutDashboard },
     { href: '/admin/salons', label: 'Salons Directory', icon: Building2 },
+    { href: '/admin/plans', label: 'Subscription Plans', icon: CreditCard },
     { href: '/admin/owners', label: 'Owners & Staff', icon: Users },
     { href: '/admin/analytics', label: 'Platform Analytics', icon: BarChart3 },
     { href: '/admin/security', label: 'Admins & Security', icon: ShieldCheck },

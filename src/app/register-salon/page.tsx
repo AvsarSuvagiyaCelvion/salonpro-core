@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,6 +19,11 @@ import {
   Scissors,
   Receipt,
   Calendar,
+  CreditCard,
+  Clock,
+  Zap,
+  Check,
+  X,
 } from 'lucide-react';
 
 export default function RegisterSalonPage() {
@@ -31,9 +36,29 @@ export default function RegisterSalonPage() {
   const [city, setCity] = useState('');
   const [password, setPassword] = useState('');
 
+  // Plans & Trial State
+  const [plans, setPlans] = useState<any[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<string>('trial'); // 'trial' or plan.id
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card'>('upi');
+  const [registeredPlanName, setRegisteredPlanName] = useState<string>('7-Day Free Trial');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registeredSalon, setRegisteredSalon] = useState<{ id: string; name: string; slug: string } | null>(null);
+
+  useEffect(() => {
+    async function loadPlans() {
+      try {
+        const res = await fetch('/api/plans');
+        if (res.ok) {
+          const data = await res.json();
+          setPlans(data.plans || []);
+        }
+      } catch {}
+    }
+    loadPlans();
+  }, []);
 
   // Computed slug preview
   const slugPreview = salonName
@@ -45,8 +70,7 @@ export default function RegisterSalonPage() {
         .replace(/^-|-$/g, '')
     : 'your-salon';
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleCompleteRegistration(planIdToSubmit: string | null) {
     setError(null);
     setLoading(true);
 
@@ -61,6 +85,7 @@ export default function RegisterSalonPage() {
           mobile,
           city,
           password,
+          planId: planIdToSubmit,
         }),
       });
 
@@ -70,11 +95,40 @@ export default function RegisterSalonPage() {
         throw new Error(data.error || 'Registration failed. Please try again.');
       }
 
+      if (planIdToSubmit) {
+        const found = plans.find((p) => p.id === planIdToSubmit);
+        setRegisteredPlanName(found ? found.name : 'Paid Plan');
+      } else {
+        setRegisteredPlanName('7-Day Free Trial');
+      }
+
+      setShowPaymentModal(false);
       setRegisteredSalon(data.salon);
     } catch (err: any) {
       setError(err.message || 'Something went wrong during salon registration.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    if (!salonName.trim() || !ownerName.trim() || !mobile.trim() || !email.trim() || !password.trim()) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (selectedPlanId === 'trial') {
+      await handleCompleteRegistration(null);
+    } else {
+      setShowPaymentModal(true);
     }
   }
 
@@ -97,6 +151,15 @@ export default function RegisterSalonPage() {
           <p className="text-xs sm:text-sm text-neutral-600 mt-2 max-w-md mx-auto">
             <strong>{registeredSalon.name}</strong> is now live on SalonPro Cloud. Your cloud POS, staff scheduler, and online booking engine are ready.
           </p>
+
+          <div className="mt-4 p-3 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-xs font-bold text-[#b3135b] flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-600" />
+            <span>
+              {registeredPlanName === '7-Day Free Trial'
+                ? '🎁 7-Day Free Trial Active (Full access until 7 days)'
+                : `👑 ${registeredPlanName} Subscription Active`}
+            </span>
+          </div>
 
           <div className="mt-6 p-4 rounded-2xl bg-pink-50 border border-pink-200 text-left">
             <div className="text-[11px] font-bold text-[#b3135b] uppercase tracking-wider mb-1">
@@ -306,21 +369,180 @@ export default function RegisterSalonPage() {
                 </div>
               </div>
 
+              {/* Plan Selection Tier */}
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    Select Your Plan or Trial <span className="text-[#b3135b]">*</span>
+                  </label>
+                  <span className="text-[11px] text-pink-600 font-bold">Instant activation</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                  {/* 7-Day Free Trial Option */}
+                  <div
+                    onClick={() => setSelectedPlanId('trial')}
+                    className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer bg-white ${
+                      selectedPlanId === 'trial'
+                        ? 'border-[#b3135b] bg-pink-50/40 ring-2 ring-pink-200'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPlanId === 'trial' ? 'border-[#b3135b]' : 'border-slate-300'}`}>
+                          {selectedPlanId === 'trial' && <div className="w-2 h-2 rounded-full bg-[#b3135b]" />}
+                        </div>
+                        <span className="font-extrabold text-xs text-slate-900">7-Day Free Trial</span>
+                      </div>
+                      <span className="text-xs font-black text-emerald-600">₹0 Free</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1 pl-6">
+                      7 days of full ERP access. Auto-locks after day 7 unless subscribed.
+                    </p>
+                  </div>
+
+                  {/* Dynamic Plans from Database */}
+                  {plans.map((p) => {
+                    const isSelected = selectedPlanId === p.id;
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => setSelectedPlanId(p.id)}
+                        className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer bg-white relative ${
+                          isSelected
+                            ? 'border-[#b3135b] bg-pink-50/40 ring-2 ring-pink-200'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        {p.is_popular && (
+                          <span className="absolute -top-2.5 right-3 bg-[#b3135b] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
+                            Popular
+                          </span>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-[#b3135b]' : 'border-slate-300'}`}>
+                              {isSelected && <div className="w-2 h-2 rounded-full bg-[#b3135b]" />}
+                            </div>
+                            <span className="font-extrabold text-xs text-slate-900">{p.name}</span>
+                          </div>
+                          <span className="text-xs font-black text-slate-900">₹{Number(p.price).toLocaleString()}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-1 pl-6 truncate">
+                          {p.description || `${p.billing_interval} subscription`}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full mt-4 py-4 px-6 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-sm shadow-xl shadow-pink-900/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed active:scale-98"
               >
                 {loading ? (
-                  <span>Registering Salon & Creating ERP Workspace...</span>
+                  <span>Setting up your salon ERP...</span>
+                ) : selectedPlanId === 'trial' ? (
+                  <span>Start 7-Day Free Trial & Launch ERP ➔</span>
                 ) : (
-                  <>
-                    <span>Create Salon Account & Launch ERP ➔</span>
-                  </>
+                  <span>Proceed to Payment & Activate Plan ➔</span>
                 )}
               </button>
             </form>
           </div>
+
+          {/* Payment Modal */}
+          {showPaymentModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+              <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-[#b3135b]" />
+                    <h3 className="font-black text-slate-900 text-base">Payment & Plan Activation</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowPaymentModal(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {(() => {
+                  const currentSelectedPlan = plans.find((p) => p.id === selectedPlanId);
+                  return (
+                    <div>
+                      <div className="p-4 rounded-2xl bg-pink-50/60 border border-pink-200 mb-4">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-extrabold text-sm text-slate-900">{currentSelectedPlan?.name}</span>
+                          <span className="text-lg font-black text-[#b3135b]">₹{Number(currentSelectedPlan?.price || 0).toLocaleString()}</span>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          {currentSelectedPlan?.billing_interval === 'yearly' ? 'Billed annually · 2 months free' : 'Billed monthly · Cancel anytime'}
+                        </p>
+                      </div>
+
+                      <div className="space-y-3 mb-6">
+                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                          Select Payment Mode
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('upi')}
+                            className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                              paymentMethod === 'upi'
+                                ? 'border-[#b3135b] bg-pink-50 text-[#b3135b]'
+                                : 'border-slate-200 text-slate-700'
+                            }`}
+                          >
+                            <span>⚡ Instant UPI / QR</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('card')}
+                            className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                              paymentMethod === 'card'
+                                ? 'border-[#b3135b] bg-pink-50 text-[#b3135b]'
+                                : 'border-slate-200 text-slate-700'
+                            }`}
+                          >
+                            <span>💳 Card / NetBanking</span>
+                          </button>
+                        </div>
+
+                        {paymentMethod === 'upi' ? (
+                          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-600">
+                            <span className="font-bold text-slate-800 block mb-1">Fast UPI QR Simulation</span>
+                            <span>Scan with GPay, PhonePe, or Paytm for instant salon onboarding.</span>
+                          </div>
+                        ) : (
+                          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-600">
+                            <span className="font-bold text-slate-800 block mb-1">Card / NetBanking Gateway</span>
+                            <span>Supports Visa, Mastercard, RuPay & all Indian Banks.</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleCompleteRegistration(selectedPlanId)}
+                        disabled={loading}
+                        className="w-full py-3.5 rounded-xl bg-[#b3135b] hover:bg-[#9c0f4e] text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>{loading ? 'Processing Activation...' : `Authorize & Pay ₹${Number(currentSelectedPlan?.price || 0).toLocaleString()}`}</span>
+                      </button>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
 
           {/* Right Column: Benefits & Preview */}
           <div className="lg:col-span-5 space-y-5">

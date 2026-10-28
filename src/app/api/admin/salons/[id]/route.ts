@@ -70,6 +70,33 @@ export async function PATCH(
       values.push(Boolean(body.is_active));
     }
 
+    if (body.subscription_status !== undefined) {
+      const allowed = ['trial', 'active', 'expired', 'cancelled'];
+      if (!allowed.includes(body.subscription_status)) {
+        return NextResponse.json({ error: 'Invalid subscription status' }, { status: 400 });
+      }
+      updates.push(`subscription_status = $${idx++}`);
+      values.push(body.subscription_status);
+    }
+
+    if (body.subscription_plan_id !== undefined) {
+      updates.push(`subscription_plan_id = $${idx++}`);
+      values.push(body.subscription_plan_id || null);
+    }
+
+    if (body.extend_trial_days !== undefined) {
+      const days = parseInt(body.extend_trial_days, 10);
+      if (!isNaN(days) && days > 0) {
+        updates.push(`trial_ends_at = GREATEST(COALESCE(trial_ends_at, NOW()), NOW()) + ($${idx++} * INTERVAL '1 day')`);
+        values.push(days);
+        // Also ensure status is trial or active
+        updates.push(`subscription_status = 'trial'`);
+      }
+    } else if (body.trial_ends_at !== undefined) {
+      updates.push(`trial_ends_at = $${idx++}`);
+      values.push(body.trial_ends_at ? new Date(body.trial_ends_at) : null);
+    }
+
     if (body.plan !== undefined) {
       const allowedPlans = ['starter', 'pro', 'enterprise'];
       if (!allowedPlans.includes(body.plan)) {

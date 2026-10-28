@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   const client = await pool.connect();
   try {
     const body = await request.json();
-    const { salonName, ownerName, email, mobile, city, address, password } = body;
+    const { salonName, ownerName, email, mobile, city, address, password, planId } = body;
 
     const cleanSalonName = salonName?.trim();
     const cleanOwnerName = ownerName?.trim();
@@ -102,15 +102,35 @@ export async function POST(request: Request) {
     // 3. Hash password using bcrypt
     const passwordHash = await bcrypt.hash(cleanPassword, 10);
 
+    // Determine subscription & trial details (7-Day Trial default)
+    let subStatus = 'trial';
+    let subPlanId: string | null = null;
+    let trialEndsAt: Date | null = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Exactly 7 days from now
+    let subEndsAt: Date | null = null;
+    let planSlug = 'pro';
+
+    if (planId) {
+      const planCheck = await query('SELECT * FROM subscription_plans WHERE id = $1 AND is_active = true', [planId]);
+      if (planCheck.rows.length > 0) {
+        subStatus = 'active';
+        subPlanId = planCheck.rows[0].id;
+        planSlug = planCheck.rows[0].slug || 'pro';
+        const isYearly = planCheck.rows[0].billing_interval === 'yearly';
+        subEndsAt = new Date(Date.now() + (isYearly ? 365 : 30) * 24 * 60 * 60 * 1000);
+      }
+    }
+
     // 4. Begin transactional registration
     await client.query('BEGIN');
 
     // Create Salon workspace
     const salonRes = await client.query(
       `INSERT INTO salons (
-        name, slug, brand_color, open_time, close_time, phone, address, is_active, is_demo, plan
+        name, slug, brand_color, open_time, close_time, phone, address, is_active, is_demo, plan,
+        trial_ends_at, subscription_status, subscription_plan_id, subscription_ends_at
       ) VALUES (
-        $1, $2, $3, '10:00:00', '20:00:00', $4, $5, true, false, 'pro'
+        $1, $2, $3, '10:00:00', '20:00:00', $4, $5, true, false, $6,
+        $7, $8, $9, $10
       ) RETURNING *`,
       [
         cleanSalonName,
@@ -118,6 +138,11 @@ export async function POST(request: Request) {
         '#b3135b',
         cleanMobile,
         fullAddress,
+        planSlug,
+        trialEndsAt,
+        subStatus,
+        subPlanId,
+        subEndsAt,
       ]
     );
     const newSalon = salonRes.rows[0];

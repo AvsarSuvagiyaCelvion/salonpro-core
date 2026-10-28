@@ -1050,10 +1050,6 @@ export default function BookingWizard({ slug }: { slug: string }) {
               Your appointment has been reserved directly in the salon scheduling system.
             </p>
 
-            <div className="my-4 p-3 bg-amber-500/15 border border-amber-500/30 rounded-2xl text-amber-300 text-xs max-w-md mx-auto text-center">
-              🧪 <strong>Preview Simulation:</strong> This test appointment is now visible on your Salon Owner ERP Kanban & Calendar. It is temporary and will be cleared upon sandbox reset.
-            </div>
-
             {/* Appointment Card */}
             <div className="mt-6 bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-left max-w-md mx-auto shadow-xl">
               <div className="text-[10px] uppercase font-bold tracking-wider text-pink-400 mb-1">

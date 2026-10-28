@@ -1,23 +1,58 @@
 import { NextResponse } from 'next/server';
 import pool, { query } from '@/lib/db';
 import { clearSalonCache } from '@/lib/salon';
+import { requireTenant } from '@/lib/api-auth';
 
-export async function POST() {
+export async function POST(request: Request) {
+  // 1. Strict DEMO_MODE guard
+  if (process.env.DEMO_MODE !== 'true') {
+    return NextResponse.json(
+      { error: 'Forbidden: Sandbox reset is only enabled when DEMO_MODE=true is configured.' },
+      { status: 403 }
+    );
+  }
+
+  // 2. Caller must be an authenticated tenant session
+  const auth = await requireTenant(request);
+  if (auth.error) {
+    return auth.error;
+  }
+
+  // 3. Must identify demo salon and ensure we do NOT touch other tenants
+  const salonRes = await query(
+    `SELECT id, slug, is_demo FROM salons WHERE slug = 'glow-studio' OR is_demo = true LIMIT 1`
+  );
+  if (salonRes.rows.length === 0) {
+    return NextResponse.json(
+      { error: 'No demo salon configured in the platform.' },
+      { status: 404 }
+    );
+  }
+
+  const demoSalonId = salonRes.rows[0].id;
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    // Delete temporary test bookings, sessions, invoices, and waiting list
-    await client.query('DELETE FROM session_items');
-    await client.query('DELETE FROM sessions');
-    await client.query('DELETE FROM payments');
-    await client.query('DELETE FROM invoices');
-    await client.query('DELETE FROM waiting');
-    await client.query('DELETE FROM appointments');
-
-    // Ensure demo salon has booking_enabled = false so real external bookings cannot be made
+    // Scoped deletes strictly for demoSalonId
     await client.query(
-      `UPDATE salons SET booking_enabled = false WHERE slug = 'glow-studio' OR id = 'e0a1b2c3-d4e5-4a5b-8c9d-0e1f2a3b4c5d'`
+      `DELETE FROM session_items WHERE session_id IN (SELECT id FROM sessions WHERE salon_id = $1)`,
+      [demoSalonId]
+    );
+    await client.query(`DELETE FROM sessions WHERE salon_id = $1`, [demoSalonId]);
+    await client.query(
+      `DELETE FROM payments WHERE invoice_id IN (SELECT id FROM invoices WHERE salon_id = $1)`,
+      [demoSalonId]
+    );
+    await client.query(`DELETE FROM invoices WHERE salon_id = $1`, [demoSalonId]);
+    await client.query(`DELETE FROM waiting WHERE salon_id = $1`, [demoSalonId]);
+    await client.query(`DELETE FROM appointments WHERE salon_id = $1`, [demoSalonId]);
+
+    // Keep booking disabled for demo salon so random internet bookings don't pollute
+    await client.query(
+      `UPDATE salons SET booking_enabled = false WHERE id = $1`,
+      [demoSalonId]
     );
 
     await client.query('COMMIT');
@@ -25,7 +60,7 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      message: 'Demo sandbox reset successfully! All test appointments, sessions, and invoices have been cleared.',
+      message: 'Demo sandbox reset successfully! Test appointments and sessions have been cleared.',
     });
   } catch (error: any) {
     await client.query('ROLLBACK');
@@ -36,9 +71,4 @@ export async function POST() {
   } finally {
     client.release();
   }
-}
-
-// GET to quickly reset on page load if ?clean=true
-export async function GET() {
-  return POST();
 }

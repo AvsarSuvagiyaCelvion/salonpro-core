@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getDefaultSalonId } from '@/lib/salon';
+import { requireTenant } from '@/lib/api-auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const staffRes = await query(
       `SELECT s.id, s.salon_id, s.name, s.role_title, 
               s.service_commission_pct, s.product_commission_pct, 
@@ -32,7 +35,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const body = await request.json();
     const {
       name,
@@ -69,13 +75,22 @@ export async function POST(request: Request) {
 
     const newStaff = staffRes.rows[0];
 
-    // Insert staff services if selected
+    // Map staff services if provided (scoped to services of caller's salon)
     if (Array.isArray(services) && services.length > 0) {
       for (const srvId of services) {
-        await query(
-          `INSERT INTO staff_services (staff_id, service_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-          [newStaff.id, srvId]
+        // Verify service belongs to caller's salon
+        const srvCheck = await query(
+          'SELECT id FROM services WHERE id = $1 AND salon_id = $2 LIMIT 1',
+          [srvId, salonId]
         );
+        if (srvCheck.rows.length > 0) {
+          await query(
+            `INSERT INTO staff_services (staff_id, service_id)
+             VALUES ($1, $2)
+             ON CONFLICT DO NOTHING`,
+            [newStaff.id, srvId]
+          );
+        }
       }
     }
 

@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getDefaultSalonId } from '@/lib/salon';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const { customer_id, name, mobile } = await request.json();
 
     let targetCustomerId = customer_id;
@@ -18,7 +21,7 @@ export async function POST(request: Request) {
         );
       }
 
-      // Check if customer with mobile exists
+      // Check if customer with mobile exists in caller's salon
       const existing = await query(
         'SELECT id FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1',
         [salonId, mobile.trim()]
@@ -32,6 +35,15 @@ export async function POST(request: Request) {
           [salonId, name.trim(), mobile.trim()]
         );
         targetCustomerId = newCust.rows[0].id;
+      }
+    } else {
+      // Verify existing customer belongs to caller's salon
+      const verifyCust = await query(
+        'SELECT id FROM customers WHERE id = $1 AND salon_id = $2 LIMIT 1',
+        [targetCustomerId, salonId]
+      );
+      if (verifyCust.rows.length === 0) {
+        return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
       }
     }
 

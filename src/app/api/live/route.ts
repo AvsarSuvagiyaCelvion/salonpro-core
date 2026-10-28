@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getDefaultSalonId } from '@/lib/salon';
+import { requireTenant } from '@/lib/api-auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
 
     // 1. Waiting customers
     const waitingRes = await query(

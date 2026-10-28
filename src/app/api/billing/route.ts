@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getDefaultSalonId } from '@/lib/salon';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function GET(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q')?.trim() || '';
     const statusFilter = searchParams.get('status')?.trim().toLowerCase() || 'all';
 
     let sql = `
       SELECT i.id, i.number, i.session_id, i.subtotal, i.discount_type, 
-              i.discount_value, i.discount_amount, i.total, i.whatsapp_sent, i.created_at,
+              i.discount_value, i.discount_amount, i.tax_rate, i.tax_amount, i.total, i.whatsapp_sent, i.created_at,
               c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile,
               COALESCE(SUM(p.amount), 0)::numeric(10,2) as paid_amount,
               (i.total - COALESCE(SUM(p.amount), 0))::numeric(10,2) as due_amount,

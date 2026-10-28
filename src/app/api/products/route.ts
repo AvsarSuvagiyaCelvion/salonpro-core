@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getDefaultSalonId } from '@/lib/salon';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function GET(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);
     const filter = searchParams.get('filter') || 'all'; // all | low_stock | active
     const q = searchParams.get('q')?.trim() || '';
@@ -44,7 +47,10 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const body = await request.json();
 
     const {
@@ -58,11 +64,13 @@ export async function POST(request: Request) {
       active = true,
     } = body;
 
-    if (!name || price === undefined) {
-      return NextResponse.json(
-        { error: 'Product name and selling price are required.' },
-        { status: 400 }
-      );
+    // Server-side validation
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: 'Product name is required' }, { status: 400 });
+    }
+    const numericPrice = parseFloat(price);
+    if (isNaN(numericPrice) || numericPrice < 0) {
+      return NextResponse.json({ error: 'Valid price is required' }, { status: 400 });
     }
 
     const res = await query(
@@ -73,20 +81,23 @@ export async function POST(request: Request) {
       [
         salonId,
         name.trim(),
-        brand ? brand.trim() : null,
-        sku ? sku.trim() : null,
-        Number(price),
-        Number(cost_price),
+        brand?.trim() || null,
+        sku?.trim() || null,
+        numericPrice,
+        parseFloat(cost_price) || 0,
         parseInt(stock, 10) || 0,
         parseInt(min_stock, 10) || 5,
         Boolean(active),
       ]
     );
 
-    return NextResponse.json({
-      product: res.rows[0],
-      message: 'Product added successfully',
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        product: { ...res.rows[0], is_low_stock: (parseInt(stock, 10) || 0) <= (parseInt(min_stock, 10) || 5) },
+        message: 'Product added successfully',
+      },
+      { status: 201 }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

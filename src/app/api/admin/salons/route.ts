@@ -1,31 +1,34 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { query } from '@/lib/db';
-import { ADMIN_COOKIE_NAME, verifyAdminSessionToken } from '@/lib/auth';
+import { requireAdmin } from '@/lib/api-auth';
 import { clearSalonCache } from '@/lib/salon';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    const payload = await verifyAdminSessionToken(token);
-    if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await requireAdmin(request);
+    if (auth.error) return auth.error;
 
     const salons = await query(`
       SELECT 
         s.*,
+        u.email as owner_email,
+        u.full_name as owner_name,
+        u.phone as owner_phone,
         COUNT(DISTINCT st.id) as staff_count,
         COUNT(DISTINCT sv.id) as services_count,
         COUNT(DISTINCT c.id) as customer_count,
-        COUNT(DISTINCT a.id) as appointments_count
+        COUNT(DISTINCT a.id) as appointments_count,
+        COALESCE(SUM(i.total), 0)::numeric(10,2) as total_revenue
       FROM salons s
+      LEFT JOIN LATERAL (
+        SELECT email, full_name, phone FROM users WHERE salon_id = s.id AND role = 'owner' LIMIT 1
+      ) u ON true
       LEFT JOIN staff st ON s.id = st.salon_id
       LEFT JOIN services sv ON s.id = sv.salon_id
       LEFT JOIN customers c ON s.id = c.salon_id
       LEFT JOIN appointments a ON s.id = a.salon_id
-      GROUP BY s.id
+      LEFT JOIN invoices i ON s.id = i.salon_id
+      GROUP BY s.id, u.email, u.full_name, u.phone
       ORDER BY s.created_at ASC
     `);
 
@@ -37,12 +40,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    const payload = await verifyAdminSessionToken(token);
-    if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await requireAdmin(request);
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const { name, slug, brand_color, open_time, close_time, phone, address } = body;

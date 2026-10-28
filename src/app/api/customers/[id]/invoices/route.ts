@@ -1,17 +1,31 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const { id: customerId } = await params;
 
-    // 1. Fetch all invoices for this specific customer
+    // Verify customer belongs to caller's salon
+    const custCheck = await query(
+      'SELECT id FROM customers WHERE id = $1 AND salon_id = $2 LIMIT 1',
+      [customerId, salonId]
+    );
+    if (custCheck.rows.length === 0) {
+      return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
+    }
+
+    // Fetch invoices for this customer and salon
     const invoicesRes = await query(
       `SELECT i.id, i.number, i.session_id, i.subtotal, i.discount_type, 
-              i.discount_value, i.discount_amount, i.total, i.whatsapp_sent, i.created_at,
+              i.discount_value, i.discount_amount, i.tax_rate, i.tax_amount, i.total, i.whatsapp_sent, i.created_at,
               COALESCE(SUM(p.amount), 0)::numeric(10,2) as paid_amount,
               (i.total - COALESCE(SUM(p.amount), 0))::numeric(10,2) as due_amount,
               CASE 
@@ -21,10 +35,10 @@ export async function GET(
               END as status
        FROM invoices i
        LEFT JOIN payments p ON i.id = p.invoice_id
-       WHERE i.customer_id = $1
+       WHERE i.customer_id = $1 AND i.salon_id = $2
        GROUP BY i.id
        ORDER BY i.created_at DESC`,
-      [customerId]
+      [customerId, salonId]
     );
 
     const sessionIds = invoicesRes.rows.map((r) => r.session_id).filter(Boolean);

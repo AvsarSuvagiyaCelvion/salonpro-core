@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { getDefaultSalonId } from '@/lib/salon';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function GET(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);
 
     const status = searchParams.get('status')?.trim().toLowerCase() || 'all';
@@ -50,7 +53,10 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const body = await request.json();
     const {
       customer_id,
@@ -71,7 +77,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Resolve or create customer
+    // 1. Resolve or create customer within caller's salon
     let targetCustomerId = customer_id;
     if (!targetCustomerId) {
       if (!new_customer_name || !new_customer_mobile) {
@@ -95,17 +101,35 @@ export async function POST(request: Request) {
         );
         targetCustomerId = createCustRes.rows[0].id;
       }
+    } else {
+      // Ensure target customer belongs to caller's salon
+      const verifyCust = await query(
+        'SELECT id FROM customers WHERE id = $1 AND salon_id = $2 LIMIT 1',
+        [targetCustomerId, salonId]
+      );
+      if (verifyCust.rows.length === 0) {
+        return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
+      }
     }
 
-    // 2. Fetch service duration to calculate ends_at
+    // 2. Fetch service duration to calculate ends_at (scoped to salon)
     const srvRes = await query(
-      'SELECT id, name, duration_min, price FROM services WHERE id = $1',
-      [service_id]
+      'SELECT id, name, duration_min, price FROM services WHERE id = $1 AND salon_id = $2',
+      [service_id, salonId]
     );
     if (srvRes.rows.length === 0) {
-      return NextResponse.json({ error: 'Service not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Service not found in this salon' }, { status: 404 });
     }
     const durationMin = srvRes.rows[0].duration_min || 30;
+
+    // Verify staff belongs to caller's salon
+    const staffRes = await query(
+      'SELECT id, name FROM staff WHERE id = $1 AND salon_id = $2',
+      [staff_id, salonId]
+    );
+    if (staffRes.rows.length === 0) {
+      return NextResponse.json({ error: 'Staff member not found in this salon' }, { status: 404 });
+    }
 
     // Construct timestamps
     const startsAt = new Date(`${date}T${start_time}:00`);
@@ -130,7 +154,6 @@ export async function POST(request: Request) {
         insertError.message.includes('no_overlap') ||
         insertError.message.includes('exclusion constraint')
       ) {
-        // Fetch conflicting appointment to display friendly message
         const conflictRes = await query(
           `SELECT a.starts_at, a.ends_at, s.name as staff_name
            FROM appointments a

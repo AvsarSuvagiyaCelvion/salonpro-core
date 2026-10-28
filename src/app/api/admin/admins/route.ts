@@ -1,20 +1,16 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
-import { ADMIN_COOKIE_NAME, verifyAdminSessionToken } from '@/lib/auth';
+import { requireAdmin } from '@/lib/api-auth';
 
 // 1. List all platform admins (Only accessible by authenticated Super Admin)
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-    const payload = await verifyAdminSessionToken(token);
-    if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await requireAdmin(request);
+    if (auth.error) return auth.error;
 
     const res = await query(
-      `SELECT id, email, name, role, created_at FROM platform_admins ORDER BY created_at ASC`
+      `SELECT id, email, name, role, is_active, created_at FROM platform_admins ORDER BY created_at ASC`
     );
 
     return NextResponse.json({ admins: res.rows });
@@ -23,37 +19,23 @@ export async function GET() {
   }
 }
 
-// 2. Add a new admin (Only accessible from INSIDE admin panel by logged-in Super Admin)
+// 2. Add a new admin (Only accessible by authenticated Super Admin)
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Security Violation: Only authenticated Super Admins can add new admins.' },
-        { status: 401 }
-      );
-    }
-
-    const payload = await verifyAdminSessionToken(token);
-    if (!payload) {
-      return NextResponse.json(
-        { error: 'Security Violation: Invalid admin session.' },
-        { status: 401 }
-      );
-    }
+    const auth = await requireAdmin(request);
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const { email, password, name, role } = body;
 
     const cleanEmail = email?.trim().toLowerCase();
     const cleanPassword = password?.trim();
-    const cleanName = name?.trim() || 'Co-Admin';
-    const cleanRole = role === 'super_admin' ? 'super_admin' : 'admin';
+    const cleanName = name?.trim() || 'Platform Admin';
+    const cleanRole = role === 'super_admin' ? 'super_admin' : 'support';
 
-    if (!cleanEmail || !cleanPassword || cleanPassword.length < 6) {
+    if (!cleanEmail || !cleanPassword || cleanPassword.length < 8) {
       return NextResponse.json(
-        { error: 'Valid email and password (minimum 6 characters) are required.' },
+        { error: 'Valid email and a secure password (minimum 8 characters) are required.' },
         { status: 400 }
       );
     }
@@ -71,11 +53,13 @@ export async function POST(request: Request) {
       );
     }
 
+    const passwordHash = await bcrypt.hash(cleanPassword, 10);
+
     const res = await query(
-      `INSERT INTO platform_admins (email, password, name, role)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, email, name, role, created_at`,
-      [cleanEmail, cleanPassword, cleanName, cleanRole]
+      `INSERT INTO platform_admins (email, password_hash, name, role, is_active)
+       VALUES ($1, $2, $3, $4, true)
+       RETURNING id, email, name, role, is_active, created_at`,
+      [cleanEmail, passwordHash, cleanName, cleanRole]
     );
 
     return NextResponse.json({

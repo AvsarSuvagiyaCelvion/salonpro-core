@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const { id } = await params;
     const body = await request.json();
 
@@ -30,7 +35,7 @@ export async function PUT(
            stock = COALESCE($6, stock),
            min_stock = COALESCE($7, min_stock),
            active = COALESCE($8, active)
-       WHERE id = $9
+       WHERE id = $9 AND salon_id = $10
        RETURNING *`,
       [
         name ? name.trim() : null,
@@ -42,11 +47,12 @@ export async function PUT(
         min_stock !== undefined ? parseInt(min_stock, 10) : null,
         active !== undefined ? Boolean(active) : null,
         id,
+        salonId,
       ]
     );
 
     if (res.rows.length === 0) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Product not found in this salon' }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -63,8 +69,21 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const { id } = await params;
-    await query('DELETE FROM products WHERE id = $1', [id]);
+
+    const res = await query(
+      'DELETE FROM products WHERE id = $1 AND salon_id = $2 RETURNING id',
+      [id, salonId]
+    );
+
+    if (res.rows.length === 0) {
+      return NextResponse.json({ error: 'Product not found in this salon' }, { status: 404 });
+    }
+
     return NextResponse.json({ success: true, message: 'Product deleted' });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

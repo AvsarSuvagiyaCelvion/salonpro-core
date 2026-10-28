@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireTenant(request);
+  if (auth.error) return auth.error;
+
+  const salonId = auth.session.salonId;
   const client = await pool.connect();
   try {
     const { id: sessionId } = await params;
@@ -14,18 +19,19 @@ export async function POST(
       services_discount_value = 0,
       products_discount_type = 'none',
       products_discount_value = 0,
+      tax_rate = 0,
     } = body;
 
     await client.query('BEGIN');
 
-    // 1. Fetch session
+    // 1. Fetch session scoped strictly to caller's salon
     const sessRes = await client.query(
-      'SELECT id, salon_id, customer_id, status FROM sessions WHERE id = $1 FOR UPDATE',
-      [sessionId]
+      'SELECT id, salon_id, customer_id, status FROM sessions WHERE id = $1 AND salon_id = $2 FOR UPDATE',
+      [sessionId, salonId]
     );
 
     if (sessRes.rows.length === 0) {
-      throw new Error('Session not found');
+      throw new Error('Session not found in this salon');
     }
     const session = sessRes.rows[0];
 
@@ -70,25 +76,30 @@ export async function POST(
 
     const totalSubtotal = servicesSubtotal + productsSubtotal;
     const totalDiscountAmount = srvDiscAmount + prodDiscAmount;
-    const finalTotal = Math.max(0, totalSubtotal - totalDiscountAmount);
+    const netTaxable = Math.max(0, totalSubtotal - totalDiscountAmount);
+    
+    // Calculate Tax
+    const numericTaxRate = Math.max(0, parseFloat(tax_rate) || 0);
+    const taxAmount = Number(((netTaxable * numericTaxRate) / 100).toFixed(2));
+    const finalTotal = Number((netTaxable + taxAmount).toFixed(2));
 
-    // 4. Generate next invoice number
+    // 4. Generate next invoice number for this salon
     const countRes = await client.query(
       'SELECT COUNT(*) as count FROM invoices WHERE salon_id = $1',
-      [session.salon_id]
+      [salonId]
     );
     const invSeq = Number(countRes.rows[0].count) + 1;
     const invNumber = `INV-2026-${invSeq.toString().padStart(4, '0')}`;
 
-    // 5. Create invoice
+    // 5. Create invoice with tax breakdown
     const invRes = await client.query(
       `INSERT INTO invoices (
         salon_id, session_id, number, customer_id, subtotal, 
-        discount_type, discount_value, discount_amount, total, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, now())
+        discount_type, discount_value, discount_amount, tax_rate, tax_amount, total, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, now())
       RETURNING *`,
       [
-        session.salon_id,
+        salonId,
         session.id,
         invNumber,
         session.customer_id,
@@ -96,24 +107,26 @@ export async function POST(
         services_discount_type !== 'none' ? services_discount_type : products_discount_type,
         services_discount_value || products_discount_value || 0,
         totalDiscountAmount,
+        numericTaxRate,
+        taxAmount,
         finalTotal,
       ]
     );
 
-    // 6. Reduce inventory stock for all products used
+    // 6. Reduce inventory stock for all products used (scoped to this salon)
     for (const prodItem of productItems) {
       await client.query(
         `UPDATE products 
          SET stock = GREATEST(0, stock - $1)
-         WHERE id = $2`,
-        [prodItem.qty, prodItem.ref_id]
+         WHERE id = $2 AND salon_id = $3`,
+        [prodItem.qty, prodItem.ref_id, salonId]
       );
     }
 
     // 7. Mark session as completed
     await client.query(
-      "UPDATE sessions SET status = 'completed' WHERE id = $1",
-      [sessionId]
+      "UPDATE sessions SET status = 'completed' WHERE id = $1 AND salon_id = $2",
+      [sessionId, salonId]
     );
 
     await client.query('COMMIT');

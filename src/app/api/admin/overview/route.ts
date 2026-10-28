@@ -1,20 +1,11 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { query } from '@/lib/db';
-import { ADMIN_COOKIE_NAME, verifyAdminSessionToken } from '@/lib/auth';
+import { requireAdmin } from '@/lib/api-auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const payload = await verifyAdminSessionToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const auth = await requireAdmin(request);
+    if (auth.error) return auth.error;
 
     // 1. Overall Platform Counts
     const salonsCountRes = await query(`SELECT COUNT(*) as count FROM salons`);

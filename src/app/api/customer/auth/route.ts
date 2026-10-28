@@ -41,9 +41,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const salonId = await getDefaultSalonId();
     const body = await request.json();
-    const { action, name, mobile, email, pin } = body;
+    const { action, name, mobile, email, pin, salonId: reqSalonId, salonSlug } = body;
+
+    let salonId = reqSalonId;
+    if (!salonId && salonSlug) {
+      const sRes = await query('SELECT id FROM salons WHERE slug = $1 LIMIT 1', [salonSlug.toLowerCase().trim()]);
+      if (sRes.rows.length > 0) salonId = sRes.rows[0].id;
+    }
+    if (!salonId) {
+      salonId = await getDefaultSalonId();
+    }
 
     const cleanMobile = mobile?.trim().replace(/\D/g, '');
     const cleanPin = pin?.trim() || '';

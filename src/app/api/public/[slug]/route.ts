@@ -11,7 +11,7 @@ export async function GET(
     // Fetch salon
     const salonRes = await query(
       `SELECT id, name, slug, address, phone, brand_color, logo_url, open_time, close_time, 
-              booking_enabled, working_days, slot_minutes, buffer_minutes, min_advance_hours, max_advance_days
+              booking_enabled, working_days, slot_minutes, buffer_minutes, min_advance_hours, max_advance_days, is_active
        FROM salons 
        WHERE slug = $1 
        LIMIT 1`,
@@ -23,6 +23,13 @@ export async function GET(
     }
 
     const salon = salonRes.rows[0];
+
+    if (!salon.is_active) {
+      return NextResponse.json(
+        { error: 'This salon workspace is currently suspended by administration.' },
+        { status: 403 }
+      );
+    }
 
     // Fetch services enabled for online booking
     const servicesRes = await query(

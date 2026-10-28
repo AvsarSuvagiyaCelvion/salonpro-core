@@ -38,7 +38,7 @@ export async function POST(
 
     // 2. Fetch salon
     const salonRes = await query(
-      `SELECT id, name, slug, phone, brand_color, buffer_minutes 
+      `SELECT id, name, slug, phone, brand_color, buffer_minutes, is_active 
        FROM salons 
        WHERE slug = $1 LIMIT 1`,
       [slug]
@@ -49,6 +49,13 @@ export async function POST(
     }
 
     const salon = salonRes.rows[0];
+
+    if (!salon.is_active) {
+      return NextResponse.json(
+        { error: 'Online booking is temporarily unavailable because this salon workspace is suspended.' },
+        { status: 403 }
+      );
+    }
 
     // 3. Fetch service
     const serviceRes = await query(

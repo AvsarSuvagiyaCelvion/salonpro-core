@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { requireTenant } from '@/lib/api-auth';
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireTenant(request);
+    if (auth.error) return auth.error;
+
+    const salonId = auth.session.salonId;
     const body = await request.json();
     const { customer_id, kind, plan_id, amount_paid } = body;
 
@@ -13,15 +18,30 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fetch validity days
+    // Verify customer belongs to caller's salon
+    const custCheck = await query(
+      'SELECT id FROM customers WHERE id = $1 AND salon_id = $2 LIMIT 1',
+      [customer_id, salonId]
+    );
+    if (custCheck.rows.length === 0) {
+      return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
+    }
+
+    // Fetch and verify plan ownership
     let validityDays = 365;
     if (kind === 'membership') {
-      const planRes = await query('SELECT validity_days, price FROM membership_plans WHERE id = $1', [plan_id]);
-      if (planRes.rows.length === 0) return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
+      const planRes = await query(
+        'SELECT validity_days, price FROM membership_plans WHERE id = $1 AND salon_id = $2 LIMIT 1',
+        [plan_id, salonId]
+      );
+      if (planRes.rows.length === 0) return NextResponse.json({ error: 'Membership plan not found in this salon' }, { status: 404 });
       validityDays = planRes.rows[0].validity_days || 365;
     } else {
-      const planRes = await query('SELECT validity_days, price FROM package_plans WHERE id = $1', [plan_id]);
-      if (planRes.rows.length === 0) return NextResponse.json({ error: 'Package not found' }, { status: 404 });
+      const planRes = await query(
+        'SELECT validity_days, price FROM package_plans WHERE id = $1 AND salon_id = $2 LIMIT 1',
+        [plan_id, salonId]
+      );
+      if (planRes.rows.length === 0) return NextResponse.json({ error: 'Package plan not found in this salon' }, { status: 404 });
       validityDays = planRes.rows[0].validity_days || 90;
     }
 

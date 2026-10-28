@@ -1,39 +1,90 @@
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { query } from '@/lib/db';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    const expectedEmail = (process.env.DEMO_EMAIL || 'avsarsuvagiya968@gmail.com').trim().toLowerCase();
-    const expectedPassword = process.env.DEMO_PASSWORD || 'Av$@r2136';
+    const cleanEmail = email?.trim().toLowerCase();
+    const cleanPassword = password?.trim();
 
-    if (!email || !password) {
+    if (!cleanEmail || !cleanPassword) {
       return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    if (
-      email.trim().toLowerCase() !== expectedEmail ||
-      password !== expectedPassword
-    ) {
+    // 1. Query users table joined with salons table
+    const userRes = await query(
+      `SELECT u.id, u.salon_id, u.email, u.password_hash, u.full_name, u.role, u.is_active as user_active,
+              s.name as salon_name, s.slug as salon_slug, s.is_active as salon_active
+       FROM users u
+       JOIN salons s ON u.salon_id = s.id
+       WHERE LOWER(u.email) = $1
+       LIMIT 1`,
+      [cleanEmail]
+    );
+
+    if (userRes.rows.length === 0) {
       return NextResponse.json(
         { error: 'Invalid email or password. Please check your credentials.' },
         { status: 401 }
       );
     }
 
-    // Create session token
+    const user = userRes.rows[0];
+
+    // 2. Check if user account is active
+    if (!user.user_active) {
+      return NextResponse.json(
+        { error: 'Your account has been deactivated. Please contact support.' },
+        { status: 403 }
+      );
+    }
+
+    // 3. Check if salon workspace is active
+    if (!user.salon_active) {
+      return NextResponse.json(
+        { error: 'Your salon workspace has been suspended. Please contact platform administration.' },
+        { status: 403 }
+      );
+    }
+
+    // 4. Verify password with bcrypt
+    const passwordMatch = await bcrypt.compare(cleanPassword, user.password_hash);
+    if (!passwordMatch) {
+      return NextResponse.json(
+        { error: 'Invalid email or password. Please check your credentials.' },
+        { status: 401 }
+      );
+    }
+
+    // 5. Create multi-tenant session token containing tenant context
     const token = await createSessionToken({
-      email: expectedEmail,
-      role: 'owner',
+      userId: user.id,
+      salonId: user.salon_id,
+      email: user.email,
+      role: user.role,
+      salonSlug: user.salon_slug,
     });
 
     const response = NextResponse.json({
       success: true,
       message: 'Login successful',
+      user: {
+        id: user.id,
+        name: user.full_name,
+        email: user.email,
+        role: user.role,
+      },
+      salon: {
+        id: user.salon_id,
+        name: user.salon_name,
+        slug: user.salon_slug,
+      },
     });
 
     // Set signed httpOnly cookie
@@ -49,6 +100,7 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error: any) {
+    console.error('Tenant login error:', error);
     return NextResponse.json(
       { error: error.message || 'Login failed' },
       { status: 500 }

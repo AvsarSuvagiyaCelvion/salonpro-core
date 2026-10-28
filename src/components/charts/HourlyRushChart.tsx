@@ -93,3 +93,4 @@ export default function HourlyRushChart({ data }: HourlyRushChartProps) {
     </div>
   );
 }
+

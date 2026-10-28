@@ -64,7 +64,23 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<'today' | '7d' | '30d'>('7d');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
+  const [salonSlug, setSalonSlug] = useState<string>('');
   const [hoveredPoint, setHoveredPoint] = useState<ChartPoint | null>(null);
+
+  useEffect(() => {
+    async function loadSalon() {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const sData = await res.json();
+          if (sData.salon?.slug) {
+            setSalonSlug(sData.salon.slug);
+          }
+        }
+      } catch {}
+    }
+    loadSalon();
+  }, []);
 
   useEffect(() => {
     async function loadStats() {
@@ -122,14 +138,16 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          <Link
-            href="/glow-studio"
-            target="_blank"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-neutral-100 hover:bg-neutral-200 text-[#2a1630] text-xs font-semibold border border-neutral-200 shadow-sm transition-all"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-[#b3135b]" />
-            <span>Public Booking</span>
-          </Link>
+          {salonSlug && (
+            <Link
+              href={`/${salonSlug}`}
+              target="_blank"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-neutral-100 hover:bg-neutral-200 text-[#2a1630] text-xs font-semibold border border-neutral-200 shadow-sm transition-all"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-[#b3135b]" />
+              <span>Public Booking</span>
+            </Link>
+          )}
         </div>
       </div>
 

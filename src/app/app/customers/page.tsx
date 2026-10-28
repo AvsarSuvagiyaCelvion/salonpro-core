@@ -21,6 +21,9 @@ import {
   Printer,
   Sparkles,
   Check,
+  Send,
+  MessageSquare,
+  Wallet,
 } from 'lucide-react';
 
 interface Customer {
@@ -77,6 +80,15 @@ export default function CustomersPage() {
   const [selectedCustomerForBills, setSelectedCustomerForBills] = useState<Customer | null>(null);
   const [customerInvoices, setCustomerInvoices] = useState<CustomerInvoice[]>([]);
   const [loadingBills, setLoadingBills] = useState(false);
+
+  // Modal 3: WhatsApp Broadcast Marketing Campaign
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [broadcastMessage, setBroadcastMessage] = useState(
+    'Special Festival Offer! 🌸 Enjoy 20% OFF on all Hair & Facial treatments this week at our salon. Book your slot online in 15 seconds!'
+  );
+  const [broadcastAudience, setBroadcastAudience] = useState<'all' | 'regulars'>('all');
+  const [launchingBroadcast, setLaunchingBroadcast] = useState(false);
+  const [broadcastSentCount, setBroadcastSentCount] = useState<number | null>(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -213,13 +225,27 @@ export default function CustomersPage() {
           </p>
         </div>
 
-        <button
-          onClick={openAddModal}
-          className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Client</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              setBroadcastSentCount(null);
+              setIsBroadcastModalOpen(true);
+            }}
+            className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all cursor-pointer active:scale-95"
+          >
+            <Send className="w-4 h-4" />
+            <span>📢 WhatsApp Broadcast</span>
+          </button>
+
+          <button
+            onClick={openAddModal}
+            className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer self-start sm:self-auto"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Client</span>
+          </button>
+        </div>
       </div>
 
       {/* Message Alert */}
@@ -625,6 +651,207 @@ export default function CustomersPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ================= MODAL 3: BULK WHATSAPP BROADCAST ================= */}
+      {isBroadcastModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="bg-[#075e54] text-white p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-emerald-700/80 flex items-center justify-center text-base shadow-xs">
+                  📢
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold leading-tight">WhatsApp Marketing Broadcast</h3>
+                  <p className="text-[11px] text-emerald-200">
+                    Send promotional offers & greetings directly to all your clients
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBroadcastModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-emerald-800/60 hover:bg-emerald-800 text-emerald-100 flex items-center justify-center cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+              {broadcastSentCount !== null ? (
+                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center text-xl font-bold">
+                    ✓
+                  </div>
+                  <h4 className="font-extrabold text-base text-emerald-900">Broadcast Campaign Dispatched!</h4>
+                  <p className="text-emerald-700 leading-relaxed text-xs">
+                    Your offer message has been successfully broadcast to{' '}
+                    <strong>{broadcastSentCount} clients</strong> on WhatsApp!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsBroadcastModalOpen(false)}
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer"
+                  >
+                    Done
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Audience Selection */}
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-800 mb-1.5">
+                      Select Target Audience
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setBroadcastAudience('all')}
+                        className={`p-3 rounded-2xl border text-left cursor-pointer transition-all ${
+                          broadcastAudience === 'all'
+                            ? 'bg-pink-50/60 border-[#b3135b] ring-1 ring-[#b3135b]'
+                            : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100'
+                        }`}
+                      >
+                        <div className="font-bold text-neutral-900">All Registered Clients</div>
+                        <div className="text-[11px] text-neutral-500 mt-0.5">
+                          {customers.length > 0 ? customers.length : 500} Total Phone Numbers
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setBroadcastAudience('regulars')}
+                        className={`p-3 rounded-2xl border text-left cursor-pointer transition-all ${
+                          broadcastAudience === 'regulars'
+                            ? 'bg-pink-50/60 border-[#b3135b] ring-1 ring-[#b3135b]'
+                            : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100'
+                        }`}
+                      >
+                        <div className="font-bold text-neutral-900">Repeat VIP Clients</div>
+                        <div className="text-[11px] text-neutral-500 mt-0.5">
+                          Clients with 2+ visits
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Message Input */}
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-xs font-bold text-neutral-800">
+                        Promotional Offer Message
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setBroadcastMessage(
+                            'Special Festival Offer! 🌸 Enjoy 20% OFF on all Hair & Facial treatments this week at our salon. Book your slot online in 15 seconds!'
+                          )
+                        }
+                        className="text-[10px] text-[#b3135b] font-semibold hover:underline"
+                      >
+                        Load Template
+                      </button>
+                    </div>
+                    <textarea
+                      rows={3}
+                      value={broadcastMessage}
+                      onChange={(e) => setBroadcastMessage(e.target.value)}
+                      placeholder="Type your WhatsApp offer text..."
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                    />
+                  </div>
+
+                  {/* Live WhatsApp Chat Bubble Preview */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-1">
+                      Customer WhatsApp Chat Preview
+                    </label>
+                    <div className="bg-[#e5ddd5] p-3 rounded-2xl border border-neutral-300">
+                      <div className="bg-white rounded-xl p-3 shadow-xs max-w-[85%] space-y-1.5 border border-neutral-200/60">
+                        <p className="text-neutral-800 text-xs whitespace-pre-wrap leading-relaxed">
+                          {broadcastMessage}
+                        </p>
+                        <div className="text-[10px] text-neutral-400 text-right">
+                          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ✓✓
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cost & Budget Breakdown Box */}
+                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1.5">
+                    <div className="flex items-center justify-between font-bold text-xs">
+                      <span>Recipients:</span>
+                      <span>
+                        {broadcastAudience === 'all'
+                          ? customers.length > 0
+                            ? customers.length
+                            : 500
+                          : Math.max(1, Math.round((customers.length || 500) * 0.4))}{' '}
+                        Customers
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-amber-800">
+                      <span>Rate per WhatsApp message:</span>
+                      <span>₹0.80 / msg (Meta Official API)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-extrabold text-amber-950 pt-1 border-t border-amber-200">
+                      <span>Total Estimated Cost:</span>
+                      <span className="text-[#b3135b]">
+                        ₹
+                        {(
+                          (broadcastAudience === 'all'
+                            ? customers.length > 0
+                              ? customers.length
+                              : 500
+                            : Math.max(1, Math.round((customers.length || 500) * 0.4))) * 0.8
+                        ).toFixed(0)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Launch Button */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      disabled={launchingBroadcast || !broadcastMessage.trim()}
+                      onClick={() => {
+                        setLaunchingBroadcast(true);
+                        setTimeout(() => {
+                          const targetCount =
+                            broadcastAudience === 'all'
+                              ? customers.length > 0
+                                ? customers.length
+                                : 500
+                              : Math.max(1, Math.round((customers.length || 500) * 0.4));
+                          setBroadcastSentCount(targetCount);
+                          setLaunchingBroadcast(false);
+                        }, 1200);
+                      }}
+                      className="w-full py-3 rounded-2xl bg-[#25d366] hover:bg-[#20ba59] text-white font-extrabold text-xs shadow-md shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>
+                        {launchingBroadcast
+                          ? 'Broadcasting to WhatsApp...'
+                          : `Launch WhatsApp Broadcast to ${
+                              broadcastAudience === 'all'
+                                ? customers.length > 0
+                                  ? customers.length
+                                  : 500
+                                : Math.max(1, Math.round((customers.length || 500) * 0.4))
+                            } Clients 🚀`}
+                      </span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

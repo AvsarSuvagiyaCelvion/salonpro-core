@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const cleanEmail = email?.trim().toLowerCase();
     const cleanPassword = password?.trim();
     const cleanName = name?.trim() || 'Platform Admin';
-    const cleanRole = role === 'super_admin' ? 'super_admin' : 'support';
+    const cleanRole = role === 'super_admin' ? 'super_admin' : 'platform_admin';
 
     if (!cleanEmail || !cleanPassword || cleanPassword.length < 8) {
       return NextResponse.json(

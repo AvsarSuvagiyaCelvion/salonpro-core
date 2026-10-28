@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -24,6 +24,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [admin, setAdmin] = useState<{ email: string; name: string; role: string } | null>(null);
+
+  useEffect(() => {
+    async function loadAdmin() {
+      try {
+        const res = await fetch('/api/admin/auth');
+        const data = await res.json();
+        if (data.loggedIn && data.admin) {
+          setAdmin(data.admin);
+        }
+      } catch {}
+    }
+    loadAdmin();
+  }, []);
 
   // If on admin login page, render without admin layout shell
   if (pathname === '/admin/login') {
@@ -226,12 +240,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Bottom Admin User Box */}
             <div className="pt-4 border-t border-slate-100 space-y-3">
               <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs">
-                  A
+                <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs uppercase">
+                  {admin?.name?.charAt(0) || 'A'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-bold text-slate-900 truncate">Super Admin</div>
-                  <div className="text-[10px] text-slate-500 font-mono truncate">Adminsalonpro@gmail.com</div>
+                  <div className="text-xs font-bold text-slate-900 truncate">
+                    {admin?.name || 'Super Admin'}
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-mono truncate">
+                    {admin?.email || 'admin@salonpro.in'}
+                  </div>
                 </div>
               </div>
               <button
@@ -336,12 +354,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Admin User Profile Box */}
           <div className="pt-4 border-t border-slate-100 px-3">
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs">
-                A
+              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs uppercase">
+                {admin?.name?.charAt(0) || 'A'}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold text-slate-900 truncate">Super Admin</div>
-                <div className="text-[10px] text-slate-500 font-mono truncate">Adminsalonpro@gmail.com</div>
+                <div className="text-xs font-bold text-slate-900 truncate">
+                  {admin?.name || 'Super Admin'}
+                </div>
+                <div className="text-[10px] text-slate-500 font-mono truncate">
+                  {admin?.email || 'admin@salonpro.in'}
+                </div>
               </div>
             </div>
           </div>

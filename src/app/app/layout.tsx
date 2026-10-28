@@ -50,6 +50,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [salon, setSalon] = useState<{ name: string; slug: string } | null>(null);
 
+  const [user, setUser] = useState<{ email: string; role: string } | null>(null);
+
   useEffect(() => {
     async function loadSalonDetails() {
       try {
@@ -57,6 +59,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data.salon) {
           setSalon({ name: data.salon.name, slug: data.salon.slug });
+        }
+        if (data.user) {
+          setUser(data.user);
         }
       } catch {}
     }
@@ -274,8 +279,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </button>
 
               <div className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80">
-                <div className="text-[10px] text-neutral-400 uppercase font-bold">Logged In Manager</div>
-                <div className="text-xs font-bold text-[#2a1630] truncate mt-0.5">avsarsuvagiya968@gmail.com</div>
+                <div className="text-[10px] text-neutral-400 uppercase font-bold">
+                  {user?.role === 'owner' ? 'Logged In Owner' : user?.role === 'manager' ? 'Logged In Manager' : 'Logged In User'}
+                </div>
+                <div className="text-xs font-bold text-[#2a1630] truncate mt-0.5">
+                  {user?.email || 'Active Workspace User'}
+                </div>
               </div>
               <button
                 type="button"
@@ -344,11 +353,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div>
               <div className="text-xs text-neutral-500 mb-0.5">Signed in as:</div>
               <div className="text-xs font-semibold text-[#2a1630] truncate">
-                avsarsuvagiya968@gmail.com
+                {user?.email || 'Active Workspace User'}
               </div>
               <div className="text-[11px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                Owner Account
+                <span className="capitalize">{user?.role || 'Owner'} Account</span>
               </div>
             </div>
           </div>

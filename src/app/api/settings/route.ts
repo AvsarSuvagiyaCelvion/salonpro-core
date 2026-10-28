@@ -22,7 +22,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Salon not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ salon: res.rows[0] });
+    return NextResponse.json({
+      salon: res.rows[0],
+      user: {
+        email: auth.session.email,
+        role: auth.session.role || 'owner',
+      },
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

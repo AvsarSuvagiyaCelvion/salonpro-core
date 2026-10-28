@@ -68,7 +68,7 @@ export default function AdminOwnersPage() {
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex justify-between items-center">
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold">Assigned Owner Email</div>
-                  <div className="font-mono text-slate-900 font-semibold">avsarsuvagiya968@gmail.com</div>
+                  <div className="font-mono text-slate-900 font-semibold">{s.owner_email || 'Owner account pending'}</div>
                 </div>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
                   Verified Owner

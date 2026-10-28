@@ -127,7 +127,7 @@ export default function LoginPage() {
                   </div>
                   <p className="leading-relaxed text-[11px] text-amber-800">
                     Salon accounts are managed by the Platform Super Admin. If you forgot your password, please contact{' '}
-                    <strong className="font-mono text-amber-950">Adminsalonpro@gmail.com</strong> or your system administrator to issue a secure password reset.
+                    <strong className="font-semibold text-amber-950">Platform Support</strong> or your system administrator to issue a secure password reset.
                   </p>
                 </div>
               )}

@@ -79,43 +79,6 @@ export async function POST(request: Request) {
     // Clear salon cache
     clearSalonCache();
 
-    // Seed standard starter services for immediate live client booking demo
-    const s1 = await query(
-      `INSERT INTO services (salon_id, name, category, description, duration_min, price, online_enabled)
-       VALUES ($1, 'Haircut & Styling', 'Hair', 'Precision haircut, hair wash and styling finish', 30, 500, true) RETURNING id`,
-      [newSalon.id]
-    );
-    const s2 = await query(
-      `INSERT INTO services (salon_id, name, category, description, duration_min, price, online_enabled)
-       VALUES ($1, 'Hair Spa & Conditioning', 'Hair', 'Deep conditioning spa treatment for hair repair and shine', 45, 1000, true) RETURNING id`,
-      [newSalon.id]
-    );
-    const s3 = await query(
-      `INSERT INTO services (salon_id, name, category, description, duration_min, price, online_enabled)
-       VALUES ($1, 'Facial & Glow Therapy', 'Skin', 'Deep pore cleansing and refreshing skin hydration', 45, 800, true) RETURNING id`,
-      [newSalon.id]
-    );
-
-    // Seed 1 default staff stylist
-    const staffRes = await query(
-      `INSERT INTO staff (salon_id, name, role_title, service_commission_pct, product_commission_pct, active, show_online)
-       VALUES ($1, 'Senior Stylist', 'Hair & Beauty Specialist', 10, 5, true, true) RETURNING id`,
-      [newSalon.id]
-    );
-
-    // Map staff to services
-    if (staffRes.rows.length > 0) {
-      const staffId = staffRes.rows[0].id;
-      for (const s of [s1, s2, s3]) {
-        if (s.rows.length > 0) {
-          await query(
-            `INSERT INTO staff_services (staff_id, service_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-            [staffId, s.rows[0].id]
-          );
-        }
-      }
-    }
-
     return NextResponse.json({ success: true, salon: newSalon });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

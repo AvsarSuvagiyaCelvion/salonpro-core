@@ -139,42 +139,6 @@ export async function POST(request: Request) {
     );
     const newUser = userRes.rows[0];
 
-    // Add owner as first Stylist in staff table
-    const staffRes = await client.query(
-      `INSERT INTO staff (
-        salon_id, name, role_title, service_commission_pct, product_commission_pct, active, show_online
-      ) VALUES (
-        $1, $2, 'Owner & Master Stylist', 10, 5, true, true
-      ) RETURNING id`,
-      [newSalon.id, cleanOwnerName]
-    );
-    const ownerStaffId = staffRes.rows[0].id;
-
-    // Seed starter services
-    const starterServices = [
-      { name: 'Hair Cut & Styling', category: 'Hair', min: 30, price: 500 },
-      { name: 'Hair Spa & Treatment', category: 'Hair', min: 45, price: 1200 },
-      { name: 'Deep Cleanse Facial', category: 'Skin', min: 60, price: 1500 },
-      { name: 'Beard Grooming & Shape', category: 'Grooming', min: 25, price: 350 },
-    ];
-
-    for (const s of starterServices) {
-      const svRes = await client.query(
-        `INSERT INTO services (
-          salon_id, name, category, description, duration_min, price, online_enabled
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6, true
-        ) RETURNING id`,
-        [newSalon.id, s.name, s.category, `Standard ${s.name} treatment`, s.min, s.price]
-      );
-      if (svRes.rows.length > 0) {
-        await client.query(
-          `INSERT INTO staff_services (staff_id, service_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-          [ownerStaffId, svRes.rows[0].id]
-        );
-      }
-    }
-
     await client.query('COMMIT');
     clearSalonCache();
 

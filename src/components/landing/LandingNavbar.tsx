@@ -39,9 +39,6 @@ export default function LandingNavbar() {
               <span className="font-black text-base sm:text-xl text-slate-900 tracking-tight">
                 SalonPro
               </span>
-              <span className="hidden sm:inline-flex text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pink-50 text-[#b3135b] border border-pink-200">
-                SaaS
-              </span>
             </div>
           </Link>
 
@@ -198,7 +195,7 @@ export default function LandingNavbar() {
 
             {/* Drawer Footer */}
             <div className="pt-4 border-t border-neutral-100 text-[11px] text-slate-400 text-center">
-              SalonPro Multi-Tenant Cloud SaaS
+              SalonPro Salon Management Platform
             </div>
           </div>
         </div>

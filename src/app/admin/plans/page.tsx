@@ -184,7 +184,7 @@ export default function AdminPlansPage() {
             Platform Monetization
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            SaaS Subscription Plans
+            Subscription Plans & Pricing
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
             Manage pricing tiers, 7-day free trial rules, and salon membership subscriptions

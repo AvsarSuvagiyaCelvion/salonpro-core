@@ -233,16 +233,16 @@ export default function RegisterSalonPage() {
       {/* Main Content Area */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-semibold mb-4 shadow-xs">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-bold mb-4 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-[#b3135b]" />
-            <span>Launch Your Salon Operating System in 2 Minutes</span>
+            <span>🎁 7-Day Free Trial Demo · No Credit Card Required · ₹0 Today</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-[1.18]">
-            Register Your Salon Business
+            Create Salon Account & Start 7-Day Demo
           </h1>
           <p className="text-xs sm:text-base text-slate-600 mt-3 leading-relaxed">
-            Get instant access to automated online bookings, live chair tracking, GST POS billing, and staff commissions.
+            Fill in your details below to launch your private cloud ERP in 60 seconds. You can log in anytime with your registered email & password.
           </p>
         </div>
 
@@ -451,6 +451,15 @@ export default function RegisterSalonPage() {
                   <span>Proceed to Payment & Activate Plan ➔</span>
                 )}
               </button>
+
+              <div className="text-center pt-3">
+                <p className="text-xs text-slate-500">
+                  Already have an existing salon account?{' '}
+                  <Link href="/salon-owner" className="font-bold text-[#b3135b] hover:underline">
+                    Sign in to your dashboard ➔
+                  </Link>
+                </p>
+              </div>
             </form>
           </div>
 

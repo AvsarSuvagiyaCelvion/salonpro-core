@@ -14,6 +14,10 @@ import {
   TrendingUp,
   Building2,
   Award,
+  Check,
+  Zap,
+  Lock,
+  Gift,
 } from 'lucide-react';
 import StatsCounter from '@/components/landing/StatsCounter';
 
@@ -37,10 +41,9 @@ export default function MarketingLandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 max-w-5xl mx-auto px-3.5 sm:px-6 pt-10 sm:pt-18 lg:pt-22 pb-10 sm:pb-16 text-center w-full">
-        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-[11px] sm:text-xs font-semibold mb-5 sm:mb-6 shadow-xs max-w-full">
-          <Sparkles className="w-3.5 h-3.5 text-[#b3135b] shrink-0" />
-          <span className="hidden sm:inline">The #1 All-in-One Salon & Spa Management Software</span>
-          <span className="sm:hidden">The #1 Salon Management Software</span>
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 shadow-xs max-w-full">
+          <Gift className="w-3.5 h-3.5 text-[#b3135b] shrink-0" />
+          <span>🎁 Special Offer: 7-Day Free Trial Demo · Zero Upfront Cost · Instant Setup</span>
         </div>
 
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.22] sm:leading-[1.15] max-w-4xl mx-auto break-normal">
@@ -55,20 +58,38 @@ export default function MarketingLandingPage() {
         </p>
 
         {/* Hero CTAs */}
-        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
           <Link
             href="/register-salon"
-            className="w-full sm:w-auto px-5 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-pink-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-900/25 transition-all active:scale-95 flex items-center justify-center gap-2 group"
           >
-            <span>Register Your Salon (Free Setup) ➔</span>
+            <span>🎁 Start 7-Day Free Trial Demo</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
 
           <Link
             href="/salon-owner"
             className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
           >
+            <Lock className="w-4 h-4 text-slate-500" />
             <span>🔐 Salon Owner Sign In</span>
           </Link>
+        </div>
+
+        {/* Quick Micro-Trust badges */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-500 font-medium">
+          <span className="flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>No credit card required</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Setup in 60 seconds</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Full ERP access for 7 days</span>
+          </span>
         </div>
 
         {/* Animated Social Proof Stats Counter */}
@@ -291,6 +312,264 @@ export default function MarketingLandingPage() {
             <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               End-of-day tally with cash breakdown, UPI payments, gross profit, and top revenue-generating treatments.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= SECTION: 7-DAY FREE TRIAL DEMO & PRICING PLANS ================= */}
+      <section id="pricing" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-slate-200/80">
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-bold mb-3 shadow-xs">
+            <Gift className="w-4 h-4 text-[#b3135b]" />
+            <span>100% Free 7-Day Evaluation Demo</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+            Start Free for 7 Days, Upgrade as You Grow
+          </h2>
+          <p className="text-xs sm:text-base text-slate-600 mt-3 max-w-2xl mx-auto leading-relaxed">
+            Every new salon starts with a full-featured <strong>7-Day Free Trial Demo</strong>. Experience real online bookings, POS billing, staff commission tracking, and live chair kanban with zero upfront cost.
+          </p>
+        </div>
+
+        {/* Step-by-Step Onboarding Roadmap */}
+        <div className="mb-14 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs relative">
+            <div className="w-10 h-10 rounded-2xl bg-pink-100 text-[#b3135b] font-black text-base flex items-center justify-center mb-3">
+              1
+            </div>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">
+              Create Your Salon Account
+            </h4>
+            <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              Enter your <strong>Full Name, Phone Number, Email, Salon Name, City & Password</strong>. Registration takes less than 60 seconds.
+            </p>
+          </div>
+
+          <div className="bg-white border border-pink-300 rounded-2xl p-5 sm:p-6 shadow-xs relative ring-2 ring-pink-100">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white font-black text-base flex items-center justify-center mb-3 shadow-md shadow-pink-900/20">
+              2
+            </div>
+            <h4 className="font-bold text-sm sm:text-base text-[#b3135b]">
+              Instant 7-Day Demo Activated
+            </h4>
+            <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              Your private salon dashboard goes live immediately. Test with your real stylists, services, and live bookings with <strong>₹0 charged</strong>.
+            </p>
+          </div>
+
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs relative">
+            <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-800 font-black text-base flex items-center justify-center mb-3">
+              3
+            </div>
+            <h4 className="font-bold text-sm sm:text-base text-slate-900">
+              Owner Login & Choose Plan
+            </h4>
+            <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              Log in anytime with your email & password. After 7 days, subscribe to your preferred plan to keep your salon active without losing any data!
+            </p>
+          </div>
+        </div>
+
+        {/* Pricing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+          {/* Plan 1: 7-Day Free Trial Demo */}
+          <div className="bg-white border-2 border-pink-400 rounded-3xl p-6 shadow-lg flex flex-col justify-between relative overflow-hidden ring-4 ring-pink-50">
+            <div className="absolute top-0 right-0 bg-[#b3135b] text-white text-[10px] font-black uppercase tracking-wider py-1 px-3 rounded-bl-xl shadow-xs">
+              Free Demo
+            </div>
+
+            <div>
+              <div className="w-10 h-10 rounded-2xl bg-pink-50 text-[#b3135b] flex items-center justify-center mb-4">
+                <Gift className="w-5 h-5 text-[#b3135b]" />
+              </div>
+              <h3 className="font-black text-lg text-slate-900">7-Day Free Trial</h3>
+              <p className="text-xs text-slate-500 mt-1">Full evaluation for new salons</p>
+
+              <div className="mt-4 mb-6">
+                <div className="text-3xl font-black text-slate-900">₹0</div>
+                <div className="text-xs text-slate-500 mt-0.5">Free for 7 full days</div>
+              </div>
+
+              <div className="space-y-2.5 text-xs text-slate-700 pb-6 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Full ERP & POS billing</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Live Studio Floor Kanban</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Public Online Booking Page</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>WhatsApp bill receipts</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>No credit card required</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <Link
+                href="/register-salon"
+                className="w-full py-3 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white font-bold text-xs shadow-md shadow-pink-900/20 transition-all flex items-center justify-center gap-1.5 active:scale-95"
+              >
+                <span>Start 7-Day Demo ➔</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Plan 2: Starter Studio */}
+          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center mb-4">
+                <Scissors className="w-5 h-5" />
+              </div>
+              <h3 className="font-black text-lg text-slate-900">Starter Studio</h3>
+              <p className="text-xs text-slate-500 mt-1">For boutique studios & solo stylists</p>
+
+              <div className="mt-4 mb-6">
+                <div className="text-3xl font-black text-slate-900">₹999</div>
+                <div className="text-xs text-slate-500 mt-0.5">per month + GST</div>
+              </div>
+
+              <div className="space-y-2.5 text-xs text-slate-700 pb-6 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Includes 7-day free trial</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Unlimited client appointments</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>10-second GST billing</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Up to 3 Stylist profiles</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Daily revenue & cash summary</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <Link
+                href="/register-salon"
+                className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 active:scale-95"
+              >
+                <span>Choose Starter ➔</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Plan 3: Growth Professional (Most Popular) */}
+          <div className="bg-gradient-to-b from-[#2a1630] to-[#1a0c1e] text-white rounded-3xl p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-black uppercase tracking-wider py-1 px-3 rounded-bl-xl shadow-xs">
+              Most Popular
+            </div>
+
+            <div>
+              <div className="w-10 h-10 rounded-2xl bg-pink-500/20 text-pink-300 flex items-center justify-center mb-4 border border-pink-500/30">
+                <Sparkles className="w-5 h-5 text-pink-300" />
+              </div>
+              <h3 className="font-black text-lg text-white">Growth Pro</h3>
+              <p className="text-xs text-pink-200/80 mt-1">For busy salons, spas & beauty studios</p>
+
+              <div className="mt-4 mb-6">
+                <div className="text-3xl font-black text-white">₹1,999</div>
+                <div className="text-xs text-pink-200/70 mt-0.5">per month + GST</div>
+              </div>
+
+              <div className="space-y-2.5 text-xs text-pink-100 pb-6 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Includes 7-day free trial</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Unlimited Stylists & Staff</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Retail product sales & POS</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Staff commissions auto-calc</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>WhatsApp marketing studio</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <Link
+                href="/register-salon"
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#e63985] hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-pink-900/30 transition-all flex items-center justify-center gap-1.5 active:scale-95"
+              >
+                <span>Choose Growth Pro ➔</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Plan 4: Enterprise Annual */}
+          <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center mb-4">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <h3 className="font-black text-lg text-slate-900">Enterprise Annual</h3>
+              <p className="text-xs text-slate-500 mt-1">Multi-branch salons & franchises</p>
+
+              <div className="mt-4 mb-6">
+                <div className="text-3xl font-black text-slate-900">₹19,999</div>
+                <div className="text-xs text-emerald-600 font-bold mt-0.5">per year · Save 17%</div>
+              </div>
+
+              <div className="space-y-2.5 text-xs text-slate-700 pb-6 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Everything in Growth Pro</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Multi-branch management</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Dedicated account manager</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Custom domain & SLA</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Priority 24/7 WhatsApp help</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <Link
+                href="/register-salon"
+                className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 active:scale-95"
+              >
+                <span>Choose Enterprise ➔</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

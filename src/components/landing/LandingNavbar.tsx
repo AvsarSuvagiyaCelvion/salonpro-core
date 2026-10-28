@@ -9,6 +9,25 @@ export default function LandingNavbar() {
 
   return (
     <>
+      {/* Top Demo & Offer Announcement Ribbon */}
+      <div className="bg-gradient-to-r from-[#2a1630] via-[#4a1c3d] to-[#2a1630] text-pink-200 text-[11px] sm:text-xs py-2 px-3 text-center font-medium tracking-wide flex items-center justify-center gap-2 relative z-50">
+        <span className="bg-[#b3135b] text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider animate-pulse">
+          7-Day Free Trial
+        </span>
+        <span className="hidden sm:inline">
+          Test-drive SalonPro free for 7 days with zero upfront payment & no credit card required!
+        </span>
+        <span className="sm:hidden">
+          7-Day Free Demo · Zero Upfront Payment!
+        </span>
+        <Link
+          href="/register-salon"
+          className="underline font-bold text-white hover:text-pink-300 ml-1 whitespace-nowrap"
+        >
+          Claim Demo ➔
+        </Link>
+      </div>
+
       <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-3 sm:px-6 py-3 sm:py-4 w-full max-w-full">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
           {/* Logo */}
@@ -31,6 +50,10 @@ export default function LandingNavbar() {
             <a href="#problems" className="hover:text-[#b3135b] transition-colors">Problems We Solve</a>
             <a href="#features" className="hover:text-[#b3135b] transition-colors">Features & POS</a>
             <a href="#how-it-works" className="hover:text-[#b3135b] transition-colors">How It Works</a>
+            <a href="#pricing" className="hover:text-[#b3135b] transition-colors flex items-center gap-1 font-bold text-[#b3135b]">
+              <span>7-Day Trial & Pricing</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-pink-100 text-[#b3135b] text-[9px] uppercase">Free</span>
+            </a>
           </div>
 
           {/* Desktop Action CTAs */}
@@ -43,9 +66,10 @@ export default function LandingNavbar() {
             </Link>
             <Link
               href="/register-salon"
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-bold transition-all shadow-xs active:scale-95 whitespace-nowrap"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-bold transition-all shadow-md shadow-pink-900/15 active:scale-95 whitespace-nowrap flex items-center gap-1.5"
             >
-              Register Salon ➔
+              <span>🎁 Start 7-Day Free Trial</span>
+              <span>➔</span>
             </Link>
           </div>
 
@@ -55,7 +79,7 @@ export default function LandingNavbar() {
               href="/register-salon"
               className="px-2.5 py-1.5 rounded-lg bg-[#b3135b] text-white text-[11px] font-bold shadow-xs active:scale-95 whitespace-nowrap"
             >
-              Register
+              7-Day Trial ➔
             </Link>
             <button
               type="button"
@@ -106,11 +130,14 @@ export default function LandingNavbar() {
                 <Link
                   href="/register-salon"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] text-white font-bold text-xs shadow-md shadow-pink-900/15"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] text-white font-bold text-xs shadow-md shadow-pink-900/15"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Building2 className="w-4 h-4" />
-                    <span>Register Your Salon</span>
+                    <span className="text-base">🎁</span>
+                    <div>
+                      <div>Start 7-Day Free Trial</div>
+                      <div className="text-[10px] text-pink-200 font-normal">₹0 setup · No card needed</div>
+                    </div>
                   </div>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -122,7 +149,7 @@ export default function LandingNavbar() {
                 >
                   <div className="flex items-center gap-2.5">
                     <Lock className="w-4 h-4" />
-                    <span>Salon Owner Sign In</span>
+                    <span>Existing Owner Sign In</span>
                   </div>
                   <ArrowRight className="w-4 h-4" />
                 </Link>

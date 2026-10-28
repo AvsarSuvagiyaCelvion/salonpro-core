@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Sparkles, Lock, Mail, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
 
@@ -63,9 +64,29 @@ export default function LoginPage() {
 
         {/* Login Form Box */}
         <div className="bg-white/90 backdrop-blur-md border border-neutral-200/80 rounded-2xl p-7 shadow-xl shadow-neutral-900/5">
-          <h2 className="text-xl font-bold text-[#2a1630] mb-5">
+          {/* New Salon Owner Free Trial Callout */}
+          <div className="mb-5 p-3.5 rounded-xl bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200/80 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="text-lg shrink-0">🎁</span>
+              <div className="text-left">
+                <p className="text-xs font-bold text-[#b3135b]">New Salon Owner?</p>
+                <p className="text-[11px] text-neutral-600">Register in 60s & get 7-Day Free Trial Demo</p>
+              </div>
+            </div>
+            <Link
+              href="/register-salon"
+              className="px-3 py-1.5 rounded-lg bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-bold whitespace-nowrap shadow-xs active:scale-95 transition-all"
+            >
+              Start Free Trial ➔
+            </Link>
+          </div>
+
+          <h2 className="text-xl font-bold text-[#2a1630] mb-2">
             Owner Sign In
           </h2>
+          <p className="text-xs text-neutral-500 mb-5">
+            Sign in with your registered email and password to access your salon ERP.
+          </p>
 
           {error && (
             <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-700 text-sm animate-in fade-in">
@@ -147,6 +168,19 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            {/* Direct Link to Register */}
+            <div className="text-center pt-2">
+              <p className="text-xs text-neutral-600">
+                Don&apos;t have a salon account yet?{' '}
+                <Link
+                  href="/register-salon"
+                  className="font-bold text-[#b3135b] hover:underline"
+                >
+                  Create Account & Start 7-Day Free Trial ➔
+                </Link>
+              </p>
+            </div>
           </form>
 
           {/* Footer Info & Panel Nav */}

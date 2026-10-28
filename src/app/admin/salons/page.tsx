@@ -28,6 +28,9 @@ export default function AdminSalonsPage() {
   const [search, setSearch] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // Add New Salon Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Platform Super Admin Broadcast Modal State
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [broadcastTitle, setBroadcastTitle] = useState('Monthly Platform Subscription Notice');

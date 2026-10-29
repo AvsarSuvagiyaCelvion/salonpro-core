@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { checkLimit } from '@/lib/plan';
 
 export async function GET(request: Request) {
   try {
@@ -51,7 +52,20 @@ export async function GET(request: Request) {
       [salonId]
     );
 
-    return NextResponse.json({ staff: staffRes.rows });
+    // Mask commissions if current plan doesn't include commission_report flag
+    const canViewCommission = Boolean(auth.session.plan?.flags.commission_report);
+    const rows = canViewCommission
+      ? staffRes.rows
+      : staffRes.rows.map((r) => ({
+          ...r,
+          service_commission_pct: 0,
+          product_commission_pct: 0,
+          service_commission_earned: '0.00',
+          product_commission_earned: '0.00',
+          total_commission_earned: '0.00',
+        }));
+
+    return NextResponse.json({ staff: rows, canViewCommission });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -63,6 +77,12 @@ export async function POST(request: Request) {
     if (auth.error) return auth.error;
 
     const salonId = auth.session.salonId;
+
+    // Check staff plan limits (e.g. Basic: 3 staff max)
+    const limitCheck = await checkLimit('max_staff', salonId);
+    if (!limitCheck.success) {
+      return limitCheck.error;
+    }
     const body = await request.json();
     const {
       name,

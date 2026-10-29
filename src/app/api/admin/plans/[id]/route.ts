@@ -36,6 +36,15 @@ export async function PATCH(
       values.push(price);
     }
 
+    if (body.yearly_price !== undefined) {
+      const yearlyPrice = Number(body.yearly_price);
+      if (isNaN(yearlyPrice) || yearlyPrice < 0) {
+        return NextResponse.json({ error: 'Valid yearly price is required' }, { status: 400 });
+      }
+      updates.push(`yearly_price = $${idx++}`);
+      values.push(yearlyPrice);
+    }
+
     if (body.billing_interval !== undefined) {
       updates.push(`billing_interval = $${idx++}`);
       values.push(body.billing_interval === 'yearly' ? 'yearly' : 'monthly');
@@ -46,9 +55,24 @@ export async function PATCH(
       values.push(JSON.stringify(Array.isArray(body.features) ? body.features : []));
     }
 
+    if (body.limits !== undefined) {
+      updates.push(`limits = $${idx++}::jsonb`);
+      values.push(JSON.stringify(typeof body.limits === 'object' ? body.limits : {}));
+    }
+
+    if (body.flags !== undefined) {
+      updates.push(`flags = $${idx++}::jsonb`);
+      values.push(JSON.stringify(typeof body.flags === 'object' ? body.flags : {}));
+    }
+
     if (body.max_staff !== undefined) {
       updates.push(`max_staff = $${idx++}`);
       values.push(Number(body.max_staff) || 0);
+    }
+
+    if (body.sort_order !== undefined) {
+      updates.push(`sort_order = $${idx++}`);
+      values.push(Number(body.sort_order) || 0);
     }
 
     if (body.is_popular !== undefined) {

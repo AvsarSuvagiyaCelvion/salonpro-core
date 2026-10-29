@@ -9,6 +9,7 @@ import {
   verifyCustomerSessionToken,
 } from './auth';
 import { query } from './db';
+import { getSalonPlan, SalonPlanContext } from './plan';
 
 export interface TenantSession {
   email: string;
@@ -16,6 +17,7 @@ export interface TenantSession {
   salonId: string;
   userId: string;
   salonSlug?: string;
+  plan?: SalonPlanContext;
 }
 
 export interface AdminSession {
@@ -34,8 +36,12 @@ export interface CustomerSession {
 /**
  * Ensures caller has an active tenant session (owner / staff).
  * Returns { session, error: null } if authorized, or { session: null, error: NextResponse } if not.
+ * By default, enforces active subscription (blocks expired trial / subscription with HTTP 402).
  */
-export async function requireTenant(request?: Request): Promise<
+export async function requireTenant(
+  request?: Request,
+  options?: { allowExpired?: boolean }
+): Promise<
   | { session: TenantSession; error: null }
   | { session: null; error: NextResponse }
 > {
@@ -80,41 +86,48 @@ export async function requireTenant(request?: Request): Promise<
     let userId = payload.userId;
     let salonSlug = payload.salonSlug;
 
-    // If legacy token without salonId or userId, resolve from users table
-    if (!salonId || !userId) {
-      const userRes = await query(
-        `SELECT u.id, u.salon_id, s.slug as salon_slug, u.is_active as user_active, s.is_active as salon_active
-         FROM users u
-         JOIN salons s ON u.salon_id = s.id
-         WHERE LOWER(u.email) = $1
-         LIMIT 1`,
-        [payload.email.toLowerCase()]
-      );
+    // Resolve or verify user and salon state from database
+    const userRes = await query(
+      `SELECT u.id, u.salon_id, s.slug as salon_slug, u.is_active as user_active, s.is_active as salon_active
+       FROM users u
+       JOIN salons s ON u.salon_id = s.id
+       WHERE LOWER(u.email) = $1
+       LIMIT 1`,
+      [payload.email.toLowerCase()]
+    );
 
-      if (userRes.rows.length === 0) {
-        return {
-          session: null,
-          error: NextResponse.json(
-            { error: 'Unauthorized: No active salon workspace linked to this user' },
-            { status: 401 }
-          ),
-        };
-      }
+    if (userRes.rows.length === 0) {
+      return {
+        session: null,
+        error: NextResponse.json(
+          { error: 'Unauthorized: No active salon workspace linked to this user' },
+          { status: 401 }
+        ),
+      };
+    }
 
-      const row = userRes.rows[0];
-      if (!row.user_active || !row.salon_active) {
-        return {
-          session: null,
-          error: NextResponse.json(
-            { error: 'Forbidden: Account or salon workspace is deactivated' },
-            { status: 403 }
-          ),
-        };
-      }
+    const row = userRes.rows[0];
+    if (!row.user_active || !row.salon_active) {
+      return {
+        session: null,
+        error: NextResponse.json(
+          { error: 'Forbidden: Account or salon workspace is deactivated', code: 'SALON_INACTIVE' },
+          { status: 403 }
+        ),
+      };
+    }
 
-      userId = row.id;
-      salonId = row.salon_id;
-      salonSlug = row.salon_slug;
+    userId = row.id;
+    salonId = row.salon_id;
+    salonSlug = row.salon_slug;
+
+    // Check plan and subscription status
+    const planResult = await getSalonPlan(salonId);
+    if (!options?.allowExpired && planResult.error) {
+      return {
+        session: null,
+        error: planResult.error,
+      };
     }
 
     return {
@@ -124,6 +137,7 @@ export async function requireTenant(request?: Request): Promise<
         salonId,
         userId,
         salonSlug,
+        plan: planResult.plan || undefined,
       },
       error: null,
     };

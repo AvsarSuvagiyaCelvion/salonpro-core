@@ -10,9 +10,12 @@ export async function GET() {
         slug, 
         description, 
         price, 
+        yearly_price,
         billing_interval, 
         features, 
         max_staff, 
+        limits,
+        flags,
         is_popular, 
         sort_order
       FROM subscription_plans

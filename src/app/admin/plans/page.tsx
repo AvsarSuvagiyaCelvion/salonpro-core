@@ -16,7 +16,11 @@ import {
   Clock,
   ShieldCheck,
   Power,
-  RotateCcw,
+  Scissors,
+  MessageSquare,
+  Lock,
+  Layers,
+  X,
 } from 'lucide-react';
 
 interface SubscriptionPlan {
@@ -25,11 +29,19 @@ interface SubscriptionPlan {
   slug: string;
   description: string | null;
   price: number;
+  yearly_price?: number;
   billing_interval: 'monthly' | 'yearly';
   features: string[];
   max_staff: number;
+  limits?: {
+    max_staff?: number;
+    max_services?: number;
+    wa_per_month?: number;
+  };
+  flags?: Record<string, boolean>;
   is_popular: boolean;
   is_active: boolean;
+  sort_order?: number;
   active_salons_count?: number;
   created_at: string;
 }
@@ -40,6 +52,21 @@ interface PlanStats {
   active_paid_count: number;
   total_salons_count: number;
 }
+
+const ALL_FLAGS: { key: string; label: string; desc: string; category: string }[] = [
+  { key: 'logo_upload', label: 'Custom Logo Upload', desc: 'Allow salon to upload brand logo on receipts & portal', category: 'Branding' },
+  { key: 'commission_report', label: 'Staff Commission & Payroll', desc: 'Auto-compute stylist earnings and commission sheets', category: 'Staff & Payroll' },
+  { key: 'memberships', label: 'VIP Memberships & Packages', desc: 'Create prepaid discount passes & client loyalty tiers', category: 'Marketing' },
+  { key: 'calendar_view', label: 'Calendar Grid View', desc: 'Visual timeline view for staff and chair bookings', category: 'Operations' },
+  { key: 'customer_cancel', label: 'Customer Reschedule / Cancel', desc: 'Permit clients to manage their appointments online', category: 'Operations' },
+  { key: 'export', label: 'Excel / CSV Data Export', desc: 'Download invoices, reports, and customer profiles', category: 'Data & Reporting' },
+  { key: 'coupons', label: 'Promotional Coupons', desc: 'Generate discount codes for festival campaigns', category: 'Marketing' },
+  { key: 'reviews', label: 'Client Feedback & Reviews', desc: 'Collect Google/custom ratings after appointment billing', category: 'Marketing' },
+  { key: 'loyalty', label: 'Loyalty Reward Points', desc: 'Auto-credit points for customer bill totals', category: 'Marketing' },
+  { key: 'custom_domain', label: 'Custom Domain Mapping', desc: 'Host on custom salon domain (requires verified DNS)', category: 'Enterprise' },
+  { key: 'multi_branch', label: 'Multi-Branch Support', desc: 'Manage multiple branches under single owner entity', category: 'Enterprise' },
+  { key: 'priority_support', label: '24/7 Priority Support', desc: 'Direct WhatsApp hotline & dedicated account manager', category: 'Support' },
+];
 
 export default function AdminPlansPage() {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
@@ -54,14 +81,16 @@ export default function AdminPlansPage() {
 
   // Form Fields
   const [name, setName] = useState('');
-  const [price, setPrice] = useState('1999');
+  const [price, setPrice] = useState('999');
+  const [yearlyPrice, setYearlyPrice] = useState('9990');
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
   const [description, setDescription] = useState('');
-  const [featuresText, setFeaturesText] = useState(
-    'Unlimited Stylists & Staff\nWhatsApp Marketing Broadcast Studio\nStaff Commission Payroll\nInstant WhatsApp Digital Bills\nLive Waiting Area Queue'
-  );
-  const [maxStaff, setMaxStaff] = useState('0');
+  const [featuresText, setFeaturesText] = useState('');
+  const [maxStaff, setMaxStaff] = useState('10');
+  const [maxServices, setMaxServices] = useState('100');
+  const [waPerMonth, setWaPerMonth] = useState('200');
   const [isPopular, setIsPopular] = useState(false);
+  const [flags, setFlags] = useState<Record<string, boolean>>({});
 
   async function fetchPlans() {
     try {
@@ -89,27 +118,53 @@ export default function AdminPlansPage() {
   function handleOpenCreate() {
     setEditingPlan(null);
     setName('');
-    setPrice('1499');
+    setPrice('999');
+    setYearlyPrice('9990');
     setBillingInterval('monthly');
-    setDescription('Comprehensive salon management package.');
+    setDescription('Comprehensive salon management tier.');
     setFeaturesText(
-      'Unlimited Bookings & Calendar\nWhatsApp Digital Invoices\nStaff Commission Tracking\nLive Waiting Area\nAnalytics Reports'
+      'Up to 10 Stylists & Staff\nUp to 100 Services in Catalog\n200 WhatsApp Messages / month\nStaff Commission Payroll\nMemberships & Packages\nCalendar Grid View\nData Export'
     );
-    setMaxStaff('0');
+    setMaxStaff('10');
+    setMaxServices('100');
+    setMaxWa('200');
     setIsPopular(false);
+
+    const defaultFlags: Record<string, boolean> = {};
+    ALL_FLAGS.forEach((f) => {
+      defaultFlags[f.key] = ['logo_upload', 'commission_report', 'memberships', 'calendar_view', 'customer_cancel', 'export', 'coupons'].includes(f.key);
+    });
+    setFlags(defaultFlags);
     setIsModalOpen(true);
+  }
+
+  function setMaxWa(val: string) {
+    setWaPerMonth(val);
   }
 
   function handleOpenEdit(plan: SubscriptionPlan) {
     setEditingPlan(plan);
     setName(plan.name);
     setPrice(String(plan.price));
+    setYearlyPrice(String(plan.yearly_price || Number(plan.price) * 10));
     setBillingInterval(plan.billing_interval);
     setDescription(plan.description || '');
     setFeaturesText(Array.isArray(plan.features) ? plan.features.join('\n') : '');
-    setMaxStaff(String(plan.max_staff || 0));
+    setMaxStaff(String(plan.limits?.max_staff ?? plan.max_staff ?? 10));
+    setMaxServices(String(plan.limits?.max_services ?? 100));
+    setWaPerMonth(String(plan.limits?.wa_per_month ?? 200));
     setIsPopular(Boolean(plan.is_popular));
+
+    const curFlags: Record<string, boolean> = {};
+    ALL_FLAGS.forEach((f) => {
+      curFlags[f.key] = Boolean(plan.flags?.[f.key]);
+    });
+    setFlags(curFlags);
     setIsModalOpen(true);
+  }
+
+  function handleToggleFlag(key: string) {
+    setFlags((prev) => ({ ...prev, [key]: !prev[key] }));
   }
 
   async function handleSavePlan(e: React.FormEvent) {
@@ -121,13 +176,22 @@ export default function AdminPlansPage() {
         .map((f) => f.trim())
         .filter(Boolean);
 
+      const limits = {
+        max_staff: Number(maxStaff),
+        max_services: Number(maxServices),
+        wa_per_month: Number(waPerMonth),
+      };
+
       const payload = {
         name,
         price: Number(price),
+        yearly_price: Number(yearlyPrice),
         billing_interval: billingInterval,
         description,
         features: parsedFeatures,
         max_staff: Number(maxStaff),
+        limits,
+        flags,
         is_popular: isPopular,
       };
 
@@ -184,10 +248,10 @@ export default function AdminPlansPage() {
             Platform Monetization
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Subscription Plans & Pricing
+            Subscription Plans & Limits Engine
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Manage pricing tiers, 7-day free trial rules, and salon membership subscriptions
+            Configure SaaS tiers, server-side limits (staff, services, WhatsApp), and 12-feature gate flags
           </p>
         </div>
 
@@ -250,7 +314,7 @@ export default function AdminPlansPage() {
             {stats?.expired_trials_count || 0}
           </div>
           <span className="text-[11px] text-amber-600 font-semibold mt-0.5 block">
-            Access Locked (Ready to Convert)
+            Access Locked (Paywall)
           </span>
         </div>
 
@@ -272,30 +336,6 @@ export default function AdminPlansPage() {
         </div>
       </div>
 
-      {/* Trial Auto-Expiry Policy Banner */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm border border-slate-700">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 shrink-0">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="font-extrabold text-sm text-white">
-              7-Day Automatic Evaluation Policy
-            </h4>
-            <p className="text-xs text-slate-300 mt-0.5">
-              Every salon that signs up gets exactly <strong>7 calendar days</strong> of free trial.
-              When day 7 expires, their portal displays the paywall lockout until an official plan is paid.
-            </p>
-          </div>
-        </div>
-
-        <div className="shrink-0 flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
-            ✓ Auto-Lockout Active
-          </span>
-        </div>
-      </div>
-
       {/* Plans Grid */}
       {loading ? (
         <div className="text-center py-16 bg-white rounded-3xl border border-slate-200">
@@ -310,129 +350,190 @@ export default function AdminPlansPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`bg-white rounded-3xl border-2 transition-all p-6 flex flex-col justify-between shadow-xs ${
-                plan.is_popular
-                  ? 'border-[#b3135b] ring-4 ring-pink-50 shadow-md'
-                  : 'border-slate-200'
-              } ${!plan.is_active ? 'opacity-60 bg-slate-50' : ''}`}
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-black text-lg text-slate-900">{plan.name}</h3>
-                    {plan.is_popular && (
-                      <span className="px-2 py-0.5 rounded-full bg-pink-100 text-[#b3135b] text-[10px] font-black uppercase">
-                        Popular
+          {plans.map((plan) => {
+            const enabledFlagsCount = ALL_FLAGS.filter((f) => Boolean(plan.flags?.[f.key])).length;
+            const staffLim = plan.limits?.max_staff === 0 ? 'Unlimited' : `${plan.limits?.max_staff || plan.max_staff || 3} Staff`;
+            const servicesLim = plan.limits?.max_services === 0 ? 'Unlimited' : `${plan.limits?.max_services || 30} Services`;
+            const waLim = plan.limits?.wa_per_month === 0 ? '0 WA/mo' : `${plan.limits?.wa_per_month || 200} WA/mo`;
+
+            return (
+              <div
+                key={plan.id}
+                className={`bg-white rounded-3xl border-2 transition-all p-6 flex flex-col justify-between shadow-xs ${
+                  plan.is_popular
+                    ? 'border-[#b3135b] ring-4 ring-pink-50 shadow-md'
+                    : 'border-slate-200'
+                } ${!plan.is_active ? 'opacity-60 bg-slate-50' : ''}`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-black text-lg text-slate-900">{plan.name}</h3>
+                      {plan.is_popular && (
+                        <span className="px-2 py-0.5 rounded-full bg-pink-100 text-[#b3135b] text-[10px] font-black uppercase">
+                          Popular
+                        </span>
+                      )}
+                    </div>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        plan.is_active
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {plan.is_active ? 'Active' : 'Disabled'}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-500 mb-3 min-h-[32px]">
+                    {plan.description || 'Standard salon subscription plan'}
+                  </p>
+
+                  <div className="mb-4 flex items-baseline justify-between">
+                    <div>
+                      <span className="text-3xl font-black text-slate-900">
+                        ₹{Number(plan.price).toLocaleString()}
+                      </span>
+                      <span className="text-xs text-slate-500 ml-1">/mo</span>
+                      {plan.yearly_price && (
+                        <span className="block text-[11px] text-emerald-600 font-bold">
+                          ₹{Number(plan.yearly_price).toLocaleString()} /year
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Subscriber Count */}
+                    <div className="text-right">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 block">Subscribers</span>
+                      <span className="text-lg font-black text-purple-700">
+                        {plan.active_salons_count || 0} Salons
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Resource Limits Badge */}
+                  <div className="bg-slate-50 rounded-2xl p-3 mb-4 space-y-1.5 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Staff Limit:</span>
+                      <strong className="text-slate-900 font-bold">{staffLim}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Services Limit:</span>
+                      <strong className="text-slate-900 font-bold">{servicesLim}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">WhatsApp Quota:</span>
+                      <strong className="text-slate-900 font-bold">{waLim}</strong>
+                    </div>
+                    <div className="flex justify-between pt-1 border-t border-slate-200/60">
+                      <span className="text-slate-500">Active Flags:</span>
+                      <strong className="text-emerald-700 font-bold">{enabledFlagsCount} of {ALL_FLAGS.length} enabled</strong>
+                    </div>
+                  </div>
+
+                  {/* Human-readable feature bullets */}
+                  <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                    {(Array.isArray(plan.features) ? plan.features : []).slice(0, 5).map((feat, i) => (
+                      <div key={i} className="flex items-start gap-1.5 text-xs text-slate-600 truncate">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span className="truncate">{feat}</span>
+                      </div>
+                    ))}
+                    {(Array.isArray(plan.features) ? plan.features.length : 0) > 5 && (
+                      <span className="text-[10px] text-slate-400 font-bold block pt-1">
+                        +{(plan.features.length - 5)} more features
                       </span>
                     )}
                   </div>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                </div>
+
+                <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(plan)}
+                    className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit Plan & Gates</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(plan)}
+                    title={plan.is_active ? 'Deactivate Plan' : 'Activate Plan'}
+                    className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                       plan.is_active
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-slate-100 text-slate-500'
+                        ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
+                        : 'border-slate-200 text-slate-400 hover:bg-slate-100'
                     }`}
                   >
-                    {plan.is_active ? 'Active' : 'Disabled'}
-                  </span>
-                </div>
-
-                <p className="text-xs text-slate-500 mb-4 min-h-[32px]">
-                  {plan.description || 'Standard salon subscription plan'}
-                </p>
-
-                <div className="mb-4">
-                  <span className="text-3xl font-black text-slate-900">
-                    ₹{Number(plan.price).toLocaleString()}
-                  </span>
-                  <span className="text-xs text-slate-500 ml-1">
-                    /{plan.billing_interval}
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 mb-4 text-xs flex items-center justify-between">
-                  <span className="text-slate-600 font-medium">Active Salons:</span>
-                  <span className="font-extrabold text-slate-900">
-                    {plan.active_salons_count || 0} Salons
-                  </span>
-                </div>
-
-                {/* Features List */}
-                <div className="space-y-2 border-t border-slate-100 pt-4">
-                  <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block mb-1">
-                    Plan Features:
-                  </span>
-                  {(Array.isArray(plan.features) ? plan.features : []).map((feat, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-slate-600">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{feat}</span>
-                    </div>
-                  ))}
+                    <Power className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="pt-6 border-t border-slate-100 mt-6 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleOpenEdit(plan)}
-                  className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Edit2 className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Edit Plan</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleToggleActive(plan)}
-                  className={`p-2 rounded-xl border text-xs font-bold transition-colors cursor-pointer ${
-                    plan.is_active
-                      ? 'border-slate-200 text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200'
-                      : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                  }`}
-                  title={plan.is_active ? 'Disable plan' : 'Enable plan'}
-                >
-                  <Power className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Create / Edit Plan Modal */}
+      {/* Full Plan Editor Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-black text-slate-900 mb-1">
-              {editingPlan ? 'Edit Subscription Plan' : 'Create New Subscription Plan'}
-            </h3>
-            <p className="text-xs text-slate-500 mb-6">
-              Configure price, billing cycle, and feature checklist for salons
-            </p>
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-5">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">
+                  {editingPlan ? `Edit Subscription Plan: ${editingPlan.name}` : 'Create New Subscription Plan'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Set prices, resource limits (0 = unlimited), and server-side feature access flags
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
             <form onSubmit={handleSavePlan} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Plan Name <span className="text-pink-600">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Starter Studio, Growth Professional"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#b3135b] outline-none text-sm text-slate-900"
-                />
+              {/* Plan Name & Popular Flag */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Plan Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Pro Studio"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b]"
+                  />
+                </div>
+
+                <div className="flex items-center sm:pt-6">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={isPopular}
+                      onChange={(e) => setIsPopular(e.target.checked)}
+                      className="w-4 h-4 text-[#b3135b] rounded border-slate-300 focus:ring-[#b3135b]"
+                    />
+                    <span>Highlight as Popular</span>
+                  </label>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* Monthly Price & Yearly Price */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Price (₹) <span className="text-pink-600">*</span>
+                    Monthly Price (₹) *
                   </label>
                   <input
                     type="number"
@@ -440,26 +541,26 @@ export default function AdminPlansPage() {
                     min="0"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    placeholder="1999"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#b3135b] outline-none text-sm text-slate-900 font-mono"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Billing Interval
+                    Yearly Price (₹) *
                   </label>
-                  <select
-                    value={billingInterval}
-                    onChange={(e: any) => setBillingInterval(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#b3135b] outline-none text-sm text-slate-900 bg-white"
-                  >
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={yearlyPrice}
+                    onChange={(e) => setYearlyPrice(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b]"
+                  />
                 </div>
               </div>
 
+              {/* Description */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   Short Description
@@ -468,54 +569,131 @@ export default function AdminPlansPage() {
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. Best for busy salons needing multi-chair coordination"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#b3135b] outline-none text-sm text-slate-900"
+                  placeholder="e.g. Ideal for expanding multi-chair salons"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b]"
                 />
               </div>
 
+              {/* Resource Limits (0 = Unlimited) */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="text-xs font-black uppercase text-slate-700 tracking-wider">
+                  Resource Limits (0 = Unlimited)
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      Max Staff (Stylists)
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={maxStaff}
+                      onChange={(e) => setMaxStaff(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b] bg-white"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">0 = unlimited</span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      Max Services Catalog
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={maxServices}
+                      onChange={(e) => setMaxServices(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b] bg-white"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">0 = unlimited</span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      WhatsApp Quota / Month
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={waPerMonth}
+                      onChange={(e) => setWaPerMonth(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b] bg-white"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">0 = blocked (no WA)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 12 Feature Flag Toggles */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+                  Feature Gate Flags (12 Gates)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-56 overflow-y-auto p-1">
+                  {ALL_FLAGS.map((f) => {
+                    const isChecked = Boolean(flags[f.key]);
+                    return (
+                      <div
+                        key={f.key}
+                        onClick={() => handleToggleFlag(f.key)}
+                        className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                          isChecked
+                            ? 'bg-pink-50/60 border-pink-300 text-slate-900'
+                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="min-w-0 pr-2">
+                          <span className="font-bold text-xs block truncate leading-tight">
+                            {f.label}
+                          </span>
+                          <span className="text-[10px] text-slate-400 block truncate">
+                            {f.desc}
+                          </span>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {}} // handled by parent div
+                          className="w-4 h-4 text-[#b3135b] rounded border-slate-300 focus:ring-[#b3135b] shrink-0"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Display Feature Bullets */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Features (One per line)
+                  Marketing Feature Bullets (One per line)
                 </label>
                 <textarea
-                  rows={5}
+                  rows={3}
                   value={featuresText}
                   onChange={(e) => setFeaturesText(e.target.value)}
-                  placeholder="Unlimited Bookings&#10;WhatsApp Bills&#10;Staff Commissions"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#b3135b] outline-none text-xs text-slate-900 font-mono leading-relaxed"
+                  placeholder="Unlimited client appointments&#10;10-second GST billing&#10;WhatsApp digital receipts"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-[#b3135b]"
                 />
-                <span className="text-[11px] text-slate-400 mt-1 block">
-                  Each line appears as a checkmark bullet on the plan card
-                </span>
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="isPopular"
-                  checked={isPopular}
-                  onChange={(e) => setIsPopular(e.target.checked)}
-                  className="w-4 h-4 text-[#b3135b] rounded-sm focus:ring-[#b3135b]"
-                />
-                <label htmlFor="isPopular" className="text-xs font-bold text-slate-700 cursor-pointer">
-                  Highlight as &quot;Popular / Recommended&quot; plan
-                </label>
-              </div>
-
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+              {/* Submit / Cancel */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-[#b3135b] hover:bg-[#9c0f4e] text-white text-xs font-extrabold shadow-md cursor-pointer transition-all active:scale-95"
+                  className="px-5 py-2 rounded-xl text-xs font-extrabold bg-[#b3135b] hover:bg-[#9c0f4e] text-white shadow-md shadow-pink-900/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  {saving ? 'Saving...' : editingPlan ? 'Update Plan' : 'Create Plan'}
+                  {saving ? 'Saving...' : editingPlan ? 'Update Plan & Limits' : 'Create Plan'}
                 </button>
               </div>
             </form>
@@ -525,4 +703,3 @@ export default function AdminPlansPage() {
     </div>
   );
 }
-

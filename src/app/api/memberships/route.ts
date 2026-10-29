@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { requireFeature } from '@/lib/plan';
 
 export async function GET(request: Request) {
   try {
@@ -8,6 +9,8 @@ export async function GET(request: Request) {
     if (auth.error) return auth.error;
 
     const salonId = auth.session.salonId;
+    const featureCheck = await requireFeature('memberships', salonId);
+    if (!featureCheck.success) return featureCheck.error;
 
     // 1. Fetch Membership Plans
     const memRes = await query(
@@ -81,6 +84,9 @@ export async function POST(request: Request) {
     if (auth.error) return auth.error;
 
     const salonId = auth.session.salonId;
+    const featureCheck = await requireFeature('memberships', salonId);
+    if (!featureCheck.success) return featureCheck.error;
+
     const body = await request.json();
     const { plan_type } = body; // 'membership' | 'package'
 

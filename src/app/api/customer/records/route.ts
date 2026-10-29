@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { query } from '@/lib/db';
 import { CUSTOMER_COOKIE_NAME, verifyCustomerSessionToken } from '@/lib/auth';
+import { requireFeature } from '@/lib/plan';
 
 export async function GET() {
   try {
@@ -97,6 +98,55 @@ export async function GET() {
       invoices: invRes.rows,
       plans: plansRes.rows,
     });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(CUSTOMER_COOKIE_NAME)?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized. Please login.' }, { status: 401 });
+    }
+
+    const payload = await verifyCustomerSessionToken(token);
+    if (!payload) {
+      return NextResponse.json({ error: 'Session expired. Please login again.' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { appointmentId, action } = body;
+
+    if (!appointmentId) {
+      return NextResponse.json({ error: 'appointmentId is required' }, { status: 400 });
+    }
+
+    // Verify appointment belongs to this customer
+    const apptRes = await query(
+      'SELECT id, salon_id FROM appointments WHERE id = $1 AND customer_id = $2 LIMIT 1',
+      [appointmentId, payload.customerId]
+    );
+
+    if (apptRes.rows.length === 0) {
+      return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
+    }
+
+    const salonId = apptRes.rows[0].salon_id;
+
+    // Feature gating: customer_cancel (requires Pro or Premium)
+    const featureCheck = await requireFeature('customer_cancel', salonId);
+    if (!featureCheck.success) {
+      return featureCheck.error;
+    }
+
+    if (action === 'cancel') {
+      await query("UPDATE appointments SET status = 'cancelled' WHERE id = $1", [appointmentId]);
+      return NextResponse.json({ success: true, message: 'Appointment cancelled successfully' });
+    }
+
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

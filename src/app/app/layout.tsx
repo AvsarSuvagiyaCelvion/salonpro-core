@@ -26,12 +26,15 @@ import {
   CheckCircle2,
   ShieldCheck,
   Zap,
+  Lock,
 } from 'lucide-react';
 
 interface NavItem {
   name: string;
   href: string;
   icon: any;
+  requiredFlag?: string;
+  requiredPlanName?: string;
 }
 
 const navItems: NavItem[] = [
@@ -43,7 +46,7 @@ const navItems: NavItem[] = [
   { name: 'Staff', href: '/app/staff', icon: UserCheck },
   { name: 'Services', href: '/app/services', icon: Scissors },
   { name: 'Products', href: '/app/products', icon: Package },
-  { name: 'Memberships & packages', href: '/app/memberships', icon: Award },
+  { name: 'Memberships & packages', href: '/app/memberships', icon: Award, requiredFlag: 'memberships', requiredPlanName: 'Pro' },
   { name: 'Reports', href: '/app/reports', icon: BarChart3 },
   { name: 'Subscription & Plans', href: '/app/subscription', icon: CreditCard },
   { name: 'Settings', href: '/app/settings', icon: Settings },
@@ -72,6 +75,54 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [activatingPlan, setActivatingPlan] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  // Global Plan Gate / Upgrade Modal Prompt
+  const [planPrompt, setPlanPrompt] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    requiredPlan?: string;
+  } | null>(null);
+
+  // Global Fetch Interceptor for 402 SUBSCRIPTION_EXPIRED and 403 UPGRADE_REQUIRED / LIMIT_REACHED
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+
+      if (response.status === 402) {
+        response.clone().json().then((data) => {
+          if (data?.code === 'SUBSCRIPTION_EXPIRED') {
+            setSubscription((prev) => prev ? { ...prev, isTrialExpired: true, isActive: false } : prev);
+          }
+        }).catch(() => {});
+      } else if (response.status === 403) {
+        response.clone().json().then((data) => {
+          if (data?.code === 'UPGRADE_REQUIRED') {
+            setPlanPrompt({
+              isOpen: true,
+              title: 'Upgrade Required',
+              message: data.error || `This feature requires the ${data.requiredPlan || 'Pro'} plan.`,
+              requiredPlan: data.requiredPlan || 'Pro',
+            });
+          } else if (data?.code === 'LIMIT_REACHED') {
+            setPlanPrompt({
+              isOpen: true,
+              title: 'Plan Limit Reached',
+              message: data.error || 'You have reached the maximum allowed limit for your subscription plan.',
+              requiredPlan: 'Pro or Premium',
+            });
+          }
+        }).catch(() => {});
+      }
+
+      return response;
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -161,6 +212,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   const isExpiredLockout = subscription?.isTrialExpired && !subscription?.isActive;
+
+  const lockedItem = navItems.find(
+    (item) =>
+      item.requiredFlag &&
+      pathname.startsWith(item.href) &&
+      subscription?.currentPlan?.flags &&
+      subscription.currentPlan.flags[item.requiredFlag] === false
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf8fa] text-[#2a1630]">
@@ -291,19 +350,35 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
+                  const isLocked = Boolean(
+                    item.requiredFlag &&
+                    subscription?.currentPlan?.flags &&
+                    subscription.currentPlan.flags[item.requiredFlag] === false
+                  );
+
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 ${
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 ${
                         isActive
                           ? 'bg-[#b3135b] text-white shadow-md shadow-[#b3135b]/20 font-bold'
+                          : isLocked
+                          ? 'text-neutral-500 hover:bg-neutral-100/80'
                           : 'text-neutral-700 hover:bg-pink-50/70 hover:translate-x-1'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-neutral-500'}`} />
-                      <span>{item.name}</span>
+                      <div className="flex items-center gap-3">
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLocked ? 'text-neutral-400' : 'text-neutral-500'}`} />
+                        <span>{item.name}</span>
+                      </div>
+                      {isLocked && (
+                        <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
+                          <Lock className="w-2.5 h-2.5" />
+                          <span>{item.requiredPlanName || 'PRO'}</span>
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
@@ -373,18 +448,34 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
+              const isLocked = Boolean(
+                item.requiredFlag &&
+                subscription?.currentPlan?.flags &&
+                subscription.currentPlan.flags[item.requiredFlag] === false
+              );
+
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-[#b3135b] text-white shadow-md shadow-[#b3135b]/20 font-semibold'
+                      : isLocked
+                      ? 'text-neutral-500 hover:bg-neutral-100/80'
                       : 'text-neutral-700 hover:bg-pink-50/60 hover:text-[#b3135b]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-neutral-500'}`} />
-                  <span>{item.name}</span>
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLocked ? 'text-neutral-400' : 'text-neutral-500'}`} />
+                    <span>{item.name}</span>
+                  </div>
+                  {isLocked && (
+                    <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
+                      <Lock className="w-2.5 h-2.5" />
+                      <span>{item.requiredPlanName || 'PRO'}</span>
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -514,6 +605,41 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
             </div>
+          ) : lockedItem ? (
+            <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+              <div className="bg-white rounded-3xl border-2 border-amber-200 p-8 shadow-xl">
+                <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-700 mx-auto flex items-center justify-center mb-4 ring-4 ring-amber-50">
+                  <Lock className="w-8 h-8" />
+                </div>
+                <span className="inline-block px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-black uppercase tracking-wider mb-3">
+                  {lockedItem.requiredPlanName || 'Pro'} Feature Locked
+                </span>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                  Upgrade to {lockedItem.requiredPlanName || 'Pro'} to Unlock {lockedItem.name}
+                </h2>
+                <p className="text-sm text-slate-600 mt-2 max-w-lg mx-auto leading-relaxed">
+                  Your salon is currently on the <strong>{subscription?.currentPlan?.name || 'Basic'}</strong> plan.
+                  VIP Memberships, package passes, and client loyalty benefits are available exclusively on Pro and Premium plans.
+                </p>
+
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowPlanModal(true)}
+                    className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#b3135b] hover:bg-[#9c0f4e] text-white font-extrabold text-xs shadow-lg shadow-pink-900/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                  >
+                    <Zap className="w-4 h-4" />
+                    <span>Upgrade to Pro / Premium</span>
+                  </button>
+                  <Link
+                    href="/app/subscription"
+                    className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>View Plan Comparison</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
           ) : (
             children
           )}
@@ -604,6 +730,60 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Limit / Upgrade Required Modal */}
+      {planPrompt?.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div className="flex items-center gap-2 text-[#b3135b] font-black text-sm">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                <span>{planPrompt.title}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPlanPrompt(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-600 mb-5 leading-relaxed">
+              {planPrompt.message}
+            </p>
+
+            <div className="p-4 rounded-2xl bg-pink-50/70 border border-pink-100 mb-5 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-pink-700">Recommended Plan</span>
+                <div className="text-sm font-extrabold text-[#2a1630]">Upgrade to {planPrompt.requiredPlan || 'Pro'}</div>
+              </div>
+              <span className="text-xs font-black text-[#b3135b]">₹999/month</span>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setPlanPrompt(null)}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPlanPrompt(null);
+                  setShowPlanModal(true);
+                }}
+                className="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-[#b3135b] hover:bg-[#9c0f4e] text-white shadow-md shadow-pink-900/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <Zap className="w-3.5 h-3.5" />
+                <span>View Upgrade Options</span>
+              </button>
             </div>
           </div>
         </div>

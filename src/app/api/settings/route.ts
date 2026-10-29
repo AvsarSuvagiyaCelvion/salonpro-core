@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { requireFeature } from '@/lib/plan';
 
 export async function GET(request: Request) {
   try {
-    const auth = await requireTenant(request);
+    const auth = await requireTenant(request, { allowExpired: true });
     if (auth.error) return auth.error;
 
     const salonId = auth.session.salonId;
     const res = await query(
-      `SELECT id, name, slug, address, phone, brand_color, logo_url,
+      `SELECT id, name, slug, address, phone, brand_color, logo_url, custom_domain, custom_domain_verified,
               booking_enabled, open_time, close_time, slot_minutes, buffer_minutes,
               working_days, min_advance_hours, max_advance_days, send_reminders,
               trial_ends_at, subscription_status, subscription_ends_at, subscription_plan_id
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function PUT(request: Request) {
+async function handleUpdateSettings(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
@@ -49,6 +50,7 @@ export async function PUT(request: Request) {
       phone,
       brand_color,
       logo_url,
+      custom_domain,
       booking_enabled,
       open_time,
       close_time,
@@ -60,13 +62,38 @@ export async function PUT(request: Request) {
       send_reminders,
     } = body;
 
+    // Feature gating: logo_upload
+    if (logo_url !== undefined && logo_url) {
+      const logoCheck = await requireFeature('logo_upload', salonId);
+      if (!logoCheck.success) return logoCheck.error;
+    }
+
+    // Feature gating: custom_domain and custom_domain_verified
+    if (custom_domain !== undefined && custom_domain) {
+      const domainCheck = await requireFeature('custom_domain', salonId);
+      if (!domainCheck.success) return domainCheck.error;
+
+      const salonCheck = await query('SELECT custom_domain_verified FROM salons WHERE id = $1', [salonId]);
+      if (!salonCheck.rows[0]?.custom_domain_verified) {
+        return NextResponse.json(
+          {
+            error: 'Custom domain is a Premium feature and requires DNS verification by platform administration. Please contact support.',
+            code: 'DOMAIN_UNVERIFIED',
+            feature: 'custom_domain',
+            requiredPlan: 'Premium',
+          },
+          { status: 403 }
+        );
+      }
+    }
+
     const res = await query(
       `UPDATE salons
        SET name = COALESCE($1, name),
            address = COALESCE($2, address),
            phone = COALESCE($3, phone),
            brand_color = COALESCE($4, brand_color),
-           logo_url = $5,
+           logo_url = COALESCE($5, logo_url),
            booking_enabled = COALESCE($6, booking_enabled),
            open_time = COALESCE($7, open_time),
            close_time = COALESCE($8, close_time),
@@ -75,8 +102,9 @@ export async function PUT(request: Request) {
            working_days = COALESCE($11, working_days),
            min_advance_hours = COALESCE($12, min_advance_hours),
            max_advance_days = COALESCE($13, max_advance_days),
-           send_reminders = COALESCE($14, send_reminders)
-       WHERE id = $15
+           send_reminders = COALESCE($14, send_reminders),
+           custom_domain = COALESCE($15, custom_domain)
+       WHERE id = $16
        RETURNING *`,
       [
         name,
@@ -93,6 +121,7 @@ export async function PUT(request: Request) {
         min_advance_hours,
         max_advance_days,
         send_reminders,
+        custom_domain,
         salonId,
       ]
     );
@@ -105,4 +134,12 @@ export async function PUT(request: Request) {
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
+
+export async function PUT(request: Request) {
+  return handleUpdateSettings(request);
+}
+
+export async function PATCH(request: Request) {
+  return handleUpdateSettings(request);
 }

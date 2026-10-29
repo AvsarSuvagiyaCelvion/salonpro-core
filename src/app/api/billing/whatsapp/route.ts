@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { checkLimit, incrementUsage } from '@/lib/plan';
 
 export async function POST(request: Request) {
   try {
@@ -8,6 +9,13 @@ export async function POST(request: Request) {
     if (auth.error) return auth.error;
 
     const salonId = auth.session.salonId;
+
+    // Check monthly WhatsApp messaging quota (Basic: 0, Pro: 200, Premium: 1000)
+    const limitCheck = await checkLimit('wa_per_month', salonId);
+    if (!limitCheck.success) {
+      return limitCheck.error;
+    }
+
     const { invoice_id } = await request.json();
     if (!invoice_id) {
       return NextResponse.json({ error: 'Invoice ID is required' }, { status: 400 });
@@ -22,9 +30,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invoice not found in this salon' }, { status: 404 });
     }
 
+    // Increment usage counter for this month
+    const newCount = await incrementUsage(salonId, 'wa_messages', 1);
+
     return NextResponse.json({
       success: true,
       invoice: res.rows[0],
+      usedThisMonth: newCount,
       message: 'Marked as sent on WhatsApp with two blue ticks!',
     });
   } catch (error: any) {

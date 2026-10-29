@@ -82,6 +82,25 @@ export async function PATCH(
     if (body.subscription_plan_id !== undefined) {
       updates.push(`subscription_plan_id = $${idx++}`);
       values.push(body.subscription_plan_id || null);
+
+      if (body.subscription_plan_id) {
+        // Look up plan slug to keep salons.plan in sync
+        const planLookup = await query('SELECT slug FROM subscription_plans WHERE id = $1', [body.subscription_plan_id]);
+        if (planLookup.rows.length > 0) {
+          updates.push(`plan = $${idx++}`);
+          values.push(planLookup.rows[0].slug);
+        }
+      }
+    }
+
+    if (body.subscription_ends_at !== undefined) {
+      updates.push(`subscription_ends_at = $${idx++}`);
+      values.push(body.subscription_ends_at ? new Date(body.subscription_ends_at) : null);
+    }
+
+    if (body.custom_domain_verified !== undefined) {
+      updates.push(`custom_domain_verified = $${idx++}`);
+      values.push(Boolean(body.custom_domain_verified));
     }
 
     if (body.extend_trial_days !== undefined) {
@@ -98,12 +117,8 @@ export async function PATCH(
     }
 
     if (body.plan !== undefined) {
-      const allowedPlans = ['starter', 'pro', 'enterprise'];
-      if (!allowedPlans.includes(body.plan)) {
-        return NextResponse.json({ error: 'Plan must be starter, pro, or enterprise' }, { status: 400 });
-      }
       updates.push(`plan = $${idx++}`);
-      values.push(body.plan);
+      values.push(body.plan.toLowerCase().trim());
     }
 
     if (body.custom_domain !== undefined) {

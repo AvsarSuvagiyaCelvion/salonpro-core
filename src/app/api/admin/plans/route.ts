@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     if (auth.error) return auth.error;
 
     const body = await request.json();
-    const { name, price, billing_interval, description, features, max_staff, is_popular } = body;
+    const { name, price, yearly_price, billing_interval, description, features, max_staff, limits, flags, is_popular, sort_order } = body;
 
     if (!name || name.trim().length === 0) {
       return NextResponse.json({ error: 'Plan name is required' }, { status: 400 });
@@ -61,6 +61,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Valid price is required' }, { status: 400 });
     }
 
+    const cleanYearlyPrice = yearly_price !== undefined ? Number(yearly_price) : cleanPrice * 10;
+
     // Generate unique slug
     let baseSlug = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     let slug = baseSlug;
@@ -70,21 +72,31 @@ export async function POST(request: Request) {
     }
 
     const parsedFeatures = Array.isArray(features) ? features : [];
+    const cleanLimits = limits && typeof limits === 'object' ? limits : {
+      max_staff: Number(max_staff) || 3,
+      max_services: 30,
+      wa_per_month: 0,
+    };
+    const cleanFlags = flags && typeof flags === 'object' ? flags : {};
 
     const res = await query(
       `INSERT INTO subscription_plans (
-        name, slug, description, price, billing_interval, features, max_staff, is_popular, is_active
-      ) VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, true)
+        name, slug, description, price, yearly_price, billing_interval, features, max_staff, limits, flags, is_popular, sort_order, is_active
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9::jsonb, $10::jsonb, $11, $12, true)
       RETURNING *`,
       [
         name.trim(),
         slug,
         description?.trim() || null,
         cleanPrice,
+        cleanYearlyPrice,
         billing_interval === 'yearly' ? 'yearly' : 'monthly',
         JSON.stringify(parsedFeatures),
         Number(max_staff) || 0,
+        JSON.stringify(cleanLimits),
+        JSON.stringify(cleanFlags),
         Boolean(is_popular),
+        Number(sort_order) || 0,
       ]
     );
 

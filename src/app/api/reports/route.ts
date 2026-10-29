@@ -122,13 +122,17 @@ export async function GET(request: Request) {
       [salonId, startIso]
     );
 
+    const canViewCommission = Boolean(auth.session.plan?.flags.commission_report);
+
     const staffReport = staffRes.rows.map((st) => {
       const servicesRev = Number(st.services_revenue);
       const productsRev = Number(st.products_revenue);
       const totalRev = servicesRev + productsRev;
-      const svcCommPct = Number(st.service_commission_pct) || 10;
-      const prodCommPct = Number(st.product_commission_pct) || 5;
-      const commission = (servicesRev * svcCommPct) / 100 + (productsRev * prodCommPct) / 100;
+      const svcCommPct = canViewCommission ? (Number(st.service_commission_pct) || 10) : 0;
+      const prodCommPct = canViewCommission ? (Number(st.product_commission_pct) || 5) : 0;
+      const commission = canViewCommission
+        ? (servicesRev * svcCommPct) / 100 + (productsRev * prodCommPct) / 100
+        : 0;
 
       return {
         id: st.id,
@@ -146,6 +150,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       period,
+      canViewCommission,
       overview: {
         totalRevenue,
         totalSessions,

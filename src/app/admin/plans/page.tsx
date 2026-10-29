@@ -117,6 +117,18 @@ export default function AdminPlansPage() {
     fetchPlans();
   }, []);
 
+  // Lock body scroll when modal is open so background does not scroll
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isModalOpen]);
+
   function handleOpenCreate() {
     setEditingPlan(null);
     setName('');
@@ -525,9 +537,16 @@ export default function AdminPlansPage() {
 
       {/* Full Plan Editor Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-5">
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+          {/* Backdrop dismiss */}
+          <div
+            className="fixed inset-0"
+            onClick={() => setIsModalOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="relative z-10 bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col my-auto text-left animate-scale-in">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4 shrink-0">
               <div>
                 <h3 className="text-lg font-black text-slate-900">
                   {editingPlan ? `Edit Subscription Plan: ${editingPlan.name}` : 'Create New Subscription Plan'}
@@ -545,7 +564,7 @@ export default function AdminPlansPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSavePlan} className="space-y-4">
+            <form onSubmit={handleSavePlan} className="space-y-4 overflow-y-auto pr-1.5 flex-1">
               {/* Plan Name & Popular Flag */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="sm:col-span-2">
@@ -741,7 +760,7 @@ export default function AdminPlansPage() {
               </div>
 
               {/* Submit / Cancel / Delete */}
-              <div className="flex items-center justify-between gap-2.5 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-between gap-2.5 pt-4 mt-2 border-t border-slate-100 shrink-0">
                 {editingPlan ? (
                   <button
                     type="button"

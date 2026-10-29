@@ -10,9 +10,10 @@ interface HourlyData {
 
 interface HourlyRushChartProps {
   data?: HourlyData[];
+  timeLabel?: string;
 }
 
-export default function HourlyRushChart({ data }: HourlyRushChartProps) {
+export default function HourlyRushChart({ data, timeLabel }: HourlyRushChartProps) {
   const [hoveredHour, setHoveredHour] = useState<HourlyData | null>(null);
 
   // Standard business hours 10:00 - 19:00
@@ -37,7 +38,7 @@ export default function HourlyRushChart({ data }: HourlyRushChartProps) {
       <div className="flex items-center justify-between text-xs text-neutral-500">
         <span className="flex items-center gap-1.5 font-bold text-neutral-700">
           <Clock className="w-3.5 h-3.5 text-pink-600" />
-          <span>Walk-in & Booking Density (10 AM - 7 PM)</span>
+          <span>Walk-in & Booking Density ({timeLabel || 'Business Hours'})</span>
         </span>
         {hoveredHour && (
           <span className="font-extrabold text-[#b3135b] animate-fade-in">

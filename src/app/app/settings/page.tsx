@@ -143,6 +143,14 @@ export default function SettingsPage() {
     setTimeout(() => setCopiedLink(false), 2500);
   }
 
+  function formatTimeForDb(timeStr: string): string {
+    if (!timeStr) return '10:00:00';
+    const parts = timeStr.trim().split(':');
+    const h = (parts[0] || '10').padStart(2, '0');
+    const m = (parts[1] || '00').padStart(2, '0');
+    return `${h}:${m}:00`;
+  }
+
   // Save Settings
   async function handleSaveSettings(e: React.FormEvent) {
     e.preventDefault();
@@ -158,8 +166,8 @@ export default function SettingsPage() {
         brand_color: brandColor,
         logo_url: logoUrl,
         booking_enabled: bookingEnabled,
-        open_time: `${openTime}:00`,
-        close_time: `${closeTime}:00`,
+        open_time: formatTimeForDb(openTime),
+        close_time: formatTimeForDb(closeTime),
         slot_minutes: Number(slotMinutes),
         buffer_minutes: Number(bufferMinutes),
         working_days: workingDays,
@@ -174,9 +182,20 @@ export default function SettingsPage() {
         body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || 'Failed to update settings');
+      }
+
+      if (data.salon) {
+        if (data.salon.open_time) setOpenTime(data.salon.open_time.slice(0, 5));
+        if (data.salon.close_time) setCloseTime(data.salon.close_time.slice(0, 5));
+        if (data.salon.name) setName(data.salon.name);
+      }
+
+      // Notify layout and other components of updated timing & settings
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('salon-settings-updated', { detail: data.salon }));
       }
 
       setSaveSuccess(true);

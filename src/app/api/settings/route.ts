@@ -87,6 +87,19 @@ async function handleUpdateSettings(request: Request) {
       }
     }
 
+    // Sanitize time formats (e.g. "10:00" or "10:00:00" -> "10:00:00")
+    function cleanTime(t: any): string | null {
+      if (!t || typeof t !== 'string') return null;
+      const parts = t.trim().split(':');
+      if (parts.length < 2) return null;
+      const h = parts[0].padStart(2, '0');
+      const m = parts[1].padStart(2, '0');
+      return `${h}:${m}:00`;
+    }
+
+    const cleanedOpenTime = cleanTime(open_time);
+    const cleanedCloseTime = cleanTime(close_time);
+
     const res = await query(
       `UPDATE salons
        SET name = COALESCE($1, name),
@@ -113,8 +126,8 @@ async function handleUpdateSettings(request: Request) {
         brand_color,
         logo_url,
         booking_enabled,
-        open_time,
-        close_time,
+        cleanedOpenTime,
+        cleanedCloseTime,
         slot_minutes,
         buffer_minutes,
         working_days,

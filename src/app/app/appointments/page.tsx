@@ -74,6 +74,9 @@ export default function AppointmentsPage() {
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Operating hours for daily timeline
+  const [operatingHours, setOperatingHours] = useState<{ start: number; end: number }>({ start: 9, end: 21 });
+
   // View Mode: Timeline Calendar vs Card List
   const [viewMode, setViewMode] = useState<'calendar' | 'cards'>('calendar');
   const [calendarDate, setCalendarDate] = useState<string>('');
@@ -138,18 +141,25 @@ export default function AppointmentsPage() {
 
   async function fetchInitialData() {
     try {
-      const [srvRes, stfRes, custRes] = await Promise.all([
+      const [srvRes, stfRes, custRes, setRes] = await Promise.all([
         fetch('/api/services'),
         fetch('/api/staff'),
         fetch('/api/customers'),
+        fetch('/api/settings'),
       ]);
       const srvData = await srvRes.json();
       const stfData = await stfRes.json();
       const custData = await custRes.json();
+      const setData = await setRes.json();
 
       if (srvRes.ok) setServices(srvData.services || []);
       if (stfRes.ok) setStaffList(stfData.staff || []);
       if (custRes.ok) setCustomers(custData.customers || []);
+      if (setRes.ok && setData.salon?.open_time && setData.salon?.close_time) {
+        const startH = parseInt(setData.salon.open_time.slice(0, 2), 10) || 9;
+        const endH = parseInt(setData.salon.close_time.slice(0, 2), 10) || 21;
+        setOperatingHours({ start: Math.min(startH, 9), end: Math.max(endH, 20) });
+      }
     } catch {}
   }
 
@@ -539,7 +549,10 @@ export default function AppointmentsPage() {
 
           {/* Timeline Slots Grid */}
           <div className="divide-y divide-neutral-100">
-            {[9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((hour) => {
+            {Array.from(
+              { length: Math.max(1, operatingHours.end - operatingHours.start + 1) },
+              (_, i) => operatingHours.start + i
+            ).map((hour) => {
               const hourFormatted = `${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
               const nextHour = hour + 1;
               const nextHourFormatted = `${nextHour > 12 ? nextHour - 12 : nextHour}:00 ${nextHour >= 12 ? 'PM' : 'AM'}`;

@@ -57,7 +57,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [salon, setSalon] = useState<{ name: string; slug: string } | null>(null);
+  const [salon, setSalon] = useState<{
+    name: string;
+    slug: string;
+    open_time?: string;
+    close_time?: string;
+  } | null>(null);
   const [user, setUser] = useState<{ email: string; role: string } | null>(null);
 
   // Subscription & 7-Day Trial State
@@ -138,7 +143,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
         const data = await res.json();
         if (data.salon) {
-          setSalon({ name: data.salon.name, slug: data.salon.slug });
+          setSalon({
+            name: data.salon.name,
+            slug: data.salon.slug,
+            open_time: data.salon.open_time,
+            close_time: data.salon.close_time,
+          });
         } else {
           router.push('/login');
           return;
@@ -170,6 +180,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       }
     }
     loadData();
+
+    function handleSettingsUpdated(e: any) {
+      if (e?.detail) {
+        setSalon((prev) => ({
+          name: e.detail.name || prev?.name || '',
+          slug: e.detail.slug || prev?.slug || '',
+          open_time: e.detail.open_time,
+          close_time: e.detail.close_time,
+        }));
+      } else {
+        loadData();
+      }
+    }
+
+    window.addEventListener('salon-settings-updated', handleSettingsUpdated);
+    return () => {
+      window.removeEventListener('salon-settings-updated', handleSettingsUpdated);
+    };
   }, [router]);
 
   async function handleActivatePlan(planId: string) {
@@ -296,7 +324,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-2 shrink-0">
           <div className="hidden md:flex items-center gap-2 text-xs text-neutral-600 bg-pink-50/70 border border-pink-100/80 py-1.5 px-3 rounded-full">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Studio Open (10:00 - 19:00)</span>
+            <span>
+              Studio Open ({salon?.open_time ? salon.open_time.slice(0, 5) : '09:00'} - {salon?.close_time ? salon.close_time.slice(0, 5) : '21:00'})
+            </span>
           </div>
 
           <button

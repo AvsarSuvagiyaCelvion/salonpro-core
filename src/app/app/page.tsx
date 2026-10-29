@@ -65,6 +65,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [salonSlug, setSalonSlug] = useState<string>('');
+  const [salonHours, setSalonHours] = useState<{ open: string; close: string }>({
+    open: '09:00',
+    close: '21:00',
+  });
   const [hoveredPoint, setHoveredPoint] = useState<ChartPoint | null>(null);
 
   useEffect(() => {
@@ -75,6 +79,12 @@ export default function DashboardPage() {
           const sData = await res.json();
           if (sData.salon?.slug) {
             setSalonSlug(sData.salon.slug);
+          }
+          if (sData.salon?.open_time && sData.salon?.close_time) {
+            setSalonHours({
+              open: sData.salon.open_time.slice(0, 5),
+              close: sData.salon.close_time.slice(0, 5),
+            });
           }
         }
       } catch {}
@@ -345,10 +355,12 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Peak Rush Hours</h3>
-              <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">10:00 - 19:00</span>
+              <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+                {salonHours.open} - {salonHours.close}
+              </span>
             </div>
 
-            <HourlyRushChart />
+            <HourlyRushChart timeLabel={`${salonHours.open} - ${salonHours.close}`} />
           </div>
 
           <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">

@@ -322,12 +322,12 @@ export default function ProductsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => handleOpenSell()}
             disabled={products.length === 0}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-extrabold shadow-md shadow-emerald-900/10 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-extrabold shadow-md shadow-emerald-900/10 transition-all cursor-pointer active:scale-95 disabled:opacity-50 whitespace-nowrap"
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Sell Product (Quick POS)</span>
@@ -336,7 +336,7 @@ export default function ProductsPage() {
           <button
             type="button"
             onClick={handleOpenAdd}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] text-white text-xs font-extrabold shadow-md shadow-pink-900/20 transition-all cursor-pointer active:scale-95"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] text-white text-xs font-extrabold shadow-md shadow-pink-900/20 transition-all cursor-pointer active:scale-95 whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Add Product</span>
@@ -363,7 +363,7 @@ export default function ProductsPage() {
       )}
 
       {/* KPI Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-3xl bg-white border border-neutral-200/80 shadow-xs">
           <div className="flex items-center justify-between text-neutral-400 mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
@@ -424,11 +424,11 @@ export default function ProductsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 pb-2">
+      <div className="flex items-center gap-2 border-b border-neutral-200 pb-2 overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => setActiveTab('inventory')}
-          className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 ${
+          className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'inventory'
               ? 'bg-[#b3135b] text-white shadow-xs'
               : 'text-neutral-600 hover:bg-neutral-100'
@@ -441,7 +441,7 @@ export default function ProductsPage() {
         <button
           type="button"
           onClick={() => setActiveTab('sales')}
-          className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 ${
+          className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'sales'
               ? 'bg-[#b3135b] text-white shadow-xs'
               : 'text-neutral-600 hover:bg-neutral-100'
@@ -911,7 +911,7 @@ export default function ProductsPage() {
                       ))}
                     </select>
                   ) : (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <input
                         type="text"
                         placeholder="Client Name"
@@ -1026,7 +1026,7 @@ export default function ProductsPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Brand Name
@@ -1053,7 +1053,7 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Selling Price (₹) <span className="text-pink-600">*</span>
@@ -1083,7 +1083,7 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Physical Stock Count <span className="text-pink-600">*</span>

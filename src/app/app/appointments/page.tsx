@@ -911,7 +911,7 @@ export default function AppointmentsPage() {
                     ))}
                   </select>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                     <input
                       type="text"
                       required
@@ -975,7 +975,7 @@ export default function AppointmentsPage() {
               </div>
 
               {/* Date & Time */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Date *

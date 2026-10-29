@@ -229,10 +229,10 @@ export default function MembershipsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => handleOpenAssign()}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] text-white text-xs font-bold shadow-md transition-all active:scale-95"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] text-white text-xs font-bold shadow-md transition-all active:scale-95 whitespace-nowrap"
           >
             <Sparkles className="w-4 h-4" />
             <span>Assign to Customer</span>
@@ -245,7 +245,7 @@ export default function MembershipsPage() {
               setFormValidity('365');
               setIsCreateModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white border border-neutral-200 text-neutral-700 hover:text-neutral-900 text-xs font-bold shadow-sm transition-all"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white border border-neutral-200 text-neutral-700 hover:text-neutral-900 text-xs font-bold shadow-sm transition-all whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>New Plan</span>
@@ -272,10 +272,10 @@ export default function MembershipsPage() {
       )}
 
       {/* Tabs Switcher */}
-      <div className="flex border-b border-neutral-200">
+      <div className="flex border-b border-neutral-200 overflow-x-auto no-scrollbar pb-1">
         <button
           onClick={() => setActiveTab('memberships')}
-          className={`pb-3 px-6 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'memberships'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
@@ -287,7 +287,7 @@ export default function MembershipsPage() {
 
         <button
           onClick={() => setActiveTab('packages')}
-          className={`pb-3 px-6 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'packages'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
@@ -299,7 +299,7 @@ export default function MembershipsPage() {
 
         <button
           onClick={() => setActiveTab('subscriptions')}
-          className={`pb-3 px-6 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'subscriptions'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'

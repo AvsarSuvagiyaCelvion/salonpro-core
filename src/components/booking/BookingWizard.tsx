@@ -369,13 +369,13 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
       {/* Top Salon Hero Banner */}
       <div 
-        className="relative overflow-hidden border-b border-neutral-800"
+        className="relative overflow-hidden border-b border-neutral-800 pb-6"
         style={{
           background: `radial-gradient(ellipse at top, ${brandColor}40 0%, #0a0a0a 75%)`,
         }}
       >
-        {/* Top Left Staff / Owner Login */}
-        <div className="absolute top-4 left-4 z-20">
+        {/* Top Staff / Customer Portal Navigation Row */}
+        <div className="flex items-center justify-between gap-2 px-4 pt-3.5 mb-2 relative z-20 max-w-2xl mx-auto">
           <Link
             href="/salon-owner"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm"
@@ -383,10 +383,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
           >
             <span>🔐 Staff Login</span>
           </Link>
-        </div>
 
-        {/* Top Right Portal Button */}
-        <div className="absolute top-4 right-4 z-20">
           <Link
             href="/portal"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm"
@@ -397,12 +394,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <span className="text-[10px] text-pink-300 font-bold">My Records</span>
               </>
             ) : (
-              <span>Client Portal / Login →</span>
+              <span>Client Portal →</span>
             )}
           </Link>
         </div>
 
-        <div className="max-w-2xl mx-auto px-4 pt-8 pb-6 text-center">
+        <div className="max-w-2xl mx-auto px-4 pt-2 text-center">
           <div 
             className="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center font-bold text-3xl shadow-xl border border-white/20 mb-3"
             style={{ backgroundColor: brandColor, color: '#ffffff' }}
@@ -1060,7 +1057,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 Stylist: <span className="text-white font-semibold">{confirmedBooking.staffName}</span>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-neutral-800 grid grid-cols-2 gap-3 text-xs">
+              <div className="mt-4 pt-4 border-t border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className="text-neutral-500 block text-[10px] uppercase font-bold">Date</span>
                   <span className="font-bold text-white">{confirmedBooking.formattedDate}</span>

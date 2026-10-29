@@ -131,8 +131,8 @@ export default function ReportsPage() {
         </div>
 
         {/* Period Selector */}
-        <div className="flex items-center gap-2">
-          <div className="bg-white border border-neutral-200 p-1 rounded-2xl flex shadow-sm">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar max-w-full pb-1 sm:pb-0">
+          <div className="bg-white border border-neutral-200 p-1 rounded-2xl flex shadow-sm shrink-0">
             {[
               { id: 'today', label: 'Today' },
               { id: '7d', label: '7 Days' },
@@ -142,7 +142,7 @@ export default function ReportsPage() {
               <button
                 key={p.id}
                 onClick={() => setPeriod(p.id as any)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 ${
                   period === p.id
                     ? 'bg-[#b3135b] text-white shadow-sm'
                     : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
@@ -155,7 +155,7 @@ export default function ReportsPage() {
 
           <button
             onClick={() => window.print()}
-            className="p-2 rounded-2xl bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 shadow-sm print:hidden"
+            className="p-2 rounded-2xl bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900 shadow-sm print:hidden shrink-0"
             title="Print Report"
           >
             <Printer className="w-4 h-4" />
@@ -164,10 +164,10 @@ export default function ReportsPage() {
       </div>
 
       {/* Tabs Switcher */}
-      <div className="flex border-b border-neutral-200">
+      <div className="flex border-b border-neutral-200 overflow-x-auto no-scrollbar pb-1">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`pb-3 px-6 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'overview'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
@@ -179,7 +179,7 @@ export default function ReportsPage() {
 
         <button
           onClick={() => setActiveTab('staff')}
-          className={`pb-3 px-6 text-sm font-bold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'staff'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'

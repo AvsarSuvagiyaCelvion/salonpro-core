@@ -391,14 +391,14 @@ export default function LiveStudioPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => {
               setRefreshing(true);
               fetchLiveData();
             }}
             disabled={refreshing}
-            className="inline-flex items-center gap-1.5 py-2 px-3 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-xs font-semibold text-neutral-700 cursor-pointer"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-xs font-semibold text-neutral-700 cursor-pointer whitespace-nowrap"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
@@ -410,7 +410,7 @@ export default function LiveStudioPage() {
               setWaitName('');
               setIsWaitModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 py-2 px-3.5 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Add Customer to Waiting</span>

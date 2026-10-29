@@ -353,20 +353,20 @@ export default function CustomerPortalPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {salon?.slug && (
               <Link
                 href={`/${salon.slug}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold shadow-md transition-all active:scale-95"
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold shadow-md transition-all active:scale-95 whitespace-nowrap"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>Book Appointment</span>
+                <span>Book Slot</span>
               </Link>
             )}
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-neutral-300 text-xs font-semibold transition-all"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-2xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 text-neutral-300 text-xs font-semibold transition-all whitespace-nowrap"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>

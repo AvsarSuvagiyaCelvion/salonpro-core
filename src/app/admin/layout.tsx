@@ -68,12 +68,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="h-screen flex flex-col bg-[#f8fafc] text-slate-900 font-sans selection:bg-amber-500 selection:text-white overflow-hidden">
       {/* Top Super Admin Banner */}
-      <div className="shrink-0 bg-[#0f172a] text-amber-300 text-xs py-1.5 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-slate-800">
-        <div className="flex items-center gap-2 mx-auto sm:mx-0">
-          <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-          <span>Master Platform Admin · Multi-Tenant Cloud Architecture</span>
+      <div className="shrink-0 bg-[#0f172a] text-amber-300 text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-slate-800">
+        <div className="flex items-center gap-1.5 text-[11px] sm:text-xs truncate">
+          <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <span className="truncate">Master Platform Admin<span className="hidden sm:inline"> · Multi-Tenant Cloud Architecture</span></span>
         </div>
-        <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-300">
+        <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-300 shrink-0">
           <Link
             href="/"
             className="flex items-center gap-1 hover:text-white transition-colors"
@@ -94,31 +94,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Top Header */}
-      <header className="shrink-0 h-16 bg-white border-b border-slate-200/90 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-3">
+      <header className="shrink-0 h-14 sm:h-16 bg-white border-b border-slate-200/90 z-30 px-3 sm:px-6 flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 focus:outline-none cursor-pointer"
+            className="lg:hidden p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-slate-100 focus:outline-none cursor-pointer shrink-0"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 text-slate-950 flex items-center justify-center font-black text-lg shadow-sm">
+          <Link href="/admin" className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 text-slate-950 flex items-center justify-center font-black text-base sm:text-lg shadow-sm shrink-0">
               👑
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base text-slate-900 tracking-tight leading-tight">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight leading-tight truncate">
                   SalonPro Admin
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                <span className="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 shrink-0">
                   Panel 1
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 block">
+              <span className="text-[10px] sm:text-[11px] text-slate-500 hidden sm:block truncate">
                 Platform Governance & Analytics
               </span>
             </div>
@@ -126,7 +126,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Top Right Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="hidden md:flex items-center gap-2 text-xs text-slate-600 bg-amber-50/80 border border-amber-200/80 py-1.5 px-3 rounded-full">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="font-medium text-slate-700">Platform Active (Supabase Cloud)</span>
@@ -135,7 +135,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <button
             onClick={handleAdminLogout}
             disabled={loggingOut}
-            className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 py-1.5 px-3 rounded-xl transition-colors cursor-pointer border border-slate-200"
+            title="Sign out of Admin"
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 p-2 sm:py-1.5 sm:px-3 rounded-xl transition-colors cursor-pointer border border-slate-200"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
@@ -271,13 +272,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
-        <aside className="hidden lg:flex w-64 bg-white border-r border-slate-200/90 flex-col justify-between py-5 px-3 h-full overflow-y-auto shrink-0 touch-scroll">
-          <div className="space-y-6">
+        <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-slate-200/90 flex-col justify-between py-3.5 px-3 h-full shrink-0 select-none overflow-y-auto no-scrollbar">
+          <div className="space-y-3">
             <div>
-              <div className="px-3 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Platform Navigation
               </div>
-              <nav className="space-y-1">
+              <nav className="space-y-0.5">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
@@ -285,7 +286,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                         isActive
                           ? 'bg-amber-500 text-slate-950 font-bold shadow-sm shadow-amber-500/20'
                           : 'text-slate-700 hover:bg-amber-50/70 hover:text-amber-900'
@@ -300,15 +301,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Quick Switcher Section */}
-            <div className="pt-4 border-t border-slate-100">
-              <div className="px-3 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="pt-2.5 border-t border-slate-100">
+              <div className="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Switch Role / Panel
               </div>
               <div className="space-y-1">
                 <Link
                   href="/salon-owner"
                   target="_blank"
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-pink-700 bg-pink-50 hover:bg-pink-100/80 transition-colors border border-pink-200/60"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-pink-700 bg-pink-50 hover:bg-pink-100/80 transition-colors border border-pink-200/60"
                 >
                   <span className="flex items-center gap-2">
                     <span>💇</span>
@@ -320,7 +321,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   href="/portal"
                   target="_blank"
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100/80 transition-colors border border-emerald-200/60"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100/80 transition-colors border border-emerald-200/60"
                 >
                   <span className="flex items-center gap-2">
                     <span>📱</span>
@@ -332,17 +333,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          {/* Admin User Profile Box */}
-          <div className="pt-4 border-t border-slate-100 px-3 shrink-0">
-            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs uppercase">
+          {/* Admin User Profile Box - Pinned firmly at bottom */}
+          <div className="pt-2.5 border-t border-slate-100 shrink-0">
+            <div className="p-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs uppercase shrink-0">
                 {admin?.name?.charAt(0) || 'A'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-bold text-slate-900 truncate">
                   {admin?.name || 'Super Admin'}
                 </div>
-                <div className="text-[10px] text-slate-500 font-mono truncate">
+                <div
+                  className="text-[11px] text-slate-500 font-mono truncate"
+                  title={admin?.email || 'admin@salonpro.in'}
+                >
                   {admin?.email || 'admin@salonpro.in'}
                 </div>
               </div>
@@ -351,8 +355,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Main Content Area - only this scrolls when user scrolls! */}
-        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 w-full touch-scroll">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 w-full max-w-full touch-scroll">
+          <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>

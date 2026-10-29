@@ -40,7 +40,7 @@ export default function AreaTrendChart({
 
   const values = data.map((d) => d.value);
   const maxValue = Math.max(...values, 100);
-  const paddingX = 40;
+  const paddingX = 48;
   const paddingY = 24;
   const svgWidth = 800;
   const svgHeight = height;
@@ -75,8 +75,8 @@ export default function AreaTrendChart({
       {/* Active Hover Floating Tooltip */}
       {activePoint && (
         <div
-          className="absolute -top-3 z-20 pointer-events-none transform -translate-x-1/2 px-3 py-1.5 rounded-xl bg-neutral-900 text-white shadow-xl text-xs font-bold transition-all duration-150 animate-fade-in flex items-center gap-1.5 border border-neutral-700"
-          style={{ left: `${(activePoint.x / svgWidth) * 100}%` }}
+          className="absolute -top-3 z-20 pointer-events-none transform -translate-x-1/2 px-3 py-1.5 rounded-xl bg-neutral-900 text-white shadow-xl text-xs font-bold transition-all duration-150 animate-fade-in flex items-center gap-1.5 border border-neutral-700 whitespace-nowrap"
+          style={{ left: `${Math.max(12, Math.min(88, (activePoint.x / svgWidth) * 100))}%` }}
         >
           <span className="text-pink-400">{activePoint.label}:</span>
           <span>
@@ -195,7 +195,7 @@ export default function AreaTrendChart({
 
       {/* X-Axis Labels */}
       {showLabels && (
-        <div className="flex justify-between items-center px-4 pt-2 text-[10px] sm:text-xs font-semibold text-neutral-400">
+        <div className="flex justify-between items-center px-6 sm:px-8 pt-2 text-[10px] sm:text-xs font-semibold text-neutral-400">
           {data.map((d, i) => (
             <span
               key={i}

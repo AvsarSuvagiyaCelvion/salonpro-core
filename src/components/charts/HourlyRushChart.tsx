@@ -83,9 +83,9 @@ export default function HourlyRushChart({ data }: HourlyRushChartProps) {
       </div>
 
       {/* X Labels */}
-      <div className="flex justify-between items-center px-1 text-[9px] sm:text-[10px] font-bold text-neutral-400">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 px-1 pt-1 text-[8px] sm:text-[10px] font-bold text-neutral-400 overflow-hidden">
         {hours.map((h, i) => (
-          <span key={i} className="text-center truncate">
+          <span key={i} className="flex-1 text-center truncate">
             {h.hour.replace(' ', '')}
           </span>
         ))}

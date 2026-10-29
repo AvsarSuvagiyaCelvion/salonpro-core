@@ -51,8 +51,8 @@ export default function BarComparisonChart({
             onMouseLeave={() => setHoveredId(null)}
             className="group cursor-pointer"
           >
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <div className="flex items-center gap-2 truncate">
+            <div className="flex items-center justify-between text-xs mb-1.5 gap-2">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
                 <span className="w-5 h-5 rounded-lg bg-neutral-100 text-neutral-600 flex items-center justify-center font-bold text-[10px] shrink-0">
                   #{idx + 1}
                 </span>

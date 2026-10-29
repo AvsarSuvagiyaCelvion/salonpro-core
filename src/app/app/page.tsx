@@ -245,7 +245,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Daily Revenue Chart Section */}
-      <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm">
+      <div className="bg-white p-4 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
             <div className="flex items-center gap-2">
@@ -277,10 +277,10 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* 3-Column Performance Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* 2x2 Performance Analytics Grid (Full responsive breathing room) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Popular Services Ranking Chart */}
-        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between">
+        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Top Services Performance</h3>
@@ -311,7 +311,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Visual Revenue Breakdown Donut */}
-        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between">
+        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Service Category Share</h3>
@@ -319,8 +319,8 @@ export default function DashboardPage() {
             </div>
 
             <DonutDistributionChart
-              size={150}
-              thickness={20}
+              size={140}
+              thickness={18}
               centerLabel="Revenue"
               centerValue={`₹${((data?.totalRevenue || 0) > 1000 ? Math.round((data?.totalRevenue || 0) / 1000) + 'k' : data?.totalRevenue || 0)}`}
               data={[
@@ -341,7 +341,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Peak Hours Traffic Density */}
-        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between">
+        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Peak Rush Hours</h3>
@@ -358,7 +358,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Invoice Payment Status Counts */}
-        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between">
+        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Payment Health</h3>

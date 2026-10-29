@@ -133,7 +133,7 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Main Revenue Trajectory Trend Chart */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
+      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
             <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ export default function AdminAnalyticsPage() {
       {/* Visual Analytics Grid: Market Share Donut & Ranking Bar Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Salon Revenue Share Donut Chart */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -175,8 +175,8 @@ export default function AdminAnalyticsPage() {
 
             <div className="py-2">
               <DonutDistributionChart
-                size={170}
-                thickness={22}
+                size={140}
+                thickness={18}
                 centerLabel="Total Revenue"
                 centerValue={`₹${totalRevenue > 1000 ? Math.round(totalRevenue / 1000) + 'k' : totalRevenue}`}
                 data={salonDonutData.length > 0 ? salonDonutData : [
@@ -192,7 +192,7 @@ export default function AdminAnalyticsPage() {
         </div>
 
         {/* Branch Performance Rankings Bar Chart */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between">
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>

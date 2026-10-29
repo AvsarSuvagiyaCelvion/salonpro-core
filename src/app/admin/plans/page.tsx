@@ -307,7 +307,7 @@ export default function AdminPlansPage() {
         <button
           type="button"
           onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs shadow-md shadow-pink-900/20 transition-all cursor-pointer active:scale-95"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs shadow-md shadow-pink-900/20 transition-all cursor-pointer active:scale-95"
         >
           <Plus className="w-4 h-4" />
           <span>Create New Plan</span>
@@ -315,7 +315,7 @@ export default function AdminPlansPage() {
       </div>
 
       {/* Analytics KPI Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">

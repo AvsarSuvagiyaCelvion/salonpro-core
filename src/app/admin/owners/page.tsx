@@ -80,13 +80,9 @@ export default function AdminOwnersPage() {
                   <div className="text-[10px] text-slate-400 uppercase font-bold">Staff Team Size</div>
                   <div className="text-slate-900 font-semibold">{s.staff_count} Stylists & Receptionists</div>
                 </div>
-                <a
-                  href="/app/staff"
-                  target="_blank"
-                  className="text-xs text-pink-700 hover:underline font-semibold"
-                >
-                  Manage Team ➔
-                </a>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 font-bold border border-slate-200">
+                  Salon Managed
+                </span>
               </div>
             </div>
           </div>

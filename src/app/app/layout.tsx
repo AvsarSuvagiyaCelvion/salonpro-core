@@ -232,25 +232,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="h-screen flex flex-col bg-[#faf8fa] text-[#2a1630] overflow-hidden">
       {/* Top Professional Trial Notification Banner (Only shown if on active 7-Day trial) */}
       {subscription?.isTrial && !subscription?.isTrialExpired && (
-        <div className="shrink-0 bg-gradient-to-r from-purple-900 via-pink-900 to-[#b3135b] text-white text-xs py-2 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-700 shadow-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>
-              <strong>🎁 7-Day Free Trial Active:</strong> You have{' '}
+        <div className="shrink-0 bg-gradient-to-r from-purple-900 via-pink-900 to-[#b3135b] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-700 shadow-xs">
+          <div className="flex items-center gap-1.5 truncate text-[11px] sm:text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-ping"></span>
+            <span className="truncate">
+              <strong>🎁 Free Trial:</strong>{' '}
               <span className="font-extrabold text-amber-300 underline decoration-amber-400">
                 {subscription.trialDaysRemaining} day{subscription.trialDaysRemaining === 1 ? '' : 's'} remaining
-              </span>{' '}
-              to explore all pro ERP features.
+              </span>
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={() => setShowPlanModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-pink-900 font-extrabold text-[11px] shadow-sm hover:bg-pink-50 transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-pink-900 font-extrabold text-[10px] sm:text-[11px] shadow-sm hover:bg-pink-50 transition-all cursor-pointer active:scale-95"
             >
               <Zap className="w-3 h-3 text-pink-700 fill-pink-600" />
-              <span>Upgrade Plan</span>
+              <span>Upgrade</span>
             </button>
             {salon?.slug && (
               <Link
@@ -258,7 +257,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 target="_blank"
                 className="hidden sm:inline-flex items-center gap-1 text-[11px] text-pink-200 hover:text-white transition-colors underline ml-2"
               >
-                <span>Live Booking Link</span>
+                <span>Live Booking</span>
                 <ExternalLink className="w-3 h-3" />
               </Link>
             )}
@@ -267,26 +266,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Top Header */}
-      <header className="shrink-0 h-16 bg-white border-b border-neutral-200/80 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-2.5 sm:gap-3">
+      <header className="shrink-0 h-14 sm:h-16 bg-white border-b border-neutral-200/80 z-30 px-3 sm:px-6 flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-neutral-700 hover:bg-neutral-100 focus:outline-none cursor-pointer transition-colors"
+            className="lg:hidden p-1.5 sm:p-2 rounded-xl text-neutral-700 hover:bg-neutral-100 focus:outline-none cursor-pointer transition-colors shrink-0"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <Link href="/app" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center font-bold text-lg shadow-sm">
-              <Sparkles className="w-5 h-5" />
+          <Link href="/app" className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <span className="font-extrabold text-lg text-[#2a1630] tracking-tight block leading-tight">
+            <div className="min-w-0">
+              <span className="font-extrabold text-sm sm:text-base text-[#2a1630] tracking-tight block leading-tight truncate max-w-[140px] sm:max-w-xs">
                 {salon?.name || 'Salon Operating System'}
               </span>
-              <span className="text-[11px] text-neutral-500 block -mt-0.5">
+              <span className="text-[10px] sm:text-[11px] text-neutral-500 hidden sm:block -mt-0.5 truncate">
                 Salon Business ERP
               </span>
             </div>
@@ -294,7 +293,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Top actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="hidden md:flex items-center gap-2 text-xs text-neutral-600 bg-pink-50/70 border border-pink-100/80 py-1.5 px-3 rounded-full">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Studio Open (10:00 - 19:00)</span>
@@ -303,7 +302,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <button
             onClick={handleLogout}
             disabled={loggingOut}
-            className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 hover:text-red-600 hover:bg-red-50 py-1.5 px-3 rounded-lg transition-colors cursor-pointer border border-neutral-200"
+            title="Sign out of ERP"
+            className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 hover:text-red-600 hover:bg-red-50 p-2 sm:py-1.5 sm:px-3 rounded-xl transition-colors cursor-pointer border border-neutral-200"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
@@ -447,9 +447,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
-        <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200/80 flex-col justify-between py-4 px-3 h-full overflow-y-auto shrink-0 touch-scroll">
-          <nav className="space-y-1">
-            <div className="px-3 pb-2 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+        <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-neutral-200/80 flex-col justify-between py-3.5 px-3 h-full shrink-0 select-none overflow-y-auto no-scrollbar">
+          <nav className="space-y-0.5">
+            <div className="px-3 pb-1.5 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
               Management
             </div>
             {navItems.map((item) => {
@@ -465,7 +465,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
                       ? 'bg-[#b3135b] text-white shadow-md shadow-[#b3135b]/20 font-semibold'
                       : isLocked
@@ -473,12 +473,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       : 'text-neutral-700 hover:bg-pink-50/60 hover:text-[#b3135b]'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLocked ? 'text-neutral-400' : 'text-neutral-500'}`} />
                     <span>{item.name}</span>
                   </div>
                   {isLocked && (
-                    <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
+                    <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
                       <Lock className="w-2.5 h-2.5" />
                       <span>{item.requiredPlanName || 'PRO'}</span>
                     </span>
@@ -488,13 +488,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="pt-4 border-t border-neutral-100 px-3">
+          <div className="pt-2.5 border-t border-neutral-100 px-3 shrink-0">
             <div>
-              <div className="text-xs text-neutral-500 mb-0.5">Signed in as:</div>
-              <div className="text-xs font-semibold text-[#2a1630] truncate">
+              <div className="text-[10px] text-neutral-400 mb-0.5 font-bold uppercase">Signed in as:</div>
+              <div className="text-xs font-semibold text-[#2a1630] truncate" title={user?.email || 'Active Workspace User'}>
                 {user?.email || 'Active Workspace User'}
               </div>
-              <div className="text-[11px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
+              <div className="text-[10px] text-emerald-600 font-semibold mt-0.5 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 <span className="capitalize">{user?.role || 'Owner'} Account</span>
               </div>
@@ -503,8 +503,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 w-full pb-24 md:pb-8 touch-scroll">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 w-full max-w-full pb-24 md:pb-8 touch-scroll">
+          <div className="max-w-7xl mx-auto w-full">
             {isExpiredLockout ? (
             <div className="max-w-4xl mx-auto py-8">
               {/* Paywall Lockout Screen */}

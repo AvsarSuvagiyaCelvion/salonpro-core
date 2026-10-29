@@ -250,47 +250,49 @@ export default function AdminSalonsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Tenant Workspaces & Subdomains</h1>
-          <p className="text-xs text-slate-500">Super Admin control center: manage subscriptions, subdomains, and suspend/activate tenants</p>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Tenant Workspaces & Subdomains</h1>
+          <p className="text-xs text-slate-500 mt-0.5">Super Admin control center: manage subscriptions, subdomains, and suspend/activate tenants</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
             <input
               type="text"
               placeholder="Search salon, slug, or owner..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 shadow-xs"
+              className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 shadow-xs"
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setBroadcastSuccess(false);
-              setIsBroadcastModalOpen(true);
-            }}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer whitespace-nowrap active:scale-95"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>📢 Broadcast to All Salons</span>
-          </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setBroadcastSuccess(false);
+                setIsBroadcastModalOpen(true);
+              }}
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Broadcast</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setModalMessage(null);
-              setIsModalOpen(true);
-            }}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add New Salon</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                setModalMessage(null);
+                setIsModalOpen(true);
+              }}
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Salon</span>
+            </button>
+          </div>
         </div>
       </div>
 

@@ -136,39 +136,40 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch('/api/settings');
-        if (!res.ok) {
+        const [res, subRes, plansRes] = await Promise.all([
+          fetch('/api/settings'),
+          fetch('/api/subscription').catch(() => null),
+          fetch('/api/plans').catch(() => null),
+        ]);
+
+        if (res.status === 401) {
           router.push('/login');
           return;
-        }
-        const data = await res.json();
-        if (data.salon) {
-          setSalon({
-            name: data.salon.name,
-            slug: data.salon.slug,
-            open_time: data.salon.open_time,
-            close_time: data.salon.close_time,
-          });
-        } else {
-          router.push('/login');
-          return;
-        }
-        if (data.user) {
-          setUser(data.user);
         }
 
-        // Fetch Subscription details
-        const subRes = await fetch('/api/subscription');
-        if (subRes.ok) {
+        if (res.ok) {
+          const data = await res.json();
+          if (data.salon) {
+            setSalon({
+              name: data.salon.name,
+              slug: data.salon.slug,
+              open_time: data.salon.open_time,
+              close_time: data.salon.close_time,
+            });
+          }
+          if (data.user) {
+            setUser(data.user);
+          }
+        }
+
+        if (subRes && subRes.ok) {
           const subData = await subRes.json();
           if (subData.subscription) {
             setSubscription(subData.subscription);
           }
         }
 
-        // Fetch Public Plans for upgrade modal
-        const plansRes = await fetch('/api/plans');
-        if (plansRes.ok) {
+        if (plansRes && plansRes.ok) {
           const plansData = await plansRes.json();
           setAvailablePlans(plansData.plans || []);
           if (plansData.plans?.length > 0) {
@@ -176,7 +177,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           }
         }
       } catch {
-        router.push('/login');
+        // Do not redirect on non-critical network interruptions
       }
     }
     loadData();

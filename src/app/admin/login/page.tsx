@@ -29,8 +29,7 @@ export default function AdminLoginPage() {
         throw new Error(data.error || 'Failed to login as Super Admin');
       }
 
-      router.push('/admin');
-      router.refresh();
+      window.location.href = '/admin';
     } catch (err: any) {
       setError(err.message);
     } finally {

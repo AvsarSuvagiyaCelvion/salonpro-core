@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
 import { clearSalonCache } from '@/lib/salon';
-import { getSalonPlan, getSalonUsage } from '@/lib/plan';
+import { getSalonPlan, getSalonUsage, invalidateSalonPlanCache } from '@/lib/plan';
 
 // 1. GET Current Salon Subscription, Plan Details, and Live Usage vs Limits
 export async function GET(request: Request) {
@@ -165,6 +165,7 @@ export async function POST(request: Request) {
     );
 
     clearSalonCache();
+    invalidateSalonPlanCache(salonId);
 
     return NextResponse.json({
       success: true,

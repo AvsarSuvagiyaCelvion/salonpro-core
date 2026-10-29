@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
-import { requireFeature } from '@/lib/plan';
+import { requireFeature, invalidateSalonPlanCache } from '@/lib/plan';
 
 export async function GET(request: Request) {
   try {
@@ -138,6 +138,8 @@ async function handleUpdateSettings(request: Request) {
         salonId,
       ]
     );
+
+    invalidateSalonPlanCache(salonId);
 
     return NextResponse.json({
       success: true,

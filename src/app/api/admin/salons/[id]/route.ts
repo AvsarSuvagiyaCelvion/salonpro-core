@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireAdmin } from '@/lib/api-auth';
 import { clearSalonCache } from '@/lib/salon';
+import { invalidateSalonPlanCache } from '@/lib/plan';
 
 // 1. Get detailed single salon info for Super Admin
 export async function GET(
@@ -165,6 +166,7 @@ export async function PATCH(
     }
 
     clearSalonCache();
+    invalidateSalonPlanCache(id);
 
     return NextResponse.json({
       success: true,
@@ -193,6 +195,7 @@ export async function DELETE(
     }
 
     clearSalonCache();
+    invalidateSalonPlanCache(id);
 
     return NextResponse.json({
       success: true,

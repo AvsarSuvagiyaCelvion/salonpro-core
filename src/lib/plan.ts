@@ -82,11 +82,41 @@ const DEFAULT_BASIC_FLAGS: PlanFlags = {
   priority_support: false,
 };
 
+interface CachedPlanResult {
+  result: { plan: SalonPlanContext; error: null } | { plan: null; error: NextResponse };
+  cachedAt: number;
+}
+
+const planCache = new Map<string, CachedPlanResult>();
+const PLAN_CACHE_TTL = 30000; // 30 seconds
+
+export function invalidateSalonPlanCache(salonId?: string) {
+  if (salonId) {
+    planCache.delete(salonId);
+  } else {
+    planCache.clear();
+  }
+}
+
 /**
  * Retrieves the salon's active plan, limits, and feature flags.
  * Enforces is_active and subscription expiry rules.
  */
 export async function getSalonPlan(salonId: string): Promise<
+  | { plan: SalonPlanContext; error: null }
+  | { plan: null; error: NextResponse }
+> {
+  const cached = planCache.get(salonId);
+  if (cached && Date.now() - cached.cachedAt < PLAN_CACHE_TTL) {
+    return cached.result;
+  }
+
+  const result = await computeSalonPlan(salonId);
+  planCache.set(salonId, { result, cachedAt: Date.now() });
+  return result;
+}
+
+async function computeSalonPlan(salonId: string): Promise<
   | { plan: SalonPlanContext; error: null }
   | { plan: null; error: NextResponse }
 > {

@@ -31,8 +31,7 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to sign in');
       }
 
-      router.push('/app');
-      router.refresh();
+      window.location.href = '/app';
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please check your credentials.');
     } finally {

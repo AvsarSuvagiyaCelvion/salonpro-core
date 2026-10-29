@@ -12,9 +12,9 @@ const pool =
     ssl: {
       rejectUnauthorized: false,
     },
-    max: 10,
+    max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    connectionTimeoutMillis: 10000,
     allowExitOnIdle: false,
   });
 
@@ -24,5 +24,18 @@ global.__dbPool = pool;
 export default pool;
 
 export async function query(text: string, params?: any[]) {
-  return pool.query(text, params);
+  try {
+    return await pool.query(text, params);
+  } catch (err: any) {
+    // Retry once for transient network resets on serverless cold starts
+    if (
+      err?.code === 'ECONNRESET' ||
+      err?.code === 'ETIMEDOUT' ||
+      err?.message?.includes('timeout')
+    ) {
+      await new Promise((r) => setTimeout(r, 150));
+      return await pool.query(text, params);
+    }
+    throw err;
+  }
 }

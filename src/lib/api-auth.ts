@@ -33,6 +33,26 @@ export interface CustomerSession {
   role: string;
 }
 
+interface CachedUserAuth {
+  userId: string;
+  salonId: string;
+  salonSlug: string;
+  userActive: boolean;
+  salonActive: boolean;
+  cachedAt: number;
+}
+
+const userAuthCache = new Map<string, CachedUserAuth>();
+const USER_CACHE_TTL = 30000; // 30 seconds
+
+export function invalidateUserAuthCache(email?: string) {
+  if (email) {
+    userAuthCache.delete(email.toLowerCase());
+  } else {
+    userAuthCache.clear();
+  }
+}
+
 /**
  * Ensures caller has an active tenant session (owner / staff).
  * Returns { session, error: null } if authorized, or { session: null, error: NextResponse } if not.
@@ -82,31 +102,65 @@ export async function requireTenant(
       };
     }
 
-    let salonId = payload.salonId;
-    let userId = payload.userId;
-    let salonSlug = payload.salonSlug;
+    const cacheKey = payload.email.toLowerCase();
+    const cached = userAuthCache.get(cacheKey);
 
-    // Resolve or verify user and salon state from database
-    const userRes = await query(
-      `SELECT u.id, u.salon_id, s.slug as salon_slug, u.is_active as user_active, s.is_active as salon_active
-       FROM users u
-       JOIN salons s ON u.salon_id = s.id
-       WHERE LOWER(u.email) = $1
-       LIMIT 1`,
-      [payload.email.toLowerCase()]
-    );
+    let row: {
+      id: string;
+      salon_id: string;
+      salon_slug: string;
+      user_active: boolean;
+      salon_active: boolean;
+    };
 
-    if (userRes.rows.length === 0) {
-      return {
-        session: null,
-        error: NextResponse.json(
-          { error: 'Unauthorized: No active salon workspace linked to this user' },
-          { status: 401 }
-        ),
+    if (cached && Date.now() - cached.cachedAt < USER_CACHE_TTL) {
+      row = {
+        id: cached.userId,
+        salon_id: cached.salonId,
+        salon_slug: cached.salonSlug,
+        user_active: cached.userActive,
+        salon_active: cached.salonActive,
       };
+    } else {
+      // Resolve or verify user and salon state from database
+      const userRes = await query(
+        `SELECT u.id, u.salon_id, s.slug as salon_slug, u.is_active as user_active, s.is_active as salon_active
+         FROM users u
+         JOIN salons s ON u.salon_id = s.id
+         WHERE LOWER(u.email) = $1
+         LIMIT 1`,
+        [cacheKey]
+      );
+
+      if (userRes.rows.length === 0) {
+        return {
+          session: null,
+          error: NextResponse.json(
+            { error: 'Unauthorized: No active salon workspace linked to this user' },
+            { status: 401 }
+          ),
+        };
+      }
+
+      const r = userRes.rows[0];
+      row = {
+        id: r.id,
+        salon_id: r.salon_id,
+        salon_slug: r.salon_slug,
+        user_active: Boolean(r.user_active),
+        salon_active: Boolean(r.salon_active),
+      };
+
+      userAuthCache.set(cacheKey, {
+        userId: row.id,
+        salonId: row.salon_id,
+        salonSlug: row.salon_slug,
+        userActive: row.user_active,
+        salonActive: row.salon_active,
+        cachedAt: Date.now(),
+      });
     }
 
-    const row = userRes.rows[0];
     if (!row.user_active || !row.salon_active) {
       return {
         session: null,
@@ -117,9 +171,9 @@ export async function requireTenant(
       };
     }
 
-    userId = row.id;
-    salonId = row.salon_id;
-    salonSlug = row.salon_slug;
+    const userId = row.id;
+    const salonId = row.salon_id;
+    const salonSlug = row.salon_slug;
 
     // Check plan and subscription status
     const planResult = await getSalonPlan(salonId);

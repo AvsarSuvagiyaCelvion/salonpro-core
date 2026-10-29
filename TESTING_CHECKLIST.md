@@ -48,12 +48,12 @@
   * Password: `Password@123`
   * Plan: `7-Day Free Trial Demo` સિલેક્ટ કરો.
   * Submit કરો -> રજીસ્ટ્રેશન સફળ થાય છે અને સીધું `/app` ડેશબોર્ડ ખુલે છે.
-- [ ] **સર્વિસિસ ઉમેરો (`/app/services`):**
+- [done ] **સર્વિસિસ ઉમેરો (`/app/services`):**
   * Service 1: `Haircut & Blowdry` (₹400, 30 Mins, Category: Hair)
   * Service 2: `Fruit Glow Facial` (₹800, 45 Mins, Category: Facial)
   * Service 3: `Bridal Makeup Trial` (₹2,500, 60 Mins, Category: Makeup)
   * ચકાસો: બધી સર્વિસિસ સેવ થઈને લિસ્ટમાં દેખાય છે.
-- [ ] **સ્ટાફ (કારીગરો) ઉમેરો (`/app/staff`):**
+- [done ] **સ્ટાફ (કારીગરો) ઉમેરો (`/app/staff`):**
   * Staff 1: `Kajal Sharma` (Senior Stylist, Commission: 10%)
   * Staff 2: `Neha Varma` (Esthetician, Commission: 15%)
   * ચકાસો: સ્ટાફ સફળતાપૂર્વક સેવ થાય છે.

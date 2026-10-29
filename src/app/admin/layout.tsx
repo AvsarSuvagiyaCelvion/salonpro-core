@@ -66,9 +66,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc] text-slate-900 font-sans selection:bg-amber-500 selection:text-white">
+    <div className="h-screen flex flex-col bg-[#f8fafc] text-slate-900 font-sans selection:bg-amber-500 selection:text-white overflow-hidden">
       {/* Top Super Admin Banner */}
-      <div className="bg-[#0f172a] text-amber-300 text-xs py-1.5 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-slate-800">
+      <div className="shrink-0 bg-[#0f172a] text-amber-300 text-xs py-1.5 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-slate-800">
         <div className="flex items-center gap-2 mx-auto sm:mx-0">
           <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
           <span>Master Platform Admin · Multi-Tenant Cloud Architecture</span>
@@ -94,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Top Header */}
-      <header className="h-16 bg-white border-b border-slate-200/90 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+      <header className="shrink-0 h-16 bg-white border-b border-slate-200/90 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -269,9 +269,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      <div className="flex flex-1">
+      <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
-        <aside className="hidden lg:flex w-64 bg-white border-r border-slate-200/90 flex-col justify-between py-5 px-3 sticky top-16 h-[calc(100vh-4rem-1.75rem)] overflow-y-auto touch-scroll">
+        <aside className="hidden lg:flex w-64 bg-white border-r border-slate-200/90 flex-col justify-between py-5 px-3 h-full overflow-y-auto shrink-0 touch-scroll">
           <div className="space-y-6">
             <div>
               <div className="px-3 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -333,7 +333,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* Admin User Profile Box */}
-          <div className="pt-4 border-t border-slate-100 px-3">
+          <div className="pt-4 border-t border-slate-100 px-3 shrink-0">
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs uppercase">
                 {admin?.name?.charAt(0) || 'A'}
@@ -350,9 +350,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </aside>
 
-        {/* Main Content Area */}
-        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-          {children}
+        {/* Main Content Area - only this scrolls when user scrolls! */}
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 w-full touch-scroll">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

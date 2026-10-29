@@ -229,10 +229,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#faf8fa] text-[#2a1630]">
+    <div className="h-screen flex flex-col bg-[#faf8fa] text-[#2a1630] overflow-hidden">
       {/* Top Professional Trial Notification Banner (Only shown if on active 7-Day trial) */}
       {subscription?.isTrial && !subscription?.isTrialExpired && (
-        <div className="bg-gradient-to-r from-purple-900 via-pink-900 to-[#b3135b] text-white text-xs py-2 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-700 shadow-xs">
+        <div className="shrink-0 bg-gradient-to-r from-purple-900 via-pink-900 to-[#b3135b] text-white text-xs py-2 px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-700 shadow-xs">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
             <span>
@@ -267,7 +267,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Top Header */}
-      <header className="h-16 bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+      <header className="shrink-0 h-16 bg-white border-b border-neutral-200/80 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-2.5 sm:gap-3">
           <button
             type="button"
@@ -445,9 +445,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="flex flex-1">
+      <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
-        <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200/80 flex-col justify-between py-4 px-3 sticky top-16 h-[calc(100vh-4rem-1.75rem)] overflow-y-auto">
+        <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200/80 flex-col justify-between py-4 px-3 h-full overflow-y-auto shrink-0 touch-scroll">
           <nav className="space-y-1">
             <div className="px-3 pb-2 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
               Management
@@ -503,8 +503,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8 animate-fade-in">
-          {isExpiredLockout ? (
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 w-full pb-24 md:pb-8 touch-scroll">
+          <div className="max-w-7xl mx-auto">
+            {isExpiredLockout ? (
             <div className="max-w-4xl mx-auto py-8">
               {/* Paywall Lockout Screen */}
               <div className="bg-white rounded-3xl border-2 border-red-200 shadow-xl overflow-hidden">
@@ -650,13 +651,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           ) : (
             children
           )}
+          </div>
         </main>
       </div>
 
       {/* Plan Upgrade / Subscription Modal (When clicked from top bar or settings) */}
       {showPlanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto my-auto">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-pink-600">

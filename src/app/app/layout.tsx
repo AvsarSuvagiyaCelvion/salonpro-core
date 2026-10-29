@@ -65,8 +65,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     status: string;
     isActive: boolean;
     isTrial: boolean;
+    isTrialActive?: boolean;
     isTrialExpired: boolean;
+    isSubscriptionExpired?: boolean;
     trialDaysRemaining: number;
+    trialEndsAt?: string | null;
+    subscriptionEndsAt?: string | null;
     currentPlan: any;
   } | null>(null);
 
@@ -211,7 +215,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const isExpiredLockout = subscription?.isTrialExpired && !subscription?.isActive;
+  const isExpiredLockout = Boolean(
+    (!subscription?.isActive && (subscription?.isTrialExpired || (subscription as any)?.isSubscriptionExpired || subscription?.status === 'expired')) ||
+    (subscription?.subscriptionEndsAt && new Date(subscription.subscriptionEndsAt).getTime() <= Date.now() && !subscription?.isActive)
+  );
 
   const lockedItem = navItems.find(
     (item) =>
@@ -506,10 +513,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <Clock className="w-8 h-8 text-white" />
                   </div>
                   <span className="inline-block px-3 py-1 rounded-full bg-red-950/40 text-red-200 text-xs font-bold uppercase tracking-wider mb-2">
-                    7-Day Free Trial Ended
+                    {subscription?.isTrial ? '7-Day Free Trial Ended' : 'Subscription Expired'}
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
-                    Your 7-Day Free Trial Has Concluded
+                    {subscription?.isTrial ? 'Your 7-Day Free Trial Has Concluded' : 'Your Workspace Subscription Has Concluded'}
                   </h2>
                   <p className="text-pink-100 text-xs sm:text-sm mt-2 max-w-xl mx-auto">
                     All salon records, appointments, and staff settings for{' '}

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { getSalonPlan } from '@/lib/plan';
 
 export async function GET(
   request: Request,
@@ -28,6 +29,15 @@ export async function GET(
       return NextResponse.json(
         { error: 'This salon workspace is currently suspended by administration.' },
         { status: 403 }
+      );
+    }
+
+    // Check if salon has an active trial or paid subscription
+    const planCheck = await getSalonPlan(salon.id);
+    if (planCheck.error) {
+      return NextResponse.json(
+        { error: 'Online booking is temporarily inactive for this salon due to an expired subscription.' },
+        { status: 402 }
       );
     }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth';
+import { getSalonPlan } from '@/lib/plan';
 
 export async function POST(
   request: Request,
@@ -54,6 +55,15 @@ export async function POST(
       return NextResponse.json(
         { error: 'Online booking is temporarily unavailable because this salon workspace is suspended.' },
         { status: 403 }
+      );
+    }
+
+    // Check if salon subscription / 7-day trial is active
+    const planCheck = await getSalonPlan(salon.id);
+    if (planCheck.error) {
+      return NextResponse.json(
+        { error: 'Online booking is temporarily inactive for this salon due to an expired subscription.' },
+        { status: 402 }
       );
     }
 

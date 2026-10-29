@@ -51,9 +51,21 @@ export async function GET(request: Request) {
 
     const now = new Date();
     const trialEnd = salon.trial_ends_at ? new Date(salon.trial_ends_at) : null;
+    const subEnd = salon.subscription_ends_at ? new Date(salon.subscription_ends_at) : null;
+
     const isTrial = salon.subscription_status === 'trial';
     const isTrialActive = Boolean(isTrial && trialEnd && trialEnd.getTime() > now.getTime());
     const isTrialExpired = Boolean(isTrial && (!trialEnd || trialEnd.getTime() <= now.getTime()));
+
+    const isSubActive = Boolean(
+      salon.subscription_status === 'active' &&
+      (!subEnd || subEnd.getTime() > now.getTime())
+    );
+    const isSubExpired = Boolean(
+      salon.subscription_status === 'active' &&
+      subEnd &&
+      subEnd.getTime() <= now.getTime()
+    );
 
     let trialDaysRemaining = 0;
     if (isTrialActive && trialEnd) {
@@ -74,11 +86,13 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       subscription: {
-        status: salon.subscription_status,
+        status: isTrialExpired || isSubExpired ? 'expired' : salon.subscription_status,
         isActive: Boolean(planContext?.isActive),
         isTrial,
         isTrialActive,
         isTrialExpired,
+        isSubscriptionExpired: isSubExpired,
+        isExpired: isTrialExpired || isSubExpired || salon.subscription_status === 'expired',
         trialEndsAt: salon.trial_ends_at,
         trialDaysRemaining,
         subscriptionEndsAt: salon.subscription_ends_at,

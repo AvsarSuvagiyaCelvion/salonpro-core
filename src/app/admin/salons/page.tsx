@@ -328,7 +328,7 @@ export default function AdminSalonsPage() {
           return (
             <div
               key={s.id}
-              className={`bg-white border rounded-3xl p-6 shadow-xs flex flex-col justify-between transition-all ${
+              className={`bg-white border rounded-3xl p-4 sm:p-6 shadow-xs flex flex-col justify-between transition-all ${
                 isActive ? 'border-slate-200/90' : 'border-rose-200 bg-rose-50/20'
               }`}
             >
@@ -457,18 +457,18 @@ export default function AdminSalonsPage() {
               </div>
 
               <div className="mt-5 pt-3 border-t border-slate-100 flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
                   <a
                     href={`/${s.slug}`}
                     target="_blank"
-                    className="flex-1 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-center text-xs font-semibold transition-all border border-slate-200"
+                    className="flex-1 min-w-[100px] py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-center text-xs font-semibold transition-all border border-slate-200"
                   >
                     Public Booking ↗
                   </a>
                   <a
                     href="/app"
                     target="_blank"
-                    className="flex-1 py-2 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-center text-xs font-bold transition-all"
+                    className="flex-1 min-w-[90px] py-2 px-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-center text-xs font-bold transition-all"
                   >
                     Owner ERP ➔
                   </a>
@@ -476,7 +476,7 @@ export default function AdminSalonsPage() {
                     <a
                       href={`https://wa.me/91${s.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${s.name} team, this is SalonPro Platform Admin.`)}`}
                       target="_blank"
-                      className="py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-center text-xs font-bold transition-all flex items-center justify-center gap-1"
+                      className="py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-center text-xs font-bold transition-all flex items-center justify-center gap-1 shrink-0"
                       title="Direct WhatsApp Chat with Salon Owner"
                     >
                       <Phone className="w-3.5 h-3.5 text-emerald-600" />
@@ -523,21 +523,23 @@ export default function AdminSalonsPage() {
 
       {/* Add New Salon Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl relative my-auto">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🏢</span>
-                <h3 className="text-base font-black text-slate-900">Register New Salon</h3>
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6 animate-fade-in">
+          <div className="fixed inset-0" onClick={() => setIsModalOpen(false)} aria-hidden="true" />
+          <div className="min-h-full flex items-center justify-center py-6">
+            <div className="relative z-10 bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 max-w-md w-full shadow-2xl my-auto animate-scale-in">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🏢</span>
+                  <h3 className="text-base font-black text-slate-900">Register New Salon</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
 
             {modalMessage && (
               <div
@@ -624,27 +626,31 @@ export default function AdminSalonsPage() {
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
+
       {/* Platform Broadcast to All Salons Modal */}
       {isBroadcastModalOpen && (
-        <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 max-w-lg w-full shadow-2xl relative my-auto">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">📢</span>
-                <div>
-                  <h3 className="text-base font-black text-slate-900">Broadcast to All Salons</h3>
-                  <p className="text-xs text-slate-500">Send an official platform notice to all salon owners</p>
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6 animate-fade-in">
+          <div className="fixed inset-0" onClick={() => setIsBroadcastModalOpen(false)} aria-hidden="true" />
+          <div className="min-h-full flex items-center justify-center py-6">
+            <div className="relative z-10 bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 max-w-lg w-full shadow-2xl my-auto animate-scale-in">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">📢</span>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">Broadcast to All Salons</h3>
+                    <p className="text-xs text-slate-500">Send an official platform notice to all salon owners</p>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsBroadcastModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsBroadcastModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
 
             {broadcastSuccess ? (
               <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
@@ -769,12 +775,15 @@ export default function AdminSalonsPage() {
             )}
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* Change Salon Plan & Expiry Date Modal */}
       {editingSalonSub && (
-        <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 my-auto">
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6 animate-fade-in">
+          <div className="fixed inset-0" onClick={() => setEditingSalonSub(null)} aria-hidden="true" />
+          <div className="min-h-full flex items-center justify-center py-6">
+            <div className="relative z-10 bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 my-auto animate-scale-in">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div>
                 <h3 className="text-base font-black text-slate-900">
@@ -872,7 +881,8 @@ export default function AdminSalonsPage() {
             </form>
           </div>
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 }

@@ -477,49 +477,51 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
-        <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-neutral-200/80 flex-col justify-between py-3.5 px-3 h-full shrink-0 select-none overflow-y-auto no-scrollbar">
-          <nav className="space-y-0.5">
+        <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-neutral-200/80 flex-col h-full shrink-0 select-none">
+          <div className="flex-1 overflow-y-auto py-3.5 px-3 space-y-0.5 no-scrollbar">
             <div className="px-3 pb-1.5 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
               Management
             </div>
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
-              const isLocked = Boolean(
-                item.requiredFlag &&
-                subscription?.currentPlan?.flags &&
-                subscription.currentPlan.flags[item.requiredFlag] === false
-              );
+            <nav className="space-y-0.5">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
+                const isLocked = Boolean(
+                  item.requiredFlag &&
+                  subscription?.currentPlan?.flags &&
+                  subscription.currentPlan.flags[item.requiredFlag] === false
+                );
 
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                    isActive
-                      ? 'bg-[#b3135b] text-white shadow-md shadow-[#b3135b]/20 font-semibold'
-                      : isLocked
-                      ? 'text-neutral-500 hover:bg-neutral-100/80'
-                      : 'text-neutral-700 hover:bg-pink-50/60 hover:text-[#b3135b]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLocked ? 'text-neutral-400' : 'text-neutral-500'}`} />
-                    <span>{item.name}</span>
-                  </div>
-                  {isLocked && (
-                    <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
-                      <Lock className="w-2.5 h-2.5" />
-                      <span>{item.requiredPlanName || 'PRO'}</span>
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                      isActive
+                        ? 'bg-[#b3135b] text-white shadow-md shadow-[#b3135b]/20 font-semibold'
+                        : isLocked
+                        ? 'text-neutral-500 hover:bg-neutral-100/80'
+                        : 'text-neutral-700 hover:bg-pink-50/60 hover:text-[#b3135b]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLocked ? 'text-neutral-400' : 'text-neutral-500'}`} />
+                      <span>{item.name}</span>
+                    </div>
+                    {isLocked && (
+                      <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
+                        <Lock className="w-2.5 h-2.5" />
+                        <span>{item.requiredPlanName || 'PRO'}</span>
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
 
-          <div className="pt-2.5 border-t border-neutral-100 px-3 shrink-0">
-            <div>
+          <div className="p-3 border-t border-neutral-200/80 bg-neutral-50/60 shrink-0">
+            <div className="p-2.5 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs">
               <div className="text-[10px] text-neutral-400 mb-0.5 font-bold uppercase">Signed in as:</div>
               <div className="text-xs font-semibold text-[#2a1630] truncate" title={user?.email || 'Active Workspace User'}>
                 {user?.email || 'Active Workspace User'}
@@ -687,88 +689,91 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Plan Upgrade / Subscription Modal (When clicked from top bar or settings) */}
       {showPlanModal && (
-        <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto my-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-pink-600">
-                  SalonPro Cloud Subscriptions
-                </span>
-                <h3 className="text-xl font-black text-slate-900">
-                  Upgrade or Manage Your Subscription Plan
-                </h3>
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6 animate-fade-in">
+          <div className="fixed inset-0" onClick={() => setShowPlanModal(false)} aria-hidden="true" />
+          <div className="min-h-full flex items-center justify-center py-6">
+            <div className="relative z-10 bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[88vh] overflow-y-auto my-auto animate-scale-in">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6 shrink-0">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-pink-600">
+                    SalonPro Cloud Subscriptions
+                  </span>
+                  <h3 className="text-xl font-black text-slate-900">
+                    Upgrade or Manage Your Subscription Plan
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPlanModal(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowPlanModal(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {paymentSuccess && (
-              <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800 text-sm font-bold animate-fade-in">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <span>Payment verified! Your plan has been activated successfully.</span>
-              </div>
-            )}
+              {paymentSuccess && (
+                <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800 text-sm font-bold animate-fade-in shrink-0">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  <span>Payment verified! Your plan has been activated successfully.</span>
+                </div>
+              )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              {availablePlans.map((plan) => {
-                const isSelected = selectedPlanId === plan.id;
-                return (
-                  <div
-                    key={plan.id}
-                    onClick={() => setSelectedPlanId(plan.id)}
-                    className={`relative rounded-2xl p-5 border-2 transition-all cursor-pointer bg-white flex flex-col justify-between ${
-                      isSelected
-                        ? 'border-[#b3135b] ring-4 ring-pink-100 shadow-lg'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    {plan.is_popular && (
-                      <span className="absolute -top-3 right-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs">
-                        Popular
-                      </span>
-                    )}
-
-                    <div>
-                      <h4 className="font-extrabold text-slate-900 text-base mb-1">{plan.name}</h4>
-                      <p className="text-xs text-slate-500 mb-3 min-h-[30px]">{plan.description}</p>
-                      <div className="mb-4">
-                        <span className="text-2xl font-black text-slate-900">₹{Number(plan.price).toLocaleString()}</span>
-                        <span className="text-xs text-slate-500 ml-1">/{plan.billing_interval}</span>
-                      </div>
-                      <div className="space-y-1.5 border-t border-slate-100 pt-3">
-                        {(Array.isArray(plan.features) ? plan.features : []).map((feat: string, i: number) => (
-                          <div key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                            <span>{feat}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleActivatePlan(plan.id);
-                      }}
-                      disabled={activatingPlan}
-                      className={`w-full mt-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {availablePlans.map((plan) => {
+                  const isSelected = selectedPlanId === plan.id;
+                  return (
+                    <div
+                      key={plan.id}
+                      onClick={() => setSelectedPlanId(plan.id)}
+                      className={`relative rounded-2xl p-5 border-2 transition-all cursor-pointer bg-white flex flex-col justify-between ${
                         isSelected
-                          ? 'bg-[#b3135b] text-white hover:bg-[#9c0f4e]'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          ? 'border-[#b3135b] ring-4 ring-pink-100 shadow-lg'
+                          : 'border-slate-200 hover:border-slate-300'
                       }`}
                     >
-                      <CreditCard className="w-3.5 h-3.5" />
-                      <span>{activatingPlan && isSelected ? 'Processing...' : 'Pay & Activate'}</span>
-                    </button>
-                  </div>
-                );
-              })}
+                      {plan.is_popular && (
+                        <span className="absolute -top-3 right-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs">
+                          Popular
+                        </span>
+                      )}
+
+                      <div>
+                        <h4 className="font-extrabold text-slate-900 text-base mb-1">{plan.name}</h4>
+                        <p className="text-xs text-slate-500 mb-3 min-h-[30px]">{plan.description}</p>
+                        <div className="mb-4">
+                          <span className="text-2xl font-black text-slate-900">₹{Number(plan.price).toLocaleString()}</span>
+                          <span className="text-xs text-slate-500 ml-1">/{plan.billing_interval}</span>
+                        </div>
+                        <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                          {(Array.isArray(plan.features) ? plan.features : []).map((feat: string, i: number) => (
+                            <div key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                              <span>{feat}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleActivatePlan(plan.id);
+                        }}
+                        disabled={activatingPlan}
+                        className={`w-full mt-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-[#b3135b] text-white hover:bg-[#9c0f4e]'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        <span>{activatingPlan && isSelected ? 'Processing...' : 'Pay & Activate'}</span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -776,53 +781,56 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Global Limit / Upgrade Required Modal */}
       {planPrompt?.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-              <div className="flex items-center gap-2 text-[#b3135b] font-black text-sm">
-                <AlertTriangle className="w-5 h-5 text-amber-500" />
-                <span>{planPrompt.title}</span>
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6 animate-fade-in">
+          <div className="fixed inset-0" onClick={() => setPlanPrompt(null)} aria-hidden="true" />
+          <div className="min-h-full flex items-center justify-center py-6">
+            <div className="relative z-10 bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 my-auto animate-scale-in">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <div className="flex items-center gap-2 text-[#b3135b] font-black text-sm">
+                  <AlertTriangle className="w-5 h-5 text-amber-500" />
+                  <span>{planPrompt.title}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPlanPrompt(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setPlanPrompt(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 mb-5 leading-relaxed">
-              {planPrompt.message}
-            </p>
+              <p className="text-xs sm:text-sm text-slate-600 mb-5 leading-relaxed">
+                {planPrompt.message}
+              </p>
 
-            <div className="p-4 rounded-2xl bg-pink-50/70 border border-pink-100 mb-5 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-pink-700">Recommended Plan</span>
-                <div className="text-sm font-extrabold text-[#2a1630]">Upgrade to {planPrompt.requiredPlan || 'Pro'}</div>
+              <div className="p-4 rounded-2xl bg-pink-50/70 border border-pink-100 mb-5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-pink-700">Recommended Plan</span>
+                  <div className="text-sm font-extrabold text-[#2a1630]">Upgrade to {planPrompt.requiredPlan || 'Pro'}</div>
+                </div>
+                <span className="text-xs font-black text-[#b3135b]">₹999/month</span>
               </div>
-              <span className="text-xs font-black text-[#b3135b]">₹999/month</span>
-            </div>
 
-            <div className="flex items-center justify-end gap-2.5">
-              <button
-                type="button"
-                onClick={() => setPlanPrompt(null)}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPlanPrompt(null);
-                  setShowPlanModal(true);
-                }}
-                className="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-[#b3135b] hover:bg-[#9c0f4e] text-white shadow-md shadow-pink-900/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>View Upgrade Options</span>
-              </button>
+              <div className="flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setPlanPrompt(null)}
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlanPrompt(null);
+                    setShowPlanModal(true);
+                  }}
+                  className="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-[#b3135b] hover:bg-[#9c0f4e] text-white shadow-md shadow-pink-900/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>View Upgrade Options</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

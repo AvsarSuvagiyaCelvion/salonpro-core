@@ -48,7 +48,7 @@ export default function AdminOwnersPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {salons.map((s) => (
-          <div key={s.id} className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
+          <div key={s.id} className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs">
             <div className="flex items-center gap-3.5 mb-5">
               <div
                 className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-white shadow-sm text-base"

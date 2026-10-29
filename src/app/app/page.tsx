@@ -329,8 +329,8 @@ export default function DashboardPage() {
             </div>
 
             <DonutDistributionChart
-              size={140}
-              thickness={18}
+              size={130}
+              thickness={16}
               centerLabel="Revenue"
               centerValue={`₹${((data?.totalRevenue || 0) > 1000 ? Math.round((data?.totalRevenue || 0) / 1000) + 'k' : data?.totalRevenue || 0)}`}
               data={[

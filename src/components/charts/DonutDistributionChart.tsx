@@ -128,7 +128,7 @@ export default function DonutDistributionChart({
                   {slice.label}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs font-mono shrink-0">
+              <div className="flex items-center gap-2.5 text-xs font-mono shrink-0 ml-2">
                 <span className="font-bold text-slate-900">
                   {typeof slice.value === 'number' && slice.value > 1000
                     ? `₹${slice.value.toLocaleString('en-IN')}`

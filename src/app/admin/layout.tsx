@@ -272,8 +272,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
-        <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-slate-200/90 flex-col justify-between py-3.5 px-3 h-full shrink-0 select-none overflow-y-auto no-scrollbar">
-          <div className="space-y-3">
+        <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-slate-200/90 flex-col h-full shrink-0 select-none">
+          {/* Scrollable nav items section */}
+          <div className="flex-1 overflow-y-auto py-3.5 px-3 space-y-3 no-scrollbar">
             <div>
               <div className="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Platform Navigation
@@ -334,8 +335,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* Admin User Profile Box - Pinned firmly at bottom */}
-          <div className="pt-2.5 border-t border-slate-100 shrink-0">
-            <div className="p-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-2.5">
+          <div className="p-3 border-t border-slate-200/80 bg-slate-50/60 shrink-0">
+            <div className="p-2.5 rounded-2xl bg-white border border-slate-200/80 flex items-center gap-2.5 shadow-2xs">
               <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs uppercase shrink-0">
                 {admin?.name?.charAt(0) || 'A'}
               </div>

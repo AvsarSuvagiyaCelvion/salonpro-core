@@ -424,7 +424,7 @@ export default function ProductsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 pb-2 overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-2 border-b border-neutral-200 pb-2 overflow-x-auto no-scrollbar touch-scroll">
         <button
           type="button"
           onClick={() => setActiveTab('inventory')}

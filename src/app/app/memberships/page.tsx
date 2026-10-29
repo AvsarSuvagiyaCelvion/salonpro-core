@@ -272,10 +272,10 @@ export default function MembershipsPage() {
       )}
 
       {/* Tabs Switcher */}
-      <div className="flex border-b border-neutral-200 overflow-x-auto no-scrollbar pb-1">
+      <div className="flex border-b border-neutral-200 overflow-x-auto no-scrollbar gap-1 sm:gap-2 pb-px touch-scroll">
         <button
           onClick={() => setActiveTab('memberships')}
-          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
+          className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'memberships'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
@@ -287,7 +287,7 @@ export default function MembershipsPage() {
 
         <button
           onClick={() => setActiveTab('packages')}
-          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
+          className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'packages'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
@@ -299,7 +299,7 @@ export default function MembershipsPage() {
 
         <button
           onClick={() => setActiveTab('subscriptions')}
-          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap ${
+          className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'subscriptions'
               ? 'border-[#b3135b] text-[#b3135b]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'

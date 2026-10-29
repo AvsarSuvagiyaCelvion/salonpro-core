@@ -275,8 +275,8 @@ export default function AdminOverviewPage() {
                 </div>
               ) : (
                 <DonutDistributionChart
-                  size={140}
-                  thickness={18}
+                  size={130}
+                  thickness={16}
                   centerLabel="Branches"
                   centerValue={salons.length}
                   data={salons.map((s, idx) => ({

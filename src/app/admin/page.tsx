@@ -254,17 +254,27 @@ export default function AdminOverviewPage() {
               <span className="text-[10px] uppercase font-bold text-slate-400">Market Share</span>
             </div>
             <div className="py-2">
-              <DonutDistributionChart
-                size={140}
-                thickness={18}
-                centerLabel="Branches"
-                centerValue={salons.length}
-                data={salons.length > 0 ? salons.map((s, idx) => ({
-                  label: s.name,
-                  value: Math.max(10, Number(s.total_revenue || 0)),
-                  color: s.brand_color || ['#b3135b', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b'][idx % 5],
-                })) : [{ label: 'Registered Salons', value: 100, color: '#b3135b' }]}
-              />
+              {salons.length === 0 ? (
+                <div className="py-8 text-center text-slate-400">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs font-semibold text-slate-600">No salon branches yet</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Click &ldquo;+ Register New Salon Branch&rdquo; to add</p>
+                </div>
+              ) : (
+                <DonutDistributionChart
+                  size={140}
+                  thickness={18}
+                  centerLabel="Branches"
+                  centerValue={salons.length}
+                  data={salons.map((s, idx) => ({
+                    label: s.name,
+                    value: Math.max(1, Number(s.total_revenue || 0)),
+                    color: s.brand_color || ['#b3135b', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b'][idx % 5],
+                  }))}
+                />
+              )}
             </div>
           </div>
           <div className="pt-3 border-t border-slate-100 text-center text-xs text-slate-400">

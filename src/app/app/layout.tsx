@@ -202,13 +202,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Top Header */}
       <header className="h-16 bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-neutral-600 hover:bg-neutral-100"
+            className="lg:hidden p-2 rounded-xl text-neutral-700 hover:bg-neutral-100 focus:outline-none cursor-pointer transition-colors"
+            aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
 
           <Link href="/app" className="flex items-center gap-2.5">
@@ -248,7 +249,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile Animated Slide-out Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop blur overlay */}
           <div
             className="fixed inset-0 bg-neutral-900/60 backdrop-blur-xs transition-opacity duration-300"
@@ -362,31 +363,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Mobile Horizontal Scroll Menu */}
-      <div className="md:hidden bg-white border-b border-neutral-200 overflow-x-auto py-2 px-3 flex gap-2 no-scrollbar sticky top-16 z-20 touch-scroll">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center gap-1.5 text-xs whitespace-nowrap px-3.5 py-2 rounded-xl font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-[#b3135b] text-white shadow-xs font-bold scale-102'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200 active:scale-95'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{item.name}</span>
-            </Link>
-          );
-        })}
-      </div>
-
       <div className="flex flex-1">
-        {/* Left Sidebar (Desktop) */}
-        <aside className="hidden md:flex w-64 bg-white border-r border-neutral-200/80 flex-col justify-between py-4 px-3 sticky top-16 h-[calc(100vh-4rem-1.75rem)] overflow-y-auto">
+        {/* Left Sidebar (Desktop & Large Screens) */}
+        <aside className="hidden lg:flex w-64 bg-white border-r border-neutral-200/80 flex-col justify-between py-4 px-3 sticky top-16 h-[calc(100vh-4rem-1.75rem)] overflow-y-auto">
           <nav className="space-y-1">
             <div className="px-3 pb-2 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
               Management

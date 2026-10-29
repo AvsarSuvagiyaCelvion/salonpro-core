@@ -99,9 +99,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+            className="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 focus:outline-none cursor-pointer"
+            aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
 
           <Link href="/admin" className="flex items-center gap-2.5">
@@ -146,7 +147,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Mobile Animated Slide-out Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop blur overlay */}
           <div
             className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity duration-300"
@@ -268,31 +269,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      {/* Mobile Horizontal Scroll Menu */}
-      <div className="md:hidden bg-white border-b border-slate-200 overflow-x-auto py-2 px-3 flex gap-2 no-scrollbar sticky top-16 z-20 touch-scroll">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-1.5 text-xs whitespace-nowrap px-3.5 py-2 rounded-xl font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-xs scale-102'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-
       <div className="flex flex-1">
-        {/* Left Sidebar (Desktop) */}
-        <aside className="hidden md:flex w-64 bg-white border-r border-slate-200/90 flex-col justify-between py-5 px-3 sticky top-16 h-[calc(100vh-4rem-1.75rem)] overflow-y-auto touch-scroll">
+        {/* Left Sidebar (Desktop & Large Screens) */}
+        <aside className="hidden lg:flex w-64 bg-white border-r border-slate-200/90 flex-col justify-between py-5 px-3 sticky top-16 h-[calc(100vh-4rem-1.75rem)] overflow-y-auto touch-scroll">
           <div className="space-y-6">
             <div>
               <div className="px-3 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">

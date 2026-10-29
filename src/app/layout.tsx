@@ -15,7 +15,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'SalonPro - Multi-Tenant Cloud Salon ERP',
+  title: 'SalonPro - Modern Salon & Spa Management Platform',
   description: 'Next-generation salon operating system and client management portal.',
 };
 

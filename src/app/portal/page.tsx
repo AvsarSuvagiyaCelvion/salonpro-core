@@ -442,8 +442,8 @@ export default function CustomerPortalPage() {
                     >
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-pink-500/10 text-pink-400 border border-pink-500/20 flex flex-col items-center justify-center font-bold">
-                          <span className="text-[10px] uppercase">{new Date(appt.starts_at).toLocaleDateString('en-IN', { month: 'short' })}</span>
-                          <span className="text-base">{new Date(appt.starts_at).getDate()}</span>
+                          <span className="text-[10px] uppercase">{new Date(appt.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short' })}</span>
+                          <span className="text-base">{new Date(appt.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' })}</span>
                         </div>
                         <div>
                           <div className="font-bold text-base text-white">{appt.service_name}</div>
@@ -453,7 +453,7 @@ export default function CustomerPortalPage() {
                           <div className="flex items-center gap-2 mt-2 text-xs text-neutral-400">
                             <span className="flex items-center gap-1 text-pink-400 font-medium">
                               <Clock className="w-3.5 h-3.5" />
-                              {new Date(appt.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                             </span>
                             <span>·</span>
                             <span>⏱ {appt.duration_min} mins</span>
@@ -490,9 +490,16 @@ export default function CustomerPortalPage() {
                         <div className="font-semibold text-neutral-200">{appt.service_name}</div>
                         <div className="text-[11px] text-neutral-500">
                           {new Date(appt.starts_at).toLocaleDateString('en-IN', {
+                            timeZone: 'Asia/Kolkata',
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric',
+                          })}{' '}
+                          ·{' '}
+                          {new Date(appt.starts_at).toLocaleTimeString('en-IN', {
+                            timeZone: 'Asia/Kolkata',
+                            hour: '2-digit',
+                            minute: '2-digit',
                           })}{' '}
                           with {appt.staff_name}
                         </div>
@@ -546,9 +553,15 @@ export default function CustomerPortalPage() {
                       </div>
                       <div className="text-xs text-neutral-400 mt-1">
                         Issued on {new Date(inv.created_at).toLocaleDateString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',
+                        })}{' '}
+                        at {new Date(inv.created_at).toLocaleTimeString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })}
                       </div>
 

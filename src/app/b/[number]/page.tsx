@@ -123,12 +123,14 @@ export default async function PublicBillPage({
             <span className="text-neutral-400 block text-[10px] uppercase font-bold tracking-wider">Date & Time</span>
             <span className="font-medium text-neutral-800">
               {new Date(invoice.created_at).toLocaleDateString('en-IN', {
+                timeZone: 'Asia/Kolkata',
                 day: 'numeric',
                 month: 'short',
                 year: 'numeric',
               })}{' '}
               ·{' '}
-              {new Date(invoice.created_at).toLocaleTimeString([], {
+              {new Date(invoice.created_at).toLocaleTimeString('en-IN', {
+                timeZone: 'Asia/Kolkata',
                 hour: '2-digit',
                 minute: '2-digit',
               })}

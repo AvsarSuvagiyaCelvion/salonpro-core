@@ -106,10 +106,14 @@ export default function AppointmentsPage() {
   const [formNote, setFormNote] = useState('');
 
   useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const today = now.toLocaleDateString('en-CA');
+    const curH = now.getHours().toString().padStart(2, '0');
+    const curM = (Math.ceil(now.getMinutes() / 15) * 15 % 60).toString().padStart(2, '0');
     setTodayDate(today);
     setCalendarDate(today);
     setFormDate(today);
+    setFormTime(`${curH}:${curM}`);
     fetchInitialData();
   }, []);
 
@@ -118,15 +122,15 @@ export default function AppointmentsPage() {
   }, [statusFilter, dateRangeFilter, viewMode, calendarDate]);
 
   function handlePrevDay() {
-    const cur = new Date(calendarDate || todayDate || '2026-10-29');
+    const cur = new Date((calendarDate || todayDate || new Date().toLocaleDateString('en-CA')) + 'T12:00:00');
     cur.setDate(cur.getDate() - 1);
-    setCalendarDate(cur.toISOString().slice(0, 10));
+    setCalendarDate(cur.toLocaleDateString('en-CA'));
   }
 
   function handleNextDay() {
-    const cur = new Date(calendarDate || todayDate || '2026-10-29');
+    const cur = new Date((calendarDate || todayDate || new Date().toLocaleDateString('en-CA')) + 'T12:00:00');
     cur.setDate(cur.getDate() + 1);
-    setCalendarDate(cur.toISOString().slice(0, 10));
+    setCalendarDate(cur.toLocaleDateString('en-CA'));
   }
 
   function handleToday() {
@@ -203,14 +207,20 @@ export default function AppointmentsPage() {
   function openCreateModal(defaultTime?: string, defaultDate?: string) {
     setOverlapError(null);
     setMessage(null);
+    const now = new Date();
+    const today = now.toLocaleDateString('en-CA');
+    const curH = now.getHours().toString().padStart(2, '0');
+    const curM = (Math.ceil(now.getMinutes() / 15) * 15 % 60).toString().padStart(2, '0');
+    const curTimeStr = `${curH}:${curM}`;
+
     setIsNewCustomer(false);
     setSelectedCustomerId(customers[0]?.id || '');
     setNewCustName('');
     setNewCustMobile('');
     setSelectedStaffId(staffList[0]?.id || '');
     setSelectedServiceId(services[0]?.id || '');
-    setFormDate(defaultDate || calendarDate || new Date().toISOString().slice(0, 10));
-    setFormTime(defaultTime || '11:00');
+    setFormDate(defaultDate || calendarDate || today);
+    setFormTime(defaultTime || curTimeStr);
     setFormNote('');
     setIsModalOpen(true);
   }
@@ -222,9 +232,10 @@ export default function AppointmentsPage() {
   function getCalculatedEndTime() {
     if (!formDate || !formTime) return '';
     try {
-      const start = new Date(`${formDate}T${formTime}:00`);
+      const cleanT = formTime.trim().length === 5 ? `${formTime.trim()}:00` : formTime.trim();
+      const start = new Date(`${formDate.trim()}T${cleanT}+05:30`);
       const end = new Date(start.getTime() + duration * 60000);
-      return end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return end.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
     } catch {
       return '';
     }
@@ -616,8 +627,8 @@ export default function AppointmentsPage() {
                                 <div className="flex items-center justify-between gap-1 mb-1.5">
                                   <span className="text-xs font-black text-[#b3135b] flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
-                                    {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
-                                    {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {startDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })} -{' '}
+                                    {endDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                                   </span>
 
                                   <span
@@ -742,12 +753,17 @@ export default function AppointmentsPage() {
                 {/* Top Badge: Date, Time & Status */}
                 <div>
                   <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-neutral-100">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#b3135b]">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>
-                        {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
-                        {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#b3135b]">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>
+                          {startDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })} -{' '}
+                          {endDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-neutral-400 font-medium">
+                        {startDate.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
                     </div>
 
                     <span

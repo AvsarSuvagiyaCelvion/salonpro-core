@@ -593,8 +593,8 @@ export default function DashboardPage() {
                   className="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#b3135b]/10 text-[#b3135b] flex items-center justify-center font-bold text-xs">
-                      {new Date(appt.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div className="w-10 h-10 rounded-xl bg-[#b3135b]/10 text-[#b3135b] flex items-center justify-center font-bold text-xs text-center leading-tight">
+                      {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                     </div>
                     <div>
                       <div className="text-xs font-bold text-[#2a1630]">{appt.customer_name}</div>

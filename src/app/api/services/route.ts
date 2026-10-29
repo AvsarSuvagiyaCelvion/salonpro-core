@@ -56,8 +56,8 @@ export async function POST(request: Request) {
     }
 
     const res = await query(
-      `INSERT INTO services (salon_id, name, category, description, duration_min, price, online_enabled)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO services (salon_id, name, category, description, duration_min, price, online_enabled, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
        RETURNING *`,
       [
         salonId,

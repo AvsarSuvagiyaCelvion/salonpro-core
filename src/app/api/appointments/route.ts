@@ -131,15 +131,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Staff member not found in this salon' }, { status: 404 });
     }
 
-    // Construct timestamps
-    const startsAt = new Date(`${date}T${start_time}:00`);
+    // Construct timestamps in Indian Standard Time (IST, UTC+05:30) so time doesn't shift by 5.5 hours on UTC servers
+    const cleanStartTime = start_time.trim().length === 5 ? `${start_time.trim()}:00` : start_time.trim();
+    const startsAt = new Date(`${date.trim()}T${cleanStartTime}+05:30`);
     const endsAt = new Date(startsAt.getTime() + durationMin * 60000);
 
-    // 3. Attempt insert into appointments table
+    // 3. Attempt insert into appointments table with current timestamp
     try {
       const apptRes = await query(
-        `INSERT INTO appointments (salon_id, customer_id, staff_id, service_id, starts_at, ends_at, status, source, note)
-         VALUES ($1, $2, $3, $4, $5, $6, 'scheduled', 'owner', $7)
+        `INSERT INTO appointments (salon_id, customer_id, staff_id, service_id, starts_at, ends_at, status, source, note, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, 'scheduled', 'owner', $7, NOW())
          RETURNING *`,
         [salonId, targetCustomerId, staff_id, service_id, startsAt.toISOString(), endsAt.toISOString(), note || null]
       );
@@ -167,10 +168,10 @@ export async function POST(request: Request) {
 
         const staffName = conflictRes.rows[0]?.staff_name || 'This stylist';
         const conflictStart = conflictRes.rows[0]
-          ? new Date(conflictRes.rows[0].starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          ? new Date(conflictRes.rows[0].starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })
           : start_time;
         const conflictEnd = conflictRes.rows[0]
-          ? new Date(conflictRes.rows[0].ends_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          ? new Date(conflictRes.rows[0].ends_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })
           : '';
 
         return NextResponse.json(

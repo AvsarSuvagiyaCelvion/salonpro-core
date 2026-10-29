@@ -103,8 +103,8 @@ export async function POST(request: Request) {
     const pComm = parseFloat(product_commission_pct) || 0;
 
     const staffRes = await query(
-      `INSERT INTO staff (salon_id, name, role_title, service_commission_pct, product_commission_pct, active, show_online)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO staff (salon_id, name, role_title, service_commission_pct, product_commission_pct, active, show_online, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
        RETURNING *`,
       [
         salonId,

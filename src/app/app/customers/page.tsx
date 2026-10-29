@@ -466,6 +466,7 @@ export default function CustomersPage() {
                       </div>
                       <span className="text-neutral-500">
                         {new Date(inv.created_at).toLocaleDateString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',

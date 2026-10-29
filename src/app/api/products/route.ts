@@ -75,8 +75,8 @@ export async function POST(request: Request) {
 
     const res = await query(
       `INSERT INTO products (
-        salon_id, name, brand, sku, price, cost_price, stock, min_stock, active
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        salon_id, name, brand, sku, price, cost_price, stock, min_stock, active, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
       RETURNING *`,
       [
         salonId,

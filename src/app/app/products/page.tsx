@@ -666,10 +666,12 @@ export default function ProductsPage() {
                     <tr key={sale.item_id} className="hover:bg-neutral-50/70 transition-colors">
                       <td className="py-3 px-4 text-[11px] text-neutral-500 whitespace-nowrap">
                         {new Date(sale.sold_at).toLocaleDateString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
                           day: 'numeric',
                           month: 'short',
                         })}{' '}
                         {new Date(sale.sold_at).toLocaleTimeString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
                           hour: '2-digit',
                           minute: '2-digit',
                         })}

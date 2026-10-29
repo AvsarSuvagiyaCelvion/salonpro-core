@@ -53,8 +53,8 @@ export async function POST(request: Request) {
     }
 
     const res = await query(
-      `INSERT INTO customers (salon_id, name, mobile, email, note, birthday)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO customers (salon_id, name, mobile, email, note, birthday, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())
        RETURNING *`,
       [
         salonId,

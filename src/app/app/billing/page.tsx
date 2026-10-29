@@ -312,11 +312,21 @@ export default function BillingPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4 text-neutral-500 whitespace-nowrap">
-                        {new Date(inv.created_at).toLocaleDateString('en-IN', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
+                        <div className="font-semibold text-neutral-800 text-xs">
+                          {new Date(inv.created_at).toLocaleDateString('en-IN', {
+                            timeZone: 'Asia/Kolkata',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </div>
+                        <div className="text-[11px] text-neutral-400 font-mono">
+                          {new Date(inv.created_at).toLocaleTimeString('en-IN', {
+                            timeZone: 'Asia/Kolkata',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </div>
                       </td>
                       <td className="py-3 px-4 text-right font-bold text-neutral-900">
                         ₹{Number(inv.total).toLocaleString('en-IN')}
@@ -671,8 +681,10 @@ export default function BillingPage() {
                   <span className="font-bold text-[#b3135b]">{viewInvoice.number}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-500">Date:</span>
-                  <span>{new Date(viewInvoice.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span className="text-neutral-500">Date & Time:</span>
+                  <span>
+                    {new Date(viewInvoice.created_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' })} · {new Date(viewInvoice.created_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-neutral-500">Client:</span>

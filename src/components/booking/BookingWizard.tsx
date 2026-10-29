@@ -815,7 +815,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div className="flex justify-between text-xs text-neutral-300">
                 <span>🗓️ Date & Time:</span>
                 <span className="font-bold text-white">
-                  {new Date(`${selectedDate}T00:00:00`).toLocaleDateString('en-IN', {
+                  {new Date(`${selectedDate}T00:00:00+05:30`).toLocaleDateString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
                     weekday: 'short',
                     day: 'numeric',
                     month: 'short',

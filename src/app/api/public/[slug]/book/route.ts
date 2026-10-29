@@ -81,8 +81,9 @@ export async function POST(
 
     const service = serviceRes.rows[0];
 
-    // Calculate starts_at & ends_at
-    const startsAt = new Date(`${date}T${time}:00`);
+    // Calculate starts_at & ends_at in Indian Standard Time (+05:30)
+    const cleanT = time.trim().length === 5 ? `${time.trim()}:00` : time.trim();
+    const startsAt = new Date(`${date.trim()}T${cleanT}+05:30`);
     const endsAt = new Date(startsAt.getTime() + service.duration_min * 60000);
 
     // 4. Resolve Staff member
@@ -157,9 +158,9 @@ export async function POST(
     try {
       const apptRes = await query(
         `INSERT INTO appointments (
-          salon_id, customer_id, staff_id, service_id, starts_at, ends_at, status, source, note
+          salon_id, customer_id, staff_id, service_id, starts_at, ends_at, status, source, note, created_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, 'scheduled', 'online', $7
+          $1, $2, $3, $4, $5, $6, 'scheduled', 'online', $7, NOW()
         ) RETURNING *`,
         [
           salon.id,
@@ -190,14 +191,16 @@ export async function POST(
     const staffRes = await query(`SELECT name FROM staff WHERE id = $1`, [finalStaffId]);
     const staffName = staffRes.rows[0]?.name || 'Our Stylist';
 
-    // Format human-readable date and time for confirmation
+    // Format human-readable date and time for confirmation (Indian Standard Time)
     const formattedDate = startsAt.toLocaleDateString('en-IN', {
+      timeZone: 'Asia/Kolkata',
       weekday: 'short',
       day: 'numeric',
       month: 'short',
       year: 'numeric',
     });
-    const formattedTime = startsAt.toLocaleTimeString([], {
+    const formattedTime = startsAt.toLocaleTimeString('en-IN', {
+      timeZone: 'Asia/Kolkata',
       hour: '2-digit',
       minute: '2-digit',
     });

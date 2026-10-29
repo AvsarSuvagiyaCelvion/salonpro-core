@@ -209,6 +209,7 @@ export default function AdminSecurityPage() {
                   </td>
                   <td className="py-3.5 px-3 text-slate-500">
                     {new Date(a.created_at).toLocaleDateString('en-IN', {
+                      timeZone: 'Asia/Kolkata',
                       day: 'numeric',
                       month: 'short',
                       year: 'numeric',

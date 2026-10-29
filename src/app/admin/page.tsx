@@ -410,8 +410,8 @@ export default function AdminOverviewPage() {
 
                 <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
                   <span className="text-slate-500 font-mono text-[11px]">
-                    {new Date(a.starts_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}{' '}
-                    at {new Date(a.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(a.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' })}{' '}
+                    at {new Date(a.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <span className="font-bold text-slate-900 font-mono">₹{Number(a.service_price).toLocaleString('en-IN')}</span>
                 </div>

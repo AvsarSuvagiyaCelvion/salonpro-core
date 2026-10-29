@@ -47,10 +47,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // Insert into waiting table
+    // Insert into waiting table with current timestamp
     const waitRes = await query(
-      `INSERT INTO waiting (salon_id, customer_id)
-       VALUES ($1, $2)
+      `INSERT INTO waiting (salon_id, customer_id, created_at)
+       VALUES ($1, $2, NOW())
        RETURNING *`,
       [salonId, targetCustomerId]
     );

@@ -72,6 +72,12 @@ export async function GET(request: Request) {
       trialDaysRemaining = Math.max(1, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     }
 
+    let subscriptionDaysRemaining = 0;
+    if (isSubActive && subEnd) {
+      subscriptionDaysRemaining = Math.max(0, Math.ceil((subEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    }
+    const isSubscriptionExpiringSoon = Boolean(isSubActive && subscriptionDaysRemaining <= 7 && subscriptionDaysRemaining > 0);
+
     // Get live usage vs limits
     const usage = await getSalonUsage(salonId);
 
@@ -96,6 +102,8 @@ export async function GET(request: Request) {
         trialEndsAt: salon.trial_ends_at,
         trialDaysRemaining,
         subscriptionEndsAt: salon.subscription_ends_at,
+        subscriptionDaysRemaining,
+        isSubscriptionExpiringSoon,
         customDomainVerified: Boolean(salon.custom_domain_verified),
         currentPlan: planContext ? {
           id: salon.subscription_plan_id,

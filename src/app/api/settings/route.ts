@@ -62,10 +62,14 @@ async function handleUpdateSettings(request: Request) {
       send_reminders,
     } = body;
 
-    // Feature gating: logo_upload
+    // Feature gating: logo_upload (only enforce if user is actively changing/uploading a new logo)
     if (logo_url !== undefined && logo_url) {
-      const logoCheck = await requireFeature('logo_upload', salonId);
-      if (!logoCheck.success) return logoCheck.error;
+      const curSalon = await query('SELECT logo_url FROM salons WHERE id = $1', [salonId]);
+      const currentLogo = curSalon.rows[0]?.logo_url;
+      if (logo_url !== currentLogo) {
+        const logoCheck = await requireFeature('logo_upload', salonId);
+        if (!logoCheck.success) return logoCheck.error;
+      }
     }
 
     // Feature gating: custom_domain and custom_domain_verified

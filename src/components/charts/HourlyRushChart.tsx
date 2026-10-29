@@ -11,26 +11,40 @@ interface HourlyData {
 interface HourlyRushChartProps {
   data?: HourlyData[];
   timeLabel?: string;
+  openTime?: string;
+  closeTime?: string;
 }
 
-export default function HourlyRushChart({ data, timeLabel }: HourlyRushChartProps) {
+export default function HourlyRushChart({ data, timeLabel, openTime, closeTime }: HourlyRushChartProps) {
   const [hoveredHour, setHoveredHour] = useState<HourlyData | null>(null);
 
-  // Standard business hours 10:00 - 19:00
-  const defaultHours: HourlyData[] = [
-    { hour: '10 AM', count: 3 },
-    { hour: '11 AM', count: 6 },
-    { hour: '12 PM', count: 8 },
-    { hour: '1 PM', count: 4 },
-    { hour: '2 PM', count: 5 },
-    { hour: '3 PM', count: 7 },
-    { hour: '4 PM', count: 11 },
-    { hour: '5 PM', count: 14 },
-    { hour: '6 PM', count: 16 },
-    { hour: '7 PM', count: 9 },
-  ];
+  const hours = React.useMemo(() => {
+    if (data && data.length > 0) return data;
 
-  const hours = data && data.length > 0 ? data : defaultHours;
+    const startH = openTime ? parseInt(openTime.slice(0, 2), 10) : 10;
+    const endH = closeTime ? parseInt(closeTime.slice(0, 2), 10) : 19;
+
+    const generated: HourlyData[] = [];
+    const countPatterns = [3, 5, 8, 4, 6, 9, 14, 16, 11, 7, 4, 2];
+
+    for (let h = startH; h <= endH; h++) {
+      const period = h >= 12 ? 'PM' : 'AM';
+      const displayHour = h % 12 === 0 ? 12 : h % 12;
+      const countIndex = (h - startH) % countPatterns.length;
+      generated.push({
+        hour: `${displayHour} ${period}`,
+        count: countPatterns[countIndex],
+      });
+    }
+
+    return generated.length > 0 ? generated : [
+      { hour: '10 AM', count: 4 },
+      { hour: '12 PM', count: 8 },
+      { hour: '2 PM', count: 6 },
+      { hour: '4 PM', count: 12 },
+      { hour: '6 PM', count: 9 },
+    ];
+  }, [data, openTime, closeTime]);
   const maxCount = Math.max(...hours.map((h) => h.count), 1);
 
   return (

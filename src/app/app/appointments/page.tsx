@@ -158,7 +158,7 @@ export default function AppointmentsPage() {
       if (setRes.ok && setData.salon?.open_time && setData.salon?.close_time) {
         const startH = parseInt(setData.salon.open_time.slice(0, 2), 10) || 9;
         const endH = parseInt(setData.salon.close_time.slice(0, 2), 10) || 21;
-        setOperatingHours({ start: Math.min(startH, 9), end: Math.max(endH, 20) });
+        setOperatingHours({ start: startH, end: Math.max(endH, startH + 1) });
       }
     } catch {}
   }

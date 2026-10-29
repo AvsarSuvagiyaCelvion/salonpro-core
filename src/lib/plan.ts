@@ -33,6 +33,8 @@ export interface SalonPlanContext {
   trialDaysRemaining: number;
   trialEndsAt: string | null;
   subscriptionEndsAt: string | null;
+  subscriptionDaysRemaining?: number;
+  isSubscriptionExpiringSoon?: boolean;
   customDomainVerified: boolean;
   limits: PlanLimits;
   flags: PlanFlags;
@@ -243,6 +245,11 @@ async function computeSalonPlan(salonId: string): Promise<
 
     const slug = (s.plan_slug as 'basic' | 'pro' | 'premium') || 'basic';
 
+    const subDaysRemaining = subEnd
+      ? Math.max(0, Math.ceil((subEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+      : 0;
+    const isSubscriptionExpiringSoon = Boolean(subDaysRemaining <= 7 && subDaysRemaining > 0);
+
     return {
       plan: {
         salonId: s.id,
@@ -255,6 +262,8 @@ async function computeSalonPlan(salonId: string): Promise<
         trialDaysRemaining: 0,
         trialEndsAt: s.trial_ends_at,
         subscriptionEndsAt: s.subscription_ends_at,
+        subscriptionDaysRemaining: subDaysRemaining,
+        isSubscriptionExpiringSoon,
         customDomainVerified: Boolean(s.custom_domain_verified),
         limits,
         flags,

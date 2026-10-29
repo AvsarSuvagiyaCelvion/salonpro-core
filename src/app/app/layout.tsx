@@ -195,9 +195,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       }
     }
 
+    function handleOpenPlanModal() {
+      setShowPlanModal(true);
+    }
+
     window.addEventListener('salon-settings-updated', handleSettingsUpdated);
+    window.addEventListener('open-plan-modal', handleOpenPlanModal);
     return () => {
       window.removeEventListener('salon-settings-updated', handleSettingsUpdated);
+      window.removeEventListener('open-plan-modal', handleOpenPlanModal);
     };
   }, [router]);
 
@@ -290,6 +296,32 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <ExternalLink className="w-3 h-3" />
               </Link>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Paid Plan Expiring Soon Banner (<= 7 days remaining) */}
+      {Boolean((subscription as any)?.isSubscriptionExpiringSoon && !subscription?.isTrial) && (
+        <div className="shrink-0 bg-gradient-to-r from-amber-800 via-rose-900 to-[#b3135b] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-amber-600 shadow-xs">
+          <div className="flex items-center gap-1.5 truncate text-[11px] sm:text-xs">
+            <span className="w-2 h-2 rounded-full bg-amber-300 shrink-0 animate-ping"></span>
+            <span className="truncate">
+              <strong>⚠️ Plan Ending Soon:</strong>{' '}
+              <span className="font-extrabold text-amber-200 underline decoration-amber-300">
+                {(subscription as any)?.subscriptionDaysRemaining} day{(subscription as any)?.subscriptionDaysRemaining === 1 ? '' : 's'} remaining
+              </span>
+              <span className="hidden md:inline text-white/90"> · Renew to avoid service stoppage</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowPlanModal(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-[10px] sm:text-[11px] shadow-sm transition-all cursor-pointer active:scale-95"
+            >
+              <Zap className="w-3 h-3 text-amber-900 fill-amber-800" />
+              <span>Renew Now</span>
+            </button>
           </div>
         </div>
       )}

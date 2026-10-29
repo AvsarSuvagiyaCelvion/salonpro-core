@@ -20,6 +20,7 @@ import {
   Clock,
   CheckCircle2,
   PieChart,
+  Zap,
 } from 'lucide-react';
 import AreaTrendChart from '@/components/charts/AreaTrendChart';
 import DonutDistributionChart, { SliceData } from '@/components/charts/DonutDistributionChart';
@@ -65,6 +66,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [salonSlug, setSalonSlug] = useState<string>('');
+  const [subscription, setSubscription] = useState<any>(null);
   const [salonHours, setSalonHours] = useState<{ open: string; close: string }>({
     open: '09:00',
     close: '21:00',
@@ -74,7 +76,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadSalon() {
       try {
-        const res = await fetch('/api/settings');
+        const [res, subRes] = await Promise.all([
+          fetch('/api/settings'),
+          fetch('/api/subscription').catch(() => null),
+        ]);
         if (res.ok) {
           const sData = await res.json();
           if (sData.salon?.slug) {
@@ -85,6 +90,12 @@ export default function DashboardPage() {
               open: sData.salon.open_time.slice(0, 5),
               close: sData.salon.close_time.slice(0, 5),
             });
+          }
+        }
+        if (subRes && subRes.ok) {
+          const subData = await subRes.json();
+          if (subData.subscription) {
+            setSubscription(subData.subscription);
           }
         }
       } catch {}
@@ -160,6 +171,74 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* 7-Day Free Trial Daily Countdown Card */}
+      {subscription?.isTrial && !subscription?.isTrialExpired && (
+        <div className="bg-gradient-to-r from-[#2a1630] via-[#451430] to-[#b3135b] text-white p-5 sm:p-6 rounded-3xl shadow-lg border border-pink-500/30 relative overflow-hidden animate-fadeIn">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div className="space-y-1.5 max-w-xl">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/20 text-pink-200 border border-pink-400/30 text-[11px] font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>7-Day Free Trial Demo</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                <span className="text-amber-300 underline decoration-amber-400">{subscription.trialDaysRemaining} Day{subscription.trialDaysRemaining === 1 ? '' : 's'} Remaining</span> in Free Trial
+              </h2>
+              <p className="text-xs sm:text-sm text-pink-100/90 leading-relaxed">
+                All Pro management tools, calendar booking, and GST billing are active. Choose an official plan (Basic, Pro, Premium) anytime to prevent service interruption.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('open-plan-modal'));
+                  }
+                }}
+                className="px-5 py-3 rounded-2xl bg-white hover:bg-pink-50 text-[#b3135b] font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4 text-[#b3135b] fill-[#b3135b]" />
+                <span>Choose Official Plan ➔</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Paid Plan Expiry Reminder Card (<= 7 days) */}
+      {Boolean(subscription?.isSubscriptionExpiringSoon && !subscription?.isTrial) && (
+        <div className="bg-gradient-to-r from-amber-950 via-rose-950 to-amber-900 text-white p-5 sm:p-6 rounded-3xl shadow-lg border border-amber-500/40 relative overflow-hidden animate-fadeIn">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div className="space-y-1.5 max-w-xl">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30 text-[11px] font-bold">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+                <span>Plan Ending Soon</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Your {subscription.currentPlan?.name || 'Subscription'} Plan Expires in <span className="text-amber-300 underline decoration-amber-400">{subscription.subscriptionDaysRemaining} Day{subscription.subscriptionDaysRemaining === 1 ? '' : 's'}</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-amber-100/90 leading-relaxed">
+                Your plan ends on {subscription.subscriptionEndsAt ? new Date(subscription.subscriptionEndsAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'soon'}. Renew now to keep online client appointments, WhatsApp notifications, and stylist tools running uninterrupted.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('open-plan-modal'));
+                  }
+                }}
+                className="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4 text-amber-900 fill-amber-900" />
+                <span>Renew / Upgrade Plan ➔</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 4 Primary KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
@@ -328,18 +407,28 @@ export default function DashboardPage() {
               <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Distribution</span>
             </div>
 
-            <DonutDistributionChart
-              size={130}
-              thickness={16}
-              centerLabel="Revenue"
-              centerValue={`₹${((data?.totalRevenue || 0) > 1000 ? Math.round((data?.totalRevenue || 0) / 1000) + 'k' : data?.totalRevenue || 0)}`}
-              data={[
-                { label: 'Hair & Styling', value: Math.max(1, Math.round((data?.totalRevenue || 100) * 0.45)), color: '#b3135b' },
-                { label: 'Facial & Skin', value: Math.max(1, Math.round((data?.totalRevenue || 100) * 0.25)), color: '#8b5cf6' },
-                { label: 'Spa & Massage', value: Math.max(1, Math.round((data?.totalRevenue || 100) * 0.18)), color: '#ec4899' },
-                { label: 'Retail Products', value: Math.max(1, Math.round((data?.totalRevenue || 100) * 0.12)), color: '#10b981' },
-              ]}
-            />
+            {(!data?.totalRevenue || data.totalRevenue === 0) ? (
+              <div className="py-8 text-center text-neutral-400">
+                <div className="w-12 h-12 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center mx-auto mb-2">
+                  <PieChart className="w-6 h-6" />
+                </div>
+                <p className="text-xs font-semibold text-neutral-600">No revenue data in this period</p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">Category breakdown will update after client invoices</p>
+              </div>
+            ) : (
+              <DonutDistributionChart
+                size={130}
+                thickness={16}
+                centerLabel="Revenue"
+                centerValue={`₹${(data.totalRevenue > 1000 ? Math.round(data.totalRevenue / 1000) + 'k' : data.totalRevenue)}`}
+                data={[
+                  { label: 'Hair & Styling', value: Math.max(1, Math.round(data.totalRevenue * 0.45)), color: '#b3135b' },
+                  { label: 'Facial & Skin', value: Math.max(1, Math.round(data.totalRevenue * 0.25)), color: '#8b5cf6' },
+                  { label: 'Spa & Massage', value: Math.max(1, Math.round(data.totalRevenue * 0.18)), color: '#ec4899' },
+                  { label: 'Retail Products', value: Math.max(1, Math.round(data.totalRevenue * 0.12)), color: '#10b981' },
+                ]}
+              />
+            )}
           </div>
 
           <Link
@@ -360,7 +449,11 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            <HourlyRushChart timeLabel={`${salonHours.open} - ${salonHours.close}`} />
+            <HourlyRushChart
+              timeLabel={`${salonHours.open} - ${salonHours.close}`}
+              openTime={salonHours.open}
+              closeTime={salonHours.close}
+            />
           </div>
 
           <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">

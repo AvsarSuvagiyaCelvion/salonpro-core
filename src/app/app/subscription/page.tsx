@@ -490,78 +490,88 @@ export default function SalonSubscriptionPage() {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/50">
                   <th className="py-3 px-4 font-bold text-slate-700">Capabilities</th>
-                  <th className="py-3 px-4 font-black text-slate-900 text-center">Basic (₹499)</th>
-                  <th className="py-3 px-4 font-black text-[#b3135b] text-center bg-pink-50/40">Pro (₹999)</th>
-                  <th className="py-3 px-4 font-black text-purple-900 text-center">Premium (₹1,999)</th>
+                  {plans.map((p) => {
+                    const price =
+                      interval === 'yearly'
+                        ? Math.round((Number(p.yearly_price) || Number(p.price) * 10) / 12)
+                        : Number(p.price);
+                    const isPopular = p.is_popular || p.slug === 'pro';
+                    return (
+                      <th
+                        key={p.id}
+                        className={`py-3 px-4 font-black text-center ${
+                          isPopular ? 'text-[#b3135b] bg-pink-50/40' : 'text-slate-900'
+                        }`}
+                      >
+                        {p.name} (₹{price.toLocaleString('en-IN')})
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 <tr>
                   <td className="py-3 px-4 font-semibold text-slate-800">Stylists & Staff Capacity</td>
-                  <td className="py-3 px-4 text-center text-slate-600 font-bold">Up to 3</td>
-                  <td className="py-3 px-4 text-center font-bold text-[#b3135b] bg-pink-50/20">Up to 10</td>
-                  <td className="py-3 px-4 text-center font-bold text-emerald-600">Unlimited</td>
+                  {plans.map((p) => {
+                    const lim = p.limits?.max_staff ?? p.max_staff ?? 3;
+                    return (
+                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700">
+                        {lim === 0 ? 'Unlimited' : `Up to ${lim}`}
+                      </td>
+                    );
+                  })}
                 </tr>
                 <tr>
                   <td className="py-3 px-4 font-semibold text-slate-800">Services Catalog Limit</td>
-                  <td className="py-3 px-4 text-center text-slate-600 font-bold">Up to 30</td>
-                  <td className="py-3 px-4 text-center font-bold text-[#b3135b] bg-pink-50/20">Up to 100</td>
-                  <td className="py-3 px-4 text-center font-bold text-emerald-600">Unlimited</td>
+                  {plans.map((p) => {
+                    const lim = p.limits?.max_services ?? 30;
+                    return (
+                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700">
+                        {lim === 0 ? 'Unlimited' : `Up to ${lim}`}
+                      </td>
+                    );
+                  })}
                 </tr>
                 <tr>
                   <td className="py-3 px-4 font-semibold text-slate-800">WhatsApp Digital Invoices</td>
-                  <td className="py-3 px-4 text-center text-slate-400">0 / month</td>
-                  <td className="py-3 px-4 text-center font-bold text-emerald-600 bg-pink-50/20">200 / month</td>
-                  <td className="py-3 px-4 text-center font-bold text-emerald-600">1,000 / month</td>
+                  {plans.map((p) => {
+                    const wa = p.limits?.wa_per_month ?? 0;
+                    return (
+                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700">
+                        {wa === 0 ? '0 / month' : `${wa.toLocaleString('en-IN')} / month`}
+                      </td>
+                    );
+                  })}
                 </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Staff Commission Payroll & Reports</td>
-                  <td className="py-3 px-4 text-center text-slate-400">❌</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold bg-pink-50/20">✅ Included</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✅ Included</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">VIP Memberships & Package Passes</td>
-                  <td className="py-3 px-4 text-center text-slate-400">❌</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold bg-pink-50/20">✅ Included</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✅ Included</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Calendar View Appointment Grid</td>
-                  <td className="py-3 px-4 text-center text-slate-400">❌</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold bg-pink-50/20">✅ Included</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✅ Included</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Client Self-Service Reschedule / Cancel</td>
-                  <td className="py-3 px-4 text-center text-slate-400">❌</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold bg-pink-50/20">✅ Included</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✅ Included</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Excel / CSV Data Export</td>
-                  <td className="py-3 px-4 text-center text-slate-400">❌</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold bg-pink-50/20">✅ Included</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✅ Included</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Custom Domain Verification</td>
-                  <td className="py-3 px-4 text-center text-slate-400">❌</td>
-                  <td className="py-3 px-4 text-center text-slate-400 bg-pink-50/20">❌</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✅ Verified Domain</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Multi-Branch Platform Management</td>
-                  <td className="py-3 px-4 text-center text-slate-400">❌</td>
-                  <td className="py-3 px-4 text-center text-slate-400 bg-pink-50/20">❌</td>
-                  <td className="py-3 px-4 text-center text-emerald-600 font-bold">✅ Included</td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Dedicated Priority Support</td>
-                  <td className="py-3 px-4 text-center text-slate-600">Standard Email</td>
-                  <td className="py-3 px-4 text-center text-slate-600 bg-pink-50/20">Standard Email + WhatsApp</td>
-                  <td className="py-3 px-4 text-center font-bold text-purple-700">24/7 Dedicated Manager</td>
-                </tr>
+                {[
+                  { label: 'Staff Commission Payroll & Reports', key: 'commission_report' },
+                  { label: 'VIP Memberships & Package Passes', key: 'memberships' },
+                  { label: 'Calendar View Appointment Grid', key: 'calendar_view' },
+                  { label: 'Client Self-Service Reschedule / Cancel', key: 'customer_cancel' },
+                  { label: 'Excel / CSV Data Export', key: 'export' },
+                  { label: 'Promotional Coupons & Discounts', key: 'coupons' },
+                  { label: 'Client Feedback & Google Reviews', key: 'reviews' },
+                  { label: 'Loyalty Reward Points', key: 'loyalty' },
+                  { label: 'Custom Domain Verification', key: 'custom_domain' },
+                  { label: 'Multi-Branch Platform Management', key: 'multi_branch' },
+                  { label: 'Dedicated Priority Support', key: 'priority_support' },
+                ].map((feat) => (
+                  <tr key={feat.key}>
+                    <td className="py-3 px-4 font-semibold text-slate-800">{feat.label}</td>
+                    {plans.map((p) => {
+                      const enabled = Boolean(p.flags?.[feat.key]);
+                      return (
+                        <td key={p.id} className="py-3 px-4 text-center font-bold">
+                          {enabled ? (
+                            <span className="text-emerald-600 font-black">✅ Included</span>
+                          ) : (
+                            <span className="text-slate-400">❌</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

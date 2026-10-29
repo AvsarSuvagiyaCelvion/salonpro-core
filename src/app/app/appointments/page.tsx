@@ -21,6 +21,9 @@ import {
   Phone,
   ArrowRight,
   ShieldAlert,
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
 } from 'lucide-react';
 
 interface Appointment {
@@ -71,6 +74,11 @@ export default function AppointmentsPage() {
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // View Mode: Timeline Calendar vs Card List
+  const [viewMode, setViewMode] = useState<'calendar' | 'cards'>('calendar');
+  const [calendarDate, setCalendarDate] = useState<string>('');
+  const [todayDate, setTodayDate] = useState<string>('');
+
   // Filters
   const [statusFilter, setStatusFilter] = useState<'all' | 'scheduled' | 'arrived' | 'done' | 'cancelled'>('all');
   const [dateRangeFilter, setDateRangeFilter] = useState<'next7' | 'today' | 'all'>('next7');
@@ -95,13 +103,38 @@ export default function AppointmentsPage() {
   const [formNote, setFormNote] = useState('');
 
   useEffect(() => {
-    setFormDate(new Date().toISOString().slice(0, 10));
+    const today = new Date().toISOString().slice(0, 10);
+    setTodayDate(today);
+    setCalendarDate(today);
+    setFormDate(today);
     fetchInitialData();
   }, []);
 
   useEffect(() => {
     fetchAppointments();
-  }, [statusFilter, dateRangeFilter]);
+  }, [statusFilter, dateRangeFilter, viewMode, calendarDate]);
+
+  function handlePrevDay() {
+    const cur = new Date(calendarDate || todayDate || '2026-10-29');
+    cur.setDate(cur.getDate() - 1);
+    setCalendarDate(cur.toISOString().slice(0, 10));
+  }
+
+  function handleNextDay() {
+    const cur = new Date(calendarDate || todayDate || '2026-10-29');
+    cur.setDate(cur.getDate() + 1);
+    setCalendarDate(cur.toISOString().slice(0, 10));
+  }
+
+  function handleToday() {
+    if (todayDate) {
+      setCalendarDate(todayDate);
+    } else {
+      const today = new Date().toISOString().slice(0, 10);
+      setTodayDate(today);
+      setCalendarDate(today);
+    }
+  }
 
   async function fetchInitialData() {
     try {
@@ -127,7 +160,13 @@ export default function AppointmentsPage() {
       if (statusFilter !== 'all') params.set('status', statusFilter);
 
       const now = new Date();
-      if (dateRangeFilter === 'today') {
+      if (viewMode === 'calendar') {
+        const targetDate = calendarDate || now.toISOString().slice(0, 10);
+        const start = `${targetDate}T00:00:00.000Z`;
+        const end = `${targetDate}T23:59:59.999Z`;
+        params.set('startDate', start);
+        params.set('endDate', end);
+      } else if (dateRangeFilter === 'today') {
         const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
         const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).toISOString();
         params.set('startDate', start);
@@ -151,7 +190,7 @@ export default function AppointmentsPage() {
     }
   }
 
-  function openCreateModal() {
+  function openCreateModal(defaultTime?: string, defaultDate?: string) {
     setOverlapError(null);
     setMessage(null);
     setIsNewCustomer(false);
@@ -160,8 +199,8 @@ export default function AppointmentsPage() {
     setNewCustMobile('');
     setSelectedStaffId(staffList[0]?.id || '');
     setSelectedServiceId(services[0]?.id || '');
-    setFormDate(new Date().toISOString().slice(0, 10));
-    setFormTime('11:00');
+    setFormDate(defaultDate || calendarDate || new Date().toISOString().slice(0, 10));
+    setFormTime(defaultTime || '11:00');
     setFormNote('');
     setIsModalOpen(true);
   }
@@ -278,7 +317,8 @@ export default function AppointmentsPage() {
         </div>
 
         <button
-          onClick={openCreateModal}
+          type="button"
+          onClick={() => openCreateModal()}
           className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
@@ -334,44 +374,114 @@ export default function AppointmentsPage() {
         </div>
       )}
 
-      {/* Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        {/* Date Quick Toggles */}
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-neutral-200/80 shadow-2xs">
+      {/* Top Controls: View Switcher (Calendar vs List) & Filters */}
+      <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+        {/* Left: View Mode Toggle */}
+        <div className="flex items-center gap-1.5 bg-white p-1 rounded-2xl border border-neutral-200/80 shadow-2xs">
           <button
-            onClick={() => setDateRangeFilter('next7')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              dateRangeFilter === 'next7'
-                ? 'bg-[#2a1630] text-white shadow-xs'
+            type="button"
+            onClick={() => setViewMode('calendar')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              viewMode === 'calendar'
+                ? 'bg-[#b3135b] text-white shadow-xs'
                 : 'text-neutral-600 hover:bg-neutral-50'
             }`}
           >
-            Next 7 Days
+            <CalendarIcon className="w-3.5 h-3.5" />
+            <span>Time Slot Calendar</span>
           </button>
+
           <button
-            onClick={() => setDateRangeFilter('today')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              dateRangeFilter === 'today'
-                ? 'bg-[#2a1630] text-white shadow-xs'
+            type="button"
+            onClick={() => setViewMode('cards')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              viewMode === 'cards'
+                ? 'bg-[#b3135b] text-white shadow-xs'
                 : 'text-neutral-600 hover:bg-neutral-50'
             }`}
           >
-            Today
-          </button>
-          <button
-            onClick={() => setDateRangeFilter('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-              dateRangeFilter === 'all'
-                ? 'bg-[#2a1630] text-white shadow-xs'
-                : 'text-neutral-600 hover:bg-neutral-50'
-            }`}
-          >
-            All Bookings
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>Card List</span>
           </button>
         </div>
 
-        {/* Status Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
+        {/* Center: Date Picker or Filter Range */}
+        {viewMode === 'cards' ? (
+          <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-neutral-200/80 shadow-2xs">
+            <button
+              onClick={() => setDateRangeFilter('next7')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                dateRangeFilter === 'next7'
+                  ? 'bg-[#2a1630] text-white shadow-xs'
+                  : 'text-neutral-600 hover:bg-neutral-50'
+              }`}
+            >
+              Next 7 Days
+            </button>
+            <button
+              onClick={() => setDateRangeFilter('today')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                dateRangeFilter === 'today'
+                  ? 'bg-[#2a1630] text-white shadow-xs'
+                  : 'text-neutral-600 hover:bg-neutral-50'
+              }`}
+            >
+              Today
+            </button>
+            <button
+              onClick={() => setDateRangeFilter('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                dateRangeFilter === 'all'
+                  ? 'bg-[#2a1630] text-white shadow-xs'
+                  : 'text-neutral-600 hover:bg-neutral-50'
+              }`}
+            >
+              All Bookings
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-neutral-200/80 shadow-2xs">
+            <button
+              type="button"
+              onClick={handlePrevDay}
+              title="Previous Day"
+              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-600 cursor-pointer transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleToday}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                calendarDate === todayDate
+                  ? 'bg-pink-100 text-[#b3135b]'
+                  : 'text-neutral-600 hover:bg-neutral-100'
+              }`}
+            >
+              Today
+            </button>
+
+            <input
+              type="date"
+              value={calendarDate}
+              onChange={(e) => setCalendarDate(e.target.value)}
+              className="px-2 py-1 text-xs font-bold text-neutral-800 border border-neutral-200 rounded-lg focus:outline-none focus:border-[#b3135b]"
+            />
+
+            <button
+              type="button"
+              onClick={handleNextDay}
+              title="Next Day"
+              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-600 cursor-pointer transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Right: Status Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
           {(['all', 'scheduled', 'arrived', 'done', 'cancelled'] as const).map((st) => (
             <button
               key={st}
@@ -388,16 +498,224 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      {/* Appointments Grid */}
+      {/* Appointments View: Timeline Calendar OR Cards Grid */}
       {loading ? (
         <div className="bg-white rounded-2xl border border-neutral-200/80 p-4">
           <SkeletonTable rows={5} columns={6} />
         </div>
+      ) : viewMode === 'calendar' ? (
+        /* ================= 1. TIMELINE CALENDAR VIEW ================= */
+        <div className="bg-white rounded-3xl border border-neutral-200/90 shadow-xs overflow-hidden">
+          {/* Calendar Header Bar */}
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-neutral-50 to-pink-50/40 border-b border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-[#b3135b]" />
+                <h2 className="font-extrabold text-sm sm:text-base text-[#2a1630]">
+                  {calendarDate
+                    ? new Date(calendarDate + 'T00:00:00').toLocaleDateString('en-IN', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : 'Daily Appointment Schedule'}
+                </h2>
+              </div>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Hourly scheduled client appointments with live stylist & chair tracking
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-neutral-500">
+                Bookings for Day:
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-[#b3135b] text-white text-xs font-black">
+                {appointments.length}
+              </span>
+            </div>
+          </div>
+
+          {/* Timeline Slots Grid */}
+          <div className="divide-y divide-neutral-100">
+            {[9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((hour) => {
+              const hourFormatted = `${hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
+              const nextHour = hour + 1;
+              const nextHourFormatted = `${nextHour > 12 ? nextHour - 12 : nextHour}:00 ${nextHour >= 12 ? 'PM' : 'AM'}`;
+
+              const hourAppts = appointments.filter((a) => {
+                const apptDate = new Date(a.starts_at);
+                return apptDate.getHours() === hour;
+              });
+
+              return (
+                <div
+                  key={hour}
+                  className="flex flex-col sm:flex-row items-stretch sm:items-start min-h-[82px] p-3 sm:p-4 hover:bg-neutral-50/50 transition-colors gap-3 sm:gap-4"
+                >
+                  {/* Time Label Column */}
+                  <div className="w-24 sm:w-28 flex-shrink-0 flex sm:flex-col justify-between sm:justify-start items-center sm:items-start pt-1 text-xs font-black text-[#2a1630]">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[#b3135b]" />
+                      <span>{hourFormatted}</span>
+                    </div>
+                    <span className="text-[10px] text-neutral-400 font-normal sm:mt-0.5">
+                      to {nextHourFormatted}
+                    </span>
+                  </div>
+
+                  {/* Appointments Slot Content */}
+                  <div className="flex-1">
+                    {hourAppts.length === 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => openCreateModal(`${hour.toString().padStart(2, '0')}:00`, calendarDate)}
+                        className="w-full h-12 border-2 border-dashed border-neutral-200 hover:border-[#b3135b]/60 rounded-2xl flex items-center justify-center gap-1.5 text-xs text-neutral-400 hover:text-[#b3135b] hover:bg-pink-50/20 transition-all cursor-pointer group"
+                      >
+                        <Plus className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                        <span>Empty Slot ({hourFormatted}) — Click to Book Appointment</span>
+                      </button>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {hourAppts.map((appt) => {
+                          const startDate = new Date(appt.starts_at);
+                          const endDate = new Date(appt.ends_at);
+                          const isDone = appt.status === 'done';
+                          const isCancelled = appt.status === 'cancelled';
+                          const isArrived = appt.status === 'arrived';
+                          const isScheduled = appt.status === 'scheduled';
+
+                          return (
+                            <div
+                              key={appt.id}
+                              className={`p-3.5 rounded-2xl border transition-all shadow-xs flex flex-col justify-between ${
+                                isArrived
+                                  ? 'bg-amber-50/60 border-amber-300 ring-2 ring-amber-100'
+                                  : isDone
+                                  ? 'bg-emerald-50/50 border-emerald-300'
+                                  : isCancelled
+                                  ? 'bg-neutral-100/70 border-neutral-200 opacity-60'
+                                  : 'bg-white border-pink-200/90 hover:border-[#b3135b] shadow-xs'
+                              }`}
+                            >
+                              <div>
+                                <div className="flex items-center justify-between gap-1 mb-1.5">
+                                  <span className="text-xs font-black text-[#b3135b] flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                                    {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+
+                                  <span
+                                    className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                                      isScheduled
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : isArrived
+                                        ? 'bg-amber-100 text-amber-900'
+                                        : isDone
+                                        ? 'bg-emerald-100 text-emerald-900'
+                                        : 'bg-neutral-200 text-neutral-600'
+                                    }`}
+                                  >
+                                    {appt.status}
+                                  </span>
+                                </div>
+
+                                <div className="font-extrabold text-sm text-[#2a1630] truncate">
+                                  {appt.customer_name}
+                                </div>
+                                <div className="text-[11px] text-neutral-500 flex items-center gap-1">
+                                  <Phone className="w-2.5 h-2.5" />
+                                  <span>+91 {appt.customer_mobile}</span>
+                                </div>
+
+                                <div className="mt-2 pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
+                                  <div className="truncate pr-1">
+                                    <span className="font-bold text-neutral-800 truncate block">
+                                      {appt.service_name}
+                                    </span>
+                                    <span className="text-[10px] text-neutral-400 block truncate">
+                                      Stylist: {appt.staff_name}
+                                    </span>
+                                  </div>
+                                  <span className="font-black text-[#b3135b] text-xs shrink-0">
+                                    ₹{Number(appt.service_price).toLocaleString('en-IN')}
+                                  </span>
+                                </div>
+
+                                {appt.note && (
+                                  <p className="text-[10px] text-neutral-500 italic mt-1.5 truncate">
+                                    "{appt.note}"
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Quick Action Buttons */}
+                              <div className="mt-3 pt-2 border-t border-neutral-100 flex items-center gap-1.5">
+                                {isScheduled && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateStatus(appt.id, 'arrived')}
+                                    className="flex-1 py-1.5 px-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold transition-colors cursor-pointer text-center"
+                                  >
+                                    Mark Arrived
+                                  </button>
+                                )}
+
+                                {(isScheduled || isArrived) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartSessionFromAppt(appt.id)}
+                                    className="flex-1 py-1.5 px-2.5 rounded-lg bg-[#b3135b] hover:bg-[#960f4c] text-white text-[11px] font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1"
+                                  >
+                                    <Play className="w-2.5 h-2.5 fill-white" />
+                                    <span>Start POS</span>
+                                  </button>
+                                )}
+
+                                {isDone && (
+                                  <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>Completed</span>
+                                  </span>
+                                )}
+
+                                {isCancelled && (
+                                  <span className="text-[11px] font-semibold text-neutral-400">
+                                    Cancelled
+                                  </span>
+                                )}
+
+                                {!isDone && !isCancelled && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateStatus(appt.id, 'cancelled')}
+                                    title="Cancel Appointment"
+                                    className="p-1.5 rounded-lg border border-neutral-200 text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       ) : appointments.length === 0 ? (
+        /* ================= 2. EMPTY CARDS LIST ================= */
         <div className="bg-white rounded-2xl border border-neutral-200/80 p-12 text-center text-neutral-400 text-sm">
           No appointments found matching this date and status filter.
         </div>
       ) : (
+        /* ================= 3. CARDS LIST VIEW ================= */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {appointments.map((appt) => {
             const startDate = new Date(appt.starts_at);

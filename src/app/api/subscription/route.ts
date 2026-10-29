@@ -134,7 +134,8 @@ export async function POST(request: Request) {
 
     const salonId = auth.session.salonId;
     const body = await request.json();
-    const { planId, billingInterval = 'monthly', paymentMethod = 'UPI / Online Gateway', transactionId } = body;
+    const { planId, paymentMethod = 'UPI / Online Gateway', transactionId } = body;
+    const billingInterval = body.billingInterval || body.interval || 'monthly';
 
     if (!planId) {
       return NextResponse.json({ error: 'Please select a subscription plan.' }, { status: 400 });

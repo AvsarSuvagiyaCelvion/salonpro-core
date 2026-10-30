@@ -195,6 +195,11 @@ export default function SettingsPage() {
 
       // Notify layout and other components of updated timing & settings
       if (typeof window !== 'undefined') {
+        if (data.salon) {
+          try {
+            localStorage.setItem('salonpro_salon_info', JSON.stringify(data.salon));
+          } catch {}
+        }
         window.dispatchEvent(new CustomEvent('salon-settings-updated', { detail: data.salon }));
       }
 

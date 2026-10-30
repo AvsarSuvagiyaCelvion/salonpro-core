@@ -83,6 +83,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
       const url = new URL(window.location.href);
       url.searchParams.set('step', newStep.toString());
       window.history.replaceState(null, '', url.toString());
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   }
 
@@ -198,46 +199,21 @@ export default function BookingWizard({ slug }: { slug: string }) {
         const todayISTStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
         const isToday = (selectedDate === todayISTStr);
 
-        // Check if salon's working hours are over for today
-        let isPastClosing = false;
-        if (isToday && salon?.close_time) {
-          const [closeH, closeM] = salon.close_time.split(':').map(Number);
-          const currentH = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }), 10);
-          const currentM = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', minute: '2-digit' }), 10);
-          if (currentH > closeH || (currentH === closeH && currentM >= closeM)) {
-            isPastClosing = true;
-          }
-        }
-
-        // Strict client-side filter: Past time slots must NOT be shown for today!
-        const validSlots = (data.slots || []).filter((s: Slot) => {
-          if (!isToday) return true;
-          const [slotH, slotM] = s.time.split(':').map(Number);
-          const currentH = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }), 10);
-          const currentM = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', minute: '2-digit' }), 10);
-          return slotH > currentH || (slotH === currentH && slotM > currentM);
-        });
+        const serverSlots = data.slots || [];
 
         if (data.isClosedDay) {
           setAvailableSlots([]);
           setSlotNotice('Salon is closed on this day. Please select another date.');
-        } else if (isToday && (isPastClosing || validSlots.length === 0)) {
-          // Rule requirement:
-          // "If the salon's working hours are over for today (or no slots remain), show a clear message: 'The shop is closed for today. Please book an appointment for another date.' Then auto-select or suggest the next available date."
+        } else if (serverSlots.length === 0) {
           setAvailableSlots([]);
-          setSlotNotice('The shop is closed for today. Please book an appointment for another date.');
-          // Auto-select the next available open date
-          const nextOpen = availableDates.find((d) => !d.isClosed && d.dateStr !== todayISTStr);
-          if (nextOpen && selectedDate === todayISTStr) {
-            setTimeout(() => {
-              if (isMounted) setSelectedDate(nextOpen.dateStr);
-            }, 1200);
+          if (isToday) {
+            setSlotNotice('The shop is closed for today (or all slots are booked). Please book an appointment for tomorrow or another date below.');
+          } else {
+            setSlotNotice('No free slots available for this date. Please try another specialist or date.');
           }
-        } else if (validSlots.length === 0) {
-          setAvailableSlots([]);
-          setSlotNotice('No free slots available for this combination. Please try another specialist or date.');
         } else {
-          setAvailableSlots(validSlots);
+          setAvailableSlots(serverSlots);
+          setSlotNotice(null);
         }
       } catch (err: any) {
         if (!isMounted) return;
@@ -550,7 +526,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
       </div>
 
       {/* Main Booking Content */}
-      <div className="flex-1 max-w-2xl w-full mx-auto p-4 sm:p-6 pb-24">
+      <div className="flex-1 max-w-2xl w-full mx-auto p-4 sm:p-6 pb-36 sm:pb-44">
         {submitError && (
           <div className="mb-6 bg-rose-500/10 border border-rose-500/30 text-rose-300 p-4 rounded-2xl text-xs sm:text-sm flex items-start gap-3">
             <span className="text-lg">⚠️</span>
@@ -586,7 +562,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Service Cards Grid */}
-            <div className="space-y-3">
+            <div className="space-y-3 pb-8">
               {filteredServices.map((svc) => {
                 const isSelected = selectedService?.id === svc.id;
                 return (
@@ -679,7 +655,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 pb-8">
               {/* Anyone Option */}
               <div
                 onClick={() => setSelectedStaffId('anyone')}
@@ -842,10 +818,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   <div className="w-8 h-8 border-3 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-xs text-neutral-400 mt-3">Finding available free slots...</p>
                 </div>
-              ) : slotNotice ? (
+              ) : availableSlots.length === 0 ? (
                 <div className="py-10 px-4 text-center bg-neutral-900/40 rounded-3xl border border-neutral-800">
                   <span className="text-2xl block mb-2">🗓️</span>
-                  <p className="text-xs sm:text-sm text-neutral-300 font-medium">{slotNotice}</p>
+                  <p className="text-xs sm:text-sm text-neutral-300 font-medium">
+                    {slotNotice || 'No slots available for this date. Please pick another date above.'}
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">

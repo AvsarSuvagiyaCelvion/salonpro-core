@@ -41,6 +41,19 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to sign in');
       }
 
+      if (typeof window !== 'undefined') {
+        if (data.salon) {
+          try {
+            localStorage.setItem('salonpro_salon_info', JSON.stringify(data.salon));
+          } catch {}
+        }
+        if (data.user) {
+          try {
+            localStorage.setItem('salonpro_user_info', JSON.stringify(data.user));
+          } catch {}
+        }
+      }
+
       const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
       const returnUrl = searchParams?.get('returnUrl');
       const targetPath = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/app';

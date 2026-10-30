@@ -138,7 +138,7 @@ export default function BillingPage() {
           `Invoice #: ${whatsappInvoice.number}`,
           `Total Amount: ₹${total}`,
           `Payment Received: ₹${paid}`,
-          `View your official digital receipt & GST breakdown: ${receiptLink}`,
+          `View & Download your official PDF receipt: ${receiptLink}`,
           `We look forward to welcoming you again!`,
         ].join('\n');
 
@@ -633,10 +633,10 @@ export default function BillingPage() {
                   href={`/b/${whatsappInvoice.number}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  className="flex-1 py-2.5 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                 >
-                  <Printer className="w-3.5 h-3.5 text-neutral-600" />
-                  <span>Original Bill PDF / Print ↗</span>
+                  <Printer className="w-4 h-4 text-neutral-600" />
+                  <span>📥 Download PDF Bill (to attach in chat) ↗</span>
                 </a>
               </div>
 

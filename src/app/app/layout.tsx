@@ -62,8 +62,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     slug: string;
     open_time?: string;
     close_time?: string;
-  } | null>(null);
-  const [user, setUser] = useState<{ email: string; role: string } | null>(null);
+  } | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const s = localStorage.getItem('salonpro_salon_info');
+        if (s) return JSON.parse(s);
+      } catch {}
+    }
+    return null;
+  });
+  const [user, setUser] = useState<{ email: string; role: string } | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const u = localStorage.getItem('salonpro_user_info');
+        if (u) return JSON.parse(u);
+      } catch {}
+    }
+    return null;
+  });
 
   // Subscription & 7-Day Trial State
   const [subscription, setSubscription] = useState<{
@@ -150,15 +166,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         if (res.ok) {
           const data = await res.json();
           if (data.salon) {
-            setSalon({
+            const sInfo = {
               name: data.salon.name,
               slug: data.salon.slug,
               open_time: data.salon.open_time,
               close_time: data.salon.close_time,
-            });
+            };
+            setSalon(sInfo);
+            try {
+              localStorage.setItem('salonpro_salon_info', JSON.stringify(sInfo));
+            } catch {}
           }
           if (data.user) {
             setUser(data.user);
+            try {
+              localStorage.setItem('salonpro_user_info', JSON.stringify(data.user));
+            } catch {}
           }
         }
 

@@ -70,6 +70,7 @@ export async function getAvailableSlots(params: {
   date: string; // 'YYYY-MM-DD'
 }): Promise<SlotAvailabilityResult> {
   const { salonSlug, salonId, serviceId, staffId = 'anyone', date } = params;
+  const cleanStaffId = (!staffId || staffId === 'undefined' || staffId === 'null') ? 'anyone' : staffId;
 
   // 1. Fetch salon
   let salonRes;
@@ -144,7 +145,7 @@ export async function getAvailableSlots(params: {
 
   // 4. Fetch eligible staff
   let eligibleStaff: any[] = [];
-  if (staffId && staffId !== 'anyone') {
+  if (cleanStaffId && cleanStaffId !== 'anyone') {
     const singleStaff = await query(
       `SELECT s.id, s.name 
        FROM staff s
@@ -154,7 +155,7 @@ export async function getAvailableSlots(params: {
          OR EXISTS (SELECT 1 FROM staff_services WHERE staff_id = s.id AND service_id = $3)
        )
        LIMIT 1`,
-      [staffId, salon.id, service.id]
+      [cleanStaffId, salon.id, service.id]
     );
     eligibleStaff = singleStaff.rows;
   } else {

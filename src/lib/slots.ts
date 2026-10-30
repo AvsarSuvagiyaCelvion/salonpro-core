@@ -112,8 +112,8 @@ export async function getAvailableSlots(params: {
 
   const service = serviceRes.rows[0];
 
-  // 3. Verify date and working days
-  const targetDate = new Date(`${date}T00:00:00`);
+  // 3. Verify date and working days (Indian Standard Time: Asia/Kolkata)
+  const targetDate = new Date(`${date}T00:00:00+05:30`);
   const dayOfWeek = targetDate.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
 
   const isClosedDay = !salon.working_days.includes(dayOfWeek);
@@ -127,10 +127,11 @@ export async function getAvailableSlots(params: {
     };
   }
 
-  // Check advance days limit
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const diffDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  // Check advance days limit against current IST date
+  const now = new Date();
+  const todayISTStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+  const todayIST = new Date(`${todayISTStr}T00:00:00+05:30`);
+  const diffDays = Math.ceil((targetDate.getTime() - todayIST.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays < 0 || diffDays > salon.max_advance_days) {
     return {
       salon,
@@ -183,9 +184,9 @@ export async function getAvailableSlots(params: {
 
   const staffIds = eligibleStaff.map((s) => s.id);
 
-  // 5. Fetch existing appointments for eligible staff on this date
-  const dayStart = `${date}T00:00:00.000Z`;
-  const dayEnd = `${date}T23:59:59.999Z`;
+  // 5. Fetch existing appointments for eligible staff on this date (in IST)
+  const dayStart = `${date}T00:00:00+05:30`;
+  const dayEnd = `${date}T23:59:59+05:30`;
 
   const apptRes = await query(
     `SELECT staff_id, starts_at, ends_at 
@@ -207,7 +208,6 @@ export async function getAvailableSlots(params: {
   const bufferMins = salon.buffer_minutes || 10;
   const durationMins = service.duration_min || 30;
 
-  const now = new Date();
   const minAdvanceMs = (salon.min_advance_hours || 1) * 3600 * 1000;
   const minBookableTime = new Date(now.getTime() + minAdvanceMs);
 
@@ -215,8 +215,14 @@ export async function getAvailableSlots(params: {
 
   for (let m = openMins; m + durationMins <= closeMins; m += slotStep) {
     const timeStr = minutesToTime(m);
-    const candidateStart = new Date(`${date}T${timeStr}:00`);
+    // Explicitly parse in Indian Standard Time (Asia/Kolkata, UTC+05:30)
+    const candidateStart = new Date(`${date}T${timeStr}:00+05:30`);
     const candidateEnd = new Date(candidateStart.getTime() + durationMins * 60000);
+
+    // Rule: Past time slots must NOT be shown! If slot has already passed in IST, skip it!
+    if (candidateStart.getTime() <= now.getTime()) {
+      continue;
+    }
 
     // Check if slot start time satisfies minimum advance hours
     if (candidateStart.getTime() < minBookableTime.getTime()) {

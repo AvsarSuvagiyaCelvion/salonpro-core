@@ -62,7 +62,7 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
-  const [period, setPeriod] = useState<'today' | '7d' | '30d'>('7d');
+  const [period, setPeriod] = useState<'today' | '7d' | '30d'>('today');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [salonSlug, setSalonSlug] = useState<string>('');
@@ -179,7 +179,7 @@ export default function DashboardPage() {
             <div className="space-y-1.5 max-w-xl">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/20 text-pink-200 border border-pink-400/30 text-[11px] font-bold">
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>7-Day Free Trial Demo</span>
+                <span>7-Day Free Trial</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 <span className="text-amber-300 underline decoration-amber-400">{subscription.trialDaysRemaining} Day{subscription.trialDaysRemaining === 1 ? '' : 's'} Remaining</span> in Free Trial

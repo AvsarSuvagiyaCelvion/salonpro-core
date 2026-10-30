@@ -129,8 +129,24 @@ export default function CustomerPortalPage() {
   }
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam === 'bills' || tabParam === 'memberships' || tabParam === 'appointments') {
+        setActiveTab(tabParam);
+      }
+    }
     checkSession();
   }, []);
+
+  function handleSwitchTab(tab: 'appointments' | 'bills' | 'memberships') {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', tab);
+      window.history.replaceState(null, '', url.toString());
+    }
+  }
 
   async function handleAuthSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -389,7 +405,7 @@ export default function CustomerPortalPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => handleSwitchTab(tab.id as any)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer active:scale-95 ${
                   isActive
                     ? 'bg-pink-500 text-white shadow-md shadow-pink-500/20 scale-102'
@@ -673,7 +689,7 @@ export default function CustomerPortalPage() {
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-900/95 backdrop-blur-md border-t border-neutral-800 px-4 py-2 flex items-center justify-around shadow-2xl">
         <button
           type="button"
-          onClick={() => setActiveTab('appointments')}
+          onClick={() => handleSwitchTab('appointments')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'appointments' ? 'text-pink-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
           }`}
@@ -684,7 +700,7 @@ export default function CustomerPortalPage() {
 
         <button
           type="button"
-          onClick={() => setActiveTab('bills')}
+          onClick={() => handleSwitchTab('bills')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'bills' ? 'text-pink-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
           }`}
@@ -695,7 +711,7 @@ export default function CustomerPortalPage() {
 
         <button
           type="button"
-          onClick={() => setActiveTab('memberships')}
+          onClick={() => handleSwitchTab('memberships')}
           className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
             activeTab === 'memberships' ? 'text-pink-400 font-bold scale-105' : 'text-neutral-400 hover:text-white'
           }`}

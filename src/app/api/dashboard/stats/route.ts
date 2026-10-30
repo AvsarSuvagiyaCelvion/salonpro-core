@@ -9,20 +9,24 @@ export async function GET(request: Request) {
 
     const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || '7d';
+    const period = searchParams.get('period') || 'today';
 
-    let days = 7;
-    if (period === 'today') days = 1;
-    else if (period === '30d') days = 30;
+    const now = new Date();
+    // Get current date in Indian Standard Time (Asia/Kolkata)
+    const todayIST = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); // "YYYY-MM-DD"
 
-    const startDate = new Date();
+    let startIso: string;
+    let daysCount = 1;
     if (period === 'today') {
-      startDate.setHours(0, 0, 0, 0);
+      startIso = `${todayIST}T00:00:00+05:30`;
+      daysCount = 1;
     } else {
-      startDate.setDate(startDate.getDate() - (days - 1));
-      startDate.setHours(0, 0, 0, 0);
+      daysCount = period === '30d' ? 30 : 7;
+      const target = new Date(`${todayIST}T00:00:00+05:30`);
+      target.setDate(target.getDate() - (daysCount - 1));
+      const pastDateIST = target.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+      startIso = `${pastDateIST}T00:00:00+05:30`;
     }
-    const startIso = startDate.toISOString();
 
     // Execute all 10 independent dashboard analytical queries in parallel
     const [
@@ -152,22 +156,31 @@ export async function GET(request: Request) {
     // Fill all days in range for smooth chart
     const dailyMap: Record<string, number> = {};
     dailyRevRes.rows.forEach((r) => {
-      const dStr = new Date(r.pay_date).toISOString().slice(0, 10);
+      const dStr = typeof r.pay_date === 'string' ? r.pay_date.slice(0, 10) : new Date(r.pay_date).toISOString().slice(0, 10);
       dailyMap[dStr] = Number(r.amount);
     });
 
     const chartData = [];
-    const loopDate = new Date(startDate);
-    const today = new Date();
-    while (loopDate <= today) {
-      const dStr = loopDate.toISOString().slice(0, 10);
-      const label = loopDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    if (period === 'today') {
       chartData.push({
-        date: dStr,
-        label,
-        amount: dailyMap[dStr] || 0,
+        date: todayIST,
+        label: 'Today',
+        amount: dailyMap[todayIST] || 0,
       });
-      loopDate.setDate(loopDate.getDate() + 1);
+    } else {
+      const loopDate = new Date(`${todayIST}T00:00:00+05:30`);
+      loopDate.setDate(loopDate.getDate() - (daysCount - 1));
+      const endDate = new Date(`${todayIST}T00:00:00+05:30`);
+      while (loopDate <= endDate) {
+        const dStr = loopDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+        const label = loopDate.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' });
+        chartData.push({
+          date: dStr,
+          label,
+          amount: dailyMap[dStr] || 0,
+        });
+        loopDate.setDate(loopDate.getDate() + 1);
+      }
     }
 
     const paymentStatusCounts = { paid: 0, partial: 0, pending: 0 };

@@ -18,13 +18,13 @@ export default function LandingNavbar() {
           Test-drive SalonPro free for 7 days with zero upfront payment & no credit card required!
         </span>
         <span className="sm:hidden">
-          7-Day Free Demo · Zero Upfront Payment!
+          7-Day Free Trial · Zero Upfront Payment!
         </span>
         <Link
           href="/register-salon"
           className="underline font-bold text-white hover:text-pink-300 ml-1 whitespace-nowrap"
         >
-          Claim Demo ➔
+          Start Free Trial ➔
         </Link>
       </div>
 

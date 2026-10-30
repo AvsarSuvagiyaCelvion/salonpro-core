@@ -29,7 +29,10 @@ export default function AdminLoginPage() {
         throw new Error(data.error || 'Failed to login as Super Admin');
       }
 
-      window.location.href = '/admin';
+      const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const returnUrl = searchParams?.get('returnUrl');
+      const targetPath = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/admin';
+      window.location.href = targetPath;
     } catch (err: any) {
       setError(err.message);
     } finally {

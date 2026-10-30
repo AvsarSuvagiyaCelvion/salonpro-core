@@ -235,11 +235,11 @@ export default function RegisterSalonPage() {
         <div className="text-center max-w-2xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-bold mb-4 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-[#b3135b]" />
-            <span>🎁 7-Day Free Trial Demo · No Credit Card Required · ₹0 Today</span>
+            <span>🎁 7-Day Free Trial · No Credit Card Required · ₹0 Today</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-[1.18]">
-            Create Salon Account & Start 7-Day Demo
+            Create Salon Account & Start 7-Day Free Trial
           </h1>
           <p className="text-xs sm:text-base text-slate-600 mt-3 leading-relaxed">
             Fill in your details below to launch your private cloud ERP in 60 seconds. You can log in anytime with your registered email & password.

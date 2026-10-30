@@ -50,19 +50,41 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [staffServices, setStaffServices] = useState<{ staff_id: string; service_id: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Wizard state
+  // Wizard state with route/refresh persistence
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaffId, setSelectedStaffId] = useState<string>('anyone');
   
   // Date & Slot state
-  const [availableDates, setAvailableDates] = useState<{ dateStr: string; label: string; dayName: string; isClosed: boolean }[]>([]);
+  const [availableDates, setAvailableDates] = useState<{ dateStr: string; label: string; dayNumber?: string; dayName: string; isClosed: boolean }[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [slotsLoading, setSlotsLoading] = useState<boolean>(false);
   const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [slotNotice, setSlotNotice] = useState<string | null>(null);
+
+  // Restore step on refresh
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const stepParam = urlParams.get('step');
+    if (stepParam) {
+      const parsed = parseInt(stepParam, 10);
+      if (parsed >= 1 && parsed <= 5) {
+        setCurrentStep(parsed);
+      }
+    }
+  }, []);
+
+  function updateStep(newStep: number) {
+    setCurrentStep(newStep);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('step', newStep.toString());
+      window.history.replaceState(null, '', url.toString());
+    }
+  }
 
   // Customer Details & Code
   const [customerName, setCustomerName] = useState<string>('');
@@ -120,24 +142,29 @@ export default function BookingWizard({ slug }: { slug: string }) {
     loadSalon();
   }, [slug]);
 
-  // 2. Generate date range when salon loads
+  // 2. Generate date range when salon loads (in Indian Standard Time)
   useEffect(() => {
     if (!salon) return;
-    const dates: { dateStr: string; label: string; dayName: string; isClosed: boolean }[] = [];
+    const dates: { dateStr: string; label: string; dayNumber?: string; dayName: string; isClosed: boolean }[] = [];
     const maxDays = salon.max_advance_days || 14;
     const workingDays = salon.working_days || [1, 2, 3, 4, 5, 6];
 
+    const now = new Date();
+    const todayIST = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    const baseDate = new Date(`${todayIST}T00:00:00+05:30`);
+
     for (let i = 0; i < maxDays; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().slice(0, 10);
+      const d = new Date(baseDate);
+      d.setDate(baseDate.getDate() + i);
+      const dateStr = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
       const dayOfWeek = d.getDay();
       const isClosed = !workingDays.includes(dayOfWeek);
 
-      const label = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-      const dayName = d.toLocaleDateString('en-IN', { weekday: 'short' });
+      const label = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' });
+      const dayNumber = d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' });
+      const dayName = d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short' });
 
-      dates.push({ dateStr, label, dayName, isClosed });
+      dates.push({ dateStr, label, dayNumber, dayName, isClosed });
     }
 
     setAvailableDates(dates);
@@ -167,14 +194,50 @@ export default function BookingWizard({ slug }: { slug: string }) {
           throw new Error(data.error || 'Failed to fetch slots');
         }
 
+        const now = new Date();
+        const todayISTStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+        const isToday = (selectedDate === todayISTStr);
+
+        // Check if salon's working hours are over for today
+        let isPastClosing = false;
+        if (isToday && salon?.close_time) {
+          const [closeH, closeM] = salon.close_time.split(':').map(Number);
+          const currentH = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }), 10);
+          const currentM = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', minute: '2-digit' }), 10);
+          if (currentH > closeH || (currentH === closeH && currentM >= closeM)) {
+            isPastClosing = true;
+          }
+        }
+
+        // Strict client-side filter: Past time slots must NOT be shown for today!
+        const validSlots = (data.slots || []).filter((s: Slot) => {
+          if (!isToday) return true;
+          const [slotH, slotM] = s.time.split(':').map(Number);
+          const currentH = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }), 10);
+          const currentM = parseInt(now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', minute: '2-digit' }), 10);
+          return slotH > currentH || (slotH === currentH && slotM > currentM);
+        });
+
         if (data.isClosedDay) {
           setAvailableSlots([]);
           setSlotNotice('Salon is closed on this day. Please select another date.');
-        } else if (!data.slots || data.slots.length === 0) {
+        } else if (isToday && (isPastClosing || validSlots.length === 0)) {
+          // Rule requirement:
+          // "If the salon's working hours are over for today (or no slots remain), show a clear message: 'The shop is closed for today. Please book an appointment for another date.' Then auto-select or suggest the next available date."
+          setAvailableSlots([]);
+          setSlotNotice('The shop is closed for today. Please book an appointment for another date.');
+          // Auto-select the next available open date
+          const nextOpen = availableDates.find((d) => !d.isClosed && d.dateStr !== todayISTStr);
+          if (nextOpen && selectedDate === todayISTStr) {
+            setTimeout(() => {
+              if (isMounted) setSelectedDate(nextOpen.dateStr);
+            }, 1200);
+          }
+        } else if (validSlots.length === 0) {
           setAvailableSlots([]);
           setSlotNotice('No free slots available for this combination. Please try another specialist or date.');
         } else {
-          setAvailableSlots(data.slots);
+          setAvailableSlots(validSlots);
         }
       } catch (err: any) {
         if (!isMounted) return;
@@ -190,7 +253,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
     return () => {
       isMounted = false;
     };
-  }, [salon, selectedService?.id, selectedStaffId, selectedDate, slug]);
+  }, [salon, selectedService?.id, selectedStaffId, selectedDate, slug, availableDates]);
 
   if (loading) {
     return (
@@ -285,18 +348,62 @@ export default function BookingWizard({ slug }: { slug: string }) {
     }
   }
 
+  // Instant server-side slot availability re-check when customer selects slot
+  async function handleSelectSlot(slot: Slot) {
+    setSelectedSlot(slot);
+    setSubmitError(null);
+    try {
+      const checkUrl = `/api/public/${slug}/slots?service_id=${selectedService!.id}&staff_id=${slot.staffId}&date=${selectedDate}`;
+      const res = await fetch(checkUrl);
+      const data = await res.json();
+      const isAvailable = (data.slots || []).some((s: any) => s.time === slot.time && s.staffId === slot.staffId);
+      if (!isAvailable) {
+        setSelectedSlot(null);
+        setSubmitError('This time was just taken, please pick another.');
+        setAvailableSlots(data.slots || []);
+      }
+    } catch {}
+  }
+
+  // Re-verify availability before transitioning from Step 3 to Step 4
+  async function handleProceedToDetails() {
+    if (!selectedSlot) {
+      setSubmitError('Please select an available time slot.');
+      return;
+    }
+    setSlotsLoading(true);
+    setSubmitError(null);
+    try {
+      const checkUrl = `/api/public/${slug}/slots?service_id=${selectedService!.id}&staff_id=${selectedSlot.staffId}&date=${selectedDate}`;
+      const res = await fetch(checkUrl);
+      const data = await res.json();
+      const isAvailable = (data.slots || []).some((s: any) => s.time === selectedSlot.time && s.staffId === selectedSlot.staffId);
+      if (!isAvailable) {
+        setSelectedSlot(null);
+        setSubmitError('This time was just taken, please pick another.');
+        setAvailableSlots(data.slots || []);
+        return;
+      }
+      updateStep(4);
+    } catch {
+      updateStep(4);
+    } finally {
+      setSlotsLoading(false);
+    }
+  }
+
   // Handle booking form submission
   async function handleBookAppointment(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedService) {
       setSubmitError('Please select a service first.');
-      setCurrentStep(1);
+      updateStep(1);
       return;
     }
 
     if (!selectedSlot || !selectedDate) {
       setSubmitError('Please select an available time slot.');
-      setCurrentStep(3);
+      updateStep(3);
       return;
     }
 
@@ -341,15 +448,23 @@ export default function BookingWizard({ slug }: { slug: string }) {
       if (!res.ok) {
         if (data.isOverlap) {
           // Rule requirement: "If two people book the same slot, the second sees 'This time was just taken, please pick another' and goes back to the times."
-          setSubmitError(data.error);
-          setCurrentStep(3); // Send back to step 3 (Time slots)
+          setSubmitError('This time was just taken, please pick another.');
+          setSelectedSlot(null);
+          updateStep(3); // Send back to step 3 (Time slots)
+          // Refresh slots immediately
+          try {
+            const refUrl = `/api/public/${slug}/slots?service_id=${selectedService!.id}&staff_id=${selectedStaffId}&date=${selectedDate}`;
+            const refRes = await fetch(refUrl);
+            const refData = await refRes.json();
+            if (refData.slots) setAvailableSlots(refData.slots);
+          } catch {}
           return;
         }
         throw new Error(data.error || 'Failed to complete appointment booking');
       }
 
       setConfirmedBooking(data);
-      setCurrentStep(5); // Confirmation screen
+      updateStep(5); // Confirmation screen
     } catch (err: any) {
       setSubmitError(err.message || 'Error occurred while saving booking');
     } finally {
@@ -359,14 +474,6 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-pink-500 selection:text-white">
-      {/* Simulation Demo Banner */}
-      <div className="bg-amber-950/90 border-b border-amber-800 text-amber-200 text-xs py-2 px-4 text-center font-medium flex items-center justify-center gap-2 z-30">
-        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></span>
-        <span>
-          <strong>🧪 Interactive Demonstration:</strong> This is a simulation preview for evaluating SalonPro. Real customer appointments and payments are not processed through this demo.
-        </span>
-      </div>
-
       {/* Top Salon Hero Banner */}
       <div 
         className="relative overflow-hidden border-b border-neutral-800 pb-6"
@@ -544,7 +651,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <button
                   type="button"
                   disabled={!selectedService}
-                  onClick={() => setCurrentStep(2)}
+                  onClick={() => updateStep(2)}
                   className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95"
                 >
                   Continue →
@@ -560,7 +667,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             <div className="flex justify-between items-end mb-4">
               <div>
                 <button
-                  onClick={() => setCurrentStep(1)}
+                  onClick={() => updateStep(1)}
                   className="text-xs text-pink-400 hover:underline mb-1 inline-block"
                 >
                   ← Back to Services
@@ -639,14 +746,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <button
                   type="button"
-                  onClick={() => setCurrentStep(1)}
+                  onClick={() => updateStep(1)}
                   className="px-4 py-2.5 rounded-2xl bg-neutral-900 text-neutral-300 text-xs font-semibold hover:bg-neutral-800"
                 >
                   ← Back
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCurrentStep(3)}
+                  onClick={() => updateStep(3)}
                   className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95"
                 >
                   Select Date & Time →
@@ -662,7 +769,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             <div className="flex justify-between items-end mb-4">
               <div>
                 <button
-                  onClick={() => setCurrentStep(2)}
+                  onClick={() => updateStep(2)}
                   className="text-xs text-pink-400 hover:underline mb-1 inline-block"
                 >
                   ← Back to Stylist
@@ -682,21 +789,34 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none">
                 {availableDates.map((d) => {
                   const isSelected = selectedDate === d.dateStr;
+                  const isWordLabel = d.label === 'Today' || d.label === 'Tomorrow';
                   return (
                     <button
                       key={d.dateStr}
                       disabled={d.isClosed}
-                      onClick={() => setSelectedDate(d.dateStr)}
-                      className={`flex flex-col items-center justify-center min-w-[70px] py-3 px-2 rounded-2xl border transition-all ${
+                      onClick={() => {
+                        setSelectedDate(d.dateStr);
+                        setSelectedSlot(null);
+                      }}
+                      className={`flex flex-col items-center justify-center shrink-0 min-w-[84px] sm:min-w-[92px] px-2.5 py-3 rounded-2xl border transition-all cursor-pointer ${
                         d.isClosed
                           ? 'opacity-30 cursor-not-allowed bg-neutral-900/40 border-neutral-800'
                           : isSelected
-                          ? 'bg-pink-500 border-pink-500 text-white shadow-lg shadow-pink-500/25 scale-105'
+                          ? 'bg-pink-500 border-pink-500 text-white shadow-lg shadow-pink-500/25 scale-102'
                           : 'bg-neutral-900/80 border-neutral-800 text-neutral-300 hover:bg-neutral-900'
                       }`}
                     >
-                      <span className="text-[10px] uppercase font-bold opacity-80">{d.dayName}</span>
-                      <span className="text-base font-extrabold mt-0.5">{d.label.split(' ')[0]}</span>
+                      <span className="text-[10px] uppercase font-bold opacity-80 tracking-wider">{d.dayName}</span>
+                      {isWordLabel ? (
+                        <span className="text-xs sm:text-sm font-extrabold mt-1 tracking-tight truncate max-w-[76px] text-center leading-tight">
+                          {d.label}
+                        </span>
+                      ) : (
+                        <div className="flex items-baseline gap-1 mt-0.5">
+                          <span className="text-base font-extrabold">{d.dayNumber || d.label.split(' ')[0]}</span>
+                          <span className="text-[10px] opacity-75">{d.label.split(' ')[1] || ''}</span>
+                        </div>
+                      )}
                       {d.isClosed && <span className="text-[9px] text-rose-400 font-bold mt-0.5">Closed</span>}
                     </button>
                   );
@@ -735,8 +855,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       <button
                         key={slot.time}
                         type="button"
-                        onClick={() => setSelectedSlot(slot)}
-                        className={`py-3 px-2 rounded-2xl border text-center transition-all ${
+                        onClick={() => handleSelectSlot(slot)}
+                        className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-pink-500 border-pink-500 text-white font-bold shadow-lg shadow-pink-500/30 scale-102'
                             : 'bg-neutral-900/80 border-neutral-800 hover:border-neutral-700 text-neutral-200'
@@ -760,16 +880,16 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <button
                   type="button"
-                  onClick={() => setCurrentStep(2)}
-                  className="px-4 py-2.5 rounded-2xl bg-neutral-900 text-neutral-300 text-xs font-semibold hover:bg-neutral-800"
+                  onClick={() => updateStep(2)}
+                  className="px-4 py-2.5 rounded-2xl bg-neutral-900 text-neutral-300 text-xs font-semibold hover:bg-neutral-800 cursor-pointer"
                 >
                   ← Back
                 </button>
                 <button
                   type="button"
                   disabled={!selectedSlot}
-                  onClick={() => setCurrentStep(4)}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95"
+                  onClick={handleProceedToDetails}
+                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95 cursor-pointer"
                 >
                   Enter Details →
                 </button>
@@ -778,13 +898,13 @@ export default function BookingWizard({ slug }: { slug: string }) {
           </div>
         )}
 
-        {/* STEP 4: CUSTOMER DETAILS & DEMO CODE */}
+        {/* STEP 4: CUSTOMER DETAILS & ACCESS PIN */}
         {currentStep === 4 && (
           <div>
             <div className="flex justify-between items-end mb-4">
               <div>
                 <button
-                  onClick={() => setCurrentStep(3)}
+                  onClick={() => updateStep(3)}
                   className="text-xs text-pink-400 hover:underline mb-1 inline-block"
                 >
                   ← Back to Slot Selection
@@ -1109,8 +1229,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 </div>
 
                 <div className="mt-3 text-center">
-                  <span className="text-[10px] text-neutral-500">
-                    Demo: In production, this WhatsApp message is triggered instantly via WhatsApp Cloud API.
+                  <span className="text-[10px] text-neutral-400">
+                    This official confirmation message has been dispatched to your registered WhatsApp number.
                   </span>
                 </div>
               </div>
@@ -1129,7 +1249,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 onClick={() => {
                   setSelectedService(null);
                   setSelectedSlot(null);
-                  setCurrentStep(1);
+                  updateStep(1);
                   setConfirmedBooking(null);
                   setSubmitError(null);
                 }}

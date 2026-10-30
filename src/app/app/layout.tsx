@@ -143,7 +143,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         ]);
 
         if (res.status === 401) {
-          router.push('/login');
+          router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`);
           return;
         }
 
@@ -240,13 +240,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   async function handleLogout() {
+    setMobileMenuOpen(false);
     setLoggingOut(true);
     try {
       await fetch('/api/logout', { method: 'POST' });
-      router.push('/login');
-      router.refresh();
     } catch {
-      router.push('/login');
+      // Continue with client purge
+    } finally {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+      // Perform full browser navigation to login so all cached states & auth tokens are purged
+      window.location.href = '/login';
     }
   }
 
@@ -386,8 +392,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           />
 
           {/* Slide Drawer Panel */}
-          <div className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white shadow-2xl flex flex-col justify-between p-5 animate-slide-left border-r border-neutral-200">
-            <div className="space-y-5 overflow-y-auto max-h-[calc(100vh-140px)] no-scrollbar">
+          <div className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full bg-white shadow-2xl flex flex-col p-4 sm:p-5 animate-slide-left border-r border-neutral-200 overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-4 no-scrollbar pr-1">
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
                 <div className="flex items-center gap-2.5">
@@ -473,20 +479,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Bottom Account & Sign Out */}
-            <div className="pt-4 border-t border-neutral-100 space-y-2.5">
+            <div className="shrink-0 pt-3 border-t border-neutral-100 space-y-2">
               <button
                 type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   setShowPlanModal(true);
                 }}
-                className="w-full py-2.5 px-3 rounded-xl bg-pink-50 hover:bg-pink-100 text-[#b3135b] border border-pink-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2 px-3 rounded-xl bg-pink-50 hover:bg-pink-100 text-[#b3135b] border border-pink-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 <Zap className="w-3.5 h-3.5 text-pink-700" />
-                <span>Subscription Plan & Billing</span>
+                <span>Subscription & Billing</span>
               </button>
 
-              <div className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80">
+              <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
                 <div className="text-[10px] text-neutral-400 uppercase font-bold">
                   {user?.role === 'owner' ? 'Logged In Owner' : user?.role === 'manager' ? 'Logged In Manager' : 'Logged In User'}
                 </div>
@@ -498,9 +504,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-98"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-4 h-4 text-red-600" />
                 <span>{loggingOut ? 'Signing out...' : 'Sign Out of ERP'}</span>
               </button>
             </div>

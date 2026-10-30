@@ -108,8 +108,13 @@ export default function BillingPage() {
       if (!res.ok) throw new Error(data.error);
 
       await fetchInvoices();
+      const updated = {
+        ...paymentModalInvoice,
+        paid_amount: (Number(paymentModalInvoice.paid_amount || 0) + parseFloat(payAmount)).toString(),
+      };
       setPaymentModalInvoice(null);
-      setMessage({ type: 'success', text: 'Payment collected successfully!' });
+      setWhatsappInvoice(updated);
+      setMessage({ type: 'success', text: 'Payment recorded! Ready to send WhatsApp receipt & bill.' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
     } finally {
@@ -120,12 +125,23 @@ export default function BillingPage() {
   async function handleMarkWhatsappSent(invoiceId: string) {
     setSendingWhatsapp(true);
     try {
-      // 1. Open real WhatsApp with customer number, bill details & digital receipt link
+      // 1. Open real WhatsApp with customer number, exact requested template & digital receipt link
       if (whatsappInvoice) {
         const rawPhone = (whatsappInvoice.customer_mobile || '').replace(/[^0-9]/g, '');
-        const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
-        const receiptUrl = `${window.location.origin}/b/${whatsappInvoice.number}`;
-        const msg = `Dear *${whatsappInvoice.customer_name}*, thank you for visiting us today! 💖\n\n📄 *Invoice #:* ${whatsappInvoice.number}\n💰 *Total Amount:* ₹${whatsappInvoice.total}\n✅ *Payment Received:* ₹${whatsappInvoice.paid_amount}\n\n👉 *View your official digital receipt & GST breakdown:*\n${receiptUrl}\n\nWe look forward to welcoming you again! ✨`;
+        const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
+        const receiptLink = `${window.location.origin}/b/${whatsappInvoice.number}`;
+        const total = Number(whatsappInvoice.total || 0).toLocaleString('en-IN');
+        const paid = Number(whatsappInvoice.paid_amount || whatsappInvoice.total || 0).toLocaleString('en-IN');
+
+        const msg = [
+          `Dear ${whatsappInvoice.customer_name}, thank you for visiting us today!`,
+          `Invoice #: ${whatsappInvoice.number}`,
+          `Total Amount: ₹${total}`,
+          `Payment Received: ₹${paid}`,
+          `View your official digital receipt & GST breakdown: ${receiptLink}`,
+          `We look forward to welcoming you again!`,
+        ].join('\n');
+
         const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
         window.open(waUrl, '_blank');
       }
@@ -610,6 +626,18 @@ export default function BillingPage() {
                     ✓✓
                   </span>
                 </div>
+              </div>
+
+              <div className="pt-2 border-t border-neutral-200/60 flex gap-2">
+                <a
+                  href={`/b/${whatsappInvoice.number}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Printer className="w-3.5 h-3.5 text-neutral-600" />
+                  <span>Original Bill PDF / Print ↗</span>
+                </a>
               </div>
 
               {whatsappInvoice.whatsapp_sent ? (

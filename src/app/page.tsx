@@ -44,7 +44,7 @@ export default function MarketingLandingPage() {
       <section className="relative z-10 max-w-5xl mx-auto px-3.5 sm:px-6 pt-10 sm:pt-18 lg:pt-22 pb-10 sm:pb-16 text-center w-full">
         <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 shadow-xs max-w-full">
           <Gift className="w-3.5 h-3.5 text-[#b3135b] shrink-0" />
-          <span>🎁 Special Offer: 7-Day Free Trial Demo · Zero Upfront Cost · Instant Setup</span>
+          <span>🎁 Special Offer: 7-Day Free Trial · Zero Upfront Cost · Instant Setup</span>
         </div>
 
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.22] sm:leading-[1.15] max-w-4xl mx-auto break-normal">
@@ -64,7 +64,7 @@ export default function MarketingLandingPage() {
             href="/register-salon"
             className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-900/25 transition-all active:scale-95 flex items-center justify-center gap-2 group"
           >
-            <span>🎁 Start 7-Day Free Trial Demo</span>
+            <span>🎁 Start 7-Day Free Trial</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
 
@@ -322,13 +322,13 @@ export default function MarketingLandingPage() {
         <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-bold mb-3 shadow-xs">
             <Gift className="w-4 h-4 text-[#b3135b]" />
-            <span>100% Free 7-Day Evaluation Demo</span>
+            <span>100% Free 7-Day Free Trial</span>
           </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
             Start Free for 7 Days, Upgrade as You Grow
           </h2>
           <p className="text-xs sm:text-base text-slate-600 mt-3 max-w-2xl mx-auto leading-relaxed">
-            Every new salon starts with a full-featured <strong>7-Day Free Trial Demo</strong>. Experience real online bookings, POS billing, staff commission tracking, and live chair kanban with zero upfront cost.
+            Every new salon starts with a full-featured <strong>7-Day Free Trial</strong>. Experience real online bookings, POS billing, staff commission tracking, and live chair kanban with zero upfront cost.
           </p>
         </div>
 
@@ -351,7 +351,7 @@ export default function MarketingLandingPage() {
               2
             </div>
             <h4 className="font-bold text-sm sm:text-base text-[#b3135b]">
-              Instant 7-Day Demo Activated
+              Instant 7-Day Free Trial Activated
             </h4>
             <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
               Your private salon dashboard goes live immediately. Test with your real stylists, services, and live bookings with <strong>₹0 charged</strong>.

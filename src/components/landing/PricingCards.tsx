@@ -185,7 +185,7 @@ export default function PricingCards() {
                       : 'bg-slate-900 hover:bg-slate-800 text-white'
                   }`}
                 >
-                  <span>Start 7-Day Free Trial Demo</span>
+                  <span>Start 7-Day Free Trial</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <p className={`text-center text-[10px] mt-2 ${isPro ? 'text-pink-200/70' : 'text-slate-400'}`}>

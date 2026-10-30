@@ -357,7 +357,7 @@ export default function SettingsPage() {
                   className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 bg-neutral-50 text-neutral-500 font-mono text-sm cursor-not-allowed"
                 />
                 <span className="text-[10px] text-neutral-400 mt-1 block">
-                  Slug is fixed for this studio demo.
+                  Slug is uniquely assigned to your salon studio.
                 </span>
               </div>
             </div>

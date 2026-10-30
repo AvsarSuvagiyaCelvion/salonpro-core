@@ -102,7 +102,7 @@ export async function POST(
              SELECT 1 FROM appointments a
              WHERE a.staff_id = s.id
                AND a.status IN ('scheduled', 'arrived')
-               AND tstzrange(a.starts_at, a.ends_at) && tstzrange($3, $4)
+               AND tstzrange(a.starts_at, a.ends_at) && tstzrange($3::timestamptz, $4::timestamptz)
            )
          LIMIT 1`,
         [salon.id, service.id, startsAt.toISOString(), endsAt.toISOString()]
@@ -119,6 +119,27 @@ export async function POST(
       }
 
       finalStaffId = candidateStaff.rows[0].id;
+    } else {
+      // Server-side availability pre-check for specific staff (prevents race condition)
+      const conflictCheck = await query(
+        `SELECT a.id FROM appointments a
+         WHERE a.salon_id = $1
+           AND a.staff_id = $2
+           AND a.status IN ('scheduled', 'arrived')
+           AND tstzrange(a.starts_at, a.ends_at) && tstzrange($3::timestamptz, $4::timestamptz)
+         LIMIT 1`,
+        [salon.id, finalStaffId, startsAt.toISOString(), endsAt.toISOString()]
+      );
+
+      if (conflictCheck.rows.length > 0) {
+        return NextResponse.json(
+          {
+            isOverlap: true,
+            error: 'This time was just taken, please pick another.',
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // 5. Customer upsert
@@ -174,8 +195,14 @@ export async function POST(
       );
       newAppt = apptRes.rows[0];
     } catch (dbErr: any) {
-      // 23P01 is Postgres EXCLUDE constraint violation
-      if (dbErr.code === '23P01' || dbErr.message?.includes('no_overlap')) {
+      // 23P01 is Postgres EXCLUDE constraint violation, or unique collision
+      if (
+        dbErr.code === '23P01' ||
+        dbErr.code === '23505' ||
+        dbErr.message?.includes('no_overlap') ||
+        dbErr.message?.includes('exclusion constraint') ||
+        dbErr.message?.includes('conflict')
+      ) {
         return NextResponse.json(
           {
             isOverlap: true,

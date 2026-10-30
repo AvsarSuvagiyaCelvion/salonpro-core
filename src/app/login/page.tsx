@@ -31,7 +31,10 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to sign in');
       }
 
-      window.location.href = '/app';
+      const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const returnUrl = searchParams?.get('returnUrl');
+      const targetPath = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/app';
+      window.location.href = targetPath;
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please check your credentials.');
     } finally {
@@ -69,7 +72,7 @@ export default function LoginPage() {
               <span className="text-lg shrink-0">🎁</span>
               <div className="text-left">
                 <p className="text-xs font-bold text-[#b3135b]">New Salon Owner?</p>
-                <p className="text-[11px] text-neutral-600">Register in 60s & get 7-Day Free Trial Demo</p>
+                <p className="text-[11px] text-neutral-600">Register in 60s & get 7-Day Free Trial</p>
               </div>
             </div>
             <Link
@@ -141,14 +144,54 @@ export default function LoginPage() {
               </div>
 
               {showForgotNotice && (
-                <div className="mt-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs animate-in fade-in">
-                  <div className="font-bold flex items-center gap-1.5 mb-1">
-                    <span>🔑 Password Recovery:</span>
+                <div className="mt-2.5 p-4 rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-950 text-xs animate-in fade-in space-y-2.5">
+                  <div className="font-bold flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-amber-900">
+                      <span>🔑</span>
+                      <span>Password Recovery & Support</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotNotice(false)}
+                      className="text-amber-700 hover:text-amber-900 text-xs"
+                    >
+                      ✕
+                    </button>
                   </div>
                   <p className="leading-relaxed text-[11px] text-amber-800">
-                    Salon accounts are managed by the Platform Super Admin. If you forgot your password, please contact{' '}
-                    <strong className="font-semibold text-amber-950">Platform Support</strong> or your system administrator to issue a secure password reset.
+                    Salon accounts are safeguarded by Platform Security. If you forgot your password, contact our dedicated{' '}
+                    <a
+                      href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                        `Hello Platform Support, I am a registered Salon Owner (${email || 'my salon'}) and need assistance resetting my password.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-[#b3135b] underline hover:text-[#960f4c] cursor-pointer inline-flex items-center gap-0.5"
+                    >
+                      Platform Support
+                    </a>{' '}
+                    team to issue a secure password reset.
                   </p>
+                  <div className="pt-2 border-t border-amber-200/60 flex flex-col sm:flex-row gap-2">
+                    <a
+                      href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                        `Hello Platform Support, I am a registered Salon Owner (${email || 'my salon'}) and need assistance resetting my password.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                    >
+                      <span>💬 WhatsApp Support</span>
+                    </a>
+                    <a
+                      href={`mailto:support@salonpro.in?subject=SalonPro%20Owner%20Password%20Reset%20Request&body=Hello%20Platform%20Support,%0D%0A%0D%0AI%20am%20requesting%20a%20password%20reset%20for%20my%20salon%20owner%20account:%20${encodeURIComponent(
+                        email || ''
+                      )}`}
+                      className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                    >
+                      <span>✉️ Email Support</span>
+                    </a>
+                  </div>
                 </div>
               )}
             </div>

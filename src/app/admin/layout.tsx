@@ -34,11 +34,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const data = await res.json();
         if (data.loggedIn && data.admin) {
           setAdmin(data.admin);
+        } else if (pathname !== '/admin/login') {
+          window.location.href = `/admin/login?returnUrl=${encodeURIComponent(pathname)}`;
         }
-      } catch {}
+      } catch {
+        if (pathname !== '/admin/login') {
+          window.location.href = `/admin/login?returnUrl=${encodeURIComponent(pathname)}`;
+        }
+      }
     }
     loadAdmin();
-  }, []);
+  }, [pathname]);
 
   // If on admin login page, render without admin layout shell
   if (pathname === '/admin/login') {
@@ -46,13 +52,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   async function handleAdminLogout() {
+    setMobileMenuOpen(false);
     setLoggingOut(true);
     try {
       await fetch('/api/admin/logout', { method: 'POST' });
-      router.push('/admin/login');
-      router.refresh();
     } catch {
-      router.push('/admin/login');
+      // Continue client purge
+    } finally {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+      window.location.href = '/admin/login';
     }
   }
 
@@ -156,8 +167,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           />
 
           {/* Slide Drawer Panel */}
-          <div className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white shadow-2xl flex flex-col justify-between p-5 animate-slide-left border-r border-slate-200">
-            <div className="space-y-6">
+          <div className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full bg-white shadow-2xl flex flex-col p-4 sm:p-5 animate-slide-left border-r border-slate-200 overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-4 no-scrollbar pr-1">
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
@@ -242,8 +253,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Bottom Admin User Box */}
-            <div className="pt-4 border-t border-slate-100 space-y-3">
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
+            <div className="shrink-0 pt-3 border-t border-slate-100 space-y-2">
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs uppercase">
                   {admin?.name?.charAt(0) || 'A'}
                 </div>
@@ -260,9 +271,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 type="button"
                 onClick={handleAdminLogout}
                 disabled={loggingOut}
-                className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-98"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-4 h-4 text-red-600" />
                 <span>{loggingOut ? 'Signing out...' : 'Admin Sign Out'}</span>
               </button>
             </div>

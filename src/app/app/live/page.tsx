@@ -21,6 +21,7 @@ import {
   CreditCard,
   Phone,
   Search,
+  Printer,
 } from 'lucide-react';
 
 interface WaitingCustomer {
@@ -349,12 +350,51 @@ export default function LiveStudioPage() {
       if (!res.ok) throw new Error(data.error);
 
       await fetchLiveData();
+      const updatedInv = {
+        ...paymentModalInvoice,
+        paid_amount: (Number(paymentModalInvoice.paid_amount || 0) + parseFloat(payAmount)).toString(),
+      };
       setPaymentModalInvoice(null);
-      setMessage({ type: 'success', text: 'Payment collected successfully!' });
+      setWhatsappInvoice(updatedInv);
+      setWhatsappSent(false);
+      setMessage({ type: 'success', text: 'Payment collected successfully! Ready to dispatch WhatsApp bill.' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
     } finally {
       setPaySubmitting(false);
+    }
+  }
+
+  async function handleSendWhatsappBill(invoice: ToCollectInvoice) {
+    try {
+      const rawPhone = (invoice.customer_mobile || '').replace(/[^0-9]/g, '');
+      const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const receiptLink = `${origin}/b/${invoice.number}`;
+      const total = Number(invoice.total || 0).toLocaleString('en-IN');
+      const paid = Number(invoice.paid_amount || invoice.total || 0).toLocaleString('en-IN');
+
+      const msg = [
+        `Dear ${invoice.customer_name}, thank you for visiting us today!`,
+        `Invoice #: ${invoice.number}`,
+        `Total Amount: ₹${total}`,
+        `Payment Received: ₹${paid}`,
+        `View your official digital receipt & GST breakdown: ${receiptLink}`,
+        `We look forward to welcoming you again!`,
+      ].join('\n');
+
+      const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+
+      await fetch('/api/billing/whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoice_id: invoice.id }),
+      });
+
+      setWhatsappSent(true);
+    } catch {
+      // Continue
     }
   }
 
@@ -1319,30 +1359,19 @@ export default function LiveStudioPage() {
             {/* Chat Body */}
             <div className="p-4 space-y-3">
               <div className="bg-white rounded-xl p-3.5 shadow-xs text-xs space-y-2 border border-neutral-200/50">
-                <p className="font-bold text-[#075e54]">
-                  ✨ Salon Bill Receipt
+                <p className="font-bold text-[#075e54] text-xs">
+                  ✨ Official Salon WhatsApp Receipt
                 </p>
-                <p className="text-neutral-700 text-[11px]">
-                  Dear <strong>{whatsappInvoice.customer_name}</strong>, thank you for your visit today!
-                </p>
-                <div className="bg-neutral-50 p-2 rounded-lg text-[10px] space-y-1 font-mono text-neutral-600">
-                  <div className="flex justify-between">
-                    <span>Invoice:</span>
-                    <span className="font-bold">{whatsappInvoice.number}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Date:</span>
-                    <span>{new Date(whatsappInvoice.created_at).toLocaleDateString('en-IN')}</span>
-                  </div>
-                  <div className="flex justify-between border-t border-neutral-200 pt-1 text-neutral-900 font-bold">
-                    <span>Total Paid:</span>
-                    <span>₹{whatsappInvoice.total}</span>
-                  </div>
+                <div className="p-2.5 rounded-lg bg-neutral-50 text-[11px] font-sans text-neutral-800 space-y-1 border border-neutral-200/60 whitespace-pre-line">
+                  {`Dear ${whatsappInvoice.customer_name}, thank you for visiting us today!
+Invoice #: ${whatsappInvoice.number}
+Total Amount: ₹${Number(whatsappInvoice.total || 0).toLocaleString('en-IN')}
+Payment Received: ₹${Number(whatsappInvoice.paid_amount || whatsappInvoice.total || 0).toLocaleString('en-IN')}
+View your official digital receipt & GST breakdown: ${typeof window !== 'undefined' ? window.location.origin : ''}/b/${whatsappInvoice.number}
+We look forward to welcoming you again!`}
                 </div>
-                <p className="text-[10px] text-neutral-500 italic text-center pt-1">
-                  We look forward to pampering you again soon! 💖
-                </p>
-                <div className="text-right text-[10px] text-neutral-400 flex items-center justify-end gap-1">
+
+                <div className="text-right text-[10px] text-neutral-400 flex items-center justify-end gap-1 pt-0.5">
                   <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   <span className={whatsappSent ? 'text-blue-500 font-bold' : 'text-neutral-400'}>
                     ✓✓
@@ -1350,21 +1379,44 @@ export default function LiveStudioPage() {
                 </div>
               </div>
 
-              {whatsappSent ? (
-                <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-semibold text-center flex items-center justify-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>WhatsApp message marked as Sent (Two Blue Ticks)</span>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setWhatsappSent(true)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
+              {/* Action Buttons: Open Original Bill PDF + Send on WhatsApp */}
+              <div className="space-y-2">
+                <a
+                  href={`/b/${whatsappInvoice.number}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Mark as Sent on WhatsApp</span>
-                </button>
-              )}
+                  <Printer className="w-3.5 h-3.5 text-neutral-600" />
+                  <span>Download / Print Original Bill (PDF) ↗</span>
+                </a>
+
+                {whatsappSent ? (
+                  <div className="space-y-2">
+                    <div className="p-2.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-semibold text-center flex items-center justify-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>WhatsApp Bill Sent (Confirmed with Two Blue Ticks ✓✓)</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleSendWhatsappBill(whatsappInvoice)}
+                      className="w-full py-2 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Send className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Resend to Customer on WhatsApp ↗</span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleSendWhatsappBill(whatsappInvoice)}
+                    className="w-full py-3 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Send Bill to Customer on WhatsApp ➔</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

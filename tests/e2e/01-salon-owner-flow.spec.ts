@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('STEP 1: Salon Owner Panel Functional & E2E Testing', () => {
-  const ownerEmail = 'owner.aura@auraglamour.in';
-  const ownerPassword = 'AuraOwnerPass@2026';
+  const ownerEmail = 'pari.branch1@gmail.com';
+  const ownerPassword = 'Pooja@123';
+  const salonName = 'Pari Beauty Studio - Branch 1';
 
-  test('1.1 Owner Sign In, Dashboard default to TODAY, and Header Salon Name', async ({ page, isMobile }) => {
+  test('1.1 Owner Sign In, Dashboard default to TODAY, and Header Salon Name', async ({ page }) => {
     await page.goto('/login');
 
     // Verify Title & Brand
@@ -20,7 +21,7 @@ test.describe('STEP 1: Salon Owner Panel Functional & E2E Testing', () => {
 
     // Verify Header shows the correct Salon Name and NOT "Salon Operating System"
     const headerTitle = page.locator('header span.font-extrabold').first();
-    await expect(headerTitle).toContainText('Aura Glamour Studio');
+    await expect(headerTitle).toContainText(salonName);
 
     // Verify Dashboard Overview defaults to TODAY
     await expect(page.locator('h1')).toContainText('Dashboard Overview');
@@ -68,10 +69,10 @@ test.describe('STEP 1: Salon Owner Panel Functional & E2E Testing', () => {
 
     // Navigate to Settings
     await page.goto('/app/settings');
-    await expect(page.locator('h1')).toContainText('Settings & Branding');
+    await expect(page.locator('h1')).toContainText('Settings & Branding', { timeout: 15000 });
 
     // Check Salon Information values
-    const nameInput = page.locator('input[value*="Aura Glamour Studio"], input').nth(0);
+    const nameInput = page.locator('input[value*="Pari Beauty Studio"], input').nth(0);
     await expect(nameInput).toBeVisible();
 
     // Switch to Booking & Timings tab
@@ -79,8 +80,8 @@ test.describe('STEP 1: Salon Owner Panel Functional & E2E Testing', () => {
     await expect(page.locator('text=Operating Hours')).toBeVisible();
 
     // Save Settings
-    await page.click('button:has-text("Save All Settings"), button:has-text("Save Settings")');
-    await expect(page.locator('text=Settings updated successfully').or(page.locator('button:has-text("Save All Settings")'))).toBeVisible();
+    await page.click('button:has-text("Save Settings")');
+    await expect(page.locator('text=Settings saved successfully')).toBeVisible({ timeout: 15000 });
   });
 
   test('1.4 Staff & Services Management', async ({ page }) => {
@@ -93,14 +94,14 @@ test.describe('STEP 1: Salon Owner Panel Functional & E2E Testing', () => {
     // 1. Check Services
     await page.goto('/app/services');
     await expect(page.locator('h1')).toContainText('Service Catalog');
-    await expect(page.locator('text=Hair Styling & Cut')).toBeVisible();
-    await expect(page.locator('text=Hydra Glow Facial')).toBeVisible();
+    await expect(page.locator('text=Haircut & Blowdry')).toBeVisible();
+    await expect(page.locator('text=Fruit Glow Facial')).toBeVisible();
 
     // 2. Check Staff
     await page.goto('/app/staff');
     await expect(page.locator('h1')).toContainText('Staff & Specialists');
-    await expect(page.locator('text=Priya Patel')).toBeVisible();
-    await expect(page.locator('text=Anjali Mehta')).toBeVisible();
+    await expect(page.locator('text=Kajal Sharma')).toBeVisible();
+    await expect(page.locator('text=Neha Varma')).toBeVisible();
   });
 
   test('1.5 Live Studio Floor & Billing Generation Flow', async ({ page }) => {

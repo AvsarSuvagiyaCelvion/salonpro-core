@@ -95,6 +95,21 @@ export default function SettingsPage() {
           setMinAdvanceHours(s.min_advance_hours || 1);
           setMaxAdvanceDays(s.max_advance_days || 14);
           setSendReminders(s.send_reminders ?? true);
+
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(
+                'salonpro_salon_info',
+                JSON.stringify({
+                  name: s.name,
+                  slug: s.slug,
+                  open_time: s.open_time,
+                  close_time: s.close_time,
+                })
+              );
+            } catch {}
+            window.dispatchEvent(new CustomEvent('salon-settings-updated', { detail: s }));
+          }
         }
       } catch (err) {
         setErrorMessage('Failed to load salon settings');

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
+import pool, { query } from '@/lib/db';
 import { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth';
 import { getSalonPlan } from '@/lib/plan';
 
@@ -7,6 +7,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  let client: any = null;
+  let inTransaction = false;
+
   try {
     const { slug } = await params;
     const body = await request.json();
@@ -76,6 +79,7 @@ export async function POST(
     );
 
     if (serviceRes.rows.length === 0) {
+      client.release();
       return NextResponse.json({ error: 'Service not found' }, { status: 404 });
     }
 
@@ -119,27 +123,6 @@ export async function POST(
       }
 
       finalStaffId = candidateStaff.rows[0].id;
-    } else {
-      // Server-side availability pre-check for specific staff (prevents race condition)
-      const conflictCheck = await query(
-        `SELECT a.id FROM appointments a
-         WHERE a.salon_id = $1
-           AND a.staff_id = $2
-           AND a.status IN ('scheduled', 'arrived')
-           AND tstzrange(a.starts_at, a.ends_at) && tstzrange($3::timestamptz, $4::timestamptz)
-         LIMIT 1`,
-        [salon.id, finalStaffId, startsAt.toISOString(), endsAt.toISOString()]
-      );
-
-      if (conflictCheck.rows.length > 0) {
-        return NextResponse.json(
-          {
-            isOverlap: true,
-            error: 'This time was just taken, please pick another.',
-          },
-          { status: 409 }
-        );
-      }
     }
 
     // 5. Customer upsert
@@ -154,14 +137,12 @@ export async function POST(
 
     if (existingCust.rows.length > 0) {
       customerId = existingCust.rows[0].id;
-      // If customer already has a PIN and supplied PIN doesn't match, verify
       if (existingCust.rows[0].pin && existingCust.rows[0].pin !== cleanPin) {
         return NextResponse.json(
           { error: 'Incorrect customer PIN for this mobile number. Please enter your existing PIN or log in first.' },
           { status: 401 }
         );
       }
-      // Update name and set/keep PIN
       await query(
         `UPDATE customers SET name = $1, pin = COALESCE(pin, $2) WHERE id = $3`,
         [cleanName, cleanPin, customerId]
@@ -174,45 +155,62 @@ export async function POST(
       customerId = newCust.rows[0].id;
     }
 
-    // 6. Insert appointment with database exclusion protection
-    let newAppt;
-    try {
-      const apptRes = await query(
-        `INSERT INTO appointments (
-          salon_id, customer_id, staff_id, service_id, starts_at, ends_at, status, source, note, created_at
-        ) VALUES (
-          $1, $2, $3, $4, $5, $6, 'scheduled', 'online', $7, NOW()
-        ) RETURNING *`,
-        [
-          salon.id,
-          customerId,
-          finalStaffId,
-          service.id,
-          startsAt.toISOString(),
-          endsAt.toISOString(),
-          note || 'Booked online',
-        ]
+    // 6. ATOMIC TRANSACTION WITH POSTGRES ADVISORY LOCK & EXCLUSION CONSTRAINT
+    client = await pool.connect();
+    await client.query('BEGIN');
+    inTransaction = true;
+
+    // Acquire transaction-scoped advisory lock for this salon + staff + slot start
+    const lockKey = `${salon.id}:${finalStaffId}:${startsAt.toISOString()}`;
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [lockKey]);
+
+    // Check for overlapping appointment inside the locked transaction
+    const conflictCheck = await client.query(
+      `SELECT a.id FROM appointments a
+       WHERE a.salon_id = $1
+         AND a.staff_id = $2
+         AND a.status IN ('scheduled', 'arrived')
+         AND tstzrange(a.starts_at, a.ends_at) && tstzrange($3::timestamptz, $4::timestamptz)
+       LIMIT 1`,
+      [salon.id, finalStaffId, startsAt.toISOString(), endsAt.toISOString()]
+    );
+
+    if (conflictCheck.rows.length > 0) {
+      await client.query('ROLLBACK');
+      inTransaction = false;
+      client.release();
+      return NextResponse.json(
+        {
+          isOverlap: true,
+          error: 'This time was just taken, please pick another.',
+        },
+        { status: 409 }
       );
-      newAppt = apptRes.rows[0];
-    } catch (dbErr: any) {
-      // 23P01 is Postgres EXCLUDE constraint violation, or unique collision
-      if (
-        dbErr.code === '23P01' ||
-        dbErr.code === '23505' ||
-        dbErr.message?.includes('no_overlap') ||
-        dbErr.message?.includes('exclusion constraint') ||
-        dbErr.message?.includes('conflict')
-      ) {
-        return NextResponse.json(
-          {
-            isOverlap: true,
-            error: 'This time was just taken, please pick another.',
-          },
-          { status: 409 }
-        );
-      }
-      throw dbErr;
     }
+
+    // Insert appointment inside transaction
+    const apptRes = await client.query(
+      `INSERT INTO appointments (
+        salon_id, customer_id, staff_id, service_id, starts_at, ends_at, status, source, note, created_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, 'scheduled', 'online', $7, NOW()
+      ) RETURNING *`,
+      [
+        salon.id,
+        customerId,
+        finalStaffId,
+        service.id,
+        startsAt.toISOString(),
+        endsAt.toISOString(),
+        note || 'Booked online',
+      ]
+    );
+
+    await client.query('COMMIT');
+    inTransaction = false;
+    client.release();
+
+    const newAppt = apptRes.rows[0];
 
     // Fetch staff details for confirmation
     const staffRes = await query(`SELECT name FROM staff WHERE id = $1`, [finalStaffId]);
@@ -244,16 +242,24 @@ export async function POST(
     const response = NextResponse.json({
       success: true,
       appointment: newAppt,
-      salonName: salon.name,
-      serviceName: service.name,
-      staffName,
+      salon: {
+        name: salon.name,
+        phone: salon.phone,
+        brandColor: salon.brand_color,
+      },
+      service: {
+        name: service.name,
+        price: service.price,
+        duration: service.duration_min,
+      },
+      staff: {
+        id: finalStaffId,
+        name: staffName,
+      },
       formattedDate,
       formattedTime,
       whatsappMessage,
-      cleanName,
-      cleanMobile,
-      customerId,
-      customerPin: cleanPin,
+      whatsappLink: `https://wa.me/${cleanMobile}?text=${encodeURIComponent(whatsappMessage)}`,
     });
 
     response.cookies.set({
@@ -263,11 +269,40 @@ export async function POST(
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 30 * 24 * 60 * 60,
+      maxAge: 60 * 60 * 24 * 30,
     });
 
     return response;
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (inTransaction) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {}
+    }
+    if (client) {
+      try {
+        client.release();
+      } catch {}
+    }
+
+    // PostgreSQL EXCLUDE constraint violation (23P01) or UNIQUE violation (23505)
+    if (
+      error.code === '23P01' ||
+      error.code === '23505' ||
+      error.message?.includes('exclude_overlapping_appointments') ||
+      error.message?.includes('idx_appointments_unique_active_slot') ||
+      error.message?.includes('exclusion constraint') ||
+      error.message?.includes('conflict')
+    ) {
+      return NextResponse.json(
+        {
+          isOverlap: true,
+          error: 'This time was just taken, please pick another.',
+        },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json({ error: error.message || 'Booking failed' }, { status: 500 });
   }
 }

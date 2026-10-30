@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { sendWhatsAppInvoiceReceipt } from '@/lib/whatsapp';
 
 export async function POST(
   request: Request,
@@ -20,13 +21,20 @@ export async function POST(
       products_discount_type = 'none',
       products_discount_value = 0,
       tax_rate = 0,
+      auto_deliver_whatsapp = true,
     } = body;
 
     await client.query('BEGIN');
 
     // 1. Fetch session scoped strictly to caller's salon
     const sessRes = await client.query(
-      'SELECT id, salon_id, customer_id, status FROM sessions WHERE id = $1 AND salon_id = $2 FOR UPDATE',
+      `SELECT s.id, s.salon_id, s.customer_id, s.status,
+              c.name as customer_name, c.mobile as customer_mobile,
+              sal.name as salon_name, sal.phone as salon_phone
+       FROM sessions s
+       JOIN customers c ON s.customer_id = c.id
+       JOIN salons sal ON s.salon_id = sal.id
+       WHERE s.id = $1 AND s.salon_id = $2 FOR UPDATE`,
       [sessionId, salonId]
     );
 
@@ -131,8 +139,34 @@ export async function POST(
 
     await client.query('COMMIT');
 
+    const createdInvoice = invRes.rows[0];
+
+    // 8. Automatic WhatsApp delivery on checkout completion
+    let waDelivery = null;
+    if (auto_deliver_whatsapp) {
+      try {
+        waDelivery = await sendWhatsAppInvoiceReceipt({
+          salonId,
+          salonName: session.salon_name,
+          salonPhone: session.salon_phone,
+          invoiceId: createdInvoice.id,
+          invoiceNumber: createdInvoice.number,
+          customerId: session.customer_id,
+          customerName: session.customer_name,
+          customerMobile: session.customer_mobile,
+          subtotal: totalSubtotal,
+          taxAmount,
+          total: finalTotal,
+          balanceDue: finalTotal,
+        });
+      } catch (waErr) {
+        console.error('Auto-WhatsApp delivery exception on session completion:', waErr);
+      }
+    }
+
     return NextResponse.json({
-      invoice: invRes.rows[0],
+      invoice: createdInvoice,
+      delivery: waDelivery,
       message: `Session completed. Invoice ${invNumber} generated for collection.`,
     });
   } catch (error: any) {

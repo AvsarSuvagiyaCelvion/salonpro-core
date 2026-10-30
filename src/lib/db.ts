@@ -12,7 +12,7 @@ const pool =
     ssl: {
       rejectUnauthorized: false,
     },
-    max: 20,
+    max: 40,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
     allowExitOnIdle: false,

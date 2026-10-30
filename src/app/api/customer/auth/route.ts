@@ -130,11 +130,18 @@ export async function POST(request: Request) {
 
       return response;
     } else if (action === 'login') {
-      // Find customer
-      const custRes = await query(
-        `SELECT id, name, mobile, email, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
+      // Find customer in target salon, or across salons by mobile
+      let custRes = await query(
+        `SELECT id, salon_id, name, mobile, email, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
         [salonId, cleanMobile]
       );
+
+      if (custRes.rows.length === 0) {
+        custRes = await query(
+          `SELECT id, salon_id, name, mobile, email, pin FROM customers WHERE mobile = $1 ORDER BY id DESC LIMIT 1`,
+          [cleanMobile]
+        );
+      }
 
       if (custRes.rows.length === 0) {
         return NextResponse.json(
@@ -144,6 +151,7 @@ export async function POST(request: Request) {
       }
 
       const customer = custRes.rows[0];
+      const actualSalonId = customer.salon_id || salonId;
 
       // Validate customer's secret PIN
       if (customer.pin && customer.pin !== cleanPin) {
@@ -162,7 +170,7 @@ export async function POST(request: Request) {
         customerId: customer.id,
         mobile: customer.mobile,
         name: customer.name,
-        salonId,
+        salonId: actualSalonId,
       });
 
       const response = NextResponse.json({

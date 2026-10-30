@@ -12,16 +12,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForgotNotice, setShowForgotNotice] = useState(false);
-  const [securityNotice, setSecurityNotice] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('security') === 'nav_reauth') {
-        setSecurityNotice('🔒 Security Verification: Session locked due to browser navigation. Please sign in again.');
-      }
-    }
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -112,16 +102,6 @@ export default function LoginPage() {
           <p className="text-xs text-neutral-500 mb-5">
             Sign in with your registered email and password to access your salon ERP.
           </p>
-
-          {securityNotice && (
-            <div className="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-800 text-xs animate-in fade-in">
-              <span className="text-base shrink-0">🛡️</span>
-              <div>
-                <p className="font-bold text-amber-900">Security Verification Required</p>
-                <p className="mt-0.5">{securityNotice}</p>
-              </div>
-            </div>
-          )}
 
           {error && (
             <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 text-red-700 text-sm animate-in fade-in">

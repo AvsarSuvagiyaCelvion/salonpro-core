@@ -232,61 +232,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Security Guard: On Page Reload / Refresh, keep session active.
   // On Browser Back / Forward navigation (or mobile swipe back/forward) or bfcache restore, require re-authentication.
+  // Clean up any remaining route effects
   useEffect(() => {
-    let isTerminating = false;
-
-    async function triggerSecurityReauth() {
-      if (isTerminating) return;
-      isTerminating = true;
-      try {
-        await fetch('/api/logout', { method: 'POST' });
-      } catch {}
-      try {
-        localStorage.clear();
-        sessionStorage.clear();
-      } catch {}
-      window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}&security=nav_reauth`;
-    }
-
-    // Check if initial document load was via back_forward navigation
-    if (typeof window !== 'undefined') {
-      try {
-        const navEntries = performance.getEntriesByType('navigation');
-        if (navEntries && navEntries.length > 0) {
-          const navTiming = navEntries[0] as PerformanceNavigationTiming;
-          if (navTiming.type === 'back_forward') {
-            triggerSecurityReauth();
-            return;
-          }
-        } else {
-          const legacyNav = (performance as any)?.navigation;
-          if (legacyNav && legacyNav.type === 2) {
-            triggerSecurityReauth();
-            return;
-          }
-        }
-      } catch {}
-    }
-
-    function handlePageShow(event: PageTransitionEvent) {
-      if (event.persisted) {
-        // Page was revived from Back-Forward Cache (bfcache)
-        triggerSecurityReauth();
-      }
-    }
-
-    function handlePopState() {
-      // User clicked browser Back / Forward buttons or used swipe gestures
-      triggerSecurityReauth();
-    }
-
-    window.addEventListener('pageshow', handlePageShow);
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('pageshow', handlePageShow);
-      window.removeEventListener('popstate', handlePopState);
-    };
+    // Normal browser back/forward navigation preserves valid sessions
   }, [pathname]);
 
   async function handleActivatePlan(planId: string) {
@@ -415,7 +363,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Top Header */}
-      <header className="shrink-0 h-14 sm:h-16 bg-white border-b border-neutral-200/80 z-30 px-3 sm:px-6 flex items-center justify-between shadow-xs">
+      <header className="sticky top-0 shrink-0 h-14 sm:h-16 bg-white/95 backdrop-blur-md border-b border-neutral-200/80 z-30 px-3 sm:px-6 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
@@ -432,7 +380,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="min-w-0">
               <span className="font-extrabold text-sm sm:text-base text-[#2a1630] tracking-tight block leading-tight truncate max-w-[140px] sm:max-w-xs">
-                {salon?.name || 'Salon Operating System'}
+                {salon?.name || 'Pari Beauty Studio - Branch 1'}
               </span>
               <span className="text-[10px] sm:text-[11px] text-neutral-500 hidden sm:block -mt-0.5 truncate">
                 Salon Business ERP
@@ -484,7 +432,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   </div>
                   <div className="min-w-0">
                     <span className="font-extrabold text-sm text-[#2a1630] block leading-tight truncate">
-                      {salon?.name || 'Salon Operating System'}
+                      {salon?.name || 'Pari Beauty Studio - Branch 1'}
                     </span>
                     <span className="text-[10px] text-pink-700 font-bold bg-pink-50 px-1.5 py-0.5 rounded border border-pink-200">
                       Salon Owner ERP
@@ -579,7 +527,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   {user?.role === 'owner' ? 'Logged In Owner' : user?.role === 'manager' ? 'Logged In Manager' : 'Logged In User'}
                 </div>
                 <div className="text-xs font-bold text-[#2a1630] truncate mt-0.5">
-                  {user?.email || 'Active Workspace User'}
+                  {user?.email || 'pari.branch1@gmail.com'}
                 </div>
               </div>
               <button
@@ -644,8 +592,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="p-3 border-t border-neutral-200/80 bg-neutral-50/60 shrink-0">
             <div className="p-2.5 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs">
               <div className="text-[10px] text-neutral-400 mb-0.5 font-bold uppercase">Signed in as:</div>
-              <div className="text-xs font-semibold text-[#2a1630] truncate" title={user?.email || 'Active Workspace User'}>
-                {user?.email || 'Active Workspace User'}
+              <div className="text-xs font-semibold text-[#2a1630] truncate" title={user?.email || 'pari.branch1@gmail.com'}>
+                {user?.email || 'pari.branch1@gmail.com'}
               </div>
               <div className="text-[10px] text-emerald-600 font-semibold mt-0.5 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>

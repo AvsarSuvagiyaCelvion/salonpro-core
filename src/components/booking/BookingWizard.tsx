@@ -131,9 +131,23 @@ export default function BookingWizard({ slug }: { slug: string }) {
         }
         const data = await res.json();
         setSalon(data.salon);
-        setServices(data.services || []);
+        const fetchedServices = data.services || [];
+        setServices(fetchedServices);
         setStaffList(data.staff || []);
         setStaffServices(data.staffServices || []);
+
+        // Restore selectedService from sessionStorage or default to first service
+        if (typeof window !== 'undefined') {
+          try {
+            const storedSvcId = sessionStorage.getItem(`salonpro_${slug}_svc_id`);
+            const matched = fetchedServices.find((s: Service) => s.id === storedSvcId);
+            if (matched) {
+              setSelectedService(matched);
+            } else if (fetchedServices.length > 0) {
+              setSelectedService(fetchedServices[0]);
+            }
+          } catch {}
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to load salon details');
       } finally {
@@ -207,13 +221,23 @@ export default function BookingWizard({ slug }: { slug: string }) {
         } else if (serverSlots.length === 0) {
           setAvailableSlots([]);
           if (isToday) {
-            setSlotNotice('The shop is closed for today (or all slots are booked). Please book an appointment for tomorrow or another date below.');
+            setSlotNotice('The shop is closed for today. Please book an appointment for another date.');
+            // Auto-select next available open date (e.g. Tomorrow)
+            const nextOpen = availableDates.find((d) => d.dateStr > todayISTStr && !d.isClosed);
+            if (nextOpen && nextOpen.dateStr !== selectedDate) {
+              setSelectedDate(nextOpen.dateStr);
+            }
           } else {
             setSlotNotice('No free slots available for this date. Please try another specialist or date.');
           }
         } else {
           setAvailableSlots(serverSlots);
-          setSlotNotice(null);
+          // Only clear notice if it wasn't a shop-closed message for today
+          if (!isToday && slotNotice?.includes('The shop is closed for today')) {
+            // Keep the notification banner so user knows why tomorrow was suggested
+          } else {
+            setSlotNotice(null);
+          }
         }
       } catch (err: any) {
         if (!isMounted) return;
@@ -365,6 +389,15 @@ export default function BookingWizard({ slug }: { slug: string }) {
       updateStep(4);
     } finally {
       setSlotsLoading(false);
+    }
+  }
+
+  function handleSelectService(svc: Service) {
+    setSelectedService(svc);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem(`salonpro_${slug}_svc_id`, svc.id);
+      } catch {}
     }
   }
 
@@ -562,13 +595,13 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Service Cards Grid */}
-            <div className="space-y-3 pb-8">
+            <div className="space-y-3 pb-36 sm:pb-44">
               {filteredServices.map((svc) => {
                 const isSelected = selectedService?.id === svc.id;
                 return (
                   <div
                     key={svc.id}
-                    onClick={() => setSelectedService(svc)}
+                    onClick={() => handleSelectService(svc)}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer flex justify-between items-center ${
                       isSelected
                         ? 'bg-neutral-900 border-pink-500 ring-2 ring-pink-500/20'
@@ -655,7 +688,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               </div>
             </div>
 
-            <div className="space-y-3 pb-8">
+            <div className="space-y-3 pb-36 sm:pb-44 max-h-[65vh] sm:max-h-[70vh] overflow-y-auto pr-1 touch-scroll scrollbar-thin">
               {/* Anyone Option */}
               <div
                 onClick={() => setSelectedStaffId('anyone')}
@@ -715,6 +748,24 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   </div>
                 );
               })}
+
+              {/* Inline Action Buttons for Desktop Viewports */}
+              <div className="hidden sm:flex items-center justify-between pt-4">
+                <button
+                  type="button"
+                  onClick={() => updateStep(1)}
+                  className="px-4 py-2.5 rounded-2xl bg-neutral-900 text-neutral-300 text-xs font-semibold hover:bg-neutral-800 cursor-pointer"
+                >
+                  ← Back to Services
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateStep(3)}
+                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95 cursor-pointer"
+                >
+                  Select Date & Time →
+                </button>
+              </div>
             </div>
 
             {/* Floating Next Button */}
@@ -822,11 +873,33 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <div className="py-10 px-4 text-center bg-neutral-900/40 rounded-3xl border border-neutral-800">
                   <span className="text-2xl block mb-2">🗓️</span>
                   <p className="text-xs sm:text-sm text-neutral-300 font-medium">
-                    {slotNotice || 'No slots available for this date. Please pick another date above.'}
+                    {slotNotice || 'The shop is closed for today. Please book an appointment for another date.'}
                   </p>
+                  {availableDates.find((d) => d.dateStr > selectedDate && !d.isClosed) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = availableDates.find((d) => d.dateStr > selectedDate && !d.isClosed);
+                        if (next) {
+                          setSelectedDate(next.dateStr);
+                          setSelectedSlot(null);
+                        }
+                      }}
+                      className="mt-4 px-5 py-2.5 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
+                    >
+                      <span>👉 View Available Slots for Tomorrow</span>
+                    </button>
+                  )}
                 </div>
               ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                <>
+                  {slotNotice && (
+                    <div className="mb-4 bg-amber-500/10 border border-amber-500/30 text-amber-300 p-3.5 rounded-2xl text-xs flex items-center gap-2.5">
+                      <span>ℹ️</span>
+                      <span>{slotNotice}</span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 pb-36 sm:pb-44">
                   {availableSlots.map((slot) => {
                     const isSelected = selectedSlot?.time === slot.time;
                     return (
@@ -850,6 +923,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     );
                   })}
                 </div>
+              </>
               )}
             </div>
 

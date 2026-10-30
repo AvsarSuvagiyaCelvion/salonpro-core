@@ -6,8 +6,8 @@ test.describe('STEP 5: UI/UX Responsive & Overflow Detection Across All Viewport
     { name: 'landing', url: '/' },
     { name: 'login', url: '/login' },
     { name: 'register-salon', url: '/register-salon' },
-    { name: 'customer-booking-salon-a', url: '/aura-glamour-studio' },
-    { name: 'customer-booking-salon-b', url: '/velvet-luxe-spa' },
+    { name: 'customer-booking-branch-1', url: '/pari-beauty-studio-branch-1' },
+    { name: 'customer-booking-branch-2', url: '/pari-beauty-studio-branch-2' },
     { name: 'customer-portal', url: '/portal' },
     { name: 'admin-login', url: '/admin/login' },
   ];
@@ -54,3 +54,4 @@ test.describe('STEP 5: UI/UX Responsive & Overflow Detection Across All Viewport
     });
   }
 });
+

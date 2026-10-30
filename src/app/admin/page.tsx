@@ -461,7 +461,7 @@ export default function AdminOverviewPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Velvet Beauty Lounge"
+                  placeholder="e.g. Luxury Hair Studio"
                   value={newSalonName}
                   onChange={(e) => {
                     setNewSalonName(e.target.value);
@@ -482,7 +482,7 @@ export default function AdminOverviewPage() {
                   <input
                     type="text"
                     required
-                    placeholder="velvet-lounge"
+                    placeholder="luxury-hair-studio"
                     value={newSalonSlug}
                     onChange={(e) => setNewSalonSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-28 pr-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-amber-500"

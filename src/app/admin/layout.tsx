@@ -51,62 +51,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <>{children}</>;
   }
 
-  // Security Guard: On Page Reload / Refresh, keep session active.
-  // On Browser Back / Forward navigation (or mobile swipe back/forward) or bfcache restore, require re-authentication.
-  useEffect(() => {
-    let isTerminating = false;
-
-    async function triggerSecurityReauth() {
-      if (isTerminating) return;
-      isTerminating = true;
-      try {
-        await fetch('/api/admin/logout', { method: 'POST' });
-      } catch {}
-      try {
-        localStorage.clear();
-        sessionStorage.clear();
-      } catch {}
-      window.location.href = `/admin/login?returnUrl=${encodeURIComponent(pathname)}&security=nav_reauth`;
-    }
-
-    // Check if initial document load was via back_forward navigation
-    if (typeof window !== 'undefined') {
-      try {
-        const navEntries = performance.getEntriesByType('navigation');
-        if (navEntries && navEntries.length > 0) {
-          const navTiming = navEntries[0] as PerformanceNavigationTiming;
-          if (navTiming.type === 'back_forward') {
-            triggerSecurityReauth();
-            return;
-          }
-        } else {
-          const legacyNav = (performance as any)?.navigation;
-          if (legacyNav && legacyNav.type === 2) {
-            triggerSecurityReauth();
-            return;
-          }
-        }
-      } catch {}
-    }
-
-    function handlePageShow(event: PageTransitionEvent) {
-      if (event.persisted) {
-        triggerSecurityReauth();
-      }
-    }
-
-    function handlePopState() {
-      triggerSecurityReauth();
-    }
-
-    window.addEventListener('pageshow', handlePageShow);
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('pageshow', handlePageShow);
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [pathname]);
+  // Normal browser back/forward navigation preserves valid sessions
+  useEffect(() => {}, [pathname]);
 
   async function handleAdminLogout() {
     setMobileMenuOpen(false);

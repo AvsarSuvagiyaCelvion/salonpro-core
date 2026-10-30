@@ -135,8 +135,48 @@ export default function CustomerPortalPage() {
       if (tabParam === 'bills' || tabParam === 'memberships' || tabParam === 'appointments') {
         setActiveTab(tabParam);
       }
+
+      // Check if user navigated here via Back / Forward button
+      try {
+        const navEntries = performance.getEntriesByType('navigation');
+        const navTiming = navEntries.length > 0 ? (navEntries[0] as PerformanceNavigationTiming) : null;
+        const legacyNav = (performance as any)?.navigation;
+        if (navTiming?.type === 'back_forward' || legacyNav?.type === 2) {
+          // Force security logout for back/forward navigation
+          fetch('/api/customer/logout', { method: 'POST' }).catch(() => {});
+          setLoggedIn(false);
+          setCustomer(null);
+          setLoading(false);
+          return;
+        }
+      } catch {}
     }
+
     checkSession();
+
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) {
+        // Revived from bfcache via Back/Forward
+        fetch('/api/customer/logout', { method: 'POST' }).catch(() => {});
+        setLoggedIn(false);
+        setCustomer(null);
+      }
+    }
+
+    function handlePopState() {
+      // Back/Forward button clicked
+      fetch('/api/customer/logout', { method: 'POST' }).catch(() => {});
+      setLoggedIn(false);
+      setCustomer(null);
+    }
+
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   function handleSwitchTab(tab: 'appointments' | 'bills' | 'memberships') {

@@ -11,6 +11,16 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [securityNotice, setSecurityNotice] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('security') === 'nav_reauth') {
+        setSecurityNotice('🔒 Security Verification: Session locked due to browser navigation. Please sign in again.');
+      }
+    }
+  }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -57,6 +67,13 @@ export default function AdminLoginPage() {
 
         {/* Login Card */}
         <div className="bg-white border border-slate-200/90 rounded-3xl p-7 sm:p-8 shadow-xl shadow-slate-900/5">
+          {securityNotice && (
+            <div className="mb-5 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center gap-2.5">
+              <span className="text-sm shrink-0">🛡️</span>
+              <span>{securityNotice}</span>
+            </div>
+          )}
+
           {error && (
             <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0" />

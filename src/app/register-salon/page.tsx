@@ -453,12 +453,15 @@ export default function RegisterSalonPage() {
               </button>
 
               <div className="text-center pt-3">
-                <p className="text-xs text-slate-500">
-                  Already have an existing salon account?{' '}
-                  <Link href="/salon-owner" className="font-bold text-[#b3135b] hover:underline">
-                    Sign in to your dashboard ➔
-                  </Link>
+                <p className="text-xs text-slate-500 block">
+                  Already have an existing salon account?
                 </p>
+                <Link
+                  href="/salon-owner"
+                  className="block mt-1 font-bold text-[#b3135b] hover:underline text-xs"
+                >
+                  Sign in to your dashboard ➔
+                </Link>
               </div>
             </form>
           </div>

@@ -207,6 +207,65 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     };
   }, [router]);
 
+  // Security Guard: On Page Reload / Refresh, keep session active.
+  // On Browser Back / Forward navigation (or mobile swipe back/forward) or bfcache restore, require re-authentication.
+  useEffect(() => {
+    let isTerminating = false;
+
+    async function triggerSecurityReauth() {
+      if (isTerminating) return;
+      isTerminating = true;
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+      } catch {}
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+      window.location.href = `/login?returnUrl=${encodeURIComponent(pathname)}&security=nav_reauth`;
+    }
+
+    // Check if initial document load was via back_forward navigation
+    if (typeof window !== 'undefined') {
+      try {
+        const navEntries = performance.getEntriesByType('navigation');
+        if (navEntries && navEntries.length > 0) {
+          const navTiming = navEntries[0] as PerformanceNavigationTiming;
+          if (navTiming.type === 'back_forward') {
+            triggerSecurityReauth();
+            return;
+          }
+        } else {
+          const legacyNav = (performance as any)?.navigation;
+          if (legacyNav && legacyNav.type === 2) {
+            triggerSecurityReauth();
+            return;
+          }
+        }
+      } catch {}
+    }
+
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) {
+        // Page was revived from Back-Forward Cache (bfcache)
+        triggerSecurityReauth();
+      }
+    }
+
+    function handlePopState() {
+      // User clicked browser Back / Forward buttons or used swipe gestures
+      triggerSecurityReauth();
+    }
+
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [pathname]);
+
   async function handleActivatePlan(planId: string) {
     setActivatingPlan(true);
     try {
@@ -270,7 +329,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="h-screen flex flex-col bg-[#faf8fa] text-[#2a1630] overflow-hidden">
+    <div className="min-h-screen lg:h-screen flex flex-col bg-[#faf8fa] text-[#2a1630] overflow-x-hidden lg:overflow-hidden">
       {/* Top Professional Trial Notification Banner (Only shown if on active 7-Day trial) */}
       {subscription?.isTrial && !subscription?.isTrialExpired && (
         <div className="shrink-0 bg-gradient-to-r from-purple-900 via-pink-900 to-[#b3135b] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-700 shadow-xs">
@@ -514,7 +573,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-visible lg:overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
         <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-neutral-200/80 flex-col h-full shrink-0 select-none">
           <div className="flex-1 overflow-y-auto py-3.5 px-3 space-y-0.5 no-scrollbar">
@@ -574,7 +633,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 w-full max-w-full pb-24 md:pb-8 touch-scroll">
+        <main className="flex-1 overflow-x-hidden lg:overflow-y-auto p-3.5 sm:p-6 lg:p-8 w-full max-w-full pb-24 md:pb-8 touch-scroll">
           <div className="max-w-7xl mx-auto w-full">
             {isExpiredLockout ? (
             <div className="max-w-4xl mx-auto py-8">

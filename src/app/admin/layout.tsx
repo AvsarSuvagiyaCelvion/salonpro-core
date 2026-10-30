@@ -51,6 +51,63 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <>{children}</>;
   }
 
+  // Security Guard: On Page Reload / Refresh, keep session active.
+  // On Browser Back / Forward navigation (or mobile swipe back/forward) or bfcache restore, require re-authentication.
+  useEffect(() => {
+    let isTerminating = false;
+
+    async function triggerSecurityReauth() {
+      if (isTerminating) return;
+      isTerminating = true;
+      try {
+        await fetch('/api/admin/logout', { method: 'POST' });
+      } catch {}
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+      window.location.href = `/admin/login?returnUrl=${encodeURIComponent(pathname)}&security=nav_reauth`;
+    }
+
+    // Check if initial document load was via back_forward navigation
+    if (typeof window !== 'undefined') {
+      try {
+        const navEntries = performance.getEntriesByType('navigation');
+        if (navEntries && navEntries.length > 0) {
+          const navTiming = navEntries[0] as PerformanceNavigationTiming;
+          if (navTiming.type === 'back_forward') {
+            triggerSecurityReauth();
+            return;
+          }
+        } else {
+          const legacyNav = (performance as any)?.navigation;
+          if (legacyNav && legacyNav.type === 2) {
+            triggerSecurityReauth();
+            return;
+          }
+        }
+      } catch {}
+    }
+
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) {
+        triggerSecurityReauth();
+      }
+    }
+
+    function handlePopState() {
+      triggerSecurityReauth();
+    }
+
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [pathname]);
+
   async function handleAdminLogout() {
     setMobileMenuOpen(false);
     setLoggingOut(true);
@@ -77,7 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-[#f8fafc] text-slate-900 font-sans selection:bg-amber-500 selection:text-white overflow-hidden">
+    <div className="min-h-screen lg:h-screen flex flex-col bg-[#f8fafc] text-slate-900 font-sans selection:bg-amber-500 selection:text-white overflow-x-hidden lg:overflow-hidden">
       {/* Top Super Admin Banner */}
       <div className="shrink-0 bg-[#0f172a] text-amber-300 text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-slate-800">
         <div className="flex items-center gap-1.5 text-[11px] sm:text-xs truncate">
@@ -281,7 +338,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-visible lg:overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
         <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-slate-200/90 flex-col h-full shrink-0 select-none">
           {/* Scrollable nav items section */}
@@ -367,7 +424,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Main Content Area - only this scrolls when user scrolls! */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 w-full max-w-full touch-scroll">
+        <main className="flex-1 overflow-x-hidden lg:overflow-y-auto p-3.5 sm:p-6 lg:p-8 w-full max-w-full touch-scroll">
           <div className="max-w-7xl mx-auto w-full">
             {children}
           </div>

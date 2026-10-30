@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Bricolage_Grotesque, DM_Sans } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 const bricolage = Bricolage_Grotesque({
@@ -31,6 +32,7 @@ export default function RootLayout({
     >
       <body className="min-h-full font-sans antialiased text-[#2a1630] bg-[#faf8fa]">
         {children}
+        <Analytics />
       </body>
     </html>
   );

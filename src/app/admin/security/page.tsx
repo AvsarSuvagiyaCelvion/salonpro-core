@@ -20,6 +20,7 @@ export default function AdminSecurityPage() {
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [newConfirmPassword, setNewConfirmPassword] = useState('');
   const [newRole, setNewRole] = useState<'super_admin' | 'admin'>('admin');
   const [saving, setSaving] = useState(false);
   const [modalMessage, setModalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -59,6 +60,18 @@ export default function AdminSecurityPage() {
     setSaving(true);
     setModalMessage(null);
 
+    if (newPassword.length < 8) {
+      setModalMessage({ type: 'error', text: 'Admin password must be at least 8 characters.' });
+      setSaving(false);
+      return;
+    }
+
+    if (newPassword !== newConfirmPassword) {
+      setModalMessage({ type: 'error', text: 'Passwords do not match. Please verify your confirm password.' });
+      setSaving(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/admin/admins', {
         method: 'POST',
@@ -67,6 +80,7 @@ export default function AdminSecurityPage() {
           name: newName,
           email: newEmail,
           password: newPassword,
+          confirmPassword: newConfirmPassword,
           role: newRole,
         }),
       });
@@ -82,6 +96,7 @@ export default function AdminSecurityPage() {
         setNewName('');
         setNewEmail('');
         setNewPassword('');
+        setNewConfirmPassword('');
         loadAdmins();
       }, 1200);
     } catch (err: any) {
@@ -292,9 +307,21 @@ export default function AdminSecurityPage() {
                 <input
                   type="password"
                   required
-                  placeholder="Minimum 6 characters"
+                  placeholder="Minimum 8 characters"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Confirm Admin Password *</label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Re-enter password"
+                  value={newConfirmPassword}
+                  onChange={(e) => setNewConfirmPassword(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-amber-500"
                 />
               </div>

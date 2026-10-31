@@ -92,6 +92,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [customerMobile, setCustomerMobile] = useState<string>('');
   const [bookingNote, setBookingNote] = useState<string>('');
   const [verificationCode, setVerificationCode] = useState<string>('');
+  const [confirmVerificationCode, setConfirmVerificationCode] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -426,9 +427,16 @@ export default function BookingWizard({ slug }: { slug: string }) {
       return;
     }
 
-    if (!verificationCode.trim() || verificationCode.trim().length < 4) {
-      setSubmitError('Please set a 4-digit security PIN for your customer portal access.');
-      return;
+    if (!activeCustomer) {
+      if (!verificationCode.trim() || verificationCode.trim().length < 4) {
+        setSubmitError('Please set a 4-digit security PIN for your customer portal access.');
+        return;
+      }
+
+      if (verificationCode !== confirmVerificationCode) {
+        setSubmitError('Security PINs do not match. Please verify your confirm PIN.');
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -443,6 +451,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
         name: customerName,
         mobile: customerMobile,
         code: verificationCode,
+        confirmCode: !activeCustomer ? confirmVerificationCode : undefined,
         note: bookingNote,
       };
 
@@ -1160,25 +1169,43 @@ export default function BookingWizard({ slug }: { slug: string }) {
               </div>
 
               {/* 4-digit verification code / portal PIN */}
-              <div className="bg-pink-500/10 border border-pink-500/30 rounded-2xl p-4">
-                <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs font-bold text-pink-300">
-                    Set 4-Digit Security PIN <span className="text-pink-500">*</span>
-                  </label>
+              {!activeCustomer && (
+                <div className="bg-pink-500/10 border border-pink-500/30 rounded-2xl p-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                    <div>
+                      <label className="block text-xs font-bold text-pink-300 mb-1.5">
+                        Set 4-Digit Security PIN <span className="text-pink-500">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        maxLength={6}
+                        required
+                        placeholder="Enter 4-digit PIN"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        className="w-full bg-neutral-900/90 border border-pink-500/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-pink-300 mb-1.5">
+                        Confirm 4-Digit PIN <span className="text-pink-500">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        maxLength={6}
+                        required
+                        placeholder="Re-enter 4-digit PIN"
+                        value={confirmVerificationCode}
+                        onChange={(e) => setConfirmVerificationCode(e.target.value)}
+                        className="w-full bg-neutral-900/90 border border-pink-500/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-neutral-400">
+                    You can use this 4-digit PIN to log into your Customer Portal (/portal) to view your visits, invoices, and rewards.
+                  </p>
                 </div>
-                <input
-                  type="password"
-                  maxLength={6}
-                  required
-                  placeholder="Enter 4-digit PIN"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                  className="w-full bg-neutral-900/90 border border-pink-500/40 rounded-xl px-4 py-2.5 text-center font-mono text-lg tracking-widest text-white focus:outline-none focus:border-pink-500"
-                />
-                <p className="text-[10px] text-neutral-400 mt-1">
-                  You can use this 4-digit PIN to log into your Customer Portal (/portal) to view your visits, invoices, and rewards.
-                </p>
-              </div>
+              )}
 
               {/* Inline Error if validation fails */}
               {submitError && (

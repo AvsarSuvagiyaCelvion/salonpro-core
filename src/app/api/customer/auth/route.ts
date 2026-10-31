@@ -48,7 +48,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { action, name, mobile, email, pin, salonId: reqSalonId, salonSlug } = body;
+    const { action, name, mobile, email, pin, confirmPin, salonId: reqSalonId, salonSlug } = body;
 
     let salonId = reqSalonId;
     if (!salonId && salonSlug) {
@@ -77,6 +77,10 @@ export async function POST(request: Request) {
     }
 
     if (action === 'signup') {
+      if (confirmPin !== undefined && cleanPin !== confirmPin?.trim()) {
+        return NextResponse.json({ error: 'PIN and Confirm PIN do not match.' }, { status: 400 });
+      }
+
       const cleanName = name?.trim();
       if (!cleanName) {
         return NextResponse.json({ error: 'Full name is required to sign up.' }, { status: 400 });

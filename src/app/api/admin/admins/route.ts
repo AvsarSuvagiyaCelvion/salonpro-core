@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     if (auth.error) return auth.error;
 
     const body = await request.json();
-    const { email, password, name, role } = body;
+    const { email, password, confirmPassword, name, role } = body;
 
     const cleanEmail = email?.trim().toLowerCase();
     const cleanPassword = password?.trim();
@@ -36,6 +36,13 @@ export async function POST(request: Request) {
     if (!cleanEmail || !cleanPassword || cleanPassword.length < 8) {
       return NextResponse.json(
         { error: 'Valid email and a secure password (minimum 8 characters) are required.' },
+        { status: 400 }
+      );
+    }
+
+    if (confirmPassword !== undefined && cleanPassword !== confirmPassword?.trim()) {
+      return NextResponse.json(
+        { error: 'Admin password and confirm password do not match.' },
         { status: 400 }
       );
     }

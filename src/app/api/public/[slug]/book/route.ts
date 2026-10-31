@@ -23,6 +23,7 @@ export async function POST(
       name,
       mobile,
       code,
+      confirmCode,
       note,
     } = body;
 
@@ -30,6 +31,13 @@ export async function POST(
     if (!cleanPin || cleanPin.length < 4) {
       return NextResponse.json(
         { error: 'Please enter a 4-digit security PIN for your customer portal access.' },
+        { status: 400 }
+      );
+    }
+
+    if (confirmCode !== undefined && cleanPin !== confirmCode?.trim()) {
+      return NextResponse.json(
+        { error: 'Security PIN and Confirm PIN do not match.' },
         { status: 400 }
       );
     }

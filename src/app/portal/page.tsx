@@ -90,6 +90,7 @@ export default function CustomerPortalPage() {
   const [authMobile, setAuthMobile] = useState('');
   const [authEmail, setAuthEmail] = useState('');
   const [authPin, setAuthPin] = useState('');
+  const [authConfirmPin, setAuthConfirmPin] = useState('');
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -155,6 +156,12 @@ export default function CustomerPortalPage() {
     setAuthSubmitting(true);
     setAuthError(null);
 
+    if (authMode === 'signup' && authPin !== authConfirmPin) {
+      setAuthError('PINs do not match. Please verify your confirm PIN.');
+      setAuthSubmitting(false);
+      return;
+    }
+
     try {
       const res = await fetch('/api/customer/auth', {
         method: 'POST',
@@ -165,6 +172,7 @@ export default function CustomerPortalPage() {
           mobile: authMobile,
           email: authEmail,
           pin: authPin,
+          confirmPin: authMode === 'signup' ? authConfirmPin : undefined,
         }),
       });
 
@@ -224,6 +232,7 @@ export default function CustomerPortalPage() {
               onClick={() => {
                 setAuthMode('login');
                 setAuthError(null);
+                setAuthConfirmPin('');
               }}
               className={`py-2 text-xs font-bold rounded-xl transition-all ${
                 authMode === 'login' ? 'bg-pink-500 text-white shadow-sm' : 'text-neutral-400 hover:text-white'
@@ -236,6 +245,7 @@ export default function CustomerPortalPage() {
               onClick={() => {
                 setAuthMode('signup');
                 setAuthError(null);
+                setAuthConfirmPin('');
               }}
               className={`py-2 text-xs font-bold rounded-xl transition-all ${
                 authMode === 'signup' ? 'bg-pink-500 text-white shadow-sm' : 'text-neutral-400 hover:text-white'
@@ -315,6 +325,23 @@ export default function CustomerPortalPage() {
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-2xl px-4 py-3 text-sm font-mono text-white placeholder-neutral-500 focus:outline-none focus:border-pink-500"
               />
             </div>
+
+            {authMode === 'signup' && (
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 mb-1.5">
+                  Confirm 4-Digit PIN <span className="text-pink-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  maxLength={6}
+                  required
+                  placeholder="Re-enter 4-digit PIN"
+                  value={authConfirmPin}
+                  onChange={(e) => setAuthConfirmPin(e.target.value)}
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-2xl px-4 py-3 text-sm font-mono text-white placeholder-neutral-500 focus:outline-none focus:border-pink-500"
+                />
+              </div>
+            )}
 
             <button
               type="submit"

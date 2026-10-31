@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   const client = await pool.connect();
   try {
     const body = await request.json();
-    const { salonName, ownerName, email, mobile, city, address, password, planId } = body;
+    const { salonName, ownerName, email, mobile, city, address, password, confirmPassword, planId } = body;
 
     const cleanSalonName = salonName?.trim();
     const cleanOwnerName = ownerName?.trim();
@@ -48,6 +48,13 @@ export async function POST(request: Request) {
     if (!cleanPassword || cleanPassword.length < 6) {
       return NextResponse.json(
         { error: 'Password is required and must be at least 6 characters.' },
+        { status: 400 }
+      );
+    }
+
+    if (confirmPassword !== undefined && cleanPassword !== confirmPassword?.trim()) {
+      return NextResponse.json(
+        { error: 'Password and Confirm Password do not match.' },
         { status: 400 }
       );
     }

@@ -35,6 +35,7 @@ export default function RegisterSalonPage() {
   const [mobile, setMobile] = useState('');
   const [city, setCity] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Plans & Trial State
   const [plans, setPlans] = useState<any[]>([]);
@@ -85,6 +86,7 @@ export default function RegisterSalonPage() {
           mobile,
           city,
           password,
+          confirmPassword,
           planId: planIdToSubmit,
         }),
       });
@@ -115,13 +117,18 @@ export default function RegisterSalonPage() {
     e.preventDefault();
     setError(null);
 
-    if (!salonName.trim() || !ownerName.trim() || !mobile.trim() || !email.trim() || !password.trim()) {
+    if (!salonName.trim() || !ownerName.trim() || !mobile.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       setError('Please fill in all required fields.');
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please verify your confirm password.');
       return;
     }
 
@@ -333,24 +340,24 @@ export default function RegisterSalonPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Email Address <span className="text-[#b3135b]">*</span>
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="owner@example.com"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-300 focus:border-[#b3135b] focus:ring-2 focus:ring-[#b3135b]/20 outline-none text-sm transition-all text-slate-900 bg-slate-50/50 focus:bg-white"
-                    />
-                  </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Email Address <span className="text-[#b3135b]">*</span>
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="owner@example.com"
+                    className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-300 focus:border-[#b3135b] focus:ring-2 focus:ring-[#b3135b]/20 outline-none text-sm transition-all text-slate-900 bg-slate-50/50 focus:bg-white"
+                  />
                 </div>
+              </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                     Create Password <span className="text-[#b3135b]">*</span>
@@ -363,6 +370,23 @@ export default function RegisterSalonPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Min 6 characters"
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-300 focus:border-[#b3135b] focus:ring-2 focus:ring-[#b3135b]/20 outline-none text-sm transition-all text-slate-900 bg-slate-50/50 focus:bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Confirm Password <span className="text-[#b3135b]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter password"
                       className="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-300 focus:border-[#b3135b] focus:ring-2 focus:ring-[#b3135b]/20 outline-none text-sm transition-all text-slate-900 bg-slate-50/50 focus:bg-white"
                     />
                   </div>

@@ -55,7 +55,7 @@ interface PlanStats {
 }
 
 const ALL_FLAGS: { key: string; label: string; desc: string; category: string }[] = [
-  { key: 'logo_upload', label: 'Custom Logo Upload', desc: 'Allow salon to upload brand logo on receipts & portal', category: 'Branding' },
+  { key: 'logo_upload', label: 'Custom Logo Upload', desc: 'Allow salon to upload brand logo on receipts & portal', category: 'General' },
   { key: 'commission_report', label: 'Staff Commission & Payroll', desc: 'Auto-compute stylist earnings and commission sheets', category: 'Staff & Payroll' },
   { key: 'memberships', label: 'VIP Memberships & Packages', desc: 'Create prepaid discount passes & client loyalty tiers', category: 'Marketing' },
   { key: 'calendar_view', label: 'Calendar Grid View', desc: 'Visual timeline view for staff and chair bookings', category: 'Operations' },

@@ -68,7 +68,6 @@ export default function AdminOverviewPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newSalonName, setNewSalonName] = useState('');
   const [newSalonSlug, setNewSalonSlug] = useState('');
-  const [newBrandColor, setNewBrandColor] = useState('#b3135b');
   const [newPhone, setNewPhone] = useState('');
   const [savingSalon, setSavingSalon] = useState(false);
   const [modalMessage, setModalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -117,7 +116,6 @@ export default function AdminOverviewPage() {
         body: JSON.stringify({
           name: newSalonName,
           slug: newSalonSlug,
-          brand_color: newBrandColor,
           phone: newPhone,
         }),
       });
@@ -307,7 +305,7 @@ export default function AdminOverviewPage() {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px] bg-slate-50/50">
-                <th className="py-3 px-3">Salon & Branding</th>
+                <th className="py-3 px-3">Salon Details</th>
                 <th className="py-3 px-3">Booking Slug</th>
                 <th className="py-3 px-3">Hours</th>
                 <th className="py-3 px-3 text-center">Stylists</th>
@@ -490,35 +488,15 @@ export default function AdminOverviewPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Brand Accent Color</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={newBrandColor}
-                      onChange={(e) => setNewBrandColor(e.target.value)}
-                      className="w-10 h-10 rounded-xl bg-transparent border-0 cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={newBrandColor}
-                      onChange={(e) => setNewBrandColor(e.target.value)}
-                      className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-mono text-slate-900"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">WhatsApp / Phone</label>
-                  <input
-                    type="tel"
-                    placeholder="9898012345"
-                    value={newPhone}
-                    onChange={(e) => setNewPhone(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">WhatsApp / Phone</label>
+                <input
+                  type="tel"
+                  placeholder="9898012345"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500"
+                />
               </div>
 
               <button

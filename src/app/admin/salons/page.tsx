@@ -47,7 +47,6 @@ export default function AdminSalonsPage() {
   const [broadcastSuccess, setBroadcastSuccess] = useState(false);
   const [newSalonName, setNewSalonName] = useState('');
   const [newSalonSlug, setNewSalonSlug] = useState('');
-  const [newBrandColor, setNewBrandColor] = useState('#b3135b');
   const [newPhone, setNewPhone] = useState('');
   const [savingSalon, setSavingSalon] = useState(false);
   const [modalMessage, setModalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -217,7 +216,6 @@ export default function AdminSalonsPage() {
         body: JSON.stringify({
           name: newSalonName,
           slug: newSalonSlug,
-          brand_color: newBrandColor,
           phone: newPhone,
         }),
       });
@@ -596,24 +594,6 @@ export default function AdminSalonsPage() {
                   onChange={(e) => setNewPhone(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-amber-500"
                 />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Theme Brand Color</label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    value={newBrandColor}
-                    onChange={(e) => setNewBrandColor(e.target.value)}
-                    className="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={newBrandColor}
-                    onChange={(e) => setNewBrandColor(e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-mono text-slate-900 focus:outline-none focus:border-amber-500"
-                  />
-                </div>
               </div>
 
               <button

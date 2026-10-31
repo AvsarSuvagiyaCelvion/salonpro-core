@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Settings,
   Store,
-  Palette,
   Calendar,
   Clock,
   Shield,
@@ -19,15 +18,6 @@ import {
   MapPin,
   AlertCircle,
 } from 'lucide-react';
-
-const COLOR_PRESETS = [
-  { name: 'Berry Rose', hex: '#b3135b' },
-  { name: 'Royal Violet', hex: '#7c3aed' },
-  { name: 'Emerald Spa', hex: '#059669' },
-  { name: 'Warm Amber', hex: '#d97706' },
-  { name: 'Midnight Blue', hex: '#2563eb' },
-  { name: 'Classic Slate', hex: '#334155' },
-];
 
 const DAYS_OF_WEEK = [
   { day: 1, label: 'Mon' },
@@ -52,7 +42,6 @@ export default function SettingsPage() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
-  const [brandColor, setBrandColor] = useState('#b3135b');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   // Booking settings
@@ -67,7 +56,7 @@ export default function SettingsPage() {
   const [sendReminders, setSendReminders] = useState(true);
 
   // Active section tab
-  const [activeSection, setActiveSection] = useState<'salon' | 'branding' | 'booking'>('salon');
+  const [activeSection, setActiveSection] = useState<'salon' | 'booking'>('salon');
 
   useEffect(() => {
     async function loadSettings() {
@@ -84,7 +73,6 @@ export default function SettingsPage() {
           setName(s.name || '');
           setAddress(s.address || '');
           setPhone(s.phone || '');
-          setBrandColor(s.brand_color || '#b3135b');
           setLogoUrl(s.logo_url || null);
           setBookingEnabled(s.booking_enabled ?? true);
           setOpenTime(s.open_time ? s.open_time.slice(0, 5) : '10:00');
@@ -178,7 +166,6 @@ export default function SettingsPage() {
         name,
         address,
         phone,
-        brand_color: brandColor,
         logo_url: logoUrl,
         booking_enabled: bookingEnabled,
         open_time: formatTimeForDb(openTime),
@@ -244,10 +231,10 @@ export default function SettingsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
-            Settings & Branding
+            Salon Settings
           </h1>
           <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-            Configure salon details, brand color theme, and public booking portal
+            Configure salon profile, working hours, and public booking portal
           </p>
         </div>
 
@@ -282,7 +269,6 @@ export default function SettingsPage() {
       <div className="flex gap-2 border-b border-neutral-200 pb-2 overflow-x-auto">
         {[
           { id: 'salon', label: 'Salon Details', icon: Store },
-          { id: 'branding', label: 'Branding & Theme', icon: Palette },
           { id: 'booking', label: 'Booking & Timings', icon: Calendar },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -380,122 +366,56 @@ export default function SettingsPage() {
                   Slug is uniquely assigned to your salon studio.
                 </span>
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* ================= SECTION 2: BRANDING & THEME ================= */}
-        {activeSection === 'branding' && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-6">
-            <div>
-              <h2 className="text-base font-bold text-[#2a1630]">Branding & Theme Colors</h2>
-              <p className="text-xs text-neutral-400 mt-0.5">
-                Customize your salon&apos;s brand accent color across the client booking portal and receipts
-              </p>
-            </div>
+              {/* Logo Upload Section */}
+              <div className="pt-4 border-t border-neutral-100 sm:col-span-2">
+                <label className="block text-xs font-bold text-neutral-700 mb-2">
+                  Salon Logo (Optional)
+                </label>
 
-            {/* Brand Color Presets */}
-            <div>
-              <label className="block text-xs font-bold text-neutral-700 mb-2">
-                Brand Accent Palette
-              </label>
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-16 h-16 rounded-2xl bg-[#b3135b] flex items-center justify-center font-bold text-white text-2xl shadow-md overflow-hidden relative"
+                  >
+                    {logoUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={logoUrl} alt="Salon Logo" className="w-full h-full object-cover" />
+                    ) : (
+                      name.charAt(0) || 'S'
+                    )}
+                  </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                {COLOR_PRESETS.map((p) => {
-                  const isSelected = brandColor.toLowerCase() === p.hex.toLowerCase();
-                  return (
-                    <button
-                      key={p.hex}
-                      type="button"
-                      onClick={() => setBrandColor(p.hex)}
-                      className={`p-3 rounded-2xl border flex flex-col items-center gap-2 transition-all ${
-                        isSelected
-                          ? 'border-neutral-900 ring-2 ring-neutral-900/10 shadow-sm scale-102 bg-neutral-50'
-                          : 'border-neutral-200 hover:border-neutral-300'
-                      }`}
-                    >
-                      <span
-                        style={{ backgroundColor: p.hex }}
-                        className="w-8 h-8 rounded-full shadow-inner border border-black/10 flex items-center justify-center text-white text-xs font-bold"
+                  <div className="space-y-1.5">
+                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold cursor-pointer border border-neutral-200 transition-all">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload Logo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoFile}
+                        className="hidden"
+                      />
+                    </label>
+                    {logoUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setLogoUrl(null)}
+                        className="block text-[11px] text-rose-600 hover:underline font-medium"
                       >
-                        {isSelected && '✓'}
-                      </span>
-                      <span className="text-xs font-semibold text-neutral-700">{p.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Custom Hex Color Picker */}
-              <div className="flex items-center gap-3 p-3 bg-neutral-50 rounded-2xl border border-neutral-200 max-w-sm">
-                <input
-                  type="color"
-                  value={brandColor}
-                  onChange={(e) => setBrandColor(e.target.value)}
-                  className="w-9 h-9 rounded-xl cursor-pointer border-0 bg-transparent p-0"
-                />
-                <div className="flex-1">
-                  <span className="text-[10px] uppercase font-bold text-neutral-400 block">Custom Hex</span>
-                  <input
-                    type="text"
-                    value={brandColor}
-                    onChange={(e) => setBrandColor(e.target.value)}
-                    className="font-mono text-xs font-bold uppercase text-neutral-800 bg-transparent focus:outline-none"
-                    placeholder="#b3135b"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Logo Upload Section */}
-            <div className="pt-4 border-t border-neutral-100">
-              <label className="block text-xs font-bold text-neutral-700 mb-2">
-                Salon Logo
-              </label>
-
-              <div className="flex items-center gap-4">
-                <div
-                  style={{ backgroundColor: brandColor }}
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-white text-2xl shadow-md overflow-hidden relative"
-                >
-                  {logoUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={logoUrl} alt="Salon Logo" className="w-full h-full object-cover" />
-                  ) : (
-                    name.charAt(0)
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold cursor-pointer border border-neutral-200 transition-all">
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Upload New Logo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoFile}
-                      className="hidden"
-                    />
-                  </label>
-                  {logoUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setLogoUrl(null)}
-                      className="block text-[11px] text-rose-600 hover:underline font-medium"
-                    >
-                      Remove logo (use initial)
-                    </button>
-                  )}
-                  <p className="text-[10px] text-neutral-400">
-                    Recommended: Square PNG or JPG, max 2MB
-                  </p>
+                        Remove logo
+                      </button>
+                    )}
+                    <p className="text-[10px] text-neutral-400">
+                      Recommended: Square PNG or JPG, max 2MB (displayed on receipts & invoices)
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* ================= SECTION 3: BOOKING & TIMINGS ================= */}
+        {/* ================= SECTION 2: BOOKING & TIMINGS ================= */}
         {activeSection === 'booking' && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-6">
             {/* Public Link Box */}

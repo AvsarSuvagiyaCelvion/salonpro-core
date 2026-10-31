@@ -57,4 +57,5 @@ scripts/run-smoke-suite.js
 scripts/smoke-test-clean-db.js
 scripts/test-conn.js
 scripts/verify-keywords.js
+scripts/reset-password.js
 

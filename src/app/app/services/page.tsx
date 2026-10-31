@@ -406,8 +406,8 @@ export default function ServicesPage() {
                   <input
                     type="number"
                     required
-                    min="5"
-                    step="5"
+                    min="1"
+                    step="1"
                     value={formDuration}
                     onChange={(e) => setFormDuration(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
@@ -423,9 +423,10 @@ export default function ServicesPage() {
                   type="number"
                   required
                   min="0"
-                  step="50"
+                  step="any"
                   value={formPrice}
                   onChange={(e) => setFormPrice(e.target.value)}
+                  placeholder="e.g. 499, 999 or 1099"
                   className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
                 />
               </div>

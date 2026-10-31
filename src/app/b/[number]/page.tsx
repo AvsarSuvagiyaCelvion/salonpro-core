@@ -8,6 +8,17 @@ export const metadata = {
 
 export const instant = false;
 
+function maskMobile(mobile: string | null | undefined): string {
+  if (!mobile) return '';
+  const digits = mobile.replace(/\D/g, '');
+  if (digits.length >= 10) {
+    const first2 = digits.slice(0, 2);
+    const last3 = digits.slice(-3);
+    return `${first2}${'X'.repeat(digits.length - 5)}${last3}`;
+  }
+  return mobile;
+}
+
 export default async function PublicBillPage({
   params,
 }: {
@@ -16,7 +27,7 @@ export default async function PublicBillPage({
   const { number } = await params;
   const decodedNumber = decodeURIComponent(number);
 
-  // Query invoice
+  // Query invoice by unguessable receipt_token or invoice number/id
   const invRes = await query(
     `SELECT i.*, 
             s.name as salon_name, s.address as salon_address, s.phone as salon_phone,
@@ -24,7 +35,7 @@ export default async function PublicBillPage({
      FROM invoices i
      JOIN salons s ON i.salon_id = s.id
      JOIN customers c ON i.customer_id = c.id
-     WHERE i.number = $1 OR i.id::text = $1
+     WHERE i.receipt_token = $1 OR i.number = $1 OR i.id::text = $1
      LIMIT 1`,
     [decodedNumber]
   );
@@ -146,7 +157,7 @@ export default async function PublicBillPage({
           <div className="flex justify-between items-center">
             <div>
               <div className="font-bold text-neutral-900 text-base">{invoice.customer_name}</div>
-              <div className="text-xs text-neutral-500 font-mono mt-0.5">{invoice.customer_mobile}</div>
+              <div className="text-xs text-neutral-500 font-mono mt-0.5">{maskMobile(invoice.customer_mobile)}</div>
             </div>
             <div className="text-right text-xs text-neutral-400">
               Verified Client

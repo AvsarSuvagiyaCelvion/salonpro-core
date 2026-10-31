@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForgotNotice, setShowForgotNotice] = useState(false);
+  const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -174,30 +176,30 @@ export default function LoginPage() {
                   <p className="leading-relaxed text-[11px] text-amber-800">
                     Salon accounts are safeguarded by Platform Security. If you forgot your password, contact our dedicated{' '}
                     <a
-                      href={`https://wa.me/918320653782?text=${encodeURIComponent(
+                      href={`https://wa.me/91${supportPhone}?text=${encodeURIComponent(
                         `Hello Platform Support, I am a registered Salon Owner (${email || 'my salon'}) and need assistance resetting my password.`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-bold text-[#b3135b] underline hover:text-[#960f4c] cursor-pointer inline-flex items-center gap-0.5"
                     >
-                      Platform Support (+91 8320653782)
+                      Platform Support (+91 {supportPhone})
                     </a>{' '}
                     team to issue a secure password reset.
                   </p>
                   <div className="pt-2 border-t border-amber-200/60 flex flex-col sm:flex-row gap-2">
                     <a
-                      href={`https://wa.me/918320653782?text=${encodeURIComponent(
+                      href={`https://wa.me/91${supportPhone}?text=${encodeURIComponent(
                         `Hello Platform Support, I am a registered Salon Owner (${email || 'my salon'}) and need assistance resetting my password.`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                     >
-                      <span>💬 WhatsApp (+91 8320653782)</span>
+                      <span>💬 WhatsApp (+91 {supportPhone})</span>
                     </a>
                     <a
-                      href={`mailto:avsarsuvagiya968@gmail.com?subject=SalonPro%20Owner%20Password%20Reset%20Request&body=Hello%20Platform%20Support,%0D%0A%0D%0AI%20am%20requesting%20a%20password%20reset%20for%20my%20salon%20owner%20account:%20${encodeURIComponent(
+                      href={`mailto:${supportEmail}?subject=SalonPro%20Owner%20Password%20Reset%20Request&body=Hello%20Platform%20Support,%0D%0A%0D%0AI%20am%20requesting%20a%20password%20reset%20for%20my%20salon%20owner%20account:%20${encodeURIComponent(
                         email || ''
                       )}`}
                       className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"

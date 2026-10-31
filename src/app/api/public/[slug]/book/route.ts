@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import pool, { query } from '@/lib/db';
 import { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth';
 import { getSalonPlan } from '@/lib/plan';
+import bcrypt from 'bcryptjs';
 
 export async function POST(
   request: Request,
@@ -42,7 +43,8 @@ export async function POST(
 
     // 2. Fetch salon
     const salonRes = await query(
-      `SELECT id, name, slug, phone, brand_color, buffer_minutes, is_active 
+      `SELECT id, name, slug, phone, brand_color, buffer_minutes, is_active,
+              open_time, close_time, working_days, min_advance_hours, max_advance_days 
        FROM salons 
        WHERE slug = $1 LIMIT 1`,
       [slug]
@@ -79,7 +81,6 @@ export async function POST(
     );
 
     if (serviceRes.rows.length === 0) {
-      client.release();
       return NextResponse.json({ error: 'Service not found' }, { status: 404 });
     }
 
@@ -90,7 +91,64 @@ export async function POST(
     const startsAt = new Date(`${date.trim()}T${cleanT}+05:30`);
     const endsAt = new Date(startsAt.getTime() + service.duration_min * 60000);
 
-    // 4. Resolve Staff member
+    // 4. Server-Side Validations (Asia/Kolkata)
+    // 4.1 Past time validation
+    if (startsAt.getTime() <= Date.now()) {
+      return NextResponse.json(
+        { error: 'This time slot is in the past. Please select an upcoming slot.' },
+        { status: 400 }
+      );
+    }
+
+    // 4.2 Working day validation (UTC noon ensures accurate calendar weekday mapping)
+    const dayOfWeek = new Date(`${date.trim()}T12:00:00Z`).getUTCDay();
+    const workingDays =
+      salon.working_days && salon.working_days.length > 0
+        ? salon.working_days
+        : [1, 2, 3, 4, 5, 6];
+    if (!workingDays.includes(dayOfWeek)) {
+      return NextResponse.json(
+        { error: 'The salon is closed on this day. Please select another date.' },
+        { status: 400 }
+      );
+    }
+
+    // 4.3 Open and close hours validation
+    const slotStartM =
+      parseInt(cleanT.split(':')[0], 10) * 60 + parseInt(cleanT.split(':')[1], 10);
+    const slotEndM = slotStartM + service.duration_min;
+    const [openH, openMin] = (salon.open_time || '09:00').split(':').map(Number);
+    const [closeH, closeMin] = (salon.close_time || '21:00').split(':').map(Number);
+    const openM = openH * 60 + (openMin || 0);
+    const closeM = closeH * 60 + (closeMin || 0);
+    if (slotStartM < openM || slotEndM > closeM) {
+      return NextResponse.json(
+        {
+          error: `The requested time (${cleanT.slice(0, 5)}) is outside salon operating hours (${salon.open_time || '09:00'} - ${salon.close_time || '21:00'}).`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 4.4 Min advance hours validation
+    const minAdvanceHours = Number(salon.min_advance_hours || 0);
+    if (minAdvanceHours > 0 && startsAt.getTime() < Date.now() + minAdvanceHours * 3600000) {
+      return NextResponse.json(
+        { error: `Bookings require at least ${minAdvanceHours} hour(s) advance notice.` },
+        { status: 400 }
+      );
+    }
+
+    // 4.5 Max advance days validation
+    const maxAdvanceDays = Number(salon.max_advance_days || 30);
+    if (startsAt.getTime() > Date.now() + maxAdvanceDays * 86400000) {
+      return NextResponse.json(
+        { error: `Bookings are only accepted up to ${maxAdvanceDays} days in advance.` },
+        { status: 400 }
+      );
+    }
+
+    // 5. Resolve Staff member
     let finalStaffId = staff_id;
     if (!finalStaffId || finalStaffId === 'anyone') {
       // Find an active eligible staff member free at this slot
@@ -125,36 +183,6 @@ export async function POST(
       finalStaffId = candidateStaff.rows[0].id;
     }
 
-    // 5. Customer upsert
-    let customerId: string;
-    const cleanMobile = mobile.trim();
-    const cleanName = name.trim();
-
-    const existingCust = await query(
-      `SELECT id, name, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
-      [salon.id, cleanMobile]
-    );
-
-    if (existingCust.rows.length > 0) {
-      customerId = existingCust.rows[0].id;
-      if (existingCust.rows[0].pin && existingCust.rows[0].pin !== cleanPin) {
-        return NextResponse.json(
-          { error: 'Incorrect customer PIN for this mobile number. Please enter your existing PIN or log in first.' },
-          { status: 401 }
-        );
-      }
-      await query(
-        `UPDATE customers SET name = $1, pin = COALESCE(pin, $2) WHERE id = $3`,
-        [cleanName, cleanPin, customerId]
-      );
-    } else {
-      const newCust = await query(
-        `INSERT INTO customers (salon_id, name, mobile, pin) VALUES ($1, $2, $3, $4) RETURNING id`,
-        [salon.id, cleanName, cleanMobile, cleanPin]
-      );
-      customerId = newCust.rows[0].id;
-    }
-
     // 6. ATOMIC TRANSACTION WITH POSTGRES ADVISORY LOCK & EXCLUSION CONSTRAINT
     client = await pool.connect();
     await client.query('BEGIN');
@@ -179,6 +207,7 @@ export async function POST(
       await client.query('ROLLBACK');
       inTransaction = false;
       client.release();
+      client = null;
       return NextResponse.json(
         {
           isOverlap: true,
@@ -186,6 +215,54 @@ export async function POST(
         },
         { status: 409 }
       );
+    }
+
+    // Customer lookup or creation INSIDE transaction
+    let customerId: string;
+    const cleanMobile = mobile.trim();
+    const cleanName = name.trim();
+
+    const existingCust = await client.query(
+      `SELECT id, name, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
+      [salon.id, cleanMobile]
+    );
+
+    if (existingCust.rows.length > 0) {
+      customerId = existingCust.rows[0].id;
+      const storedPin = existingCust.rows[0].pin;
+      if (storedPin) {
+        const isMatch =
+          (await bcrypt.compare(cleanPin, storedPin)) || storedPin === cleanPin;
+        if (!isMatch) {
+          await client.query('ROLLBACK');
+          inTransaction = false;
+          client.release();
+          client = null;
+          return NextResponse.json(
+            { error: 'Incorrect customer PIN for this mobile number. Please enter your existing PIN or log in first.' },
+            { status: 401 }
+          );
+        }
+        // If stored in plaintext, upgrade to bcrypt
+        if (!storedPin.startsWith('$2')) {
+          const newHash = await bcrypt.hash(cleanPin, 10);
+          await client.query('UPDATE customers SET pin = $1 WHERE id = $2', [newHash, customerId]);
+        }
+      } else {
+        const newHash = await bcrypt.hash(cleanPin, 10);
+        await client.query('UPDATE customers SET pin = $1 WHERE id = $2', [newHash, customerId]);
+      }
+      await client.query(
+        `UPDATE customers SET name = $1 WHERE id = $2`,
+        [cleanName, customerId]
+      );
+    } else {
+      const hashedPin = await bcrypt.hash(cleanPin, 10);
+      const newCust = await client.query(
+        `INSERT INTO customers (salon_id, name, mobile, pin) VALUES ($1, $2, $3, $4) RETURNING id`,
+        [salon.id, cleanName, cleanMobile, hashedPin]
+      );
+      customerId = newCust.rows[0].id;
     }
 
     // Insert appointment inside transaction
@@ -209,6 +286,7 @@ export async function POST(
     await client.query('COMMIT');
     inTransaction = false;
     client.release();
+    client = null;
 
     const newAppt = apptRes.rows[0];
 

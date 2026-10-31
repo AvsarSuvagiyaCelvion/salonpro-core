@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import { getDefaultSalonId } from '@/lib/salon';
 import {
@@ -7,6 +8,11 @@ import {
   createCustomerSessionToken,
   verifyCustomerSessionToken,
 } from '@/lib/auth';
+import {
+  checkRateLimit,
+  recordFailedAttempt,
+  resetRateLimit,
+} from '@/lib/rate-limit';
 
 export async function GET() {
   try {
@@ -76,33 +82,34 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Full name is required to sign up.' }, { status: 400 });
       }
 
-      // Check if customer already exists
+      // Check if customer already exists - existing account must NOT overwrite PIN!
       const existing = await query(
-        `SELECT id, name, mobile, email, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
+        `SELECT id, name, mobile, email, pin FROM customers WHERE (salon_id = $1 AND mobile = $2) OR mobile = $2 LIMIT 1`,
         [salonId, cleanMobile]
       );
 
-      let customer;
       if (existing.rows.length > 0) {
-        // Update customer details and pin
-        const updated = await query(
-          `UPDATE customers 
-           SET name = $1, email = COALESCE($2, email), pin = $3
-           WHERE id = $4
-           RETURNING id, name, mobile, email`,
-          [cleanName, email?.trim() || null, cleanPin, existing.rows[0].id]
+        return NextResponse.json(
+          {
+            error: 'An account with this mobile number already exists. Please sign in with your PIN or request support.',
+            code: 'ACCOUNT_EXISTS',
+            requiresLogin: true,
+          },
+          { status: 409 }
         );
-        customer = updated.rows[0];
-      } else {
-        // Create new customer
-        const created = await query(
-          `INSERT INTO customers (salon_id, name, mobile, email, pin)
-           VALUES ($1, $2, $3, $4, $5)
-           RETURNING id, name, mobile, email`,
-          [salonId, cleanName, cleanMobile, email?.trim() || null, cleanPin]
-        );
-        customer = created.rows[0];
       }
+
+      // Hash PIN securely with bcrypt
+      const hashedPin = await bcrypt.hash(cleanPin, 10);
+
+      // Create new customer with hashed PIN
+      const created = await query(
+        `INSERT INTO customers (salon_id, name, mobile, email, pin)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, name, mobile, email`,
+        [salonId, cleanName, cleanMobile, email?.trim() || null, hashedPin]
+      );
+      const customer = created.rows[0];
 
       // Create session cookie
       const token = await createCustomerSessionToken({
@@ -130,7 +137,17 @@ export async function POST(request: Request) {
 
       return response;
     } else if (action === 'login') {
-      // Find customer in target salon, or across salons by mobile
+      // 1. Rate limiting check & lockout protection
+      const rateLimitKey = `customer:${cleanMobile}`;
+      const rlCheck = await checkRateLimit(rateLimitKey, 5, 900);
+      if (rlCheck.isLocked) {
+        return NextResponse.json(
+          { error: rlCheck.errorMessage || 'Too many failed login attempts. Your account is temporarily locked for 15 minutes.' },
+          { status: 429 }
+        );
+      }
+
+      // 2. Find customer in target salon, or across salons by mobile
       let custRes = await query(
         `SELECT id, salon_id, name, mobile, email, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
         [salonId, cleanMobile]
@@ -153,18 +170,46 @@ export async function POST(request: Request) {
       const customer = custRes.rows[0];
       const actualSalonId = customer.salon_id || salonId;
 
-      // Validate customer's secret PIN
-      if (customer.pin && customer.pin !== cleanPin) {
+      // 3. Verify bcrypt-hashed PIN or migrate legacy plain text
+      let isPinValid = false;
+      if (customer.pin) {
+        if (customer.pin.startsWith('$2a$') || customer.pin.startsWith('$2b$')) {
+          isPinValid = await bcrypt.compare(cleanPin, customer.pin);
+        } else {
+          // Legacy plain text check & migration
+          isPinValid = (customer.pin === cleanPin);
+          if (isPinValid) {
+            const newHash = await bcrypt.hash(cleanPin, 10);
+            await query(`UPDATE customers SET pin = $1 WHERE id = $2`, [newHash, customer.id]);
+          }
+        }
+      } else {
+        // Customer had no PIN set (e.g. booked before PIN requirement), set it on initial login
+        const newHash = await bcrypt.hash(cleanPin, 10);
+        await query(`UPDATE customers SET pin = $1 WHERE id = $2`, [newHash, customer.id]);
+        isPinValid = true;
+      }
+
+      if (!isPinValid) {
+        const failResult = await recordFailedAttempt(rateLimitKey, 5, 900);
+        if (failResult.isLocked) {
+          return NextResponse.json(
+            { error: failResult.errorMessage || 'Too many failed login attempts. Account is temporarily locked.' },
+            { status: 429 }
+          );
+        }
+
         return NextResponse.json(
-          { error: 'Incorrect PIN. If you forgot your PIN, please select "New Account" to reset it.' },
+          {
+            error: `Incorrect PIN. ${failResult.remainingAttempts} attempt${failResult.remainingAttempts === 1 ? '' : 's'} remaining before temporary lockout.`,
+            remainingAttempts: failResult.remainingAttempts,
+          },
           { status: 401 }
         );
       }
 
-      // If customer had no PIN, set it
-      if (!customer.pin) {
-        await query(`UPDATE customers SET pin = $1 WHERE id = $2`, [cleanPin, customer.id]);
-      }
+      // Successful login -> reset rate limit counter
+      await resetRateLimit(rateLimitKey);
 
       const token = await createCustomerSessionToken({
         customerId: customer.id,

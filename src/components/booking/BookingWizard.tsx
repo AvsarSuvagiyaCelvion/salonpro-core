@@ -172,7 +172,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
       const d = new Date(baseDate);
       d.setDate(baseDate.getDate() + i);
       const dateStr = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-      const dayOfWeek = d.getDay();
+      const dayOfWeek = new Date(`${dateStr}T12:00:00Z`).getUTCDay();
       const isClosed = !workingDays.includes(dayOfWeek);
 
       const label = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' });

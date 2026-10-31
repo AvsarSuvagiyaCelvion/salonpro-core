@@ -114,8 +114,8 @@ export async function getAvailableSlots(params: {
   const service = serviceRes.rows[0];
 
   // 3. Verify date and working days (Indian Standard Time: Asia/Kolkata)
-  const targetDate = new Date(`${date}T00:00:00+05:30`);
-  const dayOfWeek = targetDate.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+  // Compute weekday strictly with UTC noon to eliminate timezone offset shifts
+  const dayOfWeek = new Date(`${date}T12:00:00Z`).getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
 
   const isClosedDay = !salon.working_days.includes(dayOfWeek);
   if (isClosedDay) {
@@ -131,8 +131,9 @@ export async function getAvailableSlots(params: {
   // Check advance days limit against current IST date
   const now = new Date();
   const todayISTStr = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-  const todayIST = new Date(`${todayISTStr}T00:00:00+05:30`);
-  const diffDays = Math.ceil((targetDate.getTime() - todayIST.getTime()) / (1000 * 60 * 60 * 24));
+  const todayNoonUTC = new Date(`${todayISTStr}T12:00:00Z`);
+  const targetNoonUTC = new Date(`${date}T12:00:00Z`);
+  const diffDays = Math.round((targetNoonUTC.getTime() - todayNoonUTC.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays < 0 || diffDays > salon.max_advance_days) {
     return {
       salon,

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import pool from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
 import { sendWhatsAppInvoiceReceipt } from '@/lib/whatsapp';
@@ -91,25 +92,31 @@ export async function POST(
     const taxAmount = Number(((netTaxable * numericTaxRate) / 100).toFixed(2));
     const finalTotal = Number((netTaxable + taxAmount).toFixed(2));
 
-    // 4. Generate next invoice number for this salon
-    const countRes = await client.query(
-      'SELECT COUNT(*) as count FROM invoices WHERE salon_id = $1',
+    // 4. Generate next invoice number for this salon using row-lock counter & current year
+    const currentYear = new Date().getFullYear();
+    const counterRes = await client.query(
+      `UPDATE salons 
+       SET invoice_counter = COALESCE(invoice_counter, 0) + 1 
+       WHERE id = $1 
+       RETURNING invoice_counter`,
       [salonId]
     );
-    const invSeq = Number(countRes.rows[0].count) + 1;
-    const invNumber = `INV-2026-${invSeq.toString().padStart(4, '0')}`;
+    const invSeq = Number(counterRes.rows[0].invoice_counter);
+    const invNumber = `INV-${currentYear}-${invSeq.toString().padStart(4, '0')}`;
+    const receiptToken = crypto.randomBytes(16).toString('hex');
 
-    // 5. Create invoice with tax breakdown
+    // 5. Create invoice with tax breakdown and unguessable token
     const invRes = await client.query(
       `INSERT INTO invoices (
-        salon_id, session_id, number, customer_id, subtotal, 
+        salon_id, session_id, number, receipt_token, customer_id, subtotal, 
         discount_type, discount_value, discount_amount, tax_rate, tax_amount, total, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, now())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, now())
       RETURNING *`,
       [
         salonId,
         session.id,
         invNumber,
+        receiptToken,
         session.customer_id,
         totalSubtotal,
         services_discount_type !== 'none' ? services_discount_type : products_discount_type,
@@ -151,6 +158,7 @@ export async function POST(
           salonPhone: session.salon_phone,
           invoiceId: createdInvoice.id,
           invoiceNumber: createdInvoice.number,
+          receiptToken: createdInvoice.receipt_token,
           customerId: session.customer_id,
           customerName: session.customer_name,
           customerMobile: session.customer_mobile,

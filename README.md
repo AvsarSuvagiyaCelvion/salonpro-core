@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SalonPro Cloud ERP & Multi-Tenant Booking SaaS
 
-## Getting Started
+SalonPro is a full-featured, multi-tenant SaaS platform built for salons, spas, and beauty studios. It includes three interconnected portals:
 
-First, run the development server:
+1. **Client Booking & Self-Service Portal**: Mobile-first 4-step appointment booking wizard with real-time slot computation, stylist selection, appointment history, review ratings, and digital receipt view.
+2. **Salon Owner & Staff ERP**: Live studio kanban board, appointment calendar, POS checkout & billing, inventory management, staff commissions, revenue analytics, and branding settings.
+3. **Platform Super-Admin Portal**: Global tenant management, subscription tiers, platform metrics, security auditing, and plan entitlement control.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (Turbopack, App Router, React 19)
+- **Styling**: Tailwind CSS
+- **Database**: PostgreSQL 14+ / Supabase with row-level locks and PostgreSQL advisory locks
+- **Authentication**: JWT-based stateless tokens with bcrypt password/PIN hashing, brute-force rate-limiting, and 15-minute lockouts
+- **Messaging**: Meta WhatsApp Cloud API (automated document templates with PDF receipts) & Twilio WhatsApp fallback
+- **Testing**: Playwright End-to-End test suite across Mobile, Tablet, Laptop, and Desktop viewports
+
+---
+
+## 🚀 Quick Start Guide
+
+### 1. Prerequisites
+
+- **Node.js**: v20.x or higher
+- **PostgreSQL**: PostgreSQL 14+ (or a Supabase cloud instance)
+- **Package Manager**: npm or pnpm
+
+### 2. Environment Setup
+
+Copy `.env.example` to `.env.local` and configure your credentials:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Key environment variables:
+- `DATABASE_URL`: Connection string for PostgreSQL / Supabase
+- `JWT_SECRET`: 64-character secret string for token signing
+- `NEXT_PUBLIC_APP_URL`: Canonical public URL of your deployment
+- `NEXT_PUBLIC_SUPPORT_PHONE`: WhatsApp support phone for password recovery
+- `NEXT_PUBLIC_SUPPORT_EMAIL`: Support email address
+- `WHATSAPP_CLOUD_API_TOKEN`: Meta Graph API token for automated WhatsApp PDF delivery
+- `WHATSAPP_PHONE_NUMBER_ID`: Meta WhatsApp Phone Number ID
+- `ADMIN_EMAIL` & `ADMIN_PASSWORD`: Super-admin platform credentials
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Database Migration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Run all migrations in `supabase/migrations/` sequentially or run:
 
-## Learn More
+```bash
+npm run db:setup
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Running Locally
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Install dependencies
+npm install
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Start development server
+npm run dev
+```
 
-## Deploy on Vercel
+Visit [http://localhost:3000](http://localhost:3000) to open the application.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 5. Production Build
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+npm run start
+```
+
+---
+
+## 🧪 Automated Testing
+
+SalonPro includes a comprehensive Playwright E2E test suite covering security, concurrency, auth rate-limiting, responsive layout, and billing workflows:
+
+```bash
+# Run all end-to-end tests
+npx playwright test
+
+# Run tests on specific viewports
+npx playwright test --project="Desktop 1920x1080"
+npx playwright test --project="Mobile 375x812"
+
+# View HTML test execution report
+npx playwright show-report tests/report
+```
+
+---
+
+## 🔒 Security & Concurrency Architecture
+
+- **Booking Concurrency & Advisory Locks**: Uses `pg_advisory_xact_lock(hashtext(key))` within PostgreSQL transactions to guarantee zero duplicate bookings across concurrent parallel requests.
+- **Sequential Invoices**: Row-level locking (`FOR UPDATE`) on per-salon sequence counters guarantees sequential `INV-YYYY-XXXX` invoice numbers with unique `(salon_id, number)` constraints.
+- **Unguessable Receipt Tokens**: Public digital receipts use 32-character cryptographic hex tokens (`/b/<token>`) instead of guessable sequential IDs.
+- **Customer Privacy**: Customer mobile numbers on public receipts are automatically masked (e.g. `98XXXXX123`).
+- **Auth Hardening**: PINs and passwords are encrypted with bcryptjs (cost factor 10). Failed login attempts are rate-limited with temporary 15-minute lockouts after 5 consecutive failures.

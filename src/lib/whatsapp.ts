@@ -70,6 +70,7 @@ export interface SendInvoiceReceiptParams {
   salonPhone?: string;
   invoiceId: string;
   invoiceNumber: string;
+  receiptToken?: string;
   customerId?: string;
   customerName: string;
   customerMobile: string;
@@ -115,7 +116,7 @@ export async function sendWhatsAppInvoiceReceipt(
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://salonpro-plum.vercel.app');
   
-  const receiptUrl = `${appBaseUrl}/b/${encodeURIComponent(invoiceNumber)}`;
+  const receiptUrl = `${appBaseUrl}/b/${encodeURIComponent(params.receiptToken || invoiceNumber)}`;
 
   if (!phone.valid) {
     const errorMsg = `Invalid phone number format: "${customerMobile}". Minimum 10 digits required.`;
@@ -195,6 +196,10 @@ export async function sendWhatsAppInvoiceReceipt(
     return await sendViaMetaCloudApi({
       salonId,
       invoiceId,
+      invoiceNumber,
+      customerName,
+      salonName,
+      total,
       customerId,
       phone,
       messageBody,
@@ -230,6 +235,10 @@ export async function sendWhatsAppInvoiceReceipt(
 async function sendViaMetaCloudApi(args: {
   salonId: string;
   invoiceId: string;
+  invoiceNumber: string;
+  customerName: string;
+  salonName: string;
+  total: number;
   customerId?: string;
   phone: PhoneNormalizationResult;
   messageBody: string;
@@ -237,17 +246,57 @@ async function sendViaMetaCloudApi(args: {
   cloudApiToken: string;
   cloudPhoneNumberId: string;
 }): Promise<WhatsAppSendResult> {
-  const { salonId, invoiceId, customerId, phone, messageBody, receiptUrl, cloudApiToken, cloudPhoneNumberId } = args;
+  const {
+    salonId,
+    invoiceId,
+    invoiceNumber,
+    customerName,
+    salonName,
+    total,
+    customerId,
+    phone,
+    messageBody,
+    receiptUrl,
+    cloudApiToken,
+    cloudPhoneNumberId,
+  } = args;
 
   const url = `https://graph.facebook.com/v21.0/${cloudPhoneNumberId}/messages`;
+  const templateName = process.env.WHATSAPP_TEMPLATE_NAME || 'invoice_receipt';
+  const templateLang = process.env.WHATSAPP_TEMPLATE_LANG || 'en';
+
+  // Approved template payload with PDF document header for WhatsApp Cloud API
   const body = {
     messaging_product: 'whatsapp',
     recipient_type: 'individual',
     to: phone.waId,
-    type: 'text',
-    text: {
-      preview_url: true,
-      body: messageBody,
+    type: 'template',
+    template: {
+      name: templateName,
+      language: { code: templateLang },
+      components: [
+        {
+          type: 'header',
+          parameters: [
+            {
+              type: 'document',
+              document: {
+                link: receiptUrl,
+                filename: `Invoice-${invoiceNumber}.pdf`,
+              },
+            },
+          ],
+        },
+        {
+          type: 'body',
+          parameters: [
+            { type: 'text', text: customerName || 'Valued Customer' },
+            { type: 'text', text: salonName },
+            { type: 'text', text: invoiceNumber },
+            { type: 'text', text: `₹${total.toFixed(2)}` },
+          ],
+        },
+      ],
     },
   };
 

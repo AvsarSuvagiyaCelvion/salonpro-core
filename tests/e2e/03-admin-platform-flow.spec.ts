@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('STEP 3: Admin & Platform Panel Testing', () => {
-  const adminEmail = 'adminsalonpro@gmail.com';
-  const adminPassword = 'Admin@123';
+  const adminEmail = process.env.ADMIN_EMAIL || 'adminsalonpro@gmail.com';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
 
   test('3.1 Super Admin Sign In, Platform Overview, and Global Metrics', async ({ page }) => {
     await page.goto('/admin/login');

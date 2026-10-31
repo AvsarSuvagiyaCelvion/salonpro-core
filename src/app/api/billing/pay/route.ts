@@ -66,6 +66,7 @@ export async function POST(request: Request) {
           salonPhone: inv.salon_phone,
           invoiceId: inv.id,
           invoiceNumber: inv.number,
+          receiptToken: inv.receipt_token,
           customerId: inv.customer_id,
           customerName: inv.customer_name,
           customerMobile: inv.customer_mobile,

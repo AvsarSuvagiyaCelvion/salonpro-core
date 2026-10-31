@@ -15,13 +15,21 @@ async function main() {
     );
   `);
 
-  console.log('2. Inserting exclusive Super Admin (Adminsalonpro@gmail.com)...');
-  await pool.query(`DELETE FROM platform_admins;`);
-  await pool.query(`
-    INSERT INTO platform_admins (email, password, name, role)
-    VALUES ($1, $2, $3, $4)
-    ON CONFLICT (email) DO UPDATE SET password = $2;
-  `, ['adminsalonpro@gmail.com', 'Admin@123', 'Avsar Suvagiya', 'super_admin']);
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminName = process.env.ADMIN_NAME || 'Platform Administrator';
+
+  if (adminEmail && adminPassword) {
+    console.log(`2. Provisioning Platform Admin (${adminEmail}) from environment...`);
+    await pool.query(`DELETE FROM platform_admins;`);
+    await pool.query(`
+      INSERT INTO platform_admins (email, password, name, role)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT (email) DO UPDATE SET password = $2;
+    `, [adminEmail, adminPassword, adminName, 'super_admin']);
+  } else {
+    console.log('2. Skipping admin provisioning: ADMIN_EMAIL or ADMIN_PASSWORD not set in environment.');
+  }
 
   console.log('3. Permanently wiping all fake transactions, invoices, appointments, sessions & customers...');
   await pool.query(`DELETE FROM payments;`);

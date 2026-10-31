@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
+import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
@@ -17,6 +18,16 @@ export async function POST(request: Request) {
       );
     }
 
+    // Rate limiting check
+    const rateLimitKey = `owner:${cleanEmail}`;
+    const rlCheck = await checkRateLimit(rateLimitKey, 5, 900);
+    if (rlCheck.isLocked) {
+      return NextResponse.json(
+        { error: rlCheck.errorMessage || 'Too many failed login attempts. Your account is temporarily locked for 15 minutes.' },
+        { status: 429 }
+      );
+    }
+
     // 1. Query users table joined with salons table
     const userRes = await query(
       `SELECT u.id, u.salon_id, u.email, u.password_hash, u.full_name, u.role, u.is_active as user_active,
@@ -29,9 +40,14 @@ export async function POST(request: Request) {
     );
 
     if (userRes.rows.length === 0) {
+      const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(
-        { error: 'Invalid email or password. Please check your credentials.' },
-        { status: 401 }
+        {
+          error: fail.isLocked
+            ? fail.errorMessage
+            : 'Invalid email or password. Please check your credentials.',
+        },
+        { status: fail.isLocked ? 429 : 401 }
       );
     }
 
@@ -56,11 +72,19 @@ export async function POST(request: Request) {
     // 4. Verify password with bcrypt
     const passwordMatch = await bcrypt.compare(cleanPassword, user.password_hash);
     if (!passwordMatch) {
+      const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(
-        { error: 'Invalid email or password. Please check your credentials.' },
-        { status: 401 }
+        {
+          error: fail.isLocked
+            ? fail.errorMessage
+            : 'Invalid email or password. Please check your credentials.',
+        },
+        { status: fail.isLocked ? 429 : 401 }
       );
     }
+
+    // Reset rate limit on success
+    await resetRateLimit(rateLimitKey);
 
     // 5. Create multi-tenant session token containing tenant context
     const token = await createSessionToken({

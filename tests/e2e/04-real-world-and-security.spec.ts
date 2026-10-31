@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('STEP 4: Real-World Scenarios, Concurrency & Security', () => {
-  const ownerEmail = 'pari.branch1@gmail.com';
-  const ownerPassword = 'Pooja@123';
-  const salonSlug = 'pari-beauty-studio-branch-1';
+  const ownerEmail = process.env.OWNER_EMAIL || 'pari.branch1@gmail.com';
+  const ownerPassword = process.env.OWNER_PASSWORD || 'Pooja@123';
+  const salonSlug = process.env.SALON_SLUG || 'pari-beauty-studio-branch-1';
 
   test('4.1 Concurrency / Race Condition Double-Booking Prevention', async ({ request }) => {
     // 1. Dynamically get Salon & Service IDs

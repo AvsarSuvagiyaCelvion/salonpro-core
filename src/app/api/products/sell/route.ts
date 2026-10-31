@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import pool, { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
 
@@ -235,18 +236,26 @@ export async function POST(request: Request) {
     const commissionPct = parseFloat(staffMember.product_commission_pct) || 0;
     const commissionEarned = (total * (commissionPct / 100));
 
-    // Generate Invoice Number
-    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const invoiceNumber = `RET-${dateStr}-${randomSuffix}`;
+    // Generate Invoice Number from per-salon counter inside transaction
+    const currentYear = new Date().getFullYear();
+    const counterRes = await client.query(
+      `UPDATE salons 
+       SET invoice_counter = COALESCE(invoice_counter, 0) + 1 
+       WHERE id = $1 
+       RETURNING invoice_counter`,
+      [salonId]
+    );
+    const invSeq = Number(counterRes.rows[0].invoice_counter);
+    const invoiceNumber = `INV-${currentYear}-${invSeq.toString().padStart(4, '0')}`;
+    const receiptToken = crypto.randomBytes(16).toString('hex');
 
     // 8. Create Invoice
     const invRes = await client.query(
       `INSERT INTO invoices (
-        salon_id, session_id, number, customer_id, subtotal, discount_type, discount_value, discount_amount, total, created_at
+        salon_id, session_id, number, receipt_token, customer_id, subtotal, discount_type, discount_value, discount_amount, total, created_at
       ) VALUES ($1, $2, $3, $4, $5, 'fixed', $6, $6, $7, NOW())
       RETURNING *`,
-      [salonId, sessionId, invoiceNumber, activeCustomerId, subtotal, discount, total]
+      [salonId, sessionId, invoiceNumber, receiptToken, activeCustomerId, subtotal, discount, total]
     );
     const newInvoice = invRes.rows[0];
 

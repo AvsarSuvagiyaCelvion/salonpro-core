@@ -7,6 +7,11 @@ import {
   createAdminSessionToken,
   verifyAdminSessionToken,
 } from '@/lib/auth';
+import {
+  checkRateLimit,
+  recordFailedAttempt,
+  resetRateLimit,
+} from '@/lib/rate-limit';
 
 export async function GET() {
   try {
@@ -45,6 +50,16 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
+      );
+    }
+
+    // Rate limiting check
+    const rateLimitKey = `admin:${cleanEmail}`;
+    const rlCheck = await checkRateLimit(rateLimitKey, 5, 900);
+    if (rlCheck.isLocked) {
+      return NextResponse.json(
+        { error: rlCheck.errorMessage || 'Too many failed admin login attempts. Account temporarily locked for 15 minutes.' },
+        { status: 429 }
       );
     }
 
@@ -121,11 +136,19 @@ export async function POST(request: Request) {
     }
 
     if (!authenticatedAdmin) {
+      const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(
-        { error: 'Invalid Super Admin credentials. Access denied.' },
-        { status: 401 }
+        {
+          error: fail.isLocked
+            ? fail.errorMessage
+            : 'Invalid Super Admin credentials. Access denied.',
+        },
+        { status: fail.isLocked ? 429 : 401 }
       );
     }
+
+    // Reset rate limit counter on successful admin authentication
+    await resetRateLimit(rateLimitKey);
 
     const token = await createAdminSessionToken({
       email: authenticatedAdmin.email,

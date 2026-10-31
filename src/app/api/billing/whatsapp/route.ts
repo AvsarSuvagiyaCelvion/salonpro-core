@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       salonPhone: inv.salon_phone,
       invoiceId: inv.id,
       invoiceNumber: inv.number,
+      receiptToken: inv.receipt_token,
       customerId: inv.customer_id,
       customerName: inv.customer_name,
       customerMobile: inv.customer_mobile,
@@ -65,11 +66,32 @@ export async function POST(request: Request) {
       balanceDue,
     });
 
-    // Increment usage counter for this month
+    // Enforce: /api/billing/whatsapp must return success only when status is sent
+    if (waResult.status !== 'sent') {
+      return NextResponse.json(
+        {
+          success: false,
+          status: waResult.status,
+          error:
+            waResult.error ||
+            'WhatsApp message was not sent. Check provider credentials and delivery logs.',
+          delivery: waResult,
+          invoice: {
+            id: inv.id,
+            number: inv.number,
+            whatsapp_sent: false,
+          },
+        },
+        { status: waResult.missingCredentials ? 422 : 502 }
+      );
+    }
+
+    // Increment usage counter for this month only on verified delivery
     const newCount = await incrementUsage(salonId, 'wa_messages', 1);
 
     return NextResponse.json({
       success: true,
+      status: 'sent',
       invoice: {
         id: inv.id,
         number: inv.number,
@@ -77,11 +99,7 @@ export async function POST(request: Request) {
       },
       delivery: waResult,
       usedThisMonth: newCount,
-      message: waResult.success
-        ? 'Digital bill delivered directly to customer WhatsApp!'
-        : waResult.missingCredentials
-        ? 'WhatsApp delivery queued. Provider credentials required in environment.'
-        : 'WhatsApp delivery attempted.',
+      message: 'Digital bill delivered directly to customer WhatsApp with PDF attachment!',
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

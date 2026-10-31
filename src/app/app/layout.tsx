@@ -380,7 +380,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="min-w-0">
               <span className="font-extrabold text-sm sm:text-base text-[#2a1630] tracking-tight block leading-tight truncate max-w-[140px] sm:max-w-xs">
-                {salon?.name || 'Pari Beauty Studio - Branch 1'}
+                {salon?.name || process.env.NEXT_PUBLIC_DEFAULT_SALON_NAME || 'Pari Beauty Studio - Branch 1'}
               </span>
               <span className="text-[10px] sm:text-[11px] text-neutral-500 hidden sm:block -mt-0.5 truncate">
                 Salon Business ERP
@@ -432,7 +432,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   </div>
                   <div className="min-w-0">
                     <span className="font-extrabold text-sm text-[#2a1630] block leading-tight truncate">
-                      {salon?.name || 'Pari Beauty Studio - Branch 1'}
+                      {salon?.name || process.env.NEXT_PUBLIC_DEFAULT_SALON_NAME || 'Pari Beauty Studio - Branch 1'}
                     </span>
                     <span className="text-[10px] text-pink-700 font-bold bg-pink-50 px-1.5 py-0.5 rounded border border-pink-200">
                       Salon Owner ERP

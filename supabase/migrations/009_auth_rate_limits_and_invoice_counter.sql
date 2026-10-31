@@ -25,3 +25,4 @@ BEGIN
     ALTER TABLE invoices ADD CONSTRAINT uq_invoices_salon_number UNIQUE (salon_id, number);
   END IF;
 END $$;
+

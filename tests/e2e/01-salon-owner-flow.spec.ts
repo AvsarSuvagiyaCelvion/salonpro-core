@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('STEP 1: Salon Owner Panel Functional & E2E Testing', () => {
   const ownerEmail = process.env.OWNER_EMAIL || 'pari.branch1@gmail.com';
-  const ownerPassword = process.env.OWNER_PASSWORD || 'Pooja@123';
+  const ownerPassword = process.env.OWNER_PASSWORD || process.env.TEST_OWNER_PASSWORD || '';
+  if (!ownerPassword) {
+    throw new Error('OWNER_PASSWORD environment variable is required for tests');
+  }
   const salonName = process.env.SALON_NAME || 'Pari Beauty Studio - Branch 1';
 
   test('1.1 Owner Sign In, Dashboard default to TODAY, and Header Salon Name', async ({ page }) => {

@@ -72,7 +72,7 @@ export async function GET(request: Request) {
 
     // 3. To Collect (invoices pending payment or created in last 24h)
     const invoicesRes = await query(
-      `SELECT i.id, i.number, i.session_id, i.subtotal, i.discount_type, 
+      `SELECT i.id, i.number, i.receipt_token, i.session_id, i.subtotal, i.discount_type, 
               i.discount_value, i.discount_amount, i.total, i.created_at,
               c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile,
               COALESCE(SUM(p.amount), 0)::numeric(10,2) as paid_amount,

@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.describe('STEP 4: Real-World Scenarios, Concurrency & Security', () => {
   const ownerEmail = process.env.OWNER_EMAIL || 'pari.branch1@gmail.com';
-  const ownerPassword = process.env.OWNER_PASSWORD || 'Pooja@123';
+  const ownerPassword = process.env.OWNER_PASSWORD || process.env.TEST_OWNER_PASSWORD || '';
+  if (!ownerPassword) {
+    throw new Error('OWNER_PASSWORD environment variable is required for tests');
+  }
   const salonSlug = process.env.SALON_SLUG || 'pari-beauty-studio-branch-1';
 
   test('4.1 Concurrency / Race Condition Double-Booking Prevention', async ({ request }) => {

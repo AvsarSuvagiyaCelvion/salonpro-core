@@ -37,7 +37,7 @@ cp .env.example .env.local
 
 Key environment variables:
 - `DATABASE_URL`: Connection string for PostgreSQL / Supabase
-- `JWT_SECRET`: 64-character secret string for token signing
+- `SESSION_SECRET`: 64-character secret string for session tokens and encryption
 - `NEXT_PUBLIC_APP_URL`: Canonical public URL of your deployment
 - `NEXT_PUBLIC_SUPPORT_PHONE`: WhatsApp support phone for password recovery
 - `NEXT_PUBLIC_SUPPORT_EMAIL`: Support email address

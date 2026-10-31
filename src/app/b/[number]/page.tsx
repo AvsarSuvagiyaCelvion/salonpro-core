@@ -27,7 +27,7 @@ export default async function PublicBillPage({
   const { number } = await params;
   const decodedNumber = decodeURIComponent(number);
 
-  // Query invoice by unguessable receipt_token or invoice number/id
+  // Query invoice strictly by unguessable receipt_token
   const invRes = await query(
     `SELECT i.*, 
             s.name as salon_name, s.address as salon_address, s.phone as salon_phone,
@@ -35,7 +35,7 @@ export default async function PublicBillPage({
      FROM invoices i
      JOIN salons s ON i.salon_id = s.id
      JOIN customers c ON i.customer_id = c.id
-     WHERE i.receipt_token = $1 OR i.number = $1 OR i.id::text = $1
+     WHERE i.receipt_token = $1
      LIMIT 1`,
     [decodedNumber]
   );

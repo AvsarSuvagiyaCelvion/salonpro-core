@@ -115,3 +115,4 @@ test.describe('Task 3: Customer auth bcrypt PIN, no signup overwrite, and rate l
     expect(body.error).toContain('locked');
   });
 });
+

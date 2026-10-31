@@ -48,7 +48,7 @@ export async function GET() {
         [customerId]
       ),
       query(
-        `SELECT i.id, i.number, i.subtotal, i.discount_value, i.discount_amount, i.total, i.created_at,
+        `SELECT i.id, i.number, i.receipt_token, i.subtotal, i.discount_value, i.discount_amount, i.total, i.created_at,
                 COALESCE(SUM(p.amount), 0)::numeric(10,2) as paid_amount,
                 (i.total - COALESCE(SUM(p.amount), 0))::numeric(10,2) as due_amount,
                 CASE 

@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const statusFilter = searchParams.get('status')?.trim().toLowerCase() || 'all';
 
     let sql = `
-      SELECT i.id, i.number, i.session_id, i.subtotal, i.discount_type, 
+      SELECT i.id, i.number, i.receipt_token, i.session_id, i.subtotal, i.discount_type, 
               i.discount_value, i.discount_amount, i.tax_rate, i.tax_amount, i.total, i.whatsapp_sent, i.created_at,
               c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile,
               COALESCE(SUM(p.amount), 0)::numeric(10,2) as paid_amount,

@@ -1,8 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('STEP 3: Admin & Platform Panel Testing', () => {
-  const adminEmail = process.env.ADMIN_EMAIL || 'adminsalonpro@gmail.com';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
+  const adminEmail = process.env.ADMIN_EMAIL || '';
+  const adminPassword = process.env.ADMIN_PASSWORD || '';
+  if (!adminEmail || !adminPassword) {
+    throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required for tests');
+  }
 
   test('3.1 Super Admin Sign In, Platform Overview, and Global Metrics', async ({ page }) => {
     await page.goto('/admin/login');

@@ -9,7 +9,8 @@ test.describe('Task 7: Environment settings, documentation, and cleanup', () => 
 
     const content = fs.readFileSync(envExamplePath, 'utf8');
     expect(content).toContain('DATABASE_URL=');
-    expect(content).toContain('JWT_SECRET=');
+    expect(content).toContain('SESSION_SECRET=');
+    expect(content).not.toContain('JWT_SECRET=');
     expect(content).toContain('NEXT_PUBLIC_APP_URL=');
     expect(content).toContain('NEXT_PUBLIC_SUPPORT_PHONE=');
     expect(content).toContain('NEXT_PUBLIC_SUPPORT_EMAIL=');
@@ -18,14 +19,19 @@ test.describe('Task 7: Environment settings, documentation, and cleanup', () => 
     expect(content).toContain('WHATSAPP_PHONE_NUMBER_ID=');
     expect(content).toContain('ADMIN_EMAIL=');
     expect(content).toContain('ADMIN_PASSWORD=');
+    expect(content).toContain('DEMO_OWNER_EMAIL=');
+    expect(content).toContain('DEMO_OWNER_PASSWORD=');
+    expect(content).toContain('ALLOW_WIPE=');
   });
 
-  test('7.2 README.md exists and documents system architecture & setup', () => {
+  test('7.2 README.md exists and documents system architecture & setup with SESSION_SECRET', () => {
     const readmePath = path.resolve(process.cwd(), 'README.md');
     expect(fs.existsSync(readmePath)).toBe(true);
 
     const content = fs.readFileSync(readmePath, 'utf8');
     expect(content).toContain('SalonPro');
+    expect(content).toContain('SESSION_SECRET');
+    expect(content).not.toContain('JWT_SECRET');
     expect(content).toContain('Client Booking');
     expect(content).toContain('Salon Owner & Staff ERP');
     expect(content).toContain('Platform Super-Admin');
@@ -51,4 +57,20 @@ test.describe('Task 7: Environment settings, documentation, and cleanup', () => 
     const layoutContent = fs.readFileSync(layoutFilePath, 'utf8');
     expect(layoutContent).toContain('process.env.NEXT_PUBLIC_DEFAULT_SALON_NAME');
   });
+
+  test('7.5 scripts/seed-demo.js exists and enforces safety refusal unless DATABASE_URL contains demo or ALLOW_WIPE=true', () => {
+    const seedScriptPath = path.resolve(process.cwd(), 'scripts', 'seed-demo.js');
+    expect(fs.existsSync(seedScriptPath)).toBe(true);
+
+    const scriptContent = fs.readFileSync(seedScriptPath, 'utf8');
+    expect(scriptContent).toContain('ALLOW_WIPE');
+    expect(scriptContent).toContain("dbUrl.toLowerCase().includes('demo')");
+    expect(scriptContent).toContain('Glow Studio');
+    expect(scriptContent).toContain('10:00:00');
+    expect(scriptContent).toContain('19:00:00');
+    expect(scriptContent).toContain('DEMO_OWNER_EMAIL');
+    expect(scriptContent).toContain('DEMO_OWNER_PASSWORD');
+    expect(scriptContent).toContain('receipt_token');
+  });
 });
+

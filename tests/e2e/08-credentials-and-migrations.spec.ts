@@ -21,7 +21,7 @@ test.describe('Task 2: Hardcoded credentials removal and env configuration', () 
     expect(content).not.toContain("'Admin@123'");
   });
 
-  test('E2E test files use environment variables with clean fallback', () => {
+  test('E2E test files require environment variables and do not contain hardcoded fallback credentials', () => {
     const testFiles = [
       'tests/e2e/01-salon-owner-flow.spec.ts',
       'tests/e2e/03-admin-platform-flow.spec.ts',
@@ -31,6 +31,10 @@ test.describe('Task 2: Hardcoded credentials removal and env configuration', () 
     for (const tf of testFiles) {
       const content = fs.readFileSync(path.join(process.cwd(), tf), 'utf8');
       expect(content).toContain('process.env.');
+      expect(content).not.toContain('Pooja@123');
+      expect(content).not.toContain('Admin@123');
+      expect(content).not.toContain('adminsalonpro@gmail.com');
     }
   });
 });
+

@@ -24,7 +24,7 @@ export async function GET(
 
     // Fetch invoices for this customer and salon
     const invoicesRes = await query(
-      `SELECT i.id, i.number, i.session_id, i.subtotal, i.discount_type, 
+      `SELECT i.id, i.number, i.receipt_token, i.session_id, i.subtotal, i.discount_type, 
               i.discount_value, i.discount_amount, i.tax_rate, i.tax_amount, i.total, i.whatsapp_sent, i.created_at,
               COALESCE(SUM(p.amount), 0)::numeric(10,2) as paid_amount,
               (i.total - COALESCE(SUM(p.amount), 0))::numeric(10,2) as due_amount,

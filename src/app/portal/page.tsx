@@ -52,6 +52,7 @@ interface Appointment {
 interface Invoice {
   id: string;
   number: string;
+  receipt_token: string;
   subtotal: number;
   discount_amount: number;
   total: number;
@@ -602,7 +603,7 @@ export default function CustomerPortalPage() {
                     </div>
 
                     <Link
-                      href={`/b/${inv.number}`}
+                      href={`/b/${inv.receipt_token}`}
                       target="_blank"
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition-all self-end sm:self-auto border border-neutral-700 active:scale-95"
                     >

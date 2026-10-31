@@ -109,4 +109,67 @@ test.describe('Task 4: Invoices unique constraint, sequential counter, tokenized
       await query('DELETE FROM invoices WHERE id = $1', [invoiceId]);
     }
   });
+
+  test('4.4 /b/INV-YYYY-XXXX returns 404, only token works, and two salons with same invoice number are strictly isolated', async ({
+    page,
+  }) => {
+    // 1. Accessing raw invoice number returns 404
+    const notFoundRes = await page.goto('/b/INV-2026-0001');
+    expect(notFoundRes?.status()).toBe(404);
+
+    // 2. Setup two salons with the exact same invoice number
+    const salonRes = await query('SELECT id, name FROM salons WHERE is_active = true ORDER BY created_at ASC LIMIT 2');
+    if (salonRes.rows.length >= 2) {
+      const salonA = salonRes.rows[0];
+      const salonB = salonRes.rows[1];
+      const sharedNumber = `INV-${new Date().getFullYear()}-ISOLATED`;
+      const tokenA = crypto.randomBytes(16).toString('hex');
+      const tokenB = crypto.randomBytes(16).toString('hex');
+
+      // Create customers for both
+      const cA = await query('INSERT INTO customers (salon_id, name, mobile) VALUES ($1, $2, $3) RETURNING id', [
+        salonA.id,
+        'Client Salon A',
+        '9811111111',
+      ]);
+      const cB = await query('INSERT INTO customers (salon_id, name, mobile) VALUES ($1, $2, $3) RETURNING id', [
+        salonB.id,
+        'Client Salon B',
+        '9822222222',
+      ]);
+
+      const invA = await query(
+        `INSERT INTO invoices (salon_id, customer_id, number, subtotal, tax_amount, total, receipt_token)
+         VALUES ($1, $2, $3, 100, 18, 118, $4) RETURNING id`,
+        [salonA.id, cA.rows[0].id, sharedNumber, tokenA]
+      );
+      const invB = await query(
+        `INSERT INTO invoices (salon_id, customer_id, number, subtotal, tax_amount, total, receipt_token)
+         VALUES ($1, $2, $3, 200, 36, 236, $4) RETURNING id`,
+        [salonB.id, cB.rows[0].id, sharedNumber, tokenB]
+      );
+
+      try {
+        // Token A shows Salon A and never Salon B
+        const resA = await page.goto(`/b/${tokenA}`);
+        expect(resA?.status()).toBe(200);
+        const textA = await page.textContent('body');
+        expect(textA).toContain(salonA.name);
+        expect(textA).toContain('Client Salon A');
+        expect(textA).not.toContain('Client Salon B');
+
+        // Token B shows Salon B and never Salon A
+        const resB = await page.goto(`/b/${tokenB}`);
+        expect(resB?.status()).toBe(200);
+        const textB = await page.textContent('body');
+        expect(textB).toContain(salonB.name);
+        expect(textB).toContain('Client Salon B');
+        expect(textB).not.toContain('Client Salon A');
+      } finally {
+        await query('DELETE FROM invoices WHERE id IN ($1, $2)', [invA.rows[0].id, invB.rows[0].id]);
+        await query('DELETE FROM customers WHERE id IN ($1, $2)', [cA.rows[0].id, cB.rows[0].id]);
+      }
+    }
+  });
 });
+

@@ -116,7 +116,7 @@ export async function sendWhatsAppInvoiceReceipt(
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://salonpro-plum.vercel.app');
   
-  const receiptUrl = `${appBaseUrl}/b/${encodeURIComponent(params.receiptToken || invoiceNumber)}`;
+  const receiptUrl = `${appBaseUrl}/b/${encodeURIComponent(params.receiptToken || '')}`;
 
   if (!phone.valid) {
     const errorMsg = `Invalid phone number format: "${customerMobile}". Minimum 10 digits required.`;

@@ -172,3 +172,4 @@ export async function resetRateLimit(key: string): Promise<void> {
     await query('DELETE FROM auth_rate_limits WHERE key = $1', [key]);
   } catch {}
 }
+

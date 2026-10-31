@@ -90,7 +90,17 @@ export async function POST(request: Request) {
           );
         }
 
-        const passwordMatch = await bcrypt.compare(cleanPassword, adminRow.password_hash);
+        let passwordMatch = false;
+        if (adminRow.password_hash.startsWith('$2a$') || adminRow.password_hash.startsWith('$2b$')) {
+          passwordMatch = await bcrypt.compare(cleanPassword, adminRow.password_hash);
+        } else {
+          passwordMatch = (adminRow.password_hash === cleanPassword);
+          if (passwordMatch) {
+            const upgraded = await bcrypt.hash(cleanPassword, 10);
+            await query('UPDATE platform_admins SET password_hash = $1 WHERE id = $2', [upgraded, adminRow.id]);
+          }
+        }
+
         if (passwordMatch) {
           authenticatedAdmin = {
             id: adminRow.id,

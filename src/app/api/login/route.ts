@@ -69,8 +69,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Verify password with bcrypt
-    const passwordMatch = await bcrypt.compare(cleanPassword, user.password_hash);
+    // 4. Verify password with bcrypt, or auto-upgrade plain text if set directly from mobile Supabase
+    let passwordMatch = false;
+    if (user.password_hash.startsWith('$2a$') || user.password_hash.startsWith('$2b$')) {
+      passwordMatch = await bcrypt.compare(cleanPassword, user.password_hash);
+    } else {
+      passwordMatch = (user.password_hash === cleanPassword);
+      if (passwordMatch) {
+        // Automatically upgrade to secure bcrypt hash on first successful login
+        const upgradedHash = await bcrypt.hash(cleanPassword, 10);
+        await query('UPDATE users SET password_hash = $1 WHERE id = $2', [upgradedHash, user.id]);
+      }
+    }
+
     if (!passwordMatch) {
       const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(

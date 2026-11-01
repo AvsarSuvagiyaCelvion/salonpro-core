@@ -150,3 +150,18 @@ h1, h2, h3, h4, .font-display {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
+/* Print styling for receipts & reports */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  @page {
+    margin: 8mm;
+    size: auto;
+  }
+}

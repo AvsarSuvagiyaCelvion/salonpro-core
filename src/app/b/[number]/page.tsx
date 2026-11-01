@@ -85,7 +85,7 @@ export default async function PublicBillPage({
 
   return (
     <div className="min-h-screen bg-neutral-100 py-6 sm:py-12 px-4 flex justify-center items-start print:bg-white print:p-0">
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none">
+      <div id="invoice-receipt-card" className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none">
         
         {/* Top Header Brand Banner */}
         <div className="bg-neutral-900 text-white p-6 sm:p-8 text-center relative">
@@ -282,7 +282,7 @@ export default async function PublicBillPage({
           </p>
 
           <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center print:hidden">
-            <PrintReceiptButton />
+            <PrintReceiptButton invoiceNumber={invoice.number} />
           </div>
         </div>
 

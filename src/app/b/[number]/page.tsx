@@ -282,15 +282,30 @@ export default async function PublicBillPage({
           </p>
 
           <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center print:hidden">
-            <PrintReceiptButton invoiceNumber={invoice.number} />
+            <PrintReceiptButton
+              salon={{
+                name: invoice.salon_name,
+                address: invoice.salon_address,
+                phone: invoice.salon_phone,
+              }}
+              invoice={{
+                number: invoice.number,
+                created_at: invoice.created_at,
+                customer_name: invoice.customer_name,
+                customer_mobile: invoice.customer_mobile,
+                subtotal: invoice.subtotal,
+                discount_amount: invoice.discount_amount,
+                total: invoice.total,
+              }}
+              items={items}
+              payments={payments}
+              taxableSubtotal={taxableSubtotal}
+              cgst={cgst}
+              sgst={sgst}
+              status={status}
+            />
           </div>
         </div>
-
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `if (window.location.search.includes('download=pdf')) { window.onload = function() { setTimeout(function() { window.print(); }, 400); } }`,
-          }}
-        />
 
       </div>
     </div>

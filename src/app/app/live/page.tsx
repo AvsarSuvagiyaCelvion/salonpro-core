@@ -371,7 +371,7 @@ export default function LiveStudioPage() {
       const rawPhone = (invoice.customer_mobile || '').replace(/[^0-9]/g, '');
       const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const receiptLink = `${origin}/b/${invoice.receipt_token}`;
+      const receiptLink = `${origin}/b/${invoice.receipt_token || invoice.number}`;
       const total = Number(invoice.total || 0).toLocaleString('en-IN');
       const paid = Number(invoice.paid_amount || invoice.total || 0).toLocaleString('en-IN');
 
@@ -1368,7 +1368,7 @@ export default function LiveStudioPage() {
 Invoice #: ${whatsappInvoice.number}
 Total Amount: ₹${Number(whatsappInvoice.total || 0).toLocaleString('en-IN')}
 Payment Received: ₹${Number(whatsappInvoice.paid_amount || whatsappInvoice.total || 0).toLocaleString('en-IN')}
-View & Download your official PDF receipt: ${typeof window !== 'undefined' ? window.location.origin : ''}/b/${whatsappInvoice.receipt_token}
+View & Download your official PDF receipt: ${typeof window !== 'undefined' ? window.location.origin : ''}/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}
 We look forward to welcoming you again!`}
                 </div>
 
@@ -1383,7 +1383,7 @@ We look forward to welcoming you again!`}
               {/* Action Buttons: Open Original Bill PDF + Send on WhatsApp */}
               <div className="space-y-2">
                 <a
-                  href={`/b/${whatsappInvoice.receipt_token}`}
+                  href={`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"

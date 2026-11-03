@@ -96,11 +96,6 @@ export async function proxy(request: NextRequest) {
     requestHeaders.set('x-tenant-slug', tenantSlug);
   }
 
-  // Reject raw invoice numbers on public receipt routes (/b/INV-...) with HTTP 404
-  if (pathname.startsWith('/b/INV-')) {
-    return new NextResponse('Receipt Not Found', { status: 404 });
-  }
-
   // 1. MAIN ADMIN PANEL WEB PAGES (/admin)
   if (pathname.startsWith('/admin')) {
     const adminToken = request.cookies.get(ADMIN_COOKIE_NAME)?.value;

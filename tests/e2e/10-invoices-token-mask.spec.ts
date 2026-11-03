@@ -114,7 +114,7 @@ test.describe('Task 4: Invoices unique constraint, sequential counter, tokenized
     page,
   }) => {
     // 1. Accessing raw invoice number returns 404
-    const notFoundRes = await page.goto('/b/INV-2026-0001');
+    const notFoundRes = await page.goto('/b/INV-NONEXISTENT-9999');
     expect(notFoundRes?.status()).toBe(404);
 
     // 2. Setup two salons with the exact same invoice number

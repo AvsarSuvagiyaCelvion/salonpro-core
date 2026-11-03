@@ -36,7 +36,8 @@ export default async function PublicBillPage({
      FROM invoices i
      JOIN salons s ON i.salon_id = s.id
      JOIN customers c ON i.customer_id = c.id
-     WHERE i.receipt_token = $1
+     WHERE (i.receipt_token = $1 OR i.number = $1)
+     ORDER BY i.created_at DESC
      LIMIT 1`,
     [decodedNumber]
   );

@@ -130,7 +130,7 @@ export default function BillingPage() {
       if (whatsappInvoice) {
         const rawPhone = (whatsappInvoice.customer_mobile || '').replace(/[^0-9]/g, '');
         const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
-        const receiptLink = `${window.location.origin}/b/${whatsappInvoice.receipt_token}`;
+        const receiptLink = `${window.location.origin}/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`;
         const total = Number(whatsappInvoice.total || 0).toLocaleString('en-IN');
         const paid = Number(whatsappInvoice.paid_amount || whatsappInvoice.total || 0).toLocaleString('en-IN');
 
@@ -631,7 +631,7 @@ export default function BillingPage() {
 
               <div className="pt-2 border-t border-neutral-200/60 flex gap-2">
                 <a
-                  href={`/b/${whatsappInvoice.receipt_token}`}
+                  href={`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 py-2.5 px-3 rounded-xl bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-bold border border-neutral-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"

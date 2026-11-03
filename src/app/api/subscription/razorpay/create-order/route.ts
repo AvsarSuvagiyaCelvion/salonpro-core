@@ -71,6 +71,7 @@ export async function POST(request: Request) {
       planName: plan.name,
       salonName: salon.name,
       salonPhone: salon.phone || '',
+      salonEmail: auth.session.email || '',
     });
   } catch (error: any) {
     console.error('Create Razorpay Order Error:', error);

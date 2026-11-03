@@ -123,6 +123,7 @@ export default function SalonSubscriptionPage() {
         prefill: {
           name: orderData.salonName || '',
           contact: orderData.salonPhone || '',
+          email: orderData.salonEmail || '',
         },
         theme: {
           color: '#b3135b',

@@ -10,31 +10,41 @@ import {
   Zap,
   ShieldCheck,
   Check,
-  X,
   Users,
   Scissors,
   MessageSquare,
-  Lock,
-  ArrowRight,
-  TrendingUp,
-  Award,
+  Receipt,
 } from 'lucide-react';
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') return resolve(false);
+    if ((window as any).Razorpay) return resolve(true);
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 export default function SalonSubscriptionPage() {
   const [subscription, setSubscription] = useState<any>(null);
   const [plans, setPlans] = useState<any[]>([]);
+  const [pastPayments, setPastPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [activating, setActivating] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   async function loadData() {
     try {
       setLoading(true);
-      const [subRes, plansRes] = await Promise.all([
+      const [subRes, plansRes, paymentsRes] = await Promise.all([
         fetch('/api/subscription'),
         fetch('/api/plans'),
+        fetch('/api/subscription/payments'),
       ]);
 
       if (subRes.ok) {
@@ -45,9 +55,11 @@ export default function SalonSubscriptionPage() {
       if (plansRes.ok) {
         const plansData = await plansRes.json();
         setPlans(plansData.plans || []);
-        if (plansData.plans?.length > 0) {
-          setSelectedPlanId(plansData.plans[0].id);
-        }
+      }
+
+      if (paymentsRes.ok) {
+        const payData = await paymentsRes.json();
+        setPastPayments(payData.payments || []);
       }
     } catch (err) {
       console.error(err);
@@ -62,31 +74,100 @@ export default function SalonSubscriptionPage() {
 
   async function handleActivatePlan(planId: string) {
     setActivating(true);
+    setMessage(null);
+
     try {
-      const res = await fetch('/api/subscription', {
+      // 1. Load Razorpay script in browser
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error('Unable to load Razorpay payment gateway. Please check your internet connection.');
+      }
+
+      // 2. Create Razorpay Order on server
+      const orderRes = await fetch('/api/subscription/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           planId,
           interval,
-          paymentMethod: 'Instant UPI / Card Payment',
-          transactionId: `TXN-${Date.now()}`,
         }),
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        setPaymentSuccess(true);
-        setTimeout(() => {
-          setPaymentSuccess(false);
-          loadData();
-        }, 1500);
-      } else {
-        alert(data.error || 'Failed to process plan subscription.');
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) {
+        throw new Error(orderData.error || 'Failed to initialize payment.');
       }
+
+      // 3. Open Razorpay Checkout modal
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount, // in paise
+        currency: orderData.currency || 'INR',
+        name: 'SalonPro Cloud ERP',
+        description: `Plan: ${orderData.planName} (${interval === 'yearly' ? 'Annual Billing' : 'Monthly Billing'})`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: orderData.salonName || '',
+          contact: orderData.salonPhone || '',
+        },
+        theme: {
+          color: '#b3135b',
+        },
+        modal: {
+          ondismiss: function () {
+            setActivating(false);
+          },
+        },
+        handler: async function (response: any) {
+          try {
+            setActivating(true);
+            // 4. Verify signature on server
+            const verifyRes = await fetch('/api/subscription/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                planId,
+                interval,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok) {
+              setPaymentSuccess(true);
+              setMessage({
+                type: 'success',
+                text: `Payment Successful! Payment ID: ${response.razorpay_payment_id}. Your salon subscription is now active!`,
+              });
+              setTimeout(() => {
+                setPaymentSuccess(false);
+                loadData();
+              }, 2500);
+            } else {
+              setMessage({ type: 'error', text: verifyData.error || 'Payment signature verification failed.' });
+            }
+          } catch (vErr: any) {
+            setMessage({ type: 'error', text: vErr.message || 'Payment verification error.' });
+          } finally {
+            setActivating(false);
+          }
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.on('payment.failed', function (resp: any) {
+        setMessage({
+          type: 'error',
+          text: `Payment Failed: ${resp.error.description || resp.error.reason || 'Transaction could not be completed.'}`,
+        });
+        setActivating(false);
+      });
+
+      razorpay.open();
     } catch (err: any) {
-      alert(err.message || 'Payment processing error.');
-    } finally {
+      setMessage({ type: 'error', text: err.message || 'Payment processing error.' });
       setActivating(false);
     }
   }
@@ -116,128 +197,151 @@ export default function SalonSubscriptionPage() {
   const servicesUnlimited = usage.maxServices === 0;
   const servicesPct = servicesUnlimited ? 10 : Math.min(100, Math.round((usage.servicesCount / (usage.maxServices || 1)) * 100));
 
-  const waUnlimited = usage.waLimit === 0 && currentPlan?.slug === 'premium';
   const waPct = usage.waLimit === 0 ? 0 : Math.min(100, Math.round((usage.waSentThisMonth / usage.waLimit) * 100));
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto pb-12">
-      {/* Page Header */}
-      <div>
-        <span className="text-[11px] font-black uppercase tracking-wider text-pink-600">
-          Billing & Workspace Tiers
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#2a1630] tracking-tight">
-          SaaS Subscription & Feature Limits
-        </h1>
-        <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
-          Monitor your salon resource usage, evaluate plan tiers, and manage automatic renewals
-        </p>
-      </div>
-
-      {paymentSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 text-emerald-800 text-sm font-bold animate-fade-in shadow-xs">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span>Payment verified successfully! Your salon workspace plan has been updated and activated.</span>
+    <div className="space-y-8 pb-16">
+      {/* Top Banner Alert (if any) */}
+      {message && (
+        <div
+          className={`p-4 rounded-2xl border text-xs font-bold flex items-center justify-between ${
+            message.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-rose-50 border-rose-200 text-rose-800'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {message.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            )}
+            <span>{message.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMessage(null)}
+            className="text-xs font-normal underline hover:opacity-75 cursor-pointer ml-4"
+          >
+            Dismiss
+          </button>
         </div>
       )}
 
-      {/* 1. Current Plan & Expiry Card */}
-      <div className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-7 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-100">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center shadow-md shadow-pink-900/10">
-              <CreditCard className="w-7 h-7" />
+      {/* Payment Success Overlay Toast */}
+      {paymentSuccess && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-neutral-100">
+            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+              <CheckCircle2 className="w-10 h-10" />
             </div>
-            <div>
-              <span className="text-[10px] uppercase font-black tracking-wider text-neutral-400 block mb-0.5">
-                Active Plan Tier
-              </span>
-              <h2 className="text-xl font-black text-[#2a1630]">
-                {currentPlan?.name || (subscription?.isTrial ? '7-Day Free Trial (Pro Tier)' : 'Standard Plan')}
-              </h2>
-              <span className="text-xs text-neutral-500">
-                {currentPlan
-                  ? `₹${Number(currentPlan.price).toLocaleString()} / ${currentPlan.interval}`
-                  : 'Free Evaluation Period'}
-              </span>
+            <h3 className="text-xl font-black text-neutral-900 mb-2">Payment Successful!</h3>
+            <p className="text-xs text-neutral-600 mb-6">
+              Your Razorpay transaction was verified. Your salon plan has been upgraded and all premium features are active!
+            </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200">
+              <Sparkles className="w-4 h-4" />
+              <span>Features Unlocked Instantly</span>
             </div>
           </div>
+        </div>
+      )}
 
-          <div className="flex items-center gap-2">
-            {subscription?.status === 'active' ? (
-              <span className="px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-black flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Paid Active Subscription</span>
+      {/* 1. Header & Active Plan Status Card */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#2a1630] via-[#3d1538] to-[#1a0a1f] text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-pink-900/30">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                Salon Workspace
               </span>
-            ) : subscription?.isTrialExpired ? (
-              <span className="px-3.5 py-1.5 rounded-full bg-red-50 text-red-700 border border-red-200 text-xs font-black flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4 text-red-600" />
-                <span>Trial Expired - Reactivation Required</span>
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" />
+                Razorpay Verified
               </span>
-            ) : (
-              <span className="px-3.5 py-1.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-xs font-black flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-purple-600 animate-pulse" />
-                <span>Trial Active ({subscription?.trialDaysRemaining} days remaining)</span>
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                Test Mode
               </span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
+              {subscription?.salonName || 'Your Salon'} Subscription
+            </h2>
+
+            <p className="text-xs text-pink-100/70 max-w-xl">
+              Manage your software subscription tier, real-time usage limits, and seamless UPI / Card renewals powered by Razorpay.
+            </p>
+          </div>
+
+          {/* Current Status Pill Card */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 min-w-[240px]">
+            <div className="text-[10px] uppercase font-bold text-pink-200/80 tracking-wider mb-1">
+              Active Tier
+            </div>
+            <div className="text-2xl font-black text-white flex items-center gap-2">
+              <span>{currentPlan?.name || 'Pro Plan'}</span>
+              <Zap className="w-5 h-5 text-amber-400 fill-amber-400" />
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+              <span className="text-pink-200/70">Status:</span>
+              <span
+                className={`font-black uppercase tracking-wider text-[11px] px-2 py-0.5 rounded-full ${
+                  subscription?.status === 'active'
+                    ? 'bg-emerald-400/20 text-emerald-300 border border-emerald-400/30'
+                    : subscription?.status === 'trial'
+                    ? 'bg-blue-400/20 text-blue-300 border border-blue-400/30'
+                    : 'bg-rose-400/20 text-rose-300 border border-rose-400/30'
+                }`}
+              >
+                {subscription?.status === 'trial'
+                  ? `Trial (${subscription?.trialDaysRemaining ?? 7}d left)`
+                  : subscription?.status === 'active'
+                  ? 'Active Paid'
+                  : 'Expired'}
+              </span>
+            </div>
+
+            {subscription?.subscriptionEndsAt && (
+              <div className="text-[10px] text-pink-200/60 mt-1 flex items-center gap-1">
+                <Clock className="w-3 h-3 shrink-0" />
+                <span>
+                  Valid till{' '}
+                  {new Date(subscription.subscriptionEndsAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </span>
+              </div>
             )}
           </div>
         </div>
-
-        {/* Trial Days Countdown Banner */}
-        {subscription?.isTrial && !subscription?.isTrialExpired && (
-          <div className="mt-5 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 text-xs text-purple-900 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <Clock className="w-5 h-5 text-purple-600 shrink-0" />
-              <span>
-                Your 7-day evaluation period is active until{' '}
-                <strong>
-                  {subscription.trialEndsAt
-                    ? new Date(subscription.trialEndsAt).toLocaleDateString('en-IN', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })
-                    : '7 days'}
-                </strong>
-                . You are currently granted full <strong>Pro Plan</strong> limits & features.
-              </span>
-            </div>
-          </div>
-        )}
-
-        {subscription?.subscriptionEndsAt && subscription?.status === 'active' && (
-          <div className="mt-4 text-xs text-slate-500 flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-slate-400" />
-            <span>
-              Renewal / Expiry Date:{' '}
-              <strong className="text-slate-800">
-                {new Date(subscription.subscriptionEndsAt).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </strong>
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* 2. Usage vs Limits Gauges */}
+      {/* 2. Current Month Resource Usage Gauges */}
       <div>
-        <h3 className="text-base font-black text-[#2a1630] mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#b3135b]" />
-          <span>Live Workspace Usage vs Plan Limits</span>
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-black text-[#2a1630]">Resource Consumption & Limits</h3>
+            <p className="text-xs text-neutral-500">Live tracker for current monthly billing cycle</p>
+          </div>
+          <span className="text-xs font-bold text-neutral-400">
+            Cycle: {usage.period || new Date().toISOString().slice(0, 7)}
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Staff Gauge */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Staff Limit */}
           <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-pink-50 text-[#b3135b] flex items-center justify-center">
                   <Users className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold text-slate-700">Staff Members</span>
+                <span className="text-xs font-bold text-slate-700">Stylists & Staff</span>
               </div>
               <span className="text-xs font-black text-slate-900">
                 {usage.staffCount} / {staffUnlimited ? '∞' : usage.maxStaff}
@@ -247,23 +351,19 @@ export default function SalonSubscriptionPage() {
             <div className="w-full bg-slate-100 rounded-full h-2.5 my-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full transition-all duration-300 ${
-                  staffPct >= 100 && !staffUnlimited ? 'bg-red-500' : 'bg-[#b3135b]'
+                  staffUnlimited ? 'bg-pink-500' : staffPct >= 90 ? 'bg-amber-500' : 'bg-[#b3135b]'
                 }`}
-                style={{ width: `${staffUnlimited ? 25 : staffPct}%` }}
+                style={{ width: `${staffPct}%` }}
               />
             </div>
 
             <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
-              <span>
-                {staffUnlimited
-                  ? 'Unlimited stylists allowed'
-                  : `${Math.max(0, usage.maxStaff - usage.staffCount)} slot${usage.maxStaff - usage.staffCount === 1 ? '' : 's'} remaining`}
-              </span>
+              <span>{staffUnlimited ? 'Unlimited stylists allowed' : `${Math.max(0, usage.maxStaff - usage.staffCount)} slots remaining`}</span>
               <span className="font-bold">{staffUnlimited ? 'Unlimited' : `${staffPct}%`}</span>
             </div>
           </div>
 
-          {/* Services Gauge */}
+          {/* Services Catalog Limit */}
           <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -280,23 +380,19 @@ export default function SalonSubscriptionPage() {
             <div className="w-full bg-slate-100 rounded-full h-2.5 my-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full transition-all duration-300 ${
-                  servicesPct >= 100 && !servicesUnlimited ? 'bg-red-500' : 'bg-purple-600'
+                  servicesUnlimited ? 'bg-purple-500' : servicesPct >= 90 ? 'bg-amber-500' : 'bg-purple-600'
                 }`}
-                style={{ width: `${servicesUnlimited ? 25 : servicesPct}%` }}
+                style={{ width: `${servicesPct}%` }}
               />
             </div>
 
             <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
-              <span>
-                {servicesUnlimited
-                  ? 'Unlimited services allowed'
-                  : `${Math.max(0, usage.maxServices - usage.servicesCount)} service slots remaining`}
-              </span>
+              <span>{servicesUnlimited ? 'Unlimited catalog size' : `${Math.max(0, usage.maxServices - usage.servicesCount)} services remaining`}</span>
               <span className="font-bold">{servicesUnlimited ? 'Unlimited' : `${servicesPct}%`}</span>
             </div>
           </div>
 
-          {/* WhatsApp Gauge */}
+          {/* WhatsApp Invoices Limit */}
           <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -339,7 +435,7 @@ export default function SalonSubscriptionPage() {
               Explore Subscription Plans
             </h3>
             <p className="text-xs text-neutral-500">
-              Upgrade anytime with instant UPI / card activation. No data is ever lost upon plan changes.
+              Upgrade anytime with instant Razorpay checkout (UPI, QR Code, Cards & Netbanking).
             </p>
           </div>
 
@@ -360,84 +456,94 @@ export default function SalonSubscriptionPage() {
                 }`}
               />
             </button>
-            <span className={`text-xs font-bold flex items-center gap-1 ${interval === 'yearly' ? 'text-slate-900' : 'text-slate-500'}`}>
-              <span>Yearly</span>
-              <span className="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase">
-                Save 17%
+            <div className="flex items-center gap-1.5">
+              <span className={`text-xs font-bold ${interval === 'yearly' ? 'text-[#b3135b]' : 'text-slate-500'}`}>
+                Yearly
               </span>
-            </span>
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                Save 2 Months
+              </span>
+            </div>
           </div>
         </div>
 
         {/* 3 Plan Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {plans.map((plan) => {
-            const isCurrent = currentPlan?.slug === plan.slug;
-            const isPopular = plan.slug === 'pro' || plan.is_popular;
-            const monthlyPrice = Number(plan.price);
-            const yearlyPrice = plan.yearly_price ? Number(plan.yearly_price) : monthlyPrice * 10;
-            const price = interval === 'yearly' ? yearlyPrice : monthlyPrice;
+            const isCurrent = currentPlan?.id === plan.id;
+            const price = interval === 'yearly' ? Number(plan.yearly_price) : Number(plan.price);
+            const isPopular = plan.is_popular || plan.slug === 'pro';
 
             return (
               <div
                 key={plan.id}
-                className={`bg-white rounded-3xl border-2 transition-all p-6 flex flex-col justify-between shadow-xs relative ${
+                className={`relative bg-white rounded-3xl p-6 sm:p-7 border transition-all flex flex-col justify-between ${
                   isCurrent
-                    ? 'border-[#b3135b] ring-4 ring-pink-50'
+                    ? 'border-emerald-500/80 shadow-md ring-2 ring-emerald-500/20'
                     : isPopular
-                    ? 'border-purple-300 shadow-md'
-                    : 'border-slate-200 hover:border-slate-300'
+                    ? 'border-[#b3135b] shadow-xl ring-2 ring-pink-500/20'
+                    : 'border-neutral-200 shadow-xs hover:border-neutral-300'
                 }`}
               >
-                {isPopular && (
-                  <span className="absolute -top-3 right-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-xs">
+                {/* Popular / Current Badges */}
+                {isCurrent && (
+                  <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
+                    Current Plan
+                  </div>
+                )}
+                {!isCurrent && isPopular && (
+                  <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#b3135b] text-white shadow-xs flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
                     Most Popular
-                  </span>
+                  </div>
                 )}
 
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-extrabold text-[#2a1630] text-lg">{plan.name}</h4>
-                    {isCurrent && (
-                      <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                        Current Tier
+                  <div className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+                    {plan.name} Tier
+                  </div>
+                  <h4 className="text-2xl font-black text-slate-900 mt-1">{plan.name}</h4>
+                  <p className="text-xs text-neutral-500 mt-1 min-h-[32px]">{plan.description}</p>
+
+                  <div className="my-5 pb-5 border-b border-neutral-100">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-slate-900">
+                        ₹{Number(price).toLocaleString('en-IN')}
                       </span>
+                      <span className="text-xs font-bold text-neutral-400">
+                        /{interval === 'yearly' ? 'year' : 'month'}
+                      </span>
+                    </div>
+                    {interval === 'yearly' && (
+                      <div className="text-[11px] text-emerald-600 font-bold mt-1">
+                        Equivalent to ₹{Math.round(price / 12).toLocaleString('en-IN')}/month
+                      </div>
                     )}
                   </div>
 
-                  <p className="text-xs text-neutral-500 mb-4 min-h-[32px]">{plan.description}</p>
-
-                  <div className="mb-4">
-                    <span className="text-3xl font-black text-[#2a1630]">
-                      ₹{Number(price).toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-xs text-neutral-500 ml-1">
-                      /{interval === 'yearly' ? 'year' : 'month'}
-                    </span>
-                  </div>
-
-                  {/* Limits Badge */}
-                  <div className="bg-slate-50 rounded-2xl p-3 mb-4 space-y-1.5 text-xs text-slate-600">
-                    <div className="flex justify-between">
-                      <span>Stylists Limit:</span>
-                      <strong className="text-slate-900">
-                        {plan.limits?.max_staff === 0 ? 'Unlimited' : `${plan.limits?.max_staff || 3} Staff`}
-                      </strong>
+                  {/* Limits bullets */}
+                  <div className="space-y-2 mb-5">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                      <Users className="w-4 h-4 text-[#b3135b] shrink-0" />
+                      <span>
+                        {plan.limits?.max_staff === 0 ? 'Unlimited Staff' : `Up to ${plan.limits?.max_staff || 3} Staff Members`}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Services Limit:</span>
-                      <strong className="text-slate-900">
-                        {plan.limits?.max_services === 0 ? 'Unlimited' : `${plan.limits?.max_services || 30} Services`}
-                      </strong>
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                      <Scissors className="w-4 h-4 text-[#b3135b] shrink-0" />
+                      <span>
+                        {plan.limits?.max_services === 0 ? 'Unlimited Services' : `Up to ${plan.limits?.max_services || 30} Services`}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>WhatsApp Quota:</span>
-                      <strong className="text-slate-900">
-                        {plan.limits?.wa_per_month === 0 ? 'None (0)' : `${plan.limits?.wa_per_month || 200}/month`}
-                      </strong>
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                      <MessageSquare className="w-4 h-4 text-[#b3135b] shrink-0" />
+                      <span>
+                        {(plan.limits?.wa_per_month || 0) === 0 ? '0 WhatsApp Invoices' : `${plan.limits.wa_per_month} WhatsApp/mo`}
+                      </span>
                     </div>
                   </div>
 
+                  {/* Feature Checklist */}
                   <div className="space-y-2 border-t border-neutral-100 pt-4">
                     {(Array.isArray(plan.features) ? plan.features : []).map((feat: string, i: number) => (
                       <div key={i} className="flex items-start gap-2 text-xs text-neutral-600">
@@ -452,7 +558,7 @@ export default function SalonSubscriptionPage() {
                   type="button"
                   onClick={() => handleActivatePlan(plan.id)}
                   disabled={activating || isCurrent}
-                  className={`w-full mt-6 py-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95 cursor-pointer ${
+                  className={`w-full mt-6 py-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer ${
                     isCurrent
                       ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                       : isPopular
@@ -460,13 +566,13 @@ export default function SalonSubscriptionPage() {
                       : 'bg-slate-900 hover:bg-slate-800 text-white'
                   }`}
                 >
-                  <CreditCard className="w-3.5 h-3.5" />
+                  <CreditCard className="w-4 h-4" />
                   <span>
                     {isCurrent
                       ? 'Active Current Plan'
                       : activating
-                      ? 'Activating Plan...'
-                      : `Activate ${plan.name} (₹${Number(price).toLocaleString('en-IN')})`}
+                      ? 'Opening Razorpay...'
+                      : `Pay with Razorpay (₹${Number(price).toLocaleString('en-IN')})`}
                   </span>
                 </button>
               </div>
@@ -474,8 +580,8 @@ export default function SalonSubscriptionPage() {
           })}
         </div>
 
-        {/* Comprehensive Feature Comparison Matrix */}
-        <div className="bg-white rounded-3xl border border-neutral-200/90 overflow-hidden shadow-xs">
+        {/* 4. Detailed Feature Comparison Matrix */}
+        <div className="bg-white rounded-3xl border border-neutral-200/90 overflow-hidden shadow-xs mb-8">
           <div className="p-5 bg-slate-50 border-b border-slate-200">
             <h4 className="font-extrabold text-sm text-slate-900">
               Detailed Plan Feature Matrix
@@ -575,6 +681,83 @@ export default function SalonSubscriptionPage() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* 5. Recent Subscription Invoices & Payment Receipts */}
+        <div className="bg-white rounded-3xl border border-neutral-200/90 overflow-hidden shadow-xs">
+          <div className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-[#b3135b]" />
+                <span>Subscription Payment Invoices & Receipts</span>
+              </h4>
+              <p className="text-xs text-slate-500">
+                Official transaction history with verified Razorpay payment IDs
+              </p>
+            </div>
+            <span className="text-xs font-bold text-slate-400">
+              {pastPayments.length} Record{pastPayments.length === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          {pastPayments.length === 0 ? (
+            <div className="p-8 text-center text-xs text-neutral-400">
+              No previous Razorpay subscription payments recorded for this salon yet.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50/50 text-slate-600">
+                    <th className="py-3 px-4 font-bold">Date & Time</th>
+                    <th className="py-3 px-4 font-bold">Plan Tier</th>
+                    <th className="py-3 px-4 font-bold">Billing Interval</th>
+                    <th className="py-3 px-4 font-bold">Amount</th>
+                    <th className="py-3 px-4 font-bold">Razorpay Payment ID</th>
+                    <th className="py-3 px-4 font-bold text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {pastPayments.map((pay) => (
+                    <tr key={pay.id} className="hover:bg-slate-50/50">
+                      <td className="py-3 px-4 text-slate-700 font-medium">
+                        {new Date(pay.created_at).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </td>
+                      <td className="py-3 px-4 font-bold text-slate-900">{pay.plan_name}</td>
+                      <td className="py-3 px-4 text-slate-600 uppercase font-semibold text-[10px]">
+                        {pay.billing_interval}
+                      </td>
+                      <td className="py-3 px-4 font-black text-slate-900">
+                        ₹{Number(pay.amount).toLocaleString('en-IN')}
+                      </td>
+                      <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
+                        {pay.razorpay_payment_id || pay.razorpay_order_id || '—'}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            pay.status === 'captured'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : pay.status === 'failed'
+                              ? 'bg-rose-100 text-rose-800'
+                              : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          {pay.status === 'captured' ? 'PAID' : pay.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>

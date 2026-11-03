@@ -103,6 +103,7 @@ export async function GET(request: Request) {
         trialDaysRemaining,
         subscriptionEndsAt: salon.subscription_ends_at,
         subscriptionDaysRemaining,
+        validTill: isTrial ? salon.trial_ends_at : (salon.subscription_ends_at || salon.trial_ends_at),
         isSubscriptionExpiringSoon,
         customDomainVerified: Boolean(salon.custom_domain_verified),
         currentPlan: planContext ? {
@@ -123,6 +124,8 @@ export async function GET(request: Request) {
           maxServices: limits.max_services,
           waMessagesCount: usage.waMessagesCount,
           maxWaMessages: limits.wa_per_month,
+          waSentThisMonth: usage.waMessagesCount,
+          waLimit: limits.wa_per_month,
           period: usage.period,
         },
         flags,

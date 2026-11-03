@@ -193,17 +193,22 @@ export default function SalonSubscriptionPage() {
     maxStaff: 3,
     servicesCount: 0,
     maxServices: 30,
+    waMessagesCount: 0,
+    maxWaMessages: 0,
     waSentThisMonth: 0,
     waLimit: 0,
   };
 
   const staffUnlimited = usage.maxStaff === 0;
-  const staffPct = staffUnlimited ? 10 : Math.min(100, Math.round((usage.staffCount / (usage.maxStaff || 1)) * 100));
+  const staffPct = staffUnlimited ? 10 : Math.min(100, Math.round((Number(usage.staffCount || 0) / (usage.maxStaff || 1)) * 100));
 
   const servicesUnlimited = usage.maxServices === 0;
-  const servicesPct = servicesUnlimited ? 10 : Math.min(100, Math.round((usage.servicesCount / (usage.maxServices || 1)) * 100));
+  const servicesPct = servicesUnlimited ? 10 : Math.min(100, Math.round((Number(usage.servicesCount || 0) / (usage.maxServices || 1)) * 100));
 
-  const waPct = usage.waLimit === 0 ? 0 : Math.min(100, Math.round((usage.waSentThisMonth / usage.waLimit) * 100));
+  const waCount = Number(usage.waMessagesCount ?? usage.waSentThisMonth ?? 0);
+  const waLimit = Number(usage.maxWaMessages ?? usage.waLimit ?? 0);
+  const waUnlimited = waLimit === 0 && currentPlan?.slug === 'premium';
+  const waPct = waLimit === 0 ? 0 : Math.min(100, Math.round((waCount / waLimit) * 100));
 
   return (
     <div className="space-y-8 pb-16">
@@ -311,12 +316,16 @@ export default function SalonSubscriptionPage() {
               </span>
             </div>
 
-            {subscription?.subscriptionEndsAt && (
+            {(subscription?.validTill || (subscription?.status === 'trial' ? subscription?.trialEndsAt : subscription?.subscriptionEndsAt)) && (
               <div className="text-[10px] text-pink-200/60 mt-1 flex items-center gap-1">
                 <Clock className="w-3 h-3 shrink-0" />
                 <span>
-                  Valid till{' '}
-                  {new Date(subscription.subscriptionEndsAt).toLocaleDateString('en-IN', {
+                  {subscription?.status === 'trial' ? 'Trial ends on ' : 'Valid till '}
+                  {new Date(
+                    subscription?.status === 'trial'
+                      ? (subscription?.trialEndsAt || subscription?.validTill)
+                      : (subscription?.subscriptionEndsAt || subscription?.validTill || subscription?.trialEndsAt)
+                  ).toLocaleDateString('en-IN', {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',
@@ -409,26 +418,28 @@ export default function SalonSubscriptionPage() {
                 <span className="text-xs font-bold text-slate-700">WhatsApp This Month</span>
               </div>
               <span className="text-xs font-black text-slate-900">
-                {usage.waSentThisMonth} / {usage.waLimit === 0 ? '0' : usage.waLimit}
+                {waCount} / {waUnlimited ? '∞' : waLimit}
               </span>
             </div>
 
             <div className="w-full bg-slate-100 rounded-full h-2.5 my-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full transition-all duration-300 ${
-                  usage.waLimit === 0 ? 'bg-slate-300' : waPct >= 90 ? 'bg-amber-500' : 'bg-emerald-600'
+                  waUnlimited ? 'bg-emerald-500' : waLimit === 0 ? 'bg-slate-300' : waPct >= 90 ? 'bg-amber-500' : 'bg-emerald-600'
                 }`}
-                style={{ width: `${usage.waLimit === 0 ? 0 : waPct}%` }}
+                style={{ width: `${waUnlimited ? 10 : waLimit === 0 ? 0 : waPct}%` }}
               />
             </div>
 
             <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
               <span>
-                {usage.waLimit === 0
+                {waLimit === 0 && !waUnlimited
                   ? 'No WhatsApp included (Upgrade to Pro)'
-                  : `${Math.max(0, usage.waLimit - usage.waSentThisMonth)} messages remaining`}
+                  : waUnlimited
+                  ? 'Unlimited WhatsApp messages'
+                  : `${Math.max(0, waLimit - waCount)} messages remaining`}
               </span>
-              <span className="font-bold">{usage.waLimit === 0 ? '0%' : `${waPct}%`}</span>
+              <span className="font-bold">{waLimit === 0 ? '0%' : `${waPct}%`}</span>
             </div>
           </div>
         </div>

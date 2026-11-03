@@ -93,6 +93,17 @@ export async function POST(request: Request) {
       success: true,
       message: `Payment successful! Your salon is now activated on the ${plan.name} plan.`,
       salon: salonUpdateRes.rows[0],
+      plan: {
+        id: plan.id,
+        name: plan.name,
+        slug: plan.slug,
+        price: isYearly ? plan.yearly_price : plan.price,
+        billingInterval: interval,
+        features: Array.isArray(plan.features) ? plan.features : [],
+        limits: plan.limits || {},
+        flags: plan.flags || {},
+      },
+      subscriptionEndsAt: salonUpdateRes.rows[0].subscription_ends_at,
       paymentId: razorpay_payment_id,
       orderId: razorpay_order_id,
     });

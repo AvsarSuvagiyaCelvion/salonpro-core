@@ -104,6 +104,7 @@ export async function GET(request: Request) {
         subscriptionEndsAt: salon.subscription_ends_at,
         subscriptionDaysRemaining,
         validTill: isTrial ? salon.trial_ends_at : (salon.subscription_ends_at || salon.trial_ends_at),
+        daysRemaining: isTrial ? trialDaysRemaining : subscriptionDaysRemaining,
         isSubscriptionExpiringSoon,
         customDomainVerified: Boolean(salon.custom_domain_verified),
         currentPlan: planContext ? {

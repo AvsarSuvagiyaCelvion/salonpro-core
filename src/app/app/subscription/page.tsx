@@ -15,6 +15,11 @@ import {
   Scissors,
   MessageSquare,
   Receipt,
+  Loader2,
+  Calendar,
+  Award,
+  ArrowRight,
+  ChevronRight,
 } from 'lucide-react';
 
 function loadRazorpayScript(): Promise<boolean> {
@@ -23,6 +28,7 @@ function loadRazorpayScript(): Promise<boolean> {
     if ((window as any).Razorpay) return resolve(true);
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
@@ -35,9 +41,15 @@ export default function SalonSubscriptionPage() {
   const [pastPayments, setPastPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
-  const [activating, setActivating] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [activatingPlanId, setActivatingPlanId] = useState<string | null>(null);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [celebrationData, setCelebrationData] = useState<any | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Preload Razorpay checkout script on mount so first click opens instantly
+  useEffect(() => {
+    loadRazorpayScript();
+  }, []);
 
   async function loadData() {
     try {
@@ -74,11 +86,12 @@ export default function SalonSubscriptionPage() {
   }, []);
 
   async function handleActivatePlan(planId: string) {
-    setActivating(true);
+    if (activatingPlanId) return; // Prevent double clicks
+    setActivatingPlanId(planId);
     setMessage(null);
 
     try {
-      // 1. Load Razorpay script in browser
+      // 1. Ensure Razorpay script is ready
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         throw new Error('Unable to load Razorpay payment gateway. Please check your internet connection.');
@@ -116,12 +129,15 @@ export default function SalonSubscriptionPage() {
         },
         modal: {
           ondismiss: function () {
-            setActivating(false);
+            setActivatingPlanId(null);
           },
         },
         handler: async function (response: any) {
+          // Immediately show verification loading state so user knows work is in progress
+          setVerifyingPayment(true);
+          setActivatingPlanId(null);
+
           try {
-            setActivating(true);
             // 4. Verify signature on server
             const verifyRes = await fetch('/api/subscription/razorpay/verify', {
               method: 'POST',
@@ -137,22 +153,18 @@ export default function SalonSubscriptionPage() {
 
             const verifyData = await verifyRes.json();
             if (verifyRes.ok) {
-              setPaymentSuccess(true);
-              setMessage({
-                type: 'success',
-                text: `Payment Successful! Payment ID: ${response.razorpay_payment_id}. Your salon subscription is now active!`,
-              });
-              setTimeout(() => {
-                setPaymentSuccess(false);
-                loadData();
-              }, 2500);
+              setCelebrationData(verifyData);
+              // Refresh subscription status immediately in background
+              loadData();
             } else {
               setMessage({ type: 'error', text: verifyData.error || 'Payment signature verification failed.' });
+              alert(verifyData.error || 'Payment verification failed.');
             }
           } catch (vErr: any) {
             setMessage({ type: 'error', text: vErr.message || 'Payment verification error.' });
+            alert(vErr.message || 'Payment verification error.');
           } finally {
-            setActivating(false);
+            setVerifyingPayment(false);
           }
         },
       };
@@ -165,7 +177,7 @@ export default function SalonSubscriptionPage() {
           text: `Payment Failed: ${errMsg}`,
         });
         alert(`Payment Failed: ${errMsg}`);
-        setActivating(false);
+        setActivatingPlanId(null);
       });
 
       razorpay.open();
@@ -174,7 +186,7 @@ export default function SalonSubscriptionPage() {
       const errMsg = err.message || 'Payment processing error.';
       setMessage({ type: 'error', text: errMsg });
       alert(errMsg);
-      setActivating(false);
+      setActivatingPlanId(null);
     }
   }
 
@@ -188,6 +200,14 @@ export default function SalonSubscriptionPage() {
   }
 
   const currentPlan = subscription?.currentPlan;
+  const isTrial = subscription?.status === 'trial';
+  const isActivePaid = subscription?.status === 'active' && !isTrial;
+  const daysLeft = subscription?.daysRemaining ?? subscription?.subscriptionDaysRemaining ?? subscription?.trialDaysRemaining ?? 30;
+
+  const validTillDate = isTrial
+    ? (subscription?.trialEndsAt || subscription?.validTill)
+    : (subscription?.subscriptionEndsAt || subscription?.validTill);
+
   const usage = subscription?.usage || {
     staffCount: 0,
     maxStaff: 3,
@@ -213,6 +233,7 @@ export default function SalonSubscriptionPage() {
   return (
     <div className="space-y-8 pb-16">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+
       {/* Top Banner Alert (if any) */}
       {message && (
         <div
@@ -240,21 +261,115 @@ export default function SalonSubscriptionPage() {
         </div>
       )}
 
-      {/* Payment Success Overlay Toast */}
-      {paymentSuccess && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-neutral-100">
+      {/* Verifying Payment Fullscreen Spinner */}
+      {verifyingPayment && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-neutral-100">
+            <div className="w-16 h-16 border-4 border-[#b3135b] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <h3 className="text-lg font-black text-neutral-900 mb-1">Verifying Payment...</h3>
+            <p className="text-xs text-neutral-500 mb-2">
+              Confirming transaction with Razorpay and unlocking all your plan facilities.
+            </p>
+            <div className="text-[11px] font-bold text-pink-700 bg-pink-50 py-1 px-3 rounded-full inline-block">
+              Please do not refresh this window
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Success Celebration Modal with Unlocked Facilities & 30-Day Validity */}
+      {celebrationData && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl border border-neutral-100 relative overflow-hidden">
             <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h3 className="text-xl font-black text-neutral-900 mb-2">Payment Successful!</h3>
-            <p className="text-xs text-neutral-600 mb-6">
-              Your Razorpay transaction was verified. Your salon plan has been upgraded and all premium features are active!
-            </p>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200">
-              <Sparkles className="w-4 h-4" />
-              <span>Features Unlocked Instantly</span>
+
+            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
+              Payment Successful
+            </span>
+
+            <h3 className="text-2xl font-black text-neutral-900 mt-2">
+              Welcome to {celebrationData.plan?.name || 'Pro'} Plan!
+            </h3>
+
+            {/* Exact Validity Date Badge */}
+            <div className="mt-3 p-3.5 bg-gradient-to-r from-emerald-50 via-pink-50 to-purple-50 rounded-2xl border border-emerald-200/80 text-left">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-1">
+                <span className="flex items-center gap-1.5 text-emerald-700">
+                  <Calendar className="w-4 h-4" />
+                  <span>Subscription Validity:</span>
+                </span>
+                <span className="text-emerald-900 font-black">
+                  {celebrationData.plan?.billingInterval === 'yearly' ? 'Full 365 Days Access' : 'Full 30 Days Access'}
+                </span>
+              </div>
+              <div className="text-xs text-slate-600 font-semibold">
+                Active & valid till:{' '}
+                <strong className="text-slate-900 font-bold">
+                  {new Date(celebrationData.subscriptionEndsAt).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </strong>
+              </div>
+              {celebrationData.paymentId && (
+                <div className="text-[10px] text-slate-400 font-mono mt-1">
+                  Razorpay Payment ID: {celebrationData.paymentId}
+                </div>
+              )}
             </div>
+
+            {/* Unlocked Facilities Section */}
+            <div className="mt-5 text-left">
+              <div className="text-[11px] font-black uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-pink-600" />
+                <span>Your Unlocked Facilities & Capacity</span>
+              </div>
+
+              <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0 font-black" />
+                  <span className="font-bold text-slate-800">
+                    Stylists Capacity: {celebrationData.plan?.limits?.max_staff === 0 ? 'Unlimited Staff' : `Up to ${celebrationData.plan?.limits?.max_staff || 10} Staff Members`}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0 font-black" />
+                  <span className="font-bold text-slate-800">
+                    Services Catalog: {celebrationData.plan?.limits?.max_services === 0 ? 'Unlimited Services' : `Up to ${celebrationData.plan?.limits?.max_services || 100} Services`}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0 font-black" />
+                  <span className="font-bold text-slate-800">
+                    WhatsApp Invoices: {celebrationData.plan?.limits?.wa_per_month ? `${celebrationData.plan.limits.wa_per_month} Messages / Month` : 'Instant Digital Receipt Links'}
+                  </span>
+                </div>
+
+                {(Array.isArray(celebrationData.plan?.features) ? celebrationData.plan.features : []).map((feat: string, i: number) => (
+                  <div key={i} className="flex items-start gap-2 p-1.5 text-xs text-slate-700">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setCelebrationData(null);
+                loadData();
+              }}
+              className="w-full mt-6 py-3.5 rounded-2xl bg-[#b3135b] hover:bg-[#9c0f4e] text-white font-extrabold text-xs shadow-lg shadow-pink-900/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+            >
+              <span>Continue to Salon Workspace</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
@@ -288,48 +403,47 @@ export default function SalonSubscriptionPage() {
           </div>
 
           {/* Current Status Pill Card */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 min-w-[240px]">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 min-w-[260px]">
             <div className="text-[10px] uppercase font-bold text-pink-200/80 tracking-wider mb-1">
               Active Tier
             </div>
             <div className="text-2xl font-black text-white flex items-center gap-2">
-              <span>{currentPlan?.name || 'Pro Plan'}</span>
+              <span>{currentPlan?.name || (isActivePaid ? 'Pro Plan' : 'Pro (7-Day Trial)')}</span>
               <Zap className="w-5 h-5 text-amber-400 fill-amber-400" />
             </div>
 
             <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
               <span className="text-pink-200/70">Status:</span>
               <span
-                className={`font-black uppercase tracking-wider text-[11px] px-2 py-0.5 rounded-full ${
-                  subscription?.status === 'active'
-                    ? 'bg-emerald-400/20 text-emerald-300 border border-emerald-400/30'
-                    : subscription?.status === 'trial'
+                className={`font-black uppercase tracking-wider text-[11px] px-2.5 py-0.5 rounded-full ${
+                  isActivePaid
+                    ? 'bg-emerald-400/25 text-emerald-300 border border-emerald-400/40'
+                    : isTrial
                     ? 'bg-blue-400/20 text-blue-300 border border-blue-400/30'
                     : 'bg-rose-400/20 text-rose-300 border border-rose-400/30'
                 }`}
               >
-                {subscription?.status === 'trial'
-                  ? `Trial (${subscription?.trialDaysRemaining ?? 7}d left)`
-                  : subscription?.status === 'active'
-                  ? 'Active Paid'
-                  : 'Expired'}
+                {isActivePaid
+                  ? `ACTIVE (${daysLeft}D LEFT)`
+                  : isTrial
+                  ? `TRIAL (${subscription?.trialDaysRemaining ?? 7}D LEFT)`
+                  : 'EXPIRED'}
               </span>
             </div>
 
-            {(subscription?.validTill || (subscription?.status === 'trial' ? subscription?.trialEndsAt : subscription?.subscriptionEndsAt)) && (
-              <div className="text-[10px] text-pink-200/60 mt-1 flex items-center gap-1">
-                <Clock className="w-3 h-3 shrink-0" />
+            {validTillDate && (
+              <div className="text-[10px] text-pink-200/80 mt-2 flex items-center gap-1 font-medium">
+                <Clock className="w-3.5 h-3.5 shrink-0 text-amber-300" />
                 <span>
-                  {subscription?.status === 'trial' ? 'Trial ends on ' : 'Valid till '}
-                  {new Date(
-                    subscription?.status === 'trial'
-                      ? (subscription?.trialEndsAt || subscription?.validTill)
-                      : (subscription?.subscriptionEndsAt || subscription?.validTill || subscription?.trialEndsAt)
-                  ).toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
+                  {isTrial ? 'Trial ends on ' : 'Valid till '}
+                  <strong className="text-white font-bold">
+                    {new Date(validTillDate).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </strong>
+                  {isActivePaid && ` (${daysLeft} days remaining)`}
                 </span>
               </div>
             )}
@@ -491,22 +605,23 @@ export default function SalonSubscriptionPage() {
             const isCurrent = currentPlan?.id === plan.id;
             const price = interval === 'yearly' ? Number(plan.yearly_price) : Number(plan.price);
             const isPopular = plan.is_popular || plan.slug === 'pro';
+            const isThisActivating = activatingPlanId === plan.id;
 
             return (
               <div
                 key={plan.id}
                 className={`relative bg-white rounded-3xl p-6 sm:p-7 border transition-all flex flex-col justify-between ${
-                  isCurrent
-                    ? 'border-emerald-500/80 shadow-md ring-2 ring-emerald-500/20'
+                  isCurrent && isActivePaid
+                    ? 'border-emerald-500 shadow-md ring-2 ring-emerald-500/20'
                     : isPopular
                     ? 'border-[#b3135b] shadow-xl ring-2 ring-pink-500/20'
                     : 'border-neutral-200 shadow-xs hover:border-neutral-300'
                 }`}
               >
                 {/* Popular / Current Badges */}
-                {isCurrent && (
+                {isCurrent && isActivePaid && (
                   <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
-                    Current Plan
+                    Current Active Plan
                   </div>
                 )}
                 {!isCurrent && isPopular && (
@@ -575,23 +690,32 @@ export default function SalonSubscriptionPage() {
                 <button
                   type="button"
                   onClick={() => handleActivatePlan(plan.id)}
-                  disabled={activating || isCurrent}
+                  disabled={Boolean(activatingPlanId) || (isCurrent && isActivePaid)}
                   className={`w-full mt-6 py-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer ${
-                    isCurrent
-                      ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    isCurrent && isActivePaid
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-not-allowed'
+                      : isThisActivating
+                      ? 'bg-neutral-800 text-white cursor-wait opacity-80'
                       : isPopular
                       ? 'bg-[#b3135b] hover:bg-[#9c0f4e] text-white shadow-pink-900/20'
                       : 'bg-slate-900 hover:bg-slate-800 text-white'
                   }`}
                 >
-                  <CreditCard className="w-4 h-4" />
-                  <span>
-                    {isCurrent
-                      ? 'Active Current Plan'
-                      : activating
-                      ? 'Opening Razorpay...'
-                      : `Pay with Razorpay (₹${Number(price).toLocaleString('en-IN')})`}
-                  </span>
+                  {isThisActivating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-pink-400" />
+                      <span>Opening Gateway...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4" />
+                      <span>
+                        {isCurrent && isActivePaid
+                          ? `Active Plan (Valid till ${validTillDate ? new Date(validTillDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''})`
+                          : `Pay with Razorpay (₹${Number(price).toLocaleString('en-IN')})`}
+                      </span>
+                    </>
+                  )}
                 </button>
               </div>
             );

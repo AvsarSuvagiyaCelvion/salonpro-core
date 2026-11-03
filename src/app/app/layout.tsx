@@ -336,6 +336,44 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
+      {/* Active Paid Plan Banner (Shown when salon has active paid subscription) */}
+      {!subscription?.isTrial && subscription?.status === 'active' && !(subscription as any)?.isSubscriptionExpiringSoon && (
+        <div className="shrink-0 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-emerald-800 shadow-xs">
+          <div className="flex items-center gap-2 truncate text-[11px] sm:text-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+            <span className="truncate">
+              <strong className="text-emerald-300 font-black">💎 {subscription.currentPlan?.name || 'Pro'} Active:</strong>{' '}
+              <span className="text-emerald-100 font-bold">
+                {(subscription as any)?.subscriptionDaysRemaining ?? 30} days remaining
+              </span>
+              {subscription.subscriptionEndsAt && (
+                <span className="hidden md:inline text-white/70">
+                  {' '}· Valid till {new Date(subscription.subscriptionEndsAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              )}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/app/subscription"
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-500/40 text-[10px] sm:text-[11px] hover:bg-emerald-500/30 transition-all"
+            >
+              <span>Manage Plan</span>
+            </Link>
+            {salon?.slug && (
+              <Link
+                href={`/${salon.slug}`}
+                target="_blank"
+                className="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-300/80 hover:text-white transition-colors underline ml-2"
+              >
+                <span>Live Booking</span>
+                <ExternalLink className="w-3 h-3" />
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Paid Plan Expiring Soon Banner (<= 7 days remaining) */}
       {Boolean((subscription as any)?.isSubscriptionExpiringSoon && !subscription?.isTrial) && (
         <div className="shrink-0 bg-gradient-to-r from-amber-800 via-rose-900 to-[#b3135b] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-amber-600 shadow-xs">

@@ -1,8 +1,13 @@
 import crypto from 'crypto';
 
 export function getRazorpayKeys() {
-  const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  const keyId =
+    process.env.RAZORPAY_KEY_ID ||
+    process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+    'rzp_test_TvkGEaLaUlVYMt';
+  const keySecret =
+    process.env.RAZORPAY_KEY_SECRET ||
+    'ZJ3XD3w1OMLW3SgPXmJekEUS';
 
   if (!keyId || !keySecret) {
     throw new Error('Razorpay API keys are not configured in environment variables.');
@@ -86,3 +91,4 @@ export function verifyRazorpayPaymentSignature({
     Buffer.from(signature, 'utf-8')
   );
 }
+

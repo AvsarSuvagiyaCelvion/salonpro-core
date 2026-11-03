@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Script from 'next/script';
 import {
   CreditCard,
   CheckCircle2,
@@ -158,16 +159,21 @@ export default function SalonSubscriptionPage() {
 
       const razorpay = new (window as any).Razorpay(options);
       razorpay.on('payment.failed', function (resp: any) {
+        const errMsg = resp.error?.description || resp.error?.reason || 'Transaction could not be completed.';
         setMessage({
           type: 'error',
-          text: `Payment Failed: ${resp.error.description || resp.error.reason || 'Transaction could not be completed.'}`,
+          text: `Payment Failed: ${errMsg}`,
         });
+        alert(`Payment Failed: ${errMsg}`);
         setActivating(false);
       });
 
       razorpay.open();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Payment processing error.' });
+      console.error('handleActivatePlan error:', err);
+      const errMsg = err.message || 'Payment processing error.';
+      setMessage({ type: 'error', text: errMsg });
+      alert(errMsg);
       setActivating(false);
     }
   }
@@ -201,6 +207,7 @@ export default function SalonSubscriptionPage() {
 
   return (
     <div className="space-y-8 pb-16">
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       {/* Top Banner Alert (if any) */}
       {message && (
         <div

@@ -19,3 +19,4 @@ CREATE TABLE IF NOT EXISTS subscription_payments (
 
 CREATE INDEX IF NOT EXISTS idx_sub_payments_salon ON subscription_payments(salon_id);
 CREATE INDEX IF NOT EXISTS idx_sub_payments_order ON subscription_payments(razorpay_order_id);
+

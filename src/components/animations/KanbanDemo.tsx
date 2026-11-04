@@ -256,3 +256,4 @@ export default function KanbanDemo() {
     </div>
   );
 }
+

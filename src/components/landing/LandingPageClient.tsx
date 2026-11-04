@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   CheckCircle2,
@@ -50,11 +50,11 @@ export default function LandingPageClient() {
     <SmoothScroll>
       <PageLoader />
 
-      <div className="min-h-screen bg-[#fafbfc] text-slate-900 font-sans selection:bg-pink-500 selection:text-white w-full max-w-full overflow-x-hidden relative">
+      <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0c0610] text-slate-900 dark:text-slate-100 font-sans selection:bg-pink-500 selection:text-white w-full max-w-full overflow-x-hidden relative transition-colors duration-500">
         {/* Animated Aurora Gradient Background with Desktop Cursor Spotlight */}
         <AuroraBackground />
 
-        {/* Top Sticky Glassmorphism Navbar */}
+        {/* Top Sticky Glassmorphism Navbar with Theme Switcher */}
         <LandingNavbar />
 
         {/* ================= HERO SECTION ================= */}
@@ -63,11 +63,11 @@ export default function LandingPageClient() {
           <FloatingIcons />
 
           {/* Live Beacon Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-white text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 shadow-md shadow-slate-900/10 max-w-full">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 dark:bg-pink-950/70 border border-slate-700 dark:border-pink-500/30 text-white text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 shadow-md shadow-slate-900/10 max-w-full">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
             <span className="text-emerald-300 font-extrabold">LIVE DEMO AVAILABLE</span>
             <span className="text-slate-500">·</span>
-            <span className="text-slate-300">Smart Salon & Spa Management Suite</span>
+            <span className="text-slate-300 dark:text-pink-200">Smart Salon & Spa Management Suite</span>
           </div>
 
           {/* H1 Typewriter Effect with Invisible CLS Barrier & Blinking Pink Caret */}
@@ -84,9 +84,9 @@ export default function LandingPageClient() {
             animate={typewriterDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-xs sm:text-base lg:text-lg text-slate-600 mt-4 sm:mt-6 max-w-2xl mx-auto leading-relaxed px-1">
+            <p className="text-xs sm:text-base lg:text-lg text-slate-600 dark:text-slate-300 mt-4 sm:mt-6 max-w-2xl mx-auto leading-relaxed px-1">
               The all-in-one operating system for salons & spas:{' '}
-              <strong>conflict-free online client booking</strong>, live studio Kanban, 10-second GST POS
+              <strong className="text-slate-900 dark:text-white">conflict-free online client booking</strong>, live studio Kanban, 10-second GST POS
               billing, staff commission tracking, and instant WhatsApp receipts.
             </p>
 
@@ -113,25 +113,25 @@ export default function LandingPageClient() {
 
               <Link
                 href="/login"
-                className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#180e1c] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-xs sm:text-sm border border-slate-300 dark:border-pink-500/20 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
-                <Lock className="w-4 h-4 text-slate-500" />
+                <Lock className="w-4 h-4 text-slate-500 dark:text-pink-400" />
                 <span>🔐 Owner Portal</span>
               </Link>
             </div>
 
             {/* Quick Micro-Trust Badges */}
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-500 font-medium">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>No credit card required</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Setup in 60 seconds</span>
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Complete All-in-One Salon System</span>
               </span>
             </div>
@@ -155,11 +155,11 @@ export default function LandingPageClient() {
         <section id="problems" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24">
           <Reveal>
             <div className="text-center mb-10 sm:mb-14">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-rose-600 mb-2">Common Salon Headaches</h2>
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 mb-2">Common Salon Headaches</h2>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 Running a Salon Shouldn&apos;t Feel Like Chaos
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-xl mx-auto leading-relaxed">
                 Traditional salons waste hours on manual registers and lose clients due to poor booking coordination.
                 Flip each card to see how SalonPro eliminates every pain point:
               </p>
@@ -208,14 +208,14 @@ export default function LandingPageClient() {
         </section>
 
         {/* ================= SECTION: HOW IT WORKS (ANIMATED TIMELINE) ================= */}
-        <section id="how-it-works" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-slate-200/80">
+        <section id="how-it-works" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-slate-200/80 dark:border-slate-800/80">
           <Reveal>
             <div className="text-center mb-10 sm:mb-14">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#b3135b] mb-2">Simple Multi-Tenant Workflow</h2>
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#b3135b] dark:text-pink-400 mb-2">Simple Multi-Tenant Workflow</h2>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 How SalonPro Works in Your Salon (Example: &quot;Priya Salon&quot;)
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-xl mx-auto leading-relaxed">
                 Clean segregation between your internal salon operations and what your customers see.
               </p>
             </div>
@@ -228,11 +228,11 @@ export default function LandingPageClient() {
         </section>
 
         {/* ================= SECTION: FEATURES GRID (3D TILT CARDS & LIVE WIDGETS) ================= */}
-        <section id="features" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-slate-200/80">
+        <section id="features" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-slate-200/80 dark:border-slate-800/80">
           <Reveal>
             <div className="text-center mb-10 sm:mb-14">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-purple-600 mb-2">Everything Included</h2>
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-2">Everything Included</h2>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 Built from Ground Up for Beauty & Wellness Studios
               </h3>
             </div>
@@ -241,101 +241,101 @@ export default function LandingPageClient() {
           <Reveal delay={0.15}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {/* Feature 1: Calendar + Animated Slot Filling Demo */}
-              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-pink-50 text-[#b3135b] flex items-center justify-center mb-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-pink-50 dark:bg-pink-950/60 text-[#b3135b] dark:text-pink-300 flex items-center justify-center mb-4 shadow-xs">
                     <Calendar className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-sm sm:text-base text-slate-900">Smart Appointments Calendar</h4>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">Smart Appointments Calendar</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                     Day, week, and list views. Filter by stylist, mark customer arrivals with 1-click, and reschedule effortlessly.
                   </p>
-                  <div className="mt-4 pt-3 border-t border-slate-100">
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <CalendarSlotsDemo />
                   </div>
                 </div>
               </TiltCard>
 
               {/* Feature 2: Live Studio Kanban */}
-              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 flex items-center justify-center mb-4 shadow-xs">
                     <Scissors className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-sm sm:text-base text-slate-900">Live Studio Kanban</h4>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">Live Studio Kanban</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                     Track walk-in waiting queues, currently seated chairs, and completed sessions ready for POS billing.
                   </p>
-                  <div className="mt-4 p-3 rounded-2xl bg-purple-50/60 border border-purple-100 text-[11px] text-purple-900 space-y-1">
+                  <div className="mt-4 p-3 rounded-2xl bg-purple-50/60 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-800/40 text-[11px] text-purple-900 dark:text-purple-200 space-y-1">
                     <div className="font-bold">⚡ Dynamic Visual Queuing:</div>
-                    <p className="text-slate-600 text-[10px]">Staff drag-and-drop client cards as they move from waiting lounge to chair.</p>
+                    <p className="text-slate-600 dark:text-slate-400 text-[10px]">Staff drag-and-drop client cards as they move from waiting lounge to chair.</p>
                   </div>
                 </div>
               </TiltCard>
 
               {/* Feature 3: POS Billing + Animated Line-by-Line GST Invoice Demo */}
-              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 flex items-center justify-center mb-4 shadow-xs">
                     <Receipt className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-sm sm:text-base text-slate-900">POS Billing with GST</h4>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">POS Billing with GST</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                     Itemized service and product checkout. Handles CGST (9%) + SGST (9%), discounts, and split payments (Cash + UPI).
                   </p>
-                  <div className="mt-4 pt-3 border-t border-slate-100">
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <PosInvoiceDemo />
                   </div>
                 </div>
               </TiltCard>
 
               {/* Feature 4: Staff Commission Automation */}
-              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-300 flex items-center justify-center mb-4 shadow-xs">
                     <Users className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-sm sm:text-base text-slate-900">Staff Commission Automation</h4>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">Staff Commission Automation</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                     Set separate commission percentages for services and retail products. Export transparent payroll reports.
                   </p>
-                  <div className="mt-4 p-3 rounded-2xl bg-amber-50/60 border border-amber-100 text-[11px] text-amber-900 space-y-1">
+                  <div className="mt-4 p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800/40 text-[11px] text-amber-900 dark:text-amber-200 space-y-1">
                     <div className="font-bold">📊 Stylist Breakdown:</div>
-                    <p className="text-slate-600 text-[10px]">Real-time commission calculation per service cut and product sale.</p>
+                    <p className="text-slate-600 dark:text-slate-400 text-[10px]">Real-time commission calculation per service cut and product sale.</p>
                   </div>
                 </div>
               </TiltCard>
 
               {/* Feature 5: VIP Memberships */}
-              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300 flex items-center justify-center mb-4 shadow-xs">
                     <Award className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-sm sm:text-base text-slate-900">VIP Memberships & Discounts</h4>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">VIP Memberships & Discounts</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                     Sell Gold or Platinum annual memberships. Member discounts are automatically pre-filled during billing checkout.
                   </p>
-                  <div className="mt-4 p-3 rounded-2xl bg-rose-50/60 border border-rose-100 text-[11px] text-rose-900 space-y-1">
+                  <div className="mt-4 p-3 rounded-2xl bg-rose-50/60 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-800/40 text-[11px] text-rose-900 dark:text-rose-200 space-y-1">
                     <div className="font-bold">⭐ Recurring Loyalty:</div>
-                    <p className="text-slate-600 text-[10px]">Up to 35%+ higher customer lifetime value with automated member tiers.</p>
+                    <p className="text-slate-600 dark:text-slate-400 text-[10px]">Up to 35%+ higher customer lifetime value with automated member tiers.</p>
                   </div>
                 </div>
               </TiltCard>
 
               {/* Feature 6: Daily Cash & Sales Reports */}
-              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between">
+              <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-4 shadow-xs">
+                  <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-300 flex items-center justify-center mb-4 shadow-xs">
                     <TrendingUp className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-sm sm:text-base text-slate-900">Daily Cash & Sales Reports</h4>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">Daily Cash & Sales Reports</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                     End-of-day tally with cash breakdown, UPI payments, gross profit, and top revenue-generating treatments.
                   </p>
-                  <div className="mt-4 p-3 rounded-2xl bg-teal-50/60 border border-teal-100 text-[11px] text-teal-900 space-y-1">
+                  <div className="mt-4 p-3 rounded-2xl bg-teal-50/60 dark:bg-teal-950/40 border border-teal-100 dark:border-teal-800/40 text-[11px] text-teal-900 dark:text-teal-200 space-y-1">
                     <div className="font-bold">📈 Instant Nightly Reconciliation:</div>
-                    <p className="text-slate-600 text-[10px]">Zero missing rupees. Reconciles drawer cash with digital UPI registers.</p>
+                    <p className="text-slate-600 dark:text-slate-400 text-[10px]">Zero missing rupees. Reconciles drawer cash with digital UPI registers.</p>
                   </div>
                 </div>
               </TiltCard>
@@ -344,17 +344,17 @@ export default function LandingPageClient() {
         </section>
 
         {/* ================= SECTION: 7-DAY FREE TRIAL & PRICING ================= */}
-        <section id="pricing" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-slate-200/80">
+        <section id="pricing" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-slate-200/80 dark:border-slate-800/80">
           <Reveal>
             <div className="text-center mb-12 sm:mb-16">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-xs font-bold mb-3 shadow-xs">
-                <Gift className="w-4 h-4 text-[#b3135b]" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 dark:bg-pink-950/50 border border-pink-200 dark:border-pink-800/40 text-[#b3135b] dark:text-pink-300 text-xs font-bold mb-3 shadow-xs">
+                <Gift className="w-4 h-4 text-[#b3135b] dark:text-pink-400" />
                 <span>100% Free 7-Day Free Trial</span>
               </div>
-              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
                 Start Free for 7 Days, Upgrade as You Grow
               </h2>
-              <p className="text-xs sm:text-base text-slate-600 mt-3 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xs sm:text-base text-slate-600 dark:text-slate-400 mt-3 max-w-2xl mx-auto leading-relaxed">
                 Every new salon starts with a full-featured <strong>7-Day Free Trial</strong>. Experience real online
                 bookings, POS billing, staff commission tracking, and live chair kanban with zero upfront cost.
               </p>
@@ -364,38 +364,38 @@ export default function LandingPageClient() {
           {/* Step-by-Step Onboarding Roadmap */}
           <Reveal delay={0.15}>
             <div className="mb-14 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-              <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs relative">
-                <div className="w-10 h-10 rounded-2xl bg-pink-100 text-[#b3135b] font-black text-base flex items-center justify-center mb-3">
+              <div className="bg-white dark:bg-[#180e1c] border border-slate-200/90 dark:border-pink-500/20 rounded-2xl p-5 sm:p-6 shadow-xs relative">
+                <div className="w-10 h-10 rounded-2xl bg-pink-100 dark:bg-pink-950/80 text-[#b3135b] dark:text-pink-300 font-black text-base flex items-center justify-center mb-3">
                   1
                 </div>
-                <h4 className="font-bold text-sm sm:text-base text-slate-900">
+                <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                   Create Your Salon Account
                 </h4>
-                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
                   Enter your <strong>Full Name, Phone Number, Email, Salon Name, City & Password</strong>. Registration takes less than 60 seconds.
                 </p>
               </div>
 
-              <div className="bg-white border border-pink-300 rounded-2xl p-5 sm:p-6 shadow-xs relative ring-2 ring-pink-100">
+              <div className="bg-white dark:bg-[#180e1c] border border-pink-300 dark:border-pink-500/40 rounded-2xl p-5 sm:p-6 shadow-xs relative ring-2 ring-pink-100 dark:ring-pink-950/40">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white font-black text-base flex items-center justify-center mb-3 shadow-md shadow-pink-900/20">
                   2
                 </div>
-                <h4 className="font-bold text-sm sm:text-base text-[#b3135b]">
+                <h4 className="font-bold text-sm sm:text-base text-[#b3135b] dark:text-pink-300">
                   Instant 7-Day Free Trial Activated
                 </h4>
-                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
                   Your private salon dashboard goes live immediately. Test with your real stylists, services, and live bookings with <strong>₹0 charged</strong>.
                 </p>
               </div>
 
-              <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs relative">
-                <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-800 font-black text-base flex items-center justify-center mb-3">
+              <div className="bg-white dark:bg-[#180e1c] border border-slate-200/90 dark:border-pink-500/20 rounded-2xl p-5 sm:p-6 shadow-xs relative">
+                <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-black text-base flex items-center justify-center mb-3">
                   3
                 </div>
-                <h4 className="font-bold text-sm sm:text-base text-slate-900">
+                <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                   Owner Login & Choose Plan
                 </h4>
-                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
                   Log in anytime with your email & password. After 7 days, subscribe to your preferred plan to keep your salon active without losing any data!
                 </p>
               </div>
@@ -409,15 +409,15 @@ export default function LandingPageClient() {
         {/* ================= FINAL CTA BANNER (CONFETTI BURST & GRADIENT) ================= */}
         <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center">
           <Reveal>
-            <div className="relative overflow-hidden bg-gradient-to-r from-pink-50 via-purple-50 to-amber-50 border border-pink-200/80 rounded-2xl sm:rounded-3xl p-6 sm:p-12 shadow-sm">
+            <div className="relative overflow-hidden bg-gradient-to-r from-pink-50 via-purple-50 to-amber-50 dark:from-[#1b0b1f] dark:via-[#130718] dark:to-[#170a19] border border-pink-200/80 dark:border-pink-500/30 rounded-2xl sm:rounded-3xl p-6 sm:p-12 shadow-sm">
               {/* Subtle Animated Shimmer in Background */}
-              <div className="absolute -top-24 -left-24 w-72 h-72 bg-pink-300/20 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -top-24 -left-24 w-72 h-72 bg-pink-300/20 dark:bg-pink-600/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-purple-300/20 dark:bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
 
-              <h3 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+              <h3 className="text-xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 Ready to Automate Your Salon Operations?
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 mt-3 max-w-lg mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-3 max-w-lg mx-auto leading-relaxed">
                 Join hundreds of forward-thinking salons running with SalonPro. Setup takes under 3 minutes.
               </p>
 
@@ -433,7 +433,7 @@ export default function LandingPageClient() {
 
                 <Link
                   href="/salon-owner"
-                  className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-2xl bg-white dark:bg-[#180e1c] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-xs sm:text-sm border border-slate-300 dark:border-pink-500/20 transition-all shadow-xs flex items-center justify-center gap-2"
                 >
                   <span>Already Registered? Sign In ➔</span>
                 </Link>
@@ -453,4 +453,3 @@ export default function LandingPageClient() {
     </SmoothScroll>
   );
 }
-

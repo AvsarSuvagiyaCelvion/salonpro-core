@@ -57,7 +57,7 @@ export default function PricingCards() {
           type="button"
           onClick={() => setInterval('monthly')}
           className={`text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
-            interval === 'monthly' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            interval === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
           }`}
         >
           Monthly Billing
@@ -67,8 +67,8 @@ export default function PricingCards() {
         <button
           type="button"
           onClick={() => setInterval(interval === 'monthly' ? 'yearly' : 'monthly')}
-          className="w-14 h-8 bg-slate-200 rounded-full p-1 transition-colors relative cursor-pointer focus:outline-none shadow-inner"
-          style={{ backgroundColor: interval === 'yearly' ? '#b3135b' : '#cbd5e1' }}
+          className="w-14 h-8 bg-slate-200 dark:bg-slate-800 rounded-full p-1 transition-colors relative cursor-pointer focus:outline-none shadow-inner"
+          style={{ backgroundColor: interval === 'yearly' ? '#b3135b' : undefined }}
           aria-label="Toggle Monthly and Yearly Plans"
         >
           <motion.div
@@ -84,14 +84,14 @@ export default function PricingCards() {
           type="button"
           onClick={() => setInterval('yearly')}
           className={`text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
-            interval === 'yearly' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'
+            interval === 'yearly' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
           }`}
         >
           <span>Yearly Billing</span>
           <motion.span
             animate={shouldReduceMotion ? {} : { y: [0, -3, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider inline-block shadow-xs"
+            className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10px] font-black uppercase tracking-wider inline-block shadow-xs border dark:border-emerald-700/50"
           >
             Save 17% (2 Mo Free)
           </motion.span>
@@ -154,8 +154,8 @@ export default function PricingCards() {
                   isPro
                     ? 'bg-gradient-to-b from-[#2a1630] to-[#1a0c1e] text-white shadow-2xl border-2 border-pink-500/50 scale-102 lg:-translate-y-2'
                     : isPremium
-                    ? 'bg-white text-slate-900 border-2 border-purple-300 shadow-xl'
-                    : 'bg-white text-slate-900 border border-slate-200 shadow-sm hover:shadow-md'
+                    ? 'bg-white dark:bg-[#180e1c] text-slate-900 dark:text-white border-2 border-purple-300 dark:border-purple-600/50 shadow-xl'
+                    : 'bg-white dark:bg-[#180e1c] text-slate-900 dark:text-white border border-slate-200 dark:border-pink-500/20 shadow-sm hover:shadow-md'
                 }`}
               >
                 {isPro && (
@@ -166,7 +166,7 @@ export default function PricingCards() {
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className={`text-xl font-black ${isPro ? 'text-white' : 'text-slate-900'}`}>
+                    <h3 className={`text-xl font-black ${isPro ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                       {plan.name}
                     </h3>
                     <span
@@ -174,20 +174,20 @@ export default function PricingCards() {
                         isPro
                           ? 'bg-pink-500/30 text-pink-200 border border-pink-400/30'
                           : isPremium
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-slate-100 text-slate-700'
+                          ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       {plan.slug.toUpperCase()}
                     </span>
                   </div>
 
-                  <p className={`text-xs mb-6 min-h-[36px] ${isPro ? 'text-pink-100/80' : 'text-slate-500'}`}>
+                  <p className={`text-xs mb-6 min-h-[36px] ${isPro ? 'text-pink-100/80' : 'text-slate-500 dark:text-slate-400'}`}>
                     {plan.description || 'Full salon cloud suite with automated scheduling & billing'}
                   </p>
 
                   {/* Price Display with Animated Rolling Number */}
-                  <div className="mb-6 pb-6 border-b border-slate-100/20">
+                  <div className="mb-6 pb-6 border-b border-slate-100/20 dark:border-slate-800">
                     <div className="flex items-baseline gap-1 overflow-hidden">
                       <span className="text-2xl font-bold">₹</span>
                       <AnimatePresence mode="wait" initial={false}>
@@ -202,12 +202,12 @@ export default function PricingCards() {
                           {displayPrice.toLocaleString('en-IN')}
                         </motion.span>
                       </AnimatePresence>
-                      <span className={`text-xs ${isPro ? 'text-pink-200' : 'text-slate-500'}`}>
+                      <span className={`text-xs ${isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}`}>
                         / month
                       </span>
                     </div>
                     {interval === 'yearly' && (
-                      <div className={`text-[11px] font-semibold mt-1 ${isPro ? 'text-emerald-300' : 'text-emerald-600'}`}>
+                      <div className={`text-[11px] font-semibold mt-1 ${isPro ? 'text-emerald-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
                         Billed ₹{yearlyPrice.toLocaleString('en-IN')} annually (2 months free)
                       </div>
                     )}
@@ -219,18 +219,18 @@ export default function PricingCards() {
                   </div>
 
                   {/* Core Limits Summary */}
-                  <div className={`mb-5 p-3 rounded-2xl text-xs space-y-1.5 ${isPro ? 'bg-white/10' : 'bg-slate-50'}`}>
+                  <div className={`mb-5 p-3 rounded-2xl text-xs space-y-1.5 ${isPro ? 'bg-white/10' : 'bg-slate-50 dark:bg-slate-900/60'}`}>
                     <div className="flex items-center justify-between">
-                      <span className={isPro ? 'text-pink-200' : 'text-slate-500'}>Staff capacity:</span>
-                      <strong className={isPro ? 'text-white' : 'text-slate-900'}>{staffLimit}</strong>
+                      <span className={isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}>Staff capacity:</span>
+                      <strong className={isPro ? 'text-white' : 'text-slate-900 dark:text-white'}>{staffLimit}</strong>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={isPro ? 'text-pink-200' : 'text-slate-500'}>Service catalog:</span>
-                      <strong className={isPro ? 'text-white' : 'text-slate-900'}>{servicesLimit}</strong>
+                      <span className={isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}>Service catalog:</span>
+                      <strong className={isPro ? 'text-white' : 'text-slate-900 dark:text-white'}>{servicesLimit}</strong>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={isPro ? 'text-pink-200' : 'text-slate-500'}>WhatsApp quota:</span>
-                      <strong className={isPro ? 'text-white' : 'text-slate-900'}>{waLimit}</strong>
+                      <span className={isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}>WhatsApp quota:</span>
+                      <strong className={isPro ? 'text-white' : 'text-slate-900 dark:text-white'}>{waLimit}</strong>
                     </div>
                   </div>
 
@@ -238,8 +238,8 @@ export default function PricingCards() {
                   <div className="space-y-2.5 text-xs pb-6">
                     {(Array.isArray(plan.features) ? plan.features : []).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
-                        <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isPro ? 'text-pink-400' : 'text-emerald-600'}`} />
-                        <span className={isPro ? 'text-pink-50' : 'text-slate-700'}>{feat}</span>
+                        <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isPro ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
+                        <span className={isPro ? 'text-pink-50' : 'text-slate-700 dark:text-slate-200'}>{feat}</span>
                       </div>
                     ))}
                   </div>

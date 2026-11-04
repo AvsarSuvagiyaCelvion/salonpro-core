@@ -26,7 +26,7 @@ export default function InteractiveProductPreview() {
       <div className="absolute -inset-1.5 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-amber-500/20 rounded-3xl blur-xl opacity-70 pointer-events-none" />
 
       {/* Main Container Window */}
-      <div className="relative bg-white border border-slate-200/90 rounded-3xl shadow-2xl shadow-slate-900/10 overflow-hidden">
+      <div className="relative bg-white dark:bg-[#150a19] border border-slate-200/90 dark:border-pink-500/20 rounded-3xl shadow-2xl shadow-slate-900/10 dark:shadow-pink-950/20 overflow-hidden">
         {/* Top Browser / App Header */}
         <div className="bg-slate-900 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800">
           <div className="flex items-center gap-2">
@@ -58,13 +58,13 @@ export default function InteractiveProductPreview() {
         </div>
 
         {/* Tab Switcher Bar */}
-        <div className="bg-slate-50/80 border-b border-slate-200 px-3 sm:px-6 pt-3 flex overflow-x-auto gap-2 scrollbar-none">
+        <div className="bg-slate-50/80 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 pt-3 flex overflow-x-auto gap-2 scrollbar-none">
           <button
             onClick={() => setActiveTab('kanban')}
             className={`px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'kanban'
-                ? 'bg-white text-[#b3135b] border-[#b3135b] shadow-xs'
-                : 'text-slate-600 border-transparent hover:text-slate-900'
+                ? 'bg-white dark:bg-[#150a19] text-[#b3135b] dark:text-pink-400 border-[#b3135b] dark:border-pink-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <Scissors className="w-4 h-4" />
@@ -75,8 +75,8 @@ export default function InteractiveProductPreview() {
             onClick={() => setActiveTab('booking')}
             className={`px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'booking'
-                ? 'bg-white text-[#b3135b] border-[#b3135b] shadow-xs'
-                : 'text-slate-600 border-transparent hover:text-slate-900'
+                ? 'bg-white dark:bg-[#150a19] text-[#b3135b] dark:text-pink-400 border-[#b3135b] dark:border-pink-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <Calendar className="w-4 h-4" />
@@ -87,8 +87,8 @@ export default function InteractiveProductPreview() {
             onClick={() => setActiveTab('billing')}
             className={`px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'billing'
-                ? 'bg-white text-[#b3135b] border-[#b3135b] shadow-xs'
-                : 'text-slate-600 border-transparent hover:text-slate-900'
+                ? 'bg-white dark:bg-[#150a19] text-[#b3135b] dark:text-pink-400 border-[#b3135b] dark:border-pink-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <Receipt className="w-4 h-4" />
@@ -99,8 +99,8 @@ export default function InteractiveProductPreview() {
             onClick={() => setActiveTab('whatsapp')}
             className={`px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'whatsapp'
-                ? 'bg-white text-[#b3135b] border-[#b3135b] shadow-xs'
-                : 'text-slate-600 border-transparent hover:text-slate-900'
+                ? 'bg-white dark:bg-[#150a19] text-[#b3135b] dark:text-pink-400 border-[#b3135b] dark:border-pink-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 border-transparent hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <MessageSquare className="w-4 h-4 text-emerald-600" />

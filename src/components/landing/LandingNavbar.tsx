@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, ArrowRight, Lock, User } from 'lucide-react';
+import ThemeToggle from '@/components/landing/ThemeToggle';
 
 export default function LandingNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -39,10 +40,10 @@ export default function LandingNavbar() {
       </div>
 
       <nav
-        className={`sticky top-0 z-50 border-b border-slate-200/80 transition-all duration-300 w-full max-w-full ${
+        className={`sticky top-0 z-50 border-b transition-all duration-300 w-full max-w-full ${
           scrolled
-            ? 'bg-white/80 backdrop-blur-xl shadow-md py-2.5 sm:py-3'
-            : 'bg-white/95 backdrop-blur-md py-3.5 sm:py-4.5'
+            ? 'bg-white/85 dark:bg-[#0e0712]/90 backdrop-blur-xl shadow-md border-slate-200/80 dark:border-pink-500/20 py-2.5 sm:py-3'
+            : 'bg-white/95 dark:bg-[#0d0710]/95 backdrop-blur-md border-slate-200/80 dark:border-white/10 py-3.5 sm:py-4.5'
         } px-3 sm:px-6`}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
@@ -52,36 +53,39 @@ export default function LandingNavbar() {
               ✂
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-black text-base sm:text-xl text-slate-900 tracking-tight">
+              <span className="font-black text-base sm:text-xl text-slate-900 dark:text-white tracking-tight">
                 SalonPro
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600">
-            <a href="#problems" className="hover:text-[#b3135b] transition-colors">Problems We Solve</a>
-            <a href="#features" className="hover:text-[#b3135b] transition-colors">Features & POS</a>
-            <a href="#how-it-works" className="hover:text-[#b3135b] transition-colors">How It Works</a>
-            <a href="#pricing" className="hover:text-[#b3135b] transition-colors flex items-center gap-1 font-bold text-[#b3135b]">
+          <div className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600 dark:text-slate-300">
+            <a href="#problems" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors">Problems We Solve</a>
+            <a href="#features" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors">Features & POS</a>
+            <a href="#how-it-works" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors">How It Works</a>
+            <a href="#pricing" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors flex items-center gap-1 font-bold text-[#b3135b] dark:text-pink-400">
               <span>7-Day Trial & Pricing</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-pink-100 text-[#b3135b] text-[9px] uppercase">Free</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-pink-100 dark:bg-pink-950/80 text-[#b3135b] dark:text-pink-300 text-[9px] uppercase border dark:border-pink-800/40">Free</span>
             </a>
           </div>
 
-          {/* Desktop Action CTAs */}
-          <div className="hidden sm:flex items-center gap-2">
+          {/* Desktop Action CTAs + Theme Toggle */}
+          <div className="hidden sm:flex items-center gap-2.5">
+            {/* Theme Toggle Button */}
+            <ThemeToggle />
+
             <Link
               href="/dixa-beauty-salon"
               target="_blank"
-              className="px-3 py-2 rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs hover:scale-105 active:scale-95"
+              className="px-3 py-2 rounded-xl text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-700/40 text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs hover:scale-105 active:scale-95"
             >
               <span>⚡ Live Booking Demo</span>
               <span className="text-[10px]">↗</span>
             </Link>
             <Link
               href="/salon-owner"
-              className="px-3 py-2 rounded-xl text-slate-700 hover:text-[#b3135b] hover:bg-pink-50 text-xs font-bold transition-all whitespace-nowrap"
+              className="px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-[#b3135b] dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/40 text-xs font-bold transition-all whitespace-nowrap"
             >
               Owner Sign In
             </Link>
@@ -95,7 +99,8 @@ export default function LandingNavbar() {
           </div>
 
           {/* Mobile Right Controls (< 640px) */}
-          <div className="flex sm:hidden items-center gap-1.5">
+          <div className="flex sm:hidden items-center gap-2">
+            <ThemeToggle />
             <Link
               href="/register-salon"
               className="px-2.5 py-1.5 rounded-lg bg-[#b3135b] text-white text-[11px] font-bold shadow-xs active:scale-95 whitespace-nowrap"
@@ -105,7 +110,7 @@ export default function LandingNavbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 cursor-pointer"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -124,20 +129,20 @@ export default function LandingNavbar() {
           />
 
           {/* Slide Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 z-50 w-72 max-w-[85vw] bg-white shadow-2xl flex flex-col justify-between p-5 border-l border-neutral-200 animate-in slide-in-from-right duration-200">
+          <div className="fixed inset-y-0 right-0 z-50 w-72 max-w-[85vw] bg-white dark:bg-[#120817] shadow-2xl flex flex-col justify-between p-5 border-l border-neutral-200 dark:border-pink-500/20 animate-in slide-in-from-right duration-200 text-slate-900 dark:text-white">
             <div className="space-y-5">
               {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center font-bold text-sm">
                     ✂
                   </div>
-                  <span className="font-extrabold text-base text-slate-900">SalonPro</span>
+                  <span className="font-extrabold text-base text-slate-900 dark:text-white">SalonPro</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 text-neutral-500 hover:bg-neutral-100 rounded-lg cursor-pointer"
+                  className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -166,7 +171,7 @@ export default function LandingNavbar() {
                 <Link
                   href="/salon-owner"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-pink-50 border border-pink-200 text-[#b3135b] font-bold text-xs"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-800/40 text-[#b3135b] dark:text-pink-300 font-bold text-xs"
                 >
                   <div className="flex items-center gap-2.5">
                     <Lock className="w-4 h-4" />
@@ -178,7 +183,7 @@ export default function LandingNavbar() {
                 <Link
                   href="/portal"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 font-semibold text-xs"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs"
                 >
                   <div className="flex items-center gap-2.5">
                     <User className="w-4 h-4 text-slate-500" />
@@ -189,28 +194,28 @@ export default function LandingNavbar() {
               </div>
 
               {/* Section Anchors */}
-              <div className="space-y-1 pt-2 border-t border-neutral-100">
+              <div className="space-y-1 pt-2 border-t border-neutral-100 dark:border-slate-800">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-2 mb-1">
                   Explore
                 </div>
                 <a
                   href="#problems"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   Problems We Solve
                 </a>
                 <a
                   href="#features"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   Features & POS
                 </a>
                 <a
                   href="#how-it-works"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   How It Works
                 </a>
@@ -218,7 +223,7 @@ export default function LandingNavbar() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-4 border-t border-neutral-100 text-[11px] text-slate-400 text-center">
+            <div className="pt-4 border-t border-neutral-100 dark:border-slate-800 text-[11px] text-slate-400 text-center">
               SalonPro Salon Management Platform
             </div>
           </div>

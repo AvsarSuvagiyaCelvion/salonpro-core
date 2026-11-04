@@ -238,6 +238,20 @@ export default function LoginPage() {
                 Create Account & Start 7-Day Free Trial ➔
               </Link>
             </div>
+
+            {/* Buyer & Demo Evaluator Sandbox Notice */}
+            <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-amber-50 to-pink-50 border border-amber-200/80 text-[11px] text-slate-700 flex items-center justify-between gap-2 shadow-xs">
+              <div className="flex items-center gap-1.5 font-medium">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>Evaluating software for acquisition?</span>
+              </div>
+              <Link
+                href="/register-salon"
+                className="font-bold text-[#b3135b] hover:underline shrink-0"
+              >
+                Instant Sandbox ➔
+              </Link>
+            </div>
           </form>
 
           {/* Footer Info & Panel Nav */}

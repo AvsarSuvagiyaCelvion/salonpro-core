@@ -56,6 +56,14 @@ export default function LandingNavbar() {
           {/* Desktop Action CTAs */}
           <div className="hidden sm:flex items-center gap-2">
             <Link
+              href="/dixa-beauty-salon"
+              target="_blank"
+              className="px-3 py-2 rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs"
+            >
+              <span>⚡ Live Booking Demo</span>
+              <span className="text-[10px]">↗</span>
+            </Link>
+            <Link
               href="/salon-owner"
               className="px-3 py-2 rounded-xl text-slate-700 hover:text-[#b3135b] hover:bg-pink-50 text-xs font-bold transition-all whitespace-nowrap"
             >

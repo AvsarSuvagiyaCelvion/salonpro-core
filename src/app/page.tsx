@@ -20,6 +20,7 @@ import {
   Gift,
 } from 'lucide-react';
 import StatsCounter from '@/components/landing/StatsCounter';
+import InteractiveProductPreview from '@/components/landing/InteractiveProductPreview';
 
 import LandingNavbar from '@/components/landing/LandingNavbar';
 import PricingCards from '@/components/landing/PricingCards';
@@ -42,9 +43,12 @@ export default function MarketingLandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 max-w-5xl mx-auto px-3.5 sm:px-6 pt-10 sm:pt-18 lg:pt-22 pb-10 sm:pb-16 text-center w-full">
-        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-[#b3135b] text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 shadow-xs max-w-full">
-          <Gift className="w-3.5 h-3.5 text-[#b3135b] shrink-0" />
-          <span>🎁 Special Offer: 7-Day Free Trial · Zero Upfront Cost · Instant Setup</span>
+        {/* Production-Ready Badge with Live Beacon */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-white text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 shadow-md shadow-slate-900/10 max-w-full">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+          <span className="text-emerald-300 font-extrabold">LIVE DEMO AVAILABLE</span>
+          <span className="text-slate-500">·</span>
+          <span className="text-slate-300">Next.js 16 Multi-Tenant SaaS</span>
         </div>
 
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.22] sm:leading-[1.15] max-w-4xl mx-auto break-normal">
@@ -55,25 +59,34 @@ export default function MarketingLandingPage() {
         </h1>
 
         <p className="text-xs sm:text-base lg:text-lg text-slate-600 mt-3 sm:mt-5 max-w-2xl mx-auto leading-relaxed px-1">
-          Upgrade your salon with <strong>automated online client bookings</strong>, live chair status, 10-second GST billing, staff commission tracking, and instant WhatsApp receipts.
+          The all-in-one operating system for salons & spas: <strong>conflict-free online client booking</strong>, live studio Kanban, 10-second GST POS billing, staff commission tracking, and instant WhatsApp receipts.
         </p>
 
         {/* Hero CTAs */}
         <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-md sm:max-w-none mx-auto">
           <Link
             href="/register-salon"
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-900/25 transition-all active:scale-95 flex items-center justify-center gap-2 group"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-900/25 transition-all active:scale-95 flex items-center justify-center gap-2 group cursor-pointer"
           >
             <span>🎁 Start 7-Day Free Trial</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
 
           <Link
-            href="/salon-owner"
-            className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95"
+            href="/dixa-beauty-salon"
+            target="_blank"
+            className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-900/20 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+          >
+            <span>⚡ Try Live Booking Demo</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">1-Click</span>
+          </Link>
+
+          <Link
+            href="/login"
+            className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
           >
             <Lock className="w-4 h-4 text-slate-500" />
-            <span>🔐 Salon Owner Sign In</span>
+            <span>🔐 Owner Portal</span>
           </Link>
         </div>
 
@@ -89,12 +102,15 @@ export default function MarketingLandingPage() {
           </span>
           <span className="flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Full ERP access for 7 days</span>
+            <span>Full multi-tenant source code</span>
           </span>
         </div>
 
         {/* Animated Social Proof Stats Counter */}
         <StatsCounter />
+
+        {/* Interactive Live Product Preview Component */}
+        <InteractiveProductPreview />
       </section>
 
       {/* ================= SECTION: PROBLEMS VS SALONPRO SOLUTION ================= */}
@@ -226,9 +242,14 @@ export default function MarketingLandingPage() {
                 2
               </div>
               <h4 className="text-sm sm:text-base font-bold text-slate-900">Unique Customer Link</h4>
-              <div className="text-xs font-mono text-[#b3135b] font-semibold mt-0.5">
-                {(process.env.NEXT_PUBLIC_APP_URL || 'https://salonpro.in').replace(/^https?:\/\//, '')}/priya-salon
-              </div>
+              <Link
+                href="/dixa-beauty-salon"
+                target="_blank"
+                className="text-xs font-mono text-[#b3135b] hover:underline font-semibold mt-0.5 inline-flex items-center gap-1"
+              >
+                <span>{(process.env.NEXT_PUBLIC_APP_URL || 'https://salonpro.in').replace(/^https?:\/\//, '')}/dixa-beauty-salon</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-pink-100 font-sans">Open ↗</span>
+              </Link>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
                 Priya Salon puts their unique link on their Instagram bio and Google Maps profile. Customers click and see ONLY Priya Salon&apos;s brand, services, and available stylists.
               </p>

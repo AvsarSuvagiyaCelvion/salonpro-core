@@ -14,7 +14,7 @@ export default function Typewriter({
   firstLine,
   secondLine,
   onComplete,
-  speedMs = 85,
+  speedMs = 50,
 }: TypewriterProps) {
   const shouldReduceMotion = useReducedMotion();
   const fullText = `${firstLine}\n${secondLine}`;
@@ -76,12 +76,12 @@ export default function Typewriter({
         return;
       }
 
-      // Add a natural brief pause (220ms) between the first line and second line
-      const delay = currentIndex === firstLine.length ? 220 : speedMs;
+      // Add a natural brief pause (150ms) between the first line and second line
+      const delay = currentIndex === firstLine.length ? 150 : speedMs;
       timerId = setTimeout(typeNextChar, delay);
     };
 
-    timerId = setTimeout(typeNextChar, 250);
+    timerId = setTimeout(typeNextChar, 100);
 
     return () => clearTimeout(timerId);
   }, [fullText, firstLine.length, speedMs, shouldReduceMotion, onComplete]);

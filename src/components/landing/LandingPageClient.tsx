@@ -75,7 +75,7 @@ export default function LandingPageClient() {
             firstLine="Stop Losing Revenue to"
             secondLine="Paper Registers & Double-Bookings"
             onComplete={() => setTypewriterDone(true)}
-            speedMs={85}
+            speedMs={50}
           />
 
           {/* Staggered Subtitle, CTAs, Badges & Stats (Revealed when Typewriter Finishes) */}

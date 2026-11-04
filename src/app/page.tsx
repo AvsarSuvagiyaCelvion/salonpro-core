@@ -23,6 +23,7 @@ import StatsCounter from '@/components/landing/StatsCounter';
 import InteractiveProductPreview from '@/components/landing/InteractiveProductPreview';
 
 import LandingNavbar from '@/components/landing/LandingNavbar';
+import LandingFooter from '@/components/landing/LandingFooter';
 import PricingCards from '@/components/landing/PricingCards';
 
 export const metadata = {
@@ -428,30 +429,8 @@ export default function MarketingLandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 sm:py-10 text-xs text-slate-500">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
-          <div className="flex items-center gap-2.5">
-            <span className="font-extrabold text-sm text-slate-900">SalonPro</span>
-            <span>·</span>
-            <span>All-in-One Salon & Spa Management Suite</span>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-slate-600 font-semibold text-xs">
-            <Link href="/register-salon" className="hover:text-[#b3135b] transition-colors">Register Salon</Link>
-            <Link href="/salon-owner" className="hover:text-[#b3135b] transition-colors">Salon Owner Sign In</Link>
-            <Link href="/portal" className="hover:text-[#b3135b] transition-colors">Client Portal</Link>
-            <Link href="/terms" className="hover:text-[#b3135b] transition-colors">Terms</Link>
-            <Link href="/privacy" className="hover:text-[#b3135b] transition-colors">Privacy</Link>
-            <Link href="/refund-policy" className="hover:text-[#b3135b] transition-colors">Refund Policy</Link>
-            <Link href="/admin/login" className="hover:text-[#b3135b] transition-colors">Super Admin</Link>
-          </div>
-
-          <div className="text-slate-400 text-[11px]">
-            © 2026 SalonPro Platform. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      {/* Full Enterprise SaaS Footer */}
+      <LandingFooter />
     </div>
   );
 }

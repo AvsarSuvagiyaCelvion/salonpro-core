@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getSalonPlan } from '@/lib/plan';
@@ -75,6 +76,6 @@ export async function GET(
       staffServices: mappingRes.rows,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/public/[slug]/route.ts');
   }
 }

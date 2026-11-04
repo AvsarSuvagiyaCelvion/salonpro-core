@@ -1,6 +1,8 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { normalizeMobile } from '@/lib/phone';
 
 export async function PUT(
   request: Request,
@@ -18,25 +20,36 @@ export async function PUT(
     if (!name || name.trim().length === 0) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
-    if (!mobile || mobile.trim().length < 6) {
-      return NextResponse.json({ error: 'Valid mobile number is required' }, { status: 400 });
+    const cleanMobile = normalizeMobile(mobile);
+    if (!cleanMobile) {
+      return NextResponse.json({ error: 'Valid 10-digit mobile number is required' }, { status: 400 });
     }
 
-    const res = await query(
-      `UPDATE customers
-       SET name = $1, mobile = $2, email = $3, note = $4, birthday = $5
-       WHERE id = $6 AND salon_id = $7
-       RETURNING *`,
-      [name.trim(), mobile.trim(), email?.trim() || null, note?.trim() || null, birthday || null, id, salonId]
-    );
+    try {
+      const res = await query(
+        `UPDATE customers
+         SET name = $1, mobile = $2, email = $3, note = $4, birthday = $5
+         WHERE id = $6 AND salon_id = $7
+         RETURNING *`,
+        [name.trim(), cleanMobile, email?.trim() || null, note?.trim() || null, birthday || null, id, salonId]
+      );
 
-    if (res.rows.length === 0) {
-      return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
+      if (res.rows.length === 0) {
+        return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
+      }
+
+      return NextResponse.json({ customer: res.rows[0], message: 'Customer updated successfully' });
+    } catch (updateErr: any) {
+      if (updateErr.code === '23505') {
+        return NextResponse.json(
+          { error: 'Another customer in your salon is already using this mobile number' },
+          { status: 409 }
+        );
+      }
+      throw updateErr;
     }
-
-    return NextResponse.json({ customer: res.rows[0], message: 'Customer updated successfully' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/customers/[id]/route.ts');
   }
 }
 
@@ -79,6 +92,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: 'Customer removed' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/customers/[id]/route.ts');
   }
 }

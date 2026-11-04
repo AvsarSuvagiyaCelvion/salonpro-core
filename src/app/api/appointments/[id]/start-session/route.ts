@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -61,7 +62,7 @@ export async function POST(
     });
   } catch (error: any) {
     await client.query('ROLLBACK');
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/appointments/[id]/start-session/route.ts');
   } finally {
     client.release();
   }

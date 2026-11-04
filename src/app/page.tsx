@@ -123,7 +123,7 @@ export default function MarketingLandingPage() {
                 </p>
                 <div className="mt-3.5 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>SalonPro Solution:</strong> Automated exclusion engine guarantees zero overlapping slots. Stylist buffers are computed automatically.</span>
+                  <span><strong>SalonPro Solution:</strong> Overlap-protected bookings. Automated exclusion engine serializes concurrent requests and computes stylist buffers automatically.</span>
                 </div>
               </div>
             </div>
@@ -226,7 +226,9 @@ export default function MarketingLandingPage() {
                 2
               </div>
               <h4 className="text-sm sm:text-base font-bold text-slate-900">Unique Customer Link</h4>
-              <div className="text-xs font-mono text-[#b3135b] font-semibold mt-0.5">domain.com/priya-salon</div>
+              <div className="text-xs font-mono text-[#b3135b] font-semibold mt-0.5">
+                {(process.env.NEXT_PUBLIC_APP_URL || 'https://salonpro.in').replace(/^https?:\/\//, '')}/priya-salon
+              </div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
                 Priya Salon puts their unique link on their Instagram bio and Google Maps profile. Customers click and see ONLY Priya Salon&apos;s brand, services, and available stylists.
               </p>
@@ -244,7 +246,9 @@ export default function MarketingLandingPage() {
                 3
               </div>
               <h4 className="text-sm sm:text-base font-bold text-slate-900">Instant Client Sync</h4>
-              <div className="text-xs font-mono text-emerald-700 font-semibold mt-0.5">domain.com/portal</div>
+              <div className="text-xs font-mono text-emerald-700 font-semibold mt-0.5">
+                {(process.env.NEXT_PUBLIC_APP_URL || 'https://salonpro.in').replace(/^https?:\/\//, '')}/portal
+              </div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
                 When a customer books, it instantly pops up on Priya Salon&apos;s Kanban. The client gets a WhatsApp confirmation and can view their digital bill anytime at /portal.
               </p>
@@ -382,7 +386,7 @@ export default function MarketingLandingPage() {
             Ready to Automate Your Salon Operations?
           </h3>
           <p className="text-xs sm:text-sm text-slate-600 mt-3 max-w-lg mx-auto leading-relaxed">
-            Join hundreds of forward-thinking salons running with SalonPro. Setup takes less than 3 minutes.
+            Join hundreds of forward-thinking salons running with SalonPro. Setup takes under 3 minutes.
           </p>
 
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
@@ -416,6 +420,9 @@ export default function MarketingLandingPage() {
             <Link href="/register-salon" className="hover:text-[#b3135b] transition-colors">Register Salon</Link>
             <Link href="/salon-owner" className="hover:text-[#b3135b] transition-colors">Salon Owner Sign In</Link>
             <Link href="/portal" className="hover:text-[#b3135b] transition-colors">Client Portal</Link>
+            <Link href="/terms" className="hover:text-[#b3135b] transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-[#b3135b] transition-colors">Privacy</Link>
+            <Link href="/refund-policy" className="hover:text-[#b3135b] transition-colors">Refund Policy</Link>
             <Link href="/admin/login" className="hover:text-[#b3135b] transition-colors">Super Admin</Link>
           </div>
 

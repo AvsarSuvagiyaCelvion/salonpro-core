@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -24,6 +25,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: 'Removed from waiting queue' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/live/waiting/[id]/route.ts');
   }
 }

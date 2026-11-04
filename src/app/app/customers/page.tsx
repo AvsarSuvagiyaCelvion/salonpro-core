@@ -64,6 +64,11 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   // Modal 1: Add/Edit Customer
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -92,17 +97,30 @@ export default function CustomersPage() {
   const [broadcastSentCount, setBroadcastSentCount] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchCustomers();
+    setPage(1);
   }, [search]);
 
-  async function fetchCustomers() {
+  useEffect(() => {
+    fetchCustomers(page);
+  }, [page, search]);
+
+  async function fetchCustomers(targetPage = page) {
     try {
       setLoading(true);
-      const url = search ? `/api/customers?q=${encodeURIComponent(search)}` : '/api/customers';
-      const res = await fetch(url);
+      const params = new URLSearchParams();
+      if (search) params.set('q', search);
+      params.set('page', String(targetPage));
+      params.set('pageSize', '50');
+
+      const res = await fetch(`/api/customers?${params.toString()}`);
       const data = await res.json();
       if (res.ok) {
         setCustomers(data.customers || []);
+        if (data.pagination) {
+          setPage(data.pagination.page);
+          setTotalPages(data.pagination.totalPages);
+          setTotalRecords(data.pagination.total);
+        }
       }
     } catch {
       setMessage({ type: 'error', text: 'Failed to load customers' });
@@ -398,6 +416,30 @@ export default function CustomersPage() {
                 ))}
               </tbody>
             </table>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-100 bg-neutral-50/50">
+                <p className="text-xs text-neutral-600">
+                  Showing page <span className="font-semibold text-neutral-900">{page}</span> of{' '}
+                  <span className="font-semibold text-neutral-900">{totalPages}</span> ({totalRecords} clients)
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1 || loading}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages || loading}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -75,19 +75,40 @@ export default function PricingCards() {
         </span>
       </div>
 
-      {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
-        {plans.map((plan) => {
-          const isPro = plan.slug === 'pro' || plan.is_popular;
-          const isPremium = plan.slug === 'premium';
-          const monthlyPrice = Number(plan.price);
-          const yearlyPrice = plan.yearly_price ? Number(plan.yearly_price) : monthlyPrice * 10;
-          const displayPrice = interval === 'yearly' ? Math.round(yearlyPrice / 12) : monthlyPrice;
-          const staffLimit = plan.limits?.max_staff === 0 ? 'Unlimited' : `${plan.limits?.max_staff || plan.max_staff || 3} Staff members`;
-          const servicesLimit = plan.limits?.max_services === 0 ? 'Unlimited' : `${plan.limits?.max_services || 30} Services`;
-          const waLimit = plan.limits?.wa_per_month === 0 ? '0 WhatsApp bills/mo' : `${plan.limits?.wa_per_month || 200} WhatsApp bills/mo`;
+      {/* Plans Grid or Fallback */}
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="w-8 h-8 border-4 border-pink-200 border-t-[#b3135b] rounded-full animate-spin" />
+        </div>
+      ) : plans.length === 0 ? (
+        <div className="max-w-md mx-auto p-8 rounded-2xl bg-white border border-neutral-200 shadow-sm text-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-pink-50 flex items-center justify-center text-[#b3135b]">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-neutral-900 mb-2">Pricing Plans Unavailable</h3>
+          <p className="text-xs text-neutral-600 mb-6">
+            We were unable to load our subscription plans right now. Please refresh the page to view current pricing and features.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-5 py-2.5 rounded-xl bg-[#b3135b] text-white text-xs font-bold hover:bg-[#960f4c] transition-colors cursor-pointer"
+          >
+            Refresh Page
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
+          {plans.map((plan) => {
+            const isPro = plan.slug === 'pro' || plan.is_popular;
+            const isPremium = plan.slug === 'premium';
+            const monthlyPrice = Number(plan.price);
+            const yearlyPrice = plan.yearly_price ? Number(plan.yearly_price) : monthlyPrice * 10;
+            const displayPrice = interval === 'yearly' ? Math.round(yearlyPrice / 12) : monthlyPrice;
+            const staffLimit = plan.limits?.max_staff === 0 ? 'Unlimited' : `${plan.limits?.max_staff || plan.max_staff || 3} Staff members`;
+            const servicesLimit = plan.limits?.max_services === 0 ? 'Unlimited' : `${plan.limits?.max_services || 30} Services`;
+            const waLimit = plan.limits?.wa_per_month === 0 ? '0 WhatsApp bills/mo' : `${plan.limits?.wa_per_month || 200} WhatsApp bills/mo`;
 
-          return (
+            return (
             <div
               key={plan.id}
               className={`rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-200 relative ${
@@ -196,6 +217,7 @@ export default function PricingCards() {
           );
         })}
       </div>
+    )}
     </div>
   );
 }

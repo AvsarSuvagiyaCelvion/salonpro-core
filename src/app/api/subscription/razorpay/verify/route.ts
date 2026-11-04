@@ -1,24 +1,20 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireTenant } from '@/lib/api-auth';
-import { verifyRazorpayPaymentSignature } from '@/lib/razorpay';
-import { clearSalonCache } from '@/lib/salon';
-import { invalidateSalonPlanCache } from '@/lib/plan';
+import { requireTenant, requireRole } from '@/lib/api-auth';
+import { verifyRazorpayPaymentSignature, fetchRazorpayPayment } from '@/lib/razorpay';
+import { activateSubscriptionFromPayment, markSubscriptionPaymentFailed } from '@/lib/subscription';
 
 export async function POST(request: Request) {
   try {
     const auth = await requireTenant(request, { allowExpired: true });
     if (auth.error) return auth.error;
 
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
+
     const salonId = auth.session.salonId;
-    const body = await request.json();
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      planId,
-      interval = 'monthly',
-    } = body;
+    const body = await request.json().catch(() => ({}));
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return NextResponse.json(
@@ -27,92 +23,97 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Verify cryptographic signature
-    const isValid = verifyRazorpayPaymentSignature({
+    // 1. Load row by razorpay_order_id AND salon_id = session.salonId (Do NOT trust planId or interval from body)
+    const paymentRes = await query(
+      `SELECT * FROM subscription_payments 
+       WHERE razorpay_order_id = $1 AND salon_id = $2 
+       LIMIT 1`,
+      [razorpay_order_id, salonId]
+    );
+
+    if (paymentRes.rows.length === 0) {
+      return NextResponse.json(
+        { error: 'Subscription payment order not found for this salon.' },
+        { status: 404 }
+      );
+    }
+
+    const storedPayment = paymentRes.rows[0];
+
+    // 2. If row is already status='captured', return existing success result idempotently (no second extension)
+    if (storedPayment.status === 'captured') {
+      const result = await activateSubscriptionFromPayment({
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        expectedSalonId: salonId,
+      });
+      return NextResponse.json(result, { status: 200 });
+    }
+
+    // 3. Verify HMAC signature
+    const isValidSignature = verifyRazorpayPaymentSignature({
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
       signature: razorpay_signature,
     });
 
-    if (!isValid) {
-      // Record failure in database
-      await query(
-        `UPDATE subscription_payments
-         SET status = 'failed',
-             error_message = 'Signature verification failed',
-             updated_at = NOW()
-         WHERE razorpay_order_id = $1`,
-        [razorpay_order_id]
-      );
-
+    if (!isValidSignature) {
+      await markSubscriptionPaymentFailed(razorpay_order_id, 'Signature verification failed');
       return NextResponse.json(
         { error: 'Invalid payment signature. Transaction verification failed.' },
         { status: 400 }
       );
     }
 
-    // 2. Fetch the plan
-    const planRes = await query('SELECT * FROM subscription_plans WHERE id = $1 AND is_active = true', [planId]);
-    if (planRes.rows.length === 0) {
-      return NextResponse.json({ error: 'Subscribed plan could not be found.' }, { status: 404 });
+    // 4. REST API verification against Razorpay GET /v1/payments/{id}
+    try {
+      const razorpayPayment = await fetchRazorpayPayment(razorpay_payment_id);
+      const expectedPaise = Math.round(Number(storedPayment.amount) * 100);
+
+      const isValidStatus = razorpayPayment.status === 'captured' || razorpayPayment.status === 'authorized';
+      const isMatchingAmount = Number(razorpayPayment.amount) === expectedPaise;
+      const isMatchingCurrency = razorpayPayment.currency?.toUpperCase() === 'INR';
+      const isMatchingOrder = razorpayPayment.order_id === razorpay_order_id;
+
+      if (!isValidStatus || !isMatchingAmount || !isMatchingCurrency || !isMatchingOrder) {
+        const mismatchReason = `Payment details mismatch: status=${razorpayPayment.status}, amount=${razorpayPayment.amount}/${expectedPaise}, order=${razorpayPayment.order_id}`;
+        await markSubscriptionPaymentFailed(razorpay_order_id, mismatchReason);
+        return NextResponse.json(
+          { error: 'Payment details could not be verified with Razorpay.' },
+          { status: 400 }
+        );
+      }
+    } catch (err: any) {
+      console.error('Failed to verify payment with Razorpay REST API:', err);
+      await markSubscriptionPaymentFailed(razorpay_order_id, `REST verification failed: ${err.message}`);
+      return NextResponse.json(
+        { error: 'Could not communicate with payment gateway to verify status.' },
+        { status: 400 }
+      );
     }
-    const plan = planRes.rows[0];
 
-    // 3. Mark payment as captured in database
-    await query(
-      `UPDATE subscription_payments
-       SET status = 'captured',
-           razorpay_payment_id = $1,
-           razorpay_signature = $2,
-           updated_at = NOW()
-       WHERE razorpay_order_id = $3`,
-      [razorpay_payment_id, razorpay_signature, razorpay_order_id]
-    );
-
-    // 4. Update Salon subscription in database
-    const isYearly = interval === 'yearly';
-    const intervalSql = isYearly ? "'1 year'" : "'1 month'";
-
-    const salonUpdateRes = await query(
-      `UPDATE salons
-       SET 
-         subscription_status = 'active',
-         subscription_plan_id = $1,
-         subscription_ends_at = NOW() + INTERVAL ${intervalSql},
-         plan = $2
-       WHERE id = $3
-       RETURNING *`,
-      [plan.id, plan.slug || 'pro', salonId]
-    );
-
-    // 5. Invalidate caches immediately
-    clearSalonCache();
-    invalidateSalonPlanCache(salonId);
-
-    return NextResponse.json({
-      success: true,
-      message: `Payment successful! Your salon is now activated on the ${plan.name} plan.`,
-      salon: salonUpdateRes.rows[0],
-      plan: {
-        id: plan.id,
-        name: plan.name,
-        slug: plan.slug,
-        price: isYearly ? plan.yearly_price : plan.price,
-        billingInterval: interval,
-        features: Array.isArray(plan.features) ? plan.features : [],
-        limits: plan.limits || {},
-        flags: plan.flags || {},
-      },
-      subscriptionEndsAt: salonUpdateRes.rows[0].subscription_ends_at,
-      paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id,
+    // 5. Atomic conditional update & extension
+    const activationResult = await activateSubscriptionFromPayment({
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
+      expectedSalonId: salonId,
     });
+
+    if (!activationResult.success) {
+      return NextResponse.json(
+        { error: activationResult.error || 'Failed to activate subscription.' },
+        { status: activationResult.statusCode || 400 }
+      );
+    }
+
+    return NextResponse.json(activationResult, { status: 200 });
   } catch (error: any) {
-    console.error('Verify Razorpay Payment Error:', error);
+    console.error('Subscription verification error:', error);
     return NextResponse.json(
-      { error: error.message || 'Payment verification failed.' },
+      { error: 'Internal server error while processing subscription payment.' },
       { status: 500 }
     );
   }
 }
-

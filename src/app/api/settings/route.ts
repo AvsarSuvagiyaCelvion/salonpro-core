@@ -1,6 +1,7 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireTenant } from '@/lib/api-auth';
+import { requireTenant, requireRole, invalidateUserAuthCache } from '@/lib/api-auth';
 import { requireFeature, invalidateSalonPlanCache } from '@/lib/plan';
 
 export async function GET(request: Request) {
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
       }
     );
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/settings/route.ts');
   }
 }
 
@@ -47,6 +48,9 @@ async function handleUpdateSettings(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
 
     const salonId = auth.session.salonId;
     const body = await request.json();
@@ -68,6 +72,87 @@ async function handleUpdateSettings(request: Request) {
       max_advance_days,
       send_reminders,
     } = body;
+
+    // 5.3 Validations on settings updates
+    if (brand_color !== undefined && brand_color !== null && brand_color !== '') {
+      if (!/^#[0-9a-fA-F]{6}$/.test(String(brand_color).trim())) {
+        return NextResponse.json(
+          { error: 'Brand color must be a valid 6-digit hex code (e.g. #b3135b).' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (logo_url !== undefined && logo_url !== null && logo_url !== '') {
+      if (!/^https?:\/\//i.test(String(logo_url).trim())) {
+        return NextResponse.json(
+          { error: 'Logo URL must start with http:// or https://.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    const timeRegex = /^\d{2}:\d{2}(:\d{2})?$/;
+    if (open_time !== undefined && open_time !== null && open_time !== '') {
+      if (!timeRegex.test(String(open_time).trim())) {
+        return NextResponse.json({ error: 'Open time must be in HH:MM format.' }, { status: 400 });
+      }
+    }
+    if (close_time !== undefined && close_time !== null && close_time !== '') {
+      if (!timeRegex.test(String(close_time).trim())) {
+        return NextResponse.json({ error: 'Close time must be in HH:MM format.' }, { status: 400 });
+      }
+    }
+    if (open_time && close_time) {
+      const [oh, om] = String(open_time).trim().split(':').map(Number);
+      const [ch, cm] = String(close_time).trim().split(':').map(Number);
+      if (oh * 60 + om >= ch * 60 + cm) {
+        return NextResponse.json({ error: 'Open time must be earlier than close time.' }, { status: 400 });
+      }
+    }
+
+    if (slot_minutes !== undefined && slot_minutes !== null) {
+      const slotInt = parseInt(slot_minutes, 10);
+      if (isNaN(slotInt) || slotInt < 5 || slotInt > 240) {
+        return NextResponse.json(
+          { error: 'Slot minutes must be an integer between 5 and 240 minutes.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (working_days !== undefined && working_days !== null) {
+      if (
+        !Array.isArray(working_days) ||
+        working_days.length === 0 ||
+        !working_days.every((d) => Number.isInteger(d) && d >= 0 && d <= 6)
+      ) {
+        return NextResponse.json(
+          { error: 'Working days must be a non-empty array of days (0=Sunday to 6=Saturday).' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (min_advance_hours !== undefined && min_advance_hours !== null) {
+      const minAdv = parseInt(min_advance_hours, 10);
+      if (isNaN(minAdv) || minAdv < 0) {
+        return NextResponse.json(
+          { error: 'Minimum advance hours must be 0 or greater.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (max_advance_days !== undefined && max_advance_days !== null) {
+      const maxAdv = parseInt(max_advance_days, 10);
+      if (isNaN(maxAdv) || maxAdv < 1 || maxAdv > 365) {
+        return NextResponse.json(
+          { error: 'Maximum advance days must be between 1 and 365 days.' },
+          { status: 400 }
+        );
+      }
+    }
 
     // Feature gating: logo_upload (only enforce if user is actively changing/uploading a new logo)
     if (logo_url !== undefined && logo_url) {
@@ -158,7 +243,7 @@ async function handleUpdateSettings(request: Request) {
       message: 'Salon settings saved successfully',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/settings/route.ts');
   }
 }
 

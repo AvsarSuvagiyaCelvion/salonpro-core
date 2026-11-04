@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import pool, { query } from '@/lib/db';
 import { clearSalonCache } from '@/lib/salon';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
+import { normalizeMobile } from '@/lib/phone';
 
 const RESERVED_SLUGS = new Set([
   'admin',
@@ -26,8 +27,12 @@ const RESERVED_SLUGS = new Set([
   'demo',
 ]);
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function POST(request: Request) {
   const client = await pool.connect();
+  let inTransaction = false;
+
   try {
     const body = await request.json();
     const { salonName, ownerName, email, mobile, city, address, password, confirmPassword, planId } = body;
@@ -45,9 +50,24 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!cleanPassword || cleanPassword.length < 6) {
+    if (!EMAIL_REGEX.test(cleanEmail)) {
       return NextResponse.json(
-        { error: 'Password is required and must be at least 6 characters.' },
+        { error: 'Please enter a valid email address.' },
+        { status: 400 }
+      );
+    }
+
+    const normalizedMobile = normalizeMobile(cleanMobile);
+    if (!normalizedMobile) {
+      return NextResponse.json(
+        { error: 'Please enter a valid 10-digit mobile number.' },
+        { status: 400 }
+      );
+    }
+
+    if (!cleanPassword || cleanPassword.length < 8) {
+      return NextResponse.json(
+        { error: 'Password is required and must be at least 8 characters long.' },
         { status: 400 }
       );
     }
@@ -68,7 +88,7 @@ export async function POST(request: Request) {
     if (existingUser.rows.length > 0) {
       return NextResponse.json(
         { error: 'An account with this email already exists. Please log in instead.' },
-        { status: 400 }
+        { status: 409 }
       );
     }
 
@@ -109,26 +129,24 @@ export async function POST(request: Request) {
     // 3. Hash password using bcrypt
     const passwordHash = await bcrypt.hash(cleanPassword, 10);
 
-    // Determine subscription & trial details (7-Day Trial default)
-    let subStatus = 'trial';
+    // Registration ALWAYS starts with a 7-day free trial; never activate paid on registration
+    const subStatus = 'trial';
+    const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const subEndsAt = null;
     let subPlanId: string | null = null;
-    let trialEndsAt: Date | null = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Exactly 7 days from now
-    let subEndsAt: Date | null = null;
     let planSlug = 'pro';
 
     if (planId) {
       const planCheck = await query('SELECT * FROM subscription_plans WHERE id = $1 AND is_active = true', [planId]);
       if (planCheck.rows.length > 0) {
-        subStatus = 'active';
         subPlanId = planCheck.rows[0].id;
         planSlug = planCheck.rows[0].slug || 'pro';
-        const isYearly = planCheck.rows[0].billing_interval === 'yearly';
-        subEndsAt = new Date(Date.now() + (isYearly ? 365 : 30) * 24 * 60 * 60 * 1000);
       }
     }
 
     // 4. Begin transactional registration
     await client.query('BEGIN');
+    inTransaction = true;
 
     // Create Salon workspace
     const salonRes = await client.query(
@@ -143,7 +161,7 @@ export async function POST(request: Request) {
         cleanSalonName,
         slug,
         '#b3135b',
-        cleanMobile,
+        normalizedMobile,
         fullAddress,
         planSlug,
         trialEndsAt,
@@ -166,12 +184,13 @@ export async function POST(request: Request) {
         cleanEmail,
         passwordHash,
         cleanOwnerName,
-        cleanMobile,
+        normalizedMobile,
       ]
     );
     const newUser = userRes.rows[0];
 
     await client.query('COMMIT');
+    inTransaction = false;
     clearSalonCache();
 
     // 5. Issue multi-tenant session token
@@ -210,10 +229,29 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error: any) {
-    await client.query('ROLLBACK');
+    if (inTransaction) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {}
+    }
     console.error('Salon registration error:', error);
+
+    if (error?.code === '23505') {
+      const detail = error.detail || '';
+      if (detail.includes('email') || error.constraint?.includes('email') || error.constraint?.includes('users_email')) {
+        return NextResponse.json(
+          { error: 'An account with this email already exists. Please log in instead.' },
+          { status: 409 }
+        );
+      }
+      return NextResponse.json(
+        { error: 'A salon with this name or identifier already exists. Please choose a slightly different name.' },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
-      { error: error.message || 'Failed to register salon. Please try again.' },
+      { error: 'Failed to register salon. Please try again.' },
       { status: 500 }
     );
   } finally {

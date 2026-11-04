@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
       payments: res.rows,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/subscription/payments/route.ts');
   }
 }
 

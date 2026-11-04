@@ -1,11 +1,15 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireTenant } from '@/lib/api-auth';
+import { requireTenant, requireRole } from '@/lib/api-auth';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
 
     const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);
@@ -158,6 +162,6 @@ export async function GET(request: Request) {
       staffReport,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/reports/route.ts');
   }
 }

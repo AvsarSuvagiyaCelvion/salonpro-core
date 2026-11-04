@@ -375,7 +375,7 @@ export default function AdminSalonsPage() {
                 <div className="my-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-[11px] font-mono text-slate-600 flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 truncate">
                     <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="text-slate-800 font-semibold truncate">{s.slug}.salonpro.in</span>
+                    <span className="text-slate-800 font-semibold truncate">{s.slug}.{process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'salonpro.in'}</span>
                   </div>
                   {s.custom_domain && (
                     <div className="flex items-center gap-1.5 text-purple-700 font-semibold truncate">
@@ -581,7 +581,7 @@ export default function AdminSalonsPage() {
                     onChange={(e) => setNewSalonSlug(e.target.value)}
                     className="w-full bg-transparent text-slate-900 focus:outline-none font-mono font-semibold"
                   />
-                  <span>.salonpro.in</span>
+                  <span>.{process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'salonpro.in'}</span>
                 </div>
               </div>
 

@@ -1,11 +1,24 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
-import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const ipRateLimitKey = `login_ip:${clientIp}`;
+
+    // IP rate limit check (20 attempts / 15 min)
+    const ipCheck = await checkRateLimit(ipRateLimitKey, 20, 900);
+    if (ipCheck.isLocked) {
+      return NextResponse.json(
+        { error: 'Too many login attempts from this IP address. Please try again in 15 minutes.' },
+        { status: 429 }
+      );
+    }
+
     const { email, password } = await request.json();
 
     const cleanEmail = email?.trim().toLowerCase();
@@ -40,6 +53,7 @@ export async function POST(request: Request) {
     );
 
     if (userRes.rows.length === 0) {
+      await recordFailedAttempt(ipRateLimitKey, 20, 900);
       const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(
         {
@@ -83,6 +97,7 @@ export async function POST(request: Request) {
     }
 
     if (!passwordMatch) {
+      await recordFailedAttempt(ipRateLimitKey, 20, 900);
       const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(
         {
@@ -96,6 +111,7 @@ export async function POST(request: Request) {
 
     // Reset rate limit on success
     await resetRateLimit(rateLimitKey);
+    await resetRateLimit(ipRateLimitKey);
 
     // 5. Create multi-tenant session token containing tenant context
     const token = await createSessionToken({
@@ -136,9 +152,6 @@ export async function POST(request: Request) {
     return response;
   } catch (error: any) {
     console.error('Tenant login error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Login failed' },
-      { status: 500 }
-    );
+    return serverError(error, 'src/app/api/login/route.ts');
   }
 }

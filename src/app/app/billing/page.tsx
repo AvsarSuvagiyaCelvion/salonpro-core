@@ -50,6 +50,11 @@ export default function BillingPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'partial' | 'paid'>('all');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   // Payment Modal
   const [paymentModalInvoice, setPaymentModalInvoice] = useState<Invoice | null>(null);
   const [payMethod, setPayMethod] = useState<'cash' | 'upi' | 'card' | 'online'>('upi');
@@ -66,20 +71,31 @@ export default function BillingPage() {
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
-    fetchInvoices();
+    setPage(1);
   }, [search, statusFilter]);
 
-  async function fetchInvoices() {
+  useEffect(() => {
+    fetchInvoices(page);
+  }, [page, search, statusFilter]);
+
+  async function fetchInvoices(targetPage = page) {
     try {
       setLoading(true);
       const params = new URLSearchParams();
       if (search) params.set('q', search);
       if (statusFilter !== 'all') params.set('status', statusFilter);
+      params.set('page', String(targetPage));
+      params.set('pageSize', '50');
 
       const res = await fetch(`/api/billing?${params.toString()}`);
       const data = await res.json();
       if (res.ok) {
         setInvoices(data.invoices || []);
+        if (data.pagination) {
+          setPage(data.pagination.page);
+          setTotalPages(data.pagination.totalPages);
+          setTotalRecords(data.pagination.total);
+        }
       }
     } catch {
       setMessage({ type: 'error', text: 'Failed to load invoices' });
@@ -425,6 +441,30 @@ export default function BillingPage() {
                 })}
               </tbody>
             </table>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-100 bg-neutral-50/50">
+                <p className="text-xs text-neutral-600">
+                  Showing page <span className="font-semibold text-neutral-900">{page}</span> of{' '}
+                  <span className="font-semibold text-neutral-900">{totalPages}</span> ({totalRecords} invoices)
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1 || loading}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages || loading}
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

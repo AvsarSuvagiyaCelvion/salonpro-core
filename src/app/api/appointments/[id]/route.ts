@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -48,7 +49,7 @@ export async function PATCH(
       message: `Appointment marked as ${status}${status === 'arrived' ? ' and added to Waiting queue' : ''}`,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/appointments/[id]/route.ts');
   }
 }
 
@@ -74,6 +75,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: 'Appointment deleted' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/appointments/[id]/route.ts');
   }
 }

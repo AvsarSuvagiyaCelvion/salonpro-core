@@ -36,6 +36,7 @@ export default function RegisterSalonPage() {
   const [city, setCity] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Plans & Trial State
   const [plans, setPlans] = useState<any[]>([]);
@@ -122,8 +123,13 @@ export default function RegisterSalonPage() {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    if (!agreedToTerms) {
+      setError('You must agree to the Terms of Service and Privacy Policy to register.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
       return;
     }
 
@@ -460,6 +466,29 @@ export default function RegisterSalonPage() {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Terms & Privacy Agreement Checkbox */}
+              <div className="flex items-start gap-2.5 pt-2">
+                <input
+                  type="checkbox"
+                  id="terms-checkbox"
+                  required
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#b3135b] focus:ring-[#b3135b] cursor-pointer"
+                />
+                <label htmlFor="terms-checkbox" className="text-xs text-slate-600 leading-tight cursor-pointer">
+                  I agree to the{' '}
+                  <Link href="/terms" target="_blank" className="font-bold text-[#b3135b] underline">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy" target="_blank" className="font-bold text-[#b3135b] underline">
+                    Privacy Policy
+                  </Link>
+                  .
+                </label>
               </div>
 
               <button

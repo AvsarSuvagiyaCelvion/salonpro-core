@@ -1,6 +1,7 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireTenant } from '@/lib/api-auth';
+import { requireTenant, requireRole } from '@/lib/api-auth';
 import { checkLimit } from '@/lib/plan';
 
 export async function GET(request: Request) {
@@ -52,14 +53,15 @@ export async function GET(request: Request) {
       [salonId]
     );
 
-    // Mask commissions if current plan doesn't include commission_report flag
-    const canViewCommission = Boolean(auth.session.plan?.flags.commission_report);
+    // Mask commissions if caller is staff or current plan doesn't include commission_report flag
+    const isOwner = auth.session.role === 'owner';
+    const canViewCommission = isOwner && Boolean(auth.session.plan?.flags.commission_report);
     const rows = canViewCommission
       ? staffRes.rows
       : staffRes.rows.map((r) => ({
           ...r,
-          service_commission_pct: 0,
-          product_commission_pct: 0,
+          service_commission_pct: isOwner ? r.service_commission_pct : 0,
+          product_commission_pct: isOwner ? r.product_commission_pct : 0,
           service_commission_earned: '0.00',
           product_commission_earned: '0.00',
           total_commission_earned: '0.00',
@@ -67,7 +69,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ staff: rows, canViewCommission });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/staff/route.ts');
   }
 }
 
@@ -75,6 +77,9 @@ export async function POST(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
 
     const salonId = auth.session.salonId;
 
@@ -140,6 +145,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ staff: newStaff, message: 'Staff member added successfully' }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/staff/route.ts');
   }
 }

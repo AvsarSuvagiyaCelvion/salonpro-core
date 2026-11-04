@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import pool from '@/lib/db';
@@ -13,9 +14,11 @@ export async function POST(
 
   const salonId = auth.session.salonId;
   const client = await pool.connect();
+  let inTransaction = false;
+
   try {
     const { id: sessionId } = await params;
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const {
       services_discount_type = 'none', // 'none' | 'percent' | 'fixed'
       services_discount_value = 0,
@@ -25,7 +28,38 @@ export async function POST(
       auto_deliver_whatsapp = true,
     } = body;
 
+    // Validate discount_type
+    const validDiscountTypes = ['none', 'percent', 'fixed'];
+    if (!validDiscountTypes.includes(services_discount_type) || !validDiscountTypes.includes(products_discount_type)) {
+      return NextResponse.json(
+        { error: "Invalid discount type. Must be 'none', 'percent', or 'fixed'." },
+        { status: 400 }
+      );
+    }
+
+    // Validate discount_value (>= 0; if percent <= 100)
+    const sDiscVal = parseFloat(services_discount_value) || 0;
+    const pDiscVal = parseFloat(products_discount_value) || 0;
+
+    if (sDiscVal < 0 || pDiscVal < 0) {
+      return NextResponse.json({ error: 'Discount value cannot be negative.' }, { status: 400 });
+    }
+
+    if (services_discount_type === 'percent' && sDiscVal > 100) {
+      return NextResponse.json({ error: 'Services discount percentage cannot exceed 100%.' }, { status: 400 });
+    }
+    if (products_discount_type === 'percent' && pDiscVal > 100) {
+      return NextResponse.json({ error: 'Products discount percentage cannot exceed 100%.' }, { status: 400 });
+    }
+
+    // Validate tax_rate between 0 and 28
+    const numericTaxRate = Math.max(0, parseFloat(tax_rate) || 0);
+    if (numericTaxRate < 0 || numericTaxRate > 28) {
+      return NextResponse.json({ error: 'Tax rate must be between 0% and 28%.' }, { status: 400 });
+    }
+
     await client.query('BEGIN');
+    inTransaction = true;
 
     // 1. Fetch session scoped strictly to caller's salon
     const sessRes = await client.query(
@@ -40,12 +74,16 @@ export async function POST(
     );
 
     if (sessRes.rows.length === 0) {
-      throw new Error('Session not found in this salon');
+      await client.query('ROLLBACK');
+      inTransaction = false;
+      return NextResponse.json({ error: 'Session not found in this salon' }, { status: 404 });
     }
     const session = sessRes.rows[0];
 
     if (session.status === 'completed') {
-      throw new Error('Session is already completed');
+      await client.query('ROLLBACK');
+      inTransaction = false;
+      return NextResponse.json({ error: 'Session is already completed' }, { status: 400 });
     }
 
     // 2. Fetch session items
@@ -68,31 +106,65 @@ export async function POST(
       }
     }
 
-    // 3. Calculate discounts
+    // 3. Concurrency check & stock validation for all retail products in session
+    for (const prodItem of productItems) {
+      const prodCheck = await client.query(
+        `SELECT id, name, stock FROM products WHERE id = $1 AND salon_id = $2 FOR UPDATE`,
+        [prodItem.ref_id, salonId]
+      );
+
+      if (prodCheck.rows.length === 0) {
+        await client.query('ROLLBACK');
+        inTransaction = false;
+        return NextResponse.json(
+          { error: `Product '${prodItem.name}' not found in inventory.` },
+          { status: 400 }
+        );
+      }
+
+      const availableStock = Number(prodCheck.rows[0].stock);
+      const neededQty = Number(prodItem.qty);
+
+      if (availableStock < neededQty) {
+        await client.query('ROLLBACK');
+        inTransaction = false;
+        return NextResponse.json(
+          { error: `Insufficient stock for '${prodItem.name}'. Only ${availableStock} units remaining.` },
+          { status: 400 }
+        );
+      }
+
+      // Atomically decrement stock
+      await client.query(
+        `UPDATE products SET stock = stock - $1 WHERE id = $2 AND salon_id = $3`,
+        [neededQty, prodItem.ref_id, salonId]
+      );
+    }
+
+    // 4. Server-side totals calculation: total = Math.max(0, subtotal - discount + tax)
     let srvDiscAmount = 0;
     if (services_discount_type === 'percent') {
-      srvDiscAmount = (servicesSubtotal * Number(services_discount_value)) / 100;
+      srvDiscAmount = (servicesSubtotal * sDiscVal) / 100;
     } else if (services_discount_type === 'fixed') {
-      srvDiscAmount = Math.min(servicesSubtotal, Number(services_discount_value));
+      srvDiscAmount = Math.min(servicesSubtotal, sDiscVal);
     }
 
     let prodDiscAmount = 0;
     if (products_discount_type === 'percent') {
-      prodDiscAmount = (productsSubtotal * Number(products_discount_value)) / 100;
+      prodDiscAmount = (productsSubtotal * pDiscVal) / 100;
     } else if (products_discount_type === 'fixed') {
-      prodDiscAmount = Math.min(productsSubtotal, Number(products_discount_value));
+      prodDiscAmount = Math.min(productsSubtotal, pDiscVal);
     }
 
     const totalSubtotal = servicesSubtotal + productsSubtotal;
-    const totalDiscountAmount = srvDiscAmount + prodDiscAmount;
+    const totalDiscountAmount = Math.min(totalSubtotal, srvDiscAmount + prodDiscAmount);
     const netTaxable = Math.max(0, totalSubtotal - totalDiscountAmount);
     
-    // Calculate Tax
-    const numericTaxRate = Math.max(0, parseFloat(tax_rate) || 0);
+    // Calculate Tax & final non-negative total
     const taxAmount = Number(((netTaxable * numericTaxRate) / 100).toFixed(2));
-    const finalTotal = Number((netTaxable + taxAmount).toFixed(2));
+    const finalTotal = Math.max(0, Number((netTaxable + taxAmount).toFixed(2)));
 
-    // 4. Generate next invoice number for this salon using row-lock counter & current year
+    // 5. Generate next invoice number for this salon using row-lock counter & current year
     const currentYear = new Date().getFullYear();
     const counterRes = await client.query(
       `UPDATE salons 
@@ -105,7 +177,7 @@ export async function POST(
     const invNumber = `INV-${currentYear}-${invSeq.toString().padStart(4, '0')}`;
     const receiptToken = crypto.randomBytes(16).toString('hex');
 
-    // 5. Create invoice with tax breakdown and unguessable token
+    // 6. Create invoice with tax breakdown and unguessable token
     const invRes = await client.query(
       `INSERT INTO invoices (
         salon_id, session_id, number, receipt_token, customer_id, subtotal, 
@@ -128,16 +200,6 @@ export async function POST(
       ]
     );
 
-    // 6. Reduce inventory stock for all products used (scoped to this salon)
-    for (const prodItem of productItems) {
-      await client.query(
-        `UPDATE products 
-         SET stock = GREATEST(0, stock - $1)
-         WHERE id = $2 AND salon_id = $3`,
-        [prodItem.qty, prodItem.ref_id, salonId]
-      );
-    }
-
     // 7. Mark session as completed
     await client.query(
       "UPDATE sessions SET status = 'completed' WHERE id = $1 AND salon_id = $2",
@@ -145,6 +207,7 @@ export async function POST(
     );
 
     await client.query('COMMIT');
+    inTransaction = false;
 
     const createdInvoice = invRes.rows[0];
 
@@ -178,8 +241,13 @@ export async function POST(
       message: `Session completed. Invoice ${invNumber} generated for collection.`,
     });
   } catch (error: any) {
-    await client.query('ROLLBACK');
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (inTransaction) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {}
+    }
+    console.error('Session completion error:', error);
+    return serverError(error, 'src/app/api/live/sessions/[id]/complete/route.ts');
   } finally {
     client.release();
   }

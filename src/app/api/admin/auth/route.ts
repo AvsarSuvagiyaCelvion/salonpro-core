@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
@@ -11,6 +12,7 @@ import {
   checkRateLimit,
   recordFailedAttempt,
   resetRateLimit,
+  getClientIp,
 } from '@/lib/rate-limit';
 
 export async function GET() {
@@ -35,12 +37,24 @@ export async function GET() {
       },
     });
   } catch (error: any) {
-    return NextResponse.json({ loggedIn: false, error: error.message });
+    console.error('Admin session check error:', error);
+    return NextResponse.json({ loggedIn: false, error: 'Session check failed' });
   }
 }
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const ipRateLimitKey = `admin_auth_ip:${clientIp}`;
+
+    const ipCheck = await checkRateLimit(ipRateLimitKey, 20, 900);
+    if (ipCheck.isLocked) {
+      return NextResponse.json(
+        { error: 'Too many admin authentication attempts from this IP address. Please try again in 15 minutes.' },
+        { status: 429 }
+      );
+    }
+
     const { email, password } = await request.json();
 
     const cleanEmail = email?.trim().toLowerCase();
@@ -146,6 +160,7 @@ export async function POST(request: Request) {
     }
 
     if (!authenticatedAdmin) {
+      await recordFailedAttempt(ipRateLimitKey, 20, 900);
       const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(
         {
@@ -159,6 +174,7 @@ export async function POST(request: Request) {
 
     // Reset rate limit counter on successful admin authentication
     await resetRateLimit(rateLimitKey);
+    await resetRateLimit(ipRateLimitKey);
 
     const token = await createAdminSessionToken({
       email: authenticatedAdmin.email,
@@ -187,6 +203,6 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/auth/route.ts');
   }
 }

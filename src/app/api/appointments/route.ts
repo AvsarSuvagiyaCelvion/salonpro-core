@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -14,12 +15,17 @@ export async function GET(request: Request) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10)));
+    const offset = (page - 1) * pageSize;
+
     let sql = `
       SELECT a.id, a.salon_id, a.starts_at, a.ends_at, a.status, a.source, a.note, a.created_at,
              c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile, c.email as customer_email,
              s.id as staff_id, s.name as staff_name, s.role_title as staff_role,
              sv.id as service_id, sv.name as service_name, sv.category as service_category,
-             sv.duration_min, sv.price as service_price
+             sv.duration_min, sv.price as service_price,
+             COUNT(*) OVER() as full_count
       FROM appointments a
       JOIN customers c ON a.customer_id = c.id
       JOIN staff s ON a.staff_id = s.id
@@ -43,11 +49,30 @@ export async function GET(request: Request) {
     }
 
     sql += ` ORDER BY a.starts_at ASC `;
+    sql += ` LIMIT $${idx++} OFFSET $${idx++} `;
+    params.push(pageSize, offset);
 
     const res = await query(sql, params);
-    return NextResponse.json({ appointments: res.rows });
+
+    const total = res.rows.length > 0 ? parseInt(res.rows[0].full_count, 10) : 0;
+    const totalPages = Math.ceil(total / pageSize) || 1;
+
+    const appointments = res.rows.map((row) => {
+      const { full_count, ...cleanRow } = row;
+      return cleanRow;
+    });
+
+    return NextResponse.json({
+      appointments,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
+      },
+    });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/appointments/route.ts');
   }
 }
 
@@ -186,6 +211,6 @@ export async function POST(request: Request) {
       throw insertError;
     }
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/appointments/route.ts');
   }
 }

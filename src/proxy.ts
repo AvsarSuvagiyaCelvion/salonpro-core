@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { query } from '@/lib/db';
 import {
   verifySessionToken,
   COOKIE_NAME,
@@ -37,6 +38,7 @@ const PUBLIC_API_PREFIXES = [
   '/api/customer/records',
   '/api/admin/auth',
   '/api/admin/logout',
+  '/api/subscription/razorpay/webhook',
 ];
 
 /**
@@ -84,13 +86,66 @@ export function extractTenantFromHost(host: string | null): string | null {
   return null;
 }
 
+interface CustomDomainEntry {
+  slug: string | null;
+  cachedAt: number;
+}
+const customDomainCache = new Map<string, CustomDomainEntry>();
+const CUSTOM_DOMAIN_TTL = 60 * 1000; // 60-second in-memory cache
+
+async function resolveCustomDomain(hostname: string): Promise<string | null> {
+  const cached = customDomainCache.get(hostname);
+  if (cached && Date.now() - cached.cachedAt < CUSTOM_DOMAIN_TTL) {
+    return cached.slug;
+  }
+
+  try {
+    const res = await query(
+      `SELECT slug FROM salons WHERE custom_domain = $1 AND custom_domain_verified = true LIMIT 1`,
+      [hostname]
+    );
+    const slug = res.rows.length > 0 ? res.rows[0].slug : null;
+    customDomainCache.set(hostname, { slug, cachedAt: Date.now() });
+    return slug;
+  } catch {
+    return null;
+  }
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const host = request.headers.get('host') || '';
-  const tenantSlug = extractTenantFromHost(host);
+  const hostname = host.split(':')[0].toLowerCase();
+  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'salonpro.in').toLowerCase();
+  let tenantSlug = extractTenantFromHost(host);
+
+  // When host is not a subdomain of ROOT_DOMAIN, look up verified custom domain
+  if (!tenantSlug) {
+    const isStandardHost =
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === rootDomain ||
+      hostname === `www.${rootDomain}` ||
+      hostname.endsWith('.vercel.app') ||
+      hostname.endsWith(`.${rootDomain}`) ||
+      hostname.endsWith('.localhost');
+
+    if (!isStandardHost) {
+      tenantSlug = await resolveCustomDomain(hostname);
+      if (!tenantSlug && !pathname.startsWith('/api/')) {
+        // If unverified or not found, redirect to the root landing page
+        const redirectUrl = new URL('/', `https://${rootDomain}`);
+        return NextResponse.redirect(redirectUrl);
+      }
+    }
+  }
 
   // Set up mutated request headers to pass tenant and host context downstream
   const requestHeaders = new Headers(request.headers);
+  // Strip incoming client headers to prevent spoofing
+  requestHeaders.delete('x-tenant-slug');
+  requestHeaders.delete('x-current-host');
+
   requestHeaders.set('x-current-host', host);
   if (tenantSlug) {
     requestHeaders.set('x-tenant-slug', tenantSlug);

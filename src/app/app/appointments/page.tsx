@@ -86,6 +86,11 @@ export default function AppointmentsPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'scheduled' | 'arrived' | 'done' | 'cancelled'>('all');
   const [dateRangeFilter, setDateRangeFilter] = useState<'next7' | 'today' | 'all'>('next7');
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   // Messages & Friendly Overlap Alert
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [overlapError, setOverlapError] = useState<string | null>(null);
@@ -118,8 +123,12 @@ export default function AppointmentsPage() {
   }, []);
 
   useEffect(() => {
-    fetchAppointments();
+    setPage(1);
   }, [statusFilter, dateRangeFilter, viewMode, calendarDate]);
+
+  useEffect(() => {
+    fetchAppointments(page);
+  }, [page, statusFilter, dateRangeFilter, viewMode, calendarDate]);
 
   function handlePrevDay() {
     const cur = new Date((calendarDate || todayDate || new Date().toLocaleDateString('en-CA')) + 'T12:00:00');
@@ -167,11 +176,13 @@ export default function AppointmentsPage() {
     } catch {}
   }
 
-  async function fetchAppointments() {
+  async function fetchAppointments(targetPage = page) {
     try {
       setLoading(true);
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.set('status', statusFilter);
+      params.set('page', String(targetPage));
+      params.set('pageSize', '50');
 
       const now = new Date();
       if (viewMode === 'calendar') {
@@ -196,6 +207,11 @@ export default function AppointmentsPage() {
       const data = await res.json();
       if (res.ok) {
         setAppointments(data.appointments || []);
+        if (data.pagination) {
+          setPage(data.pagination.page);
+          setTotalPages(data.pagination.totalPages);
+          setTotalRecords(data.pagination.total);
+        }
       }
     } catch {
       setMessage({ type: 'error', text: 'Failed to load appointments' });
@@ -880,6 +896,31 @@ export default function AppointmentsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {viewMode === 'cards' && totalPages > 1 && (
+        <div className="flex items-center justify-between p-4 mt-4 bg-white rounded-2xl border border-neutral-200/80 shadow-2xs">
+          <p className="text-xs text-neutral-600">
+            Showing page <span className="font-semibold text-neutral-900">{page}</span> of{' '}
+            <span className="font-semibold text-neutral-900">{totalPages}</span> ({totalRecords} appointments)
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1 || loading}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages || loading}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 

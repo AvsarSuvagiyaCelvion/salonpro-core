@@ -3,13 +3,13 @@ import { NextResponse } from 'next/server';
 import {
   COOKIE_NAME,
   ADMIN_COOKIE_NAME,
-  CUSTOMER_COOKIE_NAME,
   verifySessionToken,
   verifyAdminSessionToken,
-  verifyCustomerSessionToken,
 } from './auth';
 import { query } from './db';
 import { getSalonPlan, SalonPlanContext } from './plan';
+
+export type UserRole = 'owner' | 'staff';
 
 export interface TenantSession {
   email: string;
@@ -37,13 +37,14 @@ interface CachedUserAuth {
   userId: string;
   salonId: string;
   salonSlug: string;
+  role: string;
   userActive: boolean;
   salonActive: boolean;
   cachedAt: number;
 }
 
 const userAuthCache = new Map<string, CachedUserAuth>();
-const USER_CACHE_TTL = 30000; // 30 seconds
+const USER_CACHE_TTL = 10000; // 10 seconds
 
 export function invalidateUserAuthCache(email?: string) {
   if (email) {
@@ -51,6 +52,23 @@ export function invalidateUserAuthCache(email?: string) {
   } else {
     userAuthCache.clear();
   }
+}
+
+/**
+ * 3.1 Role authorization guard
+ * Returns null if allowed, or HTTP 403 NextResponse if denied.
+ */
+export function requireRole(
+  session: TenantSession,
+  allowedRoles: ('owner' | 'staff')[]
+): NextResponse | null {
+  if (!session || !allowedRoles.includes(session.role as any)) {
+    return NextResponse.json(
+      { error: 'Forbidden: Insufficient permissions for this action', code: 'FORBIDDEN' },
+      { status: 403 }
+    );
+  }
+  return null;
 }
 
 /**
@@ -109,6 +127,7 @@ export async function requireTenant(
       id: string;
       salon_id: string;
       salon_slug: string;
+      role: string;
       user_active: boolean;
       salon_active: boolean;
     };
@@ -118,13 +137,14 @@ export async function requireTenant(
         id: cached.userId,
         salon_id: cached.salonId,
         salon_slug: cached.salonSlug,
+        role: cached.role,
         user_active: cached.userActive,
         salon_active: cached.salonActive,
       };
     } else {
-      // Resolve or verify user and salon state from database
+      // Re-read role and state from database (users.role) instead of trusting JWT
       const userRes = await query(
-        `SELECT u.id, u.salon_id, s.slug as salon_slug, u.is_active as user_active, s.is_active as salon_active
+        `SELECT u.id, u.salon_id, u.role, s.slug as salon_slug, u.is_active as user_active, s.is_active as salon_active
          FROM users u
          JOIN salons s ON u.salon_id = s.id
          WHERE LOWER(u.email) = $1
@@ -147,6 +167,7 @@ export async function requireTenant(
         id: r.id,
         salon_id: r.salon_id,
         salon_slug: r.salon_slug,
+        role: r.role || 'staff',
         user_active: Boolean(r.user_active),
         salon_active: Boolean(r.salon_active),
       };
@@ -155,6 +176,7 @@ export async function requireTenant(
         userId: row.id,
         salonId: row.salon_id,
         salonSlug: row.salon_slug,
+        role: row.role,
         userActive: row.user_active,
         salonActive: row.salon_active,
         cachedAt: Date.now(),
@@ -174,6 +196,7 @@ export async function requireTenant(
     const userId = row.id;
     const salonId = row.salon_id;
     const salonSlug = row.salon_slug;
+    const dbRole = row.role;
 
     // Check plan and subscription status
     const planResult = await getSalonPlan(salonId);
@@ -187,7 +210,7 @@ export async function requireTenant(
     return {
       session: {
         email: payload.email,
-        role: payload.role || 'owner',
+        role: dbRole, // Always DB role
         salonId,
         userId,
         salonSlug,
@@ -242,25 +265,28 @@ export async function requireAdmin(request?: Request): Promise<
       return {
         admin: null,
         error: NextResponse.json(
-          { error: 'Unauthorized: Super Admin session required' },
+          { error: 'Unauthorized: Super Admin access required' },
           { status: 401 }
         ),
       };
     }
 
     const payload = await verifyAdminSessionToken(token);
-    if (!payload || !payload.email || payload.role !== 'super_admin') {
+    if (!payload || !payload.email) {
       return {
         admin: null,
         error: NextResponse.json(
-          { error: 'Forbidden: Super Admin access required' },
-          { status: 403 }
+          { error: 'Unauthorized: Invalid admin session' },
+          { status: 401 }
         ),
       };
     }
 
     return {
-      admin: payload,
+      admin: {
+        email: payload.email,
+        role: payload.role || 'super_admin',
+      },
       error: null,
     };
   } catch (err: any) {

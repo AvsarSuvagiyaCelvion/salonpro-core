@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireAdmin } from '@/lib/api-auth';
@@ -105,7 +106,7 @@ export async function PATCH(
       message: 'Plan updated successfully',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/plans/[id]/route.ts');
   }
 }
 
@@ -150,7 +151,7 @@ export async function DELETE(
       plan: res.rows[0],
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/plans/[id]/route.ts');
   }
 }
 

@@ -1,6 +1,8 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { normalizeMobile } from '@/lib/phone';
 
 export async function POST(request: Request) {
   try {
@@ -14,9 +16,16 @@ export async function POST(request: Request) {
 
     // If new customer details provided
     if (!targetCustomerId) {
-      if (!name || !mobile) {
+      if (!name) {
         return NextResponse.json(
-          { error: 'Name and mobile are required to register a customer' },
+          { error: 'Name is required to register a customer' },
+          { status: 400 }
+        );
+      }
+      const cleanMobile = normalizeMobile(mobile);
+      if (!cleanMobile) {
+        return NextResponse.json(
+          { error: 'Valid 10-digit mobile number is required' },
           { status: 400 }
         );
       }
@@ -24,7 +33,7 @@ export async function POST(request: Request) {
       // Check if customer with mobile exists in caller's salon
       const existing = await query(
         'SELECT id FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1',
-        [salonId, mobile.trim()]
+        [salonId, cleanMobile]
       );
 
       if (existing.rows.length > 0) {
@@ -32,7 +41,7 @@ export async function POST(request: Request) {
       } else {
         const newCust = await query(
           'INSERT INTO customers (salon_id, name, mobile) VALUES ($1, $2, $3) RETURNING id',
-          [salonId, name.trim(), mobile.trim()]
+          [salonId, name.trim(), cleanMobile]
         );
         targetCustomerId = newCust.rows[0].id;
       }
@@ -60,6 +69,6 @@ export async function POST(request: Request) {
       message: 'Customer added to waiting queue',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/live/waiting/route.ts');
   }
 }

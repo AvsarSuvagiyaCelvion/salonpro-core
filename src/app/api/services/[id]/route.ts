@@ -1,6 +1,7 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireTenant } from '@/lib/api-auth';
+import { requireTenant, requireRole } from '@/lib/api-auth';
 
 export async function PUT(
   request: Request,
@@ -9,6 +10,9 @@ export async function PUT(
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
 
     const salonId = auth.session.salonId;
     const { id } = await params;
@@ -44,7 +48,7 @@ export async function PUT(
 
     return NextResponse.json({ service: res.rows[0], message: 'Service updated successfully' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/services/[id]/route.ts');
   }
 }
 
@@ -55,6 +59,9 @@ export async function PATCH(
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
 
     const salonId = auth.session.salonId;
     const { id } = await params;
@@ -75,7 +82,7 @@ export async function PATCH(
 
     return NextResponse.json({ service: res.rows[0], message: 'Online booking status updated' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/services/[id]/route.ts');
   }
 }
 
@@ -86,6 +93,9 @@ export async function DELETE(
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
 
     const salonId = auth.session.salonId;
     const { id } = await params;
@@ -101,6 +111,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: 'Service deleted' });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/services/[id]/route.ts');
   }
 }

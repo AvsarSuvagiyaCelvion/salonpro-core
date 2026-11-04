@@ -1,6 +1,7 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireAdmin } from '@/lib/api-auth';
+import { requireAdmin, invalidateUserAuthCache } from '@/lib/api-auth';
 import { clearSalonCache } from '@/lib/salon';
 import { invalidateSalonPlanCache } from '@/lib/plan';
 
@@ -46,7 +47,7 @@ export async function GET(
 
     return NextResponse.json({ salon: res.rows[0] });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/salons/[id]/route.ts');
   }
 }
 
@@ -167,6 +168,7 @@ export async function PATCH(
 
     clearSalonCache();
     invalidateSalonPlanCache(id);
+    invalidateUserAuthCache();
 
     return NextResponse.json({
       success: true,
@@ -174,7 +176,7 @@ export async function PATCH(
       message: 'Salon updated successfully by Super Admin',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/salons/[id]/route.ts');
   }
 }
 
@@ -196,6 +198,7 @@ export async function DELETE(
 
     clearSalonCache();
     invalidateSalonPlanCache(id);
+    invalidateUserAuthCache();
 
     return NextResponse.json({
       success: true,
@@ -203,6 +206,6 @@ export async function DELETE(
       message: `Salon workspace ${res.rows[0].name} deleted successfully`,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/salons/[id]/route.ts');
   }
 }

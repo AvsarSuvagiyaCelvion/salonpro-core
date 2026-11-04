@@ -1,6 +1,7 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireTenant } from '@/lib/api-auth';
+import { requireTenant, requireRole } from '@/lib/api-auth';
 import { requireFeature } from '@/lib/plan';
 
 export async function GET(request: Request) {
@@ -74,7 +75,7 @@ export async function GET(request: Request) {
       subscriptions: subsRes.rows,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/memberships/route.ts');
   }
 }
 
@@ -82,6 +83,9 @@ export async function POST(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    const roleErr = requireRole(auth.session, ['owner']);
+    if (roleErr) return roleErr;
 
     const salonId = auth.session.salonId;
     const featureCheck = await requireFeature('memberships', salonId);
@@ -149,6 +153,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid plan_type' }, { status: 400 });
     }
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/memberships/route.ts');
   }
 }

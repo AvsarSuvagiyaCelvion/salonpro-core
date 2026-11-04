@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -102,6 +103,6 @@ export async function POST(request: Request) {
       message: 'Digital bill delivered directly to customer WhatsApp with PDF attachment!',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/billing/whatsapp/route.ts');
   }
 }

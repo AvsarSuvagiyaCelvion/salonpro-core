@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
       lowStockCount: res.rows.filter((p) => p.is_low_stock).length,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/products/route.ts');
   }
 }
 
@@ -99,6 +100,6 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/products/route.ts');
   }
 }

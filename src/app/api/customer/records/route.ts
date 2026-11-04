@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { query } from '@/lib/db';
@@ -96,7 +97,7 @@ export async function GET() {
       plans: plansRes.rows,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/customer/records/route.ts');
   }
 }
 
@@ -139,12 +140,30 @@ export async function PATCH(request: Request) {
     }
 
     if (action === 'cancel') {
-      await query("UPDATE appointments SET status = 'cancelled' WHERE id = $1", [appointmentId]);
+      const cancelRes = await query(
+        `UPDATE appointments 
+         SET status = 'cancelled' 
+         WHERE id = $1 
+           AND salon_id = $2 
+           AND customer_id = $3
+           AND status = 'scheduled' 
+           AND starts_at > NOW()
+         RETURNING id`,
+        [appointmentId, salonId, payload.customerId]
+      );
+
+      if (cancelRes.rows.length === 0) {
+        return NextResponse.json(
+          { error: 'Only upcoming scheduled appointments can be cancelled.' },
+          { status: 400 }
+        );
+      }
+
       return NextResponse.json({ success: true, message: 'Appointment cancelled successfully' });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/customer/records/route.ts');
   }
 }

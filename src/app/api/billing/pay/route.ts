@@ -1,6 +1,7 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { requireTenant } from '@/lib/api-auth';
+import { requireTenant, requireRole } from '@/lib/api-auth';
 import { sendWhatsAppInvoiceReceipt } from '@/lib/whatsapp';
 
 export async function POST(request: Request) {
@@ -9,7 +10,15 @@ export async function POST(request: Request) {
     if (auth.error) return auth.error;
 
     const salonId = auth.session.salonId;
-    const { invoice_id, method, amount, reference, note, auto_deliver_whatsapp = true } = await request.json();
+    const body = await request.json();
+    const { invoice_id, method, amount, reference, note, auto_deliver_whatsapp = true, action } = body;
+
+    // Owner-only guard for refunds
+    const isRefund = method?.toLowerCase() === 'refund' || action === 'refund';
+    if (isRefund) {
+      const roleErr = requireRole(auth.session, ['owner']);
+      if (roleErr) return roleErr;
+    }
 
     if (!invoice_id || !method || !amount) {
       return NextResponse.json(
@@ -88,6 +97,6 @@ export async function POST(request: Request) {
       message: 'Payment recorded and invoice processed successfully',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/billing/pay/route.ts');
   }
 }

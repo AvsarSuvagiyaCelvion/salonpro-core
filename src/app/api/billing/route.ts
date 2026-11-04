@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
@@ -12,7 +13,11 @@ export async function GET(request: Request) {
     const q = searchParams.get('q')?.trim() || '';
     const statusFilter = searchParams.get('status')?.trim().toLowerCase() || 'all';
 
-    let sql = `
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10)));
+    const offset = (page - 1) * pageSize;
+
+    let baseSql = `
       SELECT i.id, i.number, i.receipt_token, i.session_id, i.subtotal, i.discount_type, 
               i.discount_value, i.discount_amount, i.tax_rate, i.tax_amount, i.total, i.whatsapp_sent, i.created_at,
               c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile,
@@ -22,36 +27,44 @@ export async function GET(request: Request) {
                 WHEN (i.total - COALESCE(SUM(p.amount), 0)) <= 0 THEN 'paid'
                 WHEN COALESCE(SUM(p.amount), 0) > 0 THEN 'partial'
                 ELSE 'pending'
-              END as status
+              END as status,
+              COUNT(*) OVER() as full_count
       FROM invoices i
       JOIN customers c ON i.customer_id = c.id
       LEFT JOIN payments p ON i.id = p.invoice_id
       WHERE i.salon_id = $1
     `;
     const params: any[] = [salonId];
+    let idx = 2;
 
     if (q) {
       params.push(`%${q}%`);
-      sql += ` AND (i.number ILIKE $2 OR c.name ILIKE $2 OR c.mobile ILIKE $2) `;
+      baseSql += ` AND (i.number ILIKE $${idx} OR c.name ILIKE $${idx} OR c.mobile ILIKE $${idx}) `;
+      idx++;
     }
 
-    sql += ` GROUP BY i.id, c.id `;
+    baseSql += ` GROUP BY i.id, c.id `;
 
     if (statusFilter === 'paid') {
-      sql += ` HAVING (i.total - COALESCE(SUM(p.amount), 0)) <= 0 `;
+      baseSql += ` HAVING (i.total - COALESCE(SUM(p.amount), 0)) <= 0 `;
     } else if (statusFilter === 'partial') {
-      sql += ` HAVING (i.total - COALESCE(SUM(p.amount), 0)) > 0 AND COALESCE(SUM(p.amount), 0) > 0 `;
+      baseSql += ` HAVING (i.total - COALESCE(SUM(p.amount), 0)) > 0 AND COALESCE(SUM(p.amount), 0) > 0 `;
     } else if (statusFilter === 'pending') {
-      sql += ` HAVING COALESCE(SUM(p.amount), 0) = 0 `;
+      baseSql += ` HAVING COALESCE(SUM(p.amount), 0) = 0 `;
     }
 
-    sql += ` ORDER BY i.created_at DESC `;
+    baseSql += ` ORDER BY i.created_at DESC `;
+    baseSql += ` LIMIT $${idx++} OFFSET $${idx++} `;
+    params.push(pageSize, offset);
 
-    const res = await query(sql, params);
+    const res = await query(baseSql, params);
+
+    const total = res.rows.length > 0 ? parseInt(res.rows[0].full_count, 10) : 0;
+    const totalPages = Math.ceil(total / pageSize) || 1;
 
     // Fetch session items for these invoices to show breakdown on receipt
     const sessionIds = res.rows.map((r) => r.session_id).filter(Boolean);
-    let itemsMap: Record<string, any[]> = {};
+    const itemsMap: Record<string, any[]> = {};
 
     if (sessionIds.length > 0) {
       const itemsRes = await query(
@@ -66,13 +79,25 @@ export async function GET(request: Request) {
       }
     }
 
-    const invoices = res.rows.map((inv) => ({
-      ...inv,
-      items: inv.session_id ? itemsMap[inv.session_id] || [] : [],
-    }));
+    const invoices = res.rows.map((inv) => {
+      // Remove internal full_count from client object
+      const { full_count, ...cleanedInv } = inv;
+      return {
+        ...cleanedInv,
+        items: cleanedInv.session_id ? itemsMap[cleanedInv.session_id] || [] : [],
+      };
+    });
 
-    return NextResponse.json({ invoices });
+    return NextResponse.json({
+      invoices,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
+      },
+    });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/billing/route.ts');
   }
 }

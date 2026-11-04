@@ -134,48 +134,58 @@ export default function AdminSecurityPage() {
         </button>
       </div>
 
-      {/* Security Architecture Explainer Card */}
-      <div className="bg-gradient-to-r from-amber-50 via-slate-50 to-pink-50 border border-amber-200/90 rounded-3xl p-6 shadow-xs">
+      {/* Security Architecture Overview Card */}
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/80 text-white rounded-3xl p-6 shadow-md">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-800 flex items-center justify-center font-bold text-2xl shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-2xl shrink-0">
             🛡️
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 w-full">
             <div>
-              <h2 className="text-base font-black text-slate-900">How Admin Security Works (Zero Public Signup)</h2>
-              <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                Your question: <em>&quot;If someone opens domain.com/admin, can they make themselves an admin? What is the security?&quot;</em>
+              <h2 className="text-base font-black text-white">Platform Security Architecture Overview</h2>
+              <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                SalonPro enforces enterprise-grade zero-trust principles across all tenants, APIs, and platform administrative interfaces.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5 mb-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>1. No Public Registration</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+              <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/70 shadow-xs">
+                <div className="font-bold text-xs text-amber-300 flex items-center gap-1.5 mb-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Tenant Isolation & RLS</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  There is no &quot;Sign Up&quot; form on /admin. An outsider visiting /admin only sees a locked login form. Without your password, they can never enter.
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Strict PostgreSQL Row-Level Security (RLS) combined with server-side query scoping on every <code className="text-amber-200">salon_id</code> ensures strict data segregation.
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5 mb-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>2. Protected Admin Creation</span>
+              <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/70 shadow-xs">
+                <div className="font-bold text-xs text-amber-300 flex items-center gap-1.5 mb-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Advisory Transaction Locks</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  The API endpoint to create a new admin strictly checks for your active Super Admin session. Only you, from inside this dashboard, can authorize a new admin.
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  PostgreSQL advisory locking (<code className="text-amber-200">pg_advisory_xact_lock</code>) guarantees zero race conditions or double-bookings during concurrent slot reservations.
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5 mb-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>3. Cryptographic JWT Cookie</span>
+              <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/70 shadow-xs">
+                <div className="font-bold text-xs text-amber-300 flex items-center gap-1.5 mb-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Bcrypt & HttpOnly Auth</span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Admin session is stored in an httpOnly, signed cookie with HMAC SHA-256 encryption. Browser scripts cannot steal or forge this token.
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Passphrases and customer PINs are hashed with bcrypt. Sessions use signed, HttpOnly JWT cookies inaccessible to client-side scripts.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/70 shadow-xs">
+                <div className="font-bold text-xs text-amber-300 flex items-center gap-1.5 mb-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Rate Limiting & Honeypots</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Endpoints enforce IP and identity rate limits with sliding lockout resets. Public booking forms include honeypot hooks to neutralize automated bots.
                 </p>
               </div>
             </div>

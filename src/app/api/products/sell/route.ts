@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import pool, { query } from '@/lib/db';
@@ -74,7 +75,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/products/sell/route.ts');
   }
 }
 
@@ -205,11 +206,11 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Deduct inventory stock
-    const updatedStock = product.stock - quantity;
+    // 4. Atomically decrement stock
+    const remainingStock = product.stock - quantity;
     await client.query(
-      `UPDATE products SET stock = $1 WHERE id = $2`,
-      [updatedStock, product.id]
+      `UPDATE products SET stock = stock - $1 WHERE id = $2 AND salon_id = $3`,
+      [quantity, product.id, salonId]
     );
 
     // 5. Create Completed Beauty/Retail Session
@@ -314,8 +315,8 @@ export async function POST(request: Request) {
         id: product.id,
         name: product.name,
         qty: quantity,
-        remainingStock: updatedStock,
-        isLowStock: updatedStock <= product.min_stock,
+        remainingStock,
+        isLowStock: remainingStock <= product.min_stock,
       },
       staff: {
         id: staffMember.id,
@@ -327,7 +328,7 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     await client.query('ROLLBACK');
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/products/sell/route.ts');
   } finally {
     client.release();
   }

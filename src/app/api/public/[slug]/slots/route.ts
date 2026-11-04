@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { getAvailableSlots } from '@/lib/slots';
 
@@ -29,6 +30,6 @@ export async function GET(
 
     return NextResponse.json(result);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/public/[slug]/slots/route.ts');
   }
 }

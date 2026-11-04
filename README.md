@@ -36,7 +36,8 @@ cp .env.example .env.local
 ```
 
 Key environment variables:
-- `DATABASE_URL`: Connection string for PostgreSQL / Supabase
+- `DATABASE_URL`: Connection string for PostgreSQL / Supabase. **Note:** In serverless environments (e.g. Vercel), ensure you use Supabase Transaction Pooler (port `6543`) with `?pgbouncer=true` to prevent connection exhaustion.
+- `DB_POOL_MAX`: Maximum database client connections per serverless instance (defaults to `3`).
 - `SESSION_SECRET`: 64-character secret string for session tokens and encryption
 - `NEXT_PUBLIC_APP_URL`: Canonical public URL of your deployment
 - `NEXT_PUBLIC_SUPPORT_PHONE`: WhatsApp support phone for password recovery

@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireAdmin } from '@/lib/api-auth';
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ salons: salons.rows });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/salons/route.ts');
   }
 }
 
@@ -84,6 +85,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, salon: newSalon });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/salons/route.ts');
   }
 }

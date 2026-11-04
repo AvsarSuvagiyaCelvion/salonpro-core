@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireAdmin } from '@/lib/api-auth';
@@ -79,6 +80,6 @@ export async function GET(request: Request) {
       recentAppointments: recentAppointmentsRes.rows,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/overview/route.ts');
   }
 }

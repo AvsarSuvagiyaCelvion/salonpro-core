@@ -1,16 +1,11 @@
 import crypto from 'crypto';
 
 export function getRazorpayKeys() {
-  const keyId =
-    process.env.RAZORPAY_KEY_ID ||
-    process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
-    'rzp_test_TvkGEaLaUlVYMt';
-  const keySecret =
-    process.env.RAZORPAY_KEY_SECRET ||
-    'ZJ3XD3w1OMLW3SgPXmJekEUS';
+  const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
   if (!keyId || !keySecret) {
-    throw new Error('Razorpay API keys are not configured in environment variables.');
+    throw new Error('Razorpay API keys are not configured. Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in environment variables.');
   }
 
   return { keyId, keySecret };
@@ -32,6 +27,19 @@ export interface RazorpayOrderResponse {
   currency: string;
   receipt: string;
   status: string;
+  created_at: number;
+}
+
+export interface RazorpayPaymentDetails {
+  id: string;
+  entity: string;
+  amount: number; // in paise
+  currency: string;
+  status: string; // 'captured' | 'authorized' | 'failed' | etc.
+  order_id: string;
+  method?: string;
+  email?: string;
+  contact?: string;
   created_at: number;
 }
 
@@ -68,7 +76,30 @@ export async function createRazorpayOrder(params: CreateOrderParams): Promise<Ra
 }
 
 /**
- * Verifies Razorpay payment signature using HMAC SHA256
+ * Fetches payment details from Razorpay REST API
+ */
+export async function fetchRazorpayPayment(paymentId: string): Promise<RazorpayPaymentDetails> {
+  const { keyId, keySecret } = getRazorpayKeys();
+  const authHeader = 'Basic ' + Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+
+  const res = await fetch(`https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': authHeader,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData?.error?.description || `Failed to fetch payment details for ${paymentId}`);
+  }
+
+  return res.json() as Promise<RazorpayPaymentDetails>;
+}
+
+/**
+ * Verifies Razorpay payment signature using HMAC SHA256 with timing-safe comparison
  */
 export function verifyRazorpayPaymentSignature({
   orderId,
@@ -79,6 +110,9 @@ export function verifyRazorpayPaymentSignature({
   paymentId: string;
   signature: string;
 }): boolean {
+  if (!orderId || !paymentId || !signature) {
+    return false;
+  }
   const { keySecret } = getRazorpayKeys();
 
   const generatedSignature = crypto
@@ -86,9 +120,39 @@ export function verifyRazorpayPaymentSignature({
     .update(`${orderId}|${paymentId}`)
     .digest('hex');
 
-  return crypto.timingSafeEqual(
-    Buffer.from(generatedSignature, 'utf-8'),
-    Buffer.from(signature, 'utf-8')
-  );
+  const bufGen = Buffer.from(generatedSignature, 'utf-8');
+  const bufSig = Buffer.from(signature, 'utf-8');
+
+  if (bufGen.length !== bufSig.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(bufGen, bufSig);
 }
 
+/**
+ * Verifies Razorpay Webhook signature using HMAC SHA256 with timing-safe comparison
+ */
+export function verifyRazorpayWebhookSignature(
+  rawBody: string,
+  signature: string,
+  webhookSecret: string
+): boolean {
+  if (!rawBody || !signature || !webhookSecret) {
+    return false;
+  }
+
+  const expectedSignature = crypto
+    .createHmac('sha256', webhookSecret)
+    .update(rawBody)
+    .digest('hex');
+
+  const bufExpected = Buffer.from(expectedSignature, 'utf-8');
+  const bufActual = Buffer.from(signature, 'utf-8');
+
+  if (bufExpected.length !== bufActual.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(bufExpected, bufActual);
+}

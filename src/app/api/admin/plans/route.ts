@@ -1,3 +1,4 @@
+import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireAdmin } from '@/lib/api-auth';
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/plans/route.ts');
   }
 }
 
@@ -106,7 +107,7 @@ export async function POST(request: Request) {
       message: 'Plan created successfully',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return serverError(error, 'src/app/api/admin/plans/route.ts');
   }
 }
 

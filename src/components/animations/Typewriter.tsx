@@ -14,7 +14,7 @@ export default function Typewriter({
   firstLine,
   secondLine,
   onComplete,
-  speedMs = 52,
+  speedMs = 85,
 }: TypewriterProps) {
   const shouldReduceMotion = useReducedMotion();
   const fullText = `${firstLine}\n${secondLine}`;
@@ -61,22 +61,30 @@ export default function Typewriter({
     hasRunRef.current = true;
 
     let currentIndex = 0;
-    const interval = setInterval(() => {
+    let timerId: NodeJS.Timeout;
+
+    const typeNextChar = () => {
       currentIndex += 1;
       setDisplayedCount(currentIndex);
 
       if (currentIndex >= fullText.length) {
-        clearInterval(interval);
         setIsDone(true);
         try {
           sessionStorage.setItem('salonpro_typewriter_done', 'true');
         } catch {}
         onComplete?.();
+        return;
       }
-    }, speedMs);
 
-    return () => clearInterval(interval);
-  }, [fullText, speedMs, shouldReduceMotion, onComplete]);
+      // Add a natural brief pause (220ms) between the first line and second line
+      const delay = currentIndex === firstLine.length ? 220 : speedMs;
+      timerId = setTimeout(typeNextChar, delay);
+    };
+
+    timerId = setTimeout(typeNextChar, 250);
+
+    return () => clearTimeout(timerId);
+  }, [fullText, firstLine.length, speedMs, shouldReduceMotion, onComplete]);
 
   // Split currently displayed text across the two lines
   const firstLineCount = Math.min(displayedCount, firstLine.length);

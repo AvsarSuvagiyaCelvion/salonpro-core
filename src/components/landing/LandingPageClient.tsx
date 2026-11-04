@@ -39,7 +39,12 @@ import CalendarSlotsDemo from '@/components/animations/CalendarSlotsDemo';
 import SalonMarquee from '@/components/animations/SalonMarquee';
 
 export default function LandingPageClient() {
-  const [typewriterDone, setTypewriterDone] = useState(false);
+  const [typewriterDone, setTypewriterDone] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('salonpro_typewriter_done') === 'true';
+    }
+    return false;
+  });
 
   return (
     <SmoothScroll>
@@ -438,9 +443,9 @@ export default function LandingPageClient() {
         </section>
 
         {/* ================= INFINITE LUXURY SALON TESTIMONIAL MARQUEE ================= */}
-        <section className="relative z-10 border-t border-slate-200/70 bg-white/60 backdrop-blur-xs py-8">
+        <div className="relative z-10 w-full">
           <SalonMarquee />
-        </section>
+        </div>
 
         {/* Full Footer */}
         <LandingFooter />
@@ -448,3 +453,4 @@ export default function LandingPageClient() {
     </SmoothScroll>
   );
 }
+

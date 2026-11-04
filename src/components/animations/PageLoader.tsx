@@ -4,13 +4,24 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PageLoader() {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Automatically dismiss after 900ms
+    // Only show loader once per browser session
+    const hasShown = sessionStorage.getItem('salonpro_loader_shown');
+    if (hasShown) {
+      setIsVisible(false);
+      return;
+    }
+
+    setIsVisible(true);
+    try {
+      sessionStorage.setItem('salonpro_loader_shown', 'true');
+    } catch {}
+
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, 900);
+    }, 750);
 
     return () => clearTimeout(timer);
   }, []);
@@ -21,45 +32,66 @@ export default function PageLoader() {
         <motion.div
           key="page-loader"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[99999] bg-slate-950 flex flex-col items-center justify-center pointer-events-none"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className="fixed inset-0 z-[99999] bg-[#1a0c1e] flex flex-col items-center justify-center pointer-events-none select-none"
         >
           <div className="relative flex flex-col items-center">
-            {/* Animated Scissors Icon */}
-            <motion.div
-              initial={{ scale: 0.8, rotate: -20 }}
-              animate={{
-                scale: [0.8, 1.1, 1],
-                rotate: [-20, 15, 0],
-              }}
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
+            {/* GPU Hardware-Accelerated Snappy Scissors Cut (100% smooth, no JS stutter) */}
+            <div
               className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center text-3xl font-black shadow-2xl shadow-pink-600/40 mb-3"
+              style={{
+                willChange: 'transform, opacity',
+                animation: 'snipAndPulse 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              }}
             >
               ✂
-            </motion.div>
+            </div>
 
             {/* Logo Text Reveal */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-              className="text-center"
-            >
+            <div className="text-center">
               <h2 className="text-xl font-black text-white tracking-tight">SalonPro</h2>
-              <p className="text-[10px] text-pink-400 font-semibold uppercase tracking-widest mt-0.5">
+              <p className="text-[10px] text-pink-300 font-semibold uppercase tracking-widest mt-0.5">
                 Operating System for Salons
               </p>
-            </motion.div>
+            </div>
 
-            {/* Snipping Line Animation */}
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: 120 }}
-              transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
+            {/* Snipping Line */}
+            <div
               className="h-[2px] bg-gradient-to-r from-transparent via-pink-400 to-transparent mt-3 rounded-full"
+              style={{
+                width: '120px',
+                animation: 'expandLine 0.6s ease-out forwards',
+              }}
             />
           </div>
+
+          <style jsx>{`
+            @keyframes snipAndPulse {
+              0% {
+                transform: translate3d(0, 0, 0) scale(0.8) rotate(-15deg);
+                opacity: 0.5;
+              }
+              50% {
+                transform: translate3d(0, 0, 0) scale(1.08) rotate(10deg);
+                opacity: 1;
+              }
+              100% {
+                transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+                opacity: 1;
+              }
+            }
+            @keyframes expandLine {
+              0% {
+                width: 0px;
+                opacity: 0;
+              }
+              100% {
+                width: 140px;
+                opacity: 1;
+              }
+            }
+          `}</style>
         </motion.div>
       )}
     </AnimatePresence>

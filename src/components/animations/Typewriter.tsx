@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
 interface TypewriterProps {
@@ -14,18 +14,51 @@ export default function Typewriter({
   firstLine,
   secondLine,
   onComplete,
-  speedMs = 38,
+  speedMs = 52,
 }: TypewriterProps) {
   const shouldReduceMotion = useReducedMotion();
   const fullText = `${firstLine}\n${secondLine}`;
-  const [displayedCount, setDisplayedCount] = useState(shouldReduceMotion ? fullText.length : 0);
-  const [isDone, setIsDone] = useState(shouldReduceMotion);
+  const hasRunRef = useRef(false);
+
+  // Initialize with full text if already typed in this session or reduced motion requested
+  const [displayedCount, setDisplayedCount] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const alreadyDone = sessionStorage.getItem('salonpro_typewriter_done');
+      if (alreadyDone === 'true' || shouldReduceMotion) {
+        return fullText.length;
+      }
+    }
+    return 0;
+  });
+
+  const [isDone, setIsDone] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const alreadyDone = sessionStorage.getItem('salonpro_typewriter_done');
+      if (alreadyDone === 'true' || shouldReduceMotion) {
+        return true;
+      }
+    }
+    return false;
+  });
 
   useEffect(() => {
-    if (shouldReduceMotion) {
+    // If already typed once in this session, trigger onComplete immediately and exit
+    if (typeof window !== 'undefined' && sessionStorage.getItem('salonpro_typewriter_done') === 'true') {
+      setIsDone(true);
+      setDisplayedCount(fullText.length);
       onComplete?.();
       return;
     }
+
+    if (shouldReduceMotion) {
+      setIsDone(true);
+      setDisplayedCount(fullText.length);
+      onComplete?.();
+      return;
+    }
+
+    if (hasRunRef.current) return;
+    hasRunRef.current = true;
 
     let currentIndex = 0;
     const interval = setInterval(() => {
@@ -35,6 +68,9 @@ export default function Typewriter({
       if (currentIndex >= fullText.length) {
         clearInterval(interval);
         setIsDone(true);
+        try {
+          sessionStorage.setItem('salonpro_typewriter_done', 'true');
+        } catch {}
         onComplete?.();
       }
     }, speedMs);
@@ -78,7 +114,7 @@ export default function Typewriter({
             </span>
             <span
               className={`inline-block w-[3px] h-[0.85em] bg-[#b3135b] ml-1 align-baseline ${
-                isDone ? 'animate-ping' : 'animate-pulse'
+                isDone ? 'hidden' : 'animate-pulse'
               }`}
             />
           </>

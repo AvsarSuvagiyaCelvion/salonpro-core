@@ -47,7 +47,7 @@ export default function MagneticButton({
           particleCount: 80,
           spread: 70,
           origin: { y: 0.7 },
-          colors: ['#b3135b', '#e63985', '#ffd700', '#6366f1'],
+          colors: ['#4B263F', '#B77A91', '#C69A5D', '#D4AD76', '#2F7D68'],
         });
       } catch {}
     }
@@ -68,10 +68,9 @@ export default function MagneticButton({
         className={`relative overflow-hidden group ${className}`}
       >
         {/* Shimmer Sweep Animation */}
-        <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+        <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
         {children}
       </Link>
     </motion.div>
   );
 }
-

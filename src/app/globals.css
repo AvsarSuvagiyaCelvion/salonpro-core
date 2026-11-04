@@ -3,21 +3,68 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --ink: #2a1630;
-  --accent: #b3135b;
-  --accent-hover: #960f4c;
-  --accent-light: #fdf2f7;
-  --border: #f0e6ed;
+  /* Exact Light Mode Color Palette */
+  --brand-primary: #4B263F;
+  --brand-secondary: #B77A91;
+  --brand-accent: #C69A5D;
+  --bg-main: #F7F5F2;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #F1EBEF;
+  --text-main: #242126;
+  --text-secondary: #77717A;
+  --border-color: #E8E1E5;
+  --color-success: #2F7D68;
+  --color-error: #C65B62;
+
+  --ink: #242126;
+  --accent: #4B263F;
+  --accent-hover: #3a1c30;
+  --accent-light: #F1EBEF;
+  --border: #E8E1E5;
+}
+
+.dark {
+  /* Exact Dark Mode Color Palette */
+  --brand-primary: #D6A0B4;
+  --brand-secondary: #B77A91;
+  --brand-accent: #D4AD76;
+  --bg-main: #151218;
+  --bg-card: #211B24;
+  --bg-elevated: #2B2230;
+  --text-main: #F5EFF5;
+  --text-secondary: #B5AAB8;
+  --border-color: #3A3040;
+  --color-success: #55B99A;
+  --color-error: #EF858B;
+
+  --ink: #F5EFF5;
+  --accent: #D6A0B4;
+  --accent-hover: #e8b8ca;
+  --accent-light: #2B2230;
+  --border: #3A3040;
 }
 
 @theme inline {
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
-  --color-ink: #2a1630;
-  --color-accent: #b3135b;
-  --color-accent-hover: #960f4c;
-  --color-accent-light: #fdf2f7;
-  --color-border: #f0e6ed;
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-border: var(--border);
+
+  --color-plum: #4B263F;
+  --color-rose: #B77A91;
+  --color-gold: #C69A5D;
+  --color-ivory: #F7F5F2;
+  --color-card-light: #FFFFFF;
+  --color-elevated-light: #F1EBEF;
+  
+  --color-dark-bg: #151218;
+  --color-dark-card: #211B24;
+  --color-dark-elevated: #2B2230;
+  --color-dark-plum: #D6A0B4;
+  --color-dark-gold: #D4AD76;
 }
 
 html, body {
@@ -27,6 +74,9 @@ html, body {
   overflow-x: hidden;
   max-width: 100%;
   width: 100%;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, .font-display {
@@ -101,69 +151,27 @@ h1, h2, h3, h4, .font-display {
   animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 3s ease-in-out infinite;
-}
-
-@keyframes loadingBar {
+/* Subtle Shimmer Sweep Effect */
+@keyframes shimmer {
   0% {
     transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(0%);
   }
   100% {
     transform: translateX(100%);
   }
 }
 
-.animate-loading-bar {
-  animation: loadingBar 1.5s ease-in-out infinite;
+.animate-shimmer {
+  animation: shimmer 2.2s infinite;
 }
 
-/* Smooth mobile scrolling */
-.touch-scroll {
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Modern sleek scrollbars */
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.65);
-}
-
-/* Hide scrollbar utility */
+/* Hide scrollbars for chrome, safari and opera */
 .no-scrollbar::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  display: none;
 }
+
+/* Hide scrollbars for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
-}
-
-/* Print styling for receipts & reports */
-@media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  @page {
-    margin: 8mm;
-    size: auto;
-  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

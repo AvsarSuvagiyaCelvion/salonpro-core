@@ -102,26 +102,26 @@ export default function Typewriter({
         className="opacity-0 pointer-events-none select-none text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.22] sm:leading-[1.15] break-normal"
       >
         {firstLine} <br className="hidden sm:block" />
-        <span className="bg-gradient-to-r from-[#b3135b] via-[#d62475] to-purple-600 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-[#4B263F] via-[#B77A91] to-[#C69A5D] dark:from-[#D6A0B4] dark:via-[#B77A91] dark:to-[#D4AD76] bg-clip-text text-transparent">
           {secondLine}
         </span>
       </h1>
 
       {/* Actual Live Animated Typewriter Element */}
-      <h1 className="absolute inset-0 text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.22] sm:leading-[1.15] break-normal">
+      <h1 className="absolute inset-0 text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#242126] dark:text-[#F5EFF5] tracking-tight leading-[1.22] sm:leading-[1.15] break-normal">
         <span>{displayedFirst}</span>
         {displayedCount <= firstLine.length && (
-          <span className="inline-block w-[3px] h-[0.85em] bg-[#b3135b] ml-1 align-baseline animate-pulse" />
+          <span className="inline-block w-[3px] h-[0.85em] bg-[#4B263F] dark:bg-[#D6A0B4] ml-1 align-baseline animate-pulse" />
         )}
 
         {displayedCount > firstLine.length && (
           <>
             <br className="hidden sm:block" />{' '}
-            <span className="bg-gradient-to-r from-[#b3135b] via-[#d62475] to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#4B263F] via-[#B77A91] to-[#C69A5D] dark:from-[#D6A0B4] dark:via-[#B77A91] dark:to-[#D4AD76] bg-clip-text text-transparent">
               {displayedSecond}
             </span>
             <span
-              className={`inline-block w-[3px] h-[0.85em] bg-[#b3135b] ml-1 align-baseline ${
+              className={`inline-block w-[3px] h-[0.85em] bg-[#4B263F] dark:bg-[#D6A0B4] ml-1 align-baseline ${
                 isDone ? 'hidden' : 'animate-pulse'
               }`}
             />

@@ -23,9 +23,9 @@ const stats: StatItem[] = [
     suffix: '%',
     label: 'Double-Bookings',
     subtext: 'Overlap-protected bookings',
-    colorClass: 'text-slate-900',
-    bgLightClass: 'bg-slate-50',
-    borderClass: 'border-slate-200/80',
+    colorClass: 'text-[#242126] dark:text-[#F5EFF5]',
+    bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
+    borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
     icon: ShieldCheck,
   },
   {
@@ -34,9 +34,9 @@ const stats: StatItem[] = [
     suffix: ' Sec',
     label: 'Built for Indian Salons',
     subtext: 'GST POS ready with UPI',
-    colorClass: 'text-[#b3135b]',
-    bgLightClass: 'bg-pink-50/70',
-    borderClass: 'border-pink-200/60',
+    colorClass: 'text-[#4B263F] dark:text-[#D6A0B4]',
+    bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
+    borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
     icon: Zap,
   },
   {
@@ -45,9 +45,9 @@ const stats: StatItem[] = [
     suffix: '%',
     label: 'Automatic WhatsApp Confirmations',
     subtext: 'Real-time booking alerts',
-    colorClass: 'text-purple-600',
-    bgLightClass: 'bg-purple-50/70',
-    borderClass: 'border-purple-200/60',
+    colorClass: 'text-[#C69A5D] dark:text-[#D4AD76]',
+    bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
+    borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
     icon: MessageSquare,
   },
   {
@@ -56,9 +56,9 @@ const stats: StatItem[] = [
     suffix: '%+',
     label: 'Repeat Visits with VIP Plans',
     subtext: 'Higher Client Retention',
-    colorClass: 'text-emerald-600',
-    bgLightClass: 'bg-emerald-50/70',
-    borderClass: 'border-emerald-200/60',
+    colorClass: 'text-[#2F7D68] dark:text-[#55B99A]',
+    bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
+    borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
     icon: TrendingUp,
   },
 ];
@@ -118,19 +118,19 @@ function CounterCard({ item }: { item: StatItem }) {
   return (
     <div
       ref={cardRef}
-      className={`group relative p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-white/90 dark:bg-[#180e1c]/90 backdrop-blur-sm border ${item.borderClass} dark:border-pink-500/20 shadow-xs hover:shadow-lg dark:hover:shadow-pink-950/20 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between`}
+      className={`group relative p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#211B24] border ${item.borderClass} shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between`}
     >
       {/* Top micro badge */}
       <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl ${item.bgLightClass} dark:bg-pink-950/40 flex items-center justify-center transition-transform group-hover:scale-110`}>
+        <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl ${item.bgLightClass} flex items-center justify-center transition-transform group-hover:scale-110`}>
           <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${item.colorClass}`} />
         </span>
-        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500/80 animate-ping" />
+        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-ping" />
       </div>
 
       {/* Counter value */}
       <div className="my-0.5 sm:my-1">
-        <div className={`text-2xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight ${item.colorClass} dark:text-white flex items-baseline justify-center sm:justify-start gap-0.5`}>
+        <div className={`text-2xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight ${item.colorClass} flex items-baseline justify-center sm:justify-start gap-0.5`}>
           <span>{item.prefix || ''}</span>
           <span className="tabular-nums">{count}</span>
           <span className="text-lg sm:text-2xl lg:text-3xl font-extrabold">{item.suffix || ''}</span>
@@ -139,10 +139,10 @@ function CounterCard({ item }: { item: StatItem }) {
 
       {/* Label & Description */}
       <div className="mt-1.5 sm:mt-2 text-center sm:text-left">
-        <div className="text-[11px] sm:text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-[#b3135b] dark:group-hover:text-pink-400 transition-colors leading-snug">
+        <div className="text-[11px] sm:text-sm font-bold text-[#242126] dark:text-[#F5EFF5] group-hover:text-[#4B263F] dark:group-hover:text-[#D6A0B4] transition-colors leading-snug">
           {item.label}
         </div>
-        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 hidden xs:block font-medium">
+        <div className="text-[10px] sm:text-[11px] text-[#77717A] dark:text-[#B5AAB8] mt-0.5 hidden xs:block font-medium">
           {item.subtext}
         </div>
       </div>
@@ -152,7 +152,7 @@ function CounterCard({ item }: { item: StatItem }) {
 
 export default function StatsCounter() {
   return (
-    <div className="mt-12 sm:mt-16 pt-8 border-t border-slate-200/80 dark:border-slate-850">
+    <div className="mt-12 sm:mt-16 pt-8 border-t border-[#E8E1E5] dark:border-[#3A3040]">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {stats.map((item) => (
           <CounterCard key={item.id} item={item} />

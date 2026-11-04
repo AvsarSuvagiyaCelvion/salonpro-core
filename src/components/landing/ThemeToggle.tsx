@@ -37,7 +37,7 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="w-16 h-8 rounded-full bg-slate-200 dark:bg-slate-800 p-1 opacity-60" />
+      <div className="w-14 h-7.5 rounded-full bg-[#E8E1E5] dark:bg-[#2B2230] p-1 opacity-60" />
     );
   }
 
@@ -46,25 +46,25 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       aria-label="Toggle Dark and Light theme"
-      className="relative flex items-center justify-between w-15 h-8 p-1 rounded-full bg-slate-200 dark:bg-[#2a1630] border border-slate-300 dark:border-pink-500/40 cursor-pointer shadow-inner transition-colors duration-300 focus:outline-none"
+      className="relative flex items-center justify-between w-14 h-7.5 p-1 rounded-full bg-[#F1EBEF] dark:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] cursor-pointer shadow-inner transition-colors duration-300 focus:outline-none"
     >
       {/* Sun Icon */}
-      <Sun className={`w-3.5 h-3.5 ml-1 transition-opacity ${theme === 'light' ? 'text-amber-500 opacity-100' : 'text-slate-400 opacity-40'}`} />
+      <Sun className={`w-3.5 h-3.5 ml-0.5 transition-opacity ${theme === 'light' ? 'text-[#C69A5D] opacity-100' : 'text-[#77717A] opacity-40'}`} />
 
       {/* Moon Icon */}
-      <Moon className={`w-3.5 h-3.5 mr-1 transition-opacity ${theme === 'dark' ? 'text-pink-300 opacity-100' : 'text-slate-400 opacity-40'}`} />
+      <Moon className={`w-3.5 h-3.5 mr-0.5 transition-opacity ${theme === 'dark' ? 'text-[#D4AD76] opacity-100' : 'text-[#77717A] opacity-40'}`} />
 
-      {/* Sliding Animated Thumb */}
+      {/* Sliding Animated Thumb with Champagne Gold / Plum styling */}
       <motion.div
         layout
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className={`absolute top-1 w-6 h-6 rounded-full shadow-md flex items-center justify-center text-xs transition-colors ${
+        className={`absolute top-0.5 w-6.5 h-6.5 rounded-full shadow-md flex items-center justify-center text-xs transition-colors ${
           theme === 'dark'
-            ? 'right-1 bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white'
-            : 'left-1 bg-white text-amber-500'
+            ? 'right-0.5 bg-[#4B263F] text-[#D4AD76] border border-[#3A3040]'
+            : 'left-0.5 bg-white text-[#C69A5D] border border-[#E8E1E5]'
         }`}
       >
-        {theme === 'dark' ? <Moon className="w-3 h-3 text-white" /> : <Sun className="w-3 h-3 text-amber-500" />}
+        {theme === 'dark' ? <Moon className="w-3 h-3 text-[#D4AD76]" /> : <Sun className="w-3 h-3 text-[#C69A5D]" />}
       </motion.div>
     </button>
   );

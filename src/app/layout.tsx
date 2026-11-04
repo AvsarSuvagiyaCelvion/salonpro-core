@@ -33,9 +33,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${bricolage.variable} ${dmSans.variable} h-full`}
     >
-      <body className="min-h-full font-sans antialiased text-[#2a1630] bg-[#faf8fa]">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('salonpro_theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full font-sans antialiased bg-[#F7F5F2] text-[#242126] dark:bg-[#151218] dark:text-[#F5EFF5] transition-colors duration-300">
         {children}
         <Analytics />
       </body>

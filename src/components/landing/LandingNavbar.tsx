@@ -20,9 +20,9 @@ export default function LandingNavbar() {
 
   return (
     <>
-      {/* Top Demo & Offer Announcement Ribbon */}
-      <div className="bg-gradient-to-r from-[#2a1630] via-[#4a1c3d] to-[#2a1630] text-pink-200 text-[11px] sm:text-xs py-2 px-3 text-center font-medium tracking-wide flex items-center justify-center gap-2 relative z-50">
-        <span className="bg-[#b3135b] text-white px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider animate-pulse">
+      {/* Top Demo & Offer Announcement Ribbon in Regal Plum + Champagne Gold */}
+      <div className="bg-[#4B263F] text-[#F1EBEF] text-[11px] sm:text-xs py-2 px-3 text-center font-medium tracking-wide flex items-center justify-center gap-2 relative z-50">
+        <span className="bg-[#C69A5D] text-[#242126] px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">
           7-Day Free Trial
         </span>
         <span className="hidden sm:inline">
@@ -33,7 +33,7 @@ export default function LandingNavbar() {
         </span>
         <Link
           href="/register-salon"
-          className="underline font-bold text-white hover:text-pink-300 ml-1 whitespace-nowrap"
+          className="underline font-bold text-[#D4AD76] hover:text-white ml-1 whitespace-nowrap"
         >
           Start Free Trial ➔
         </Link>
@@ -42,31 +42,31 @@ export default function LandingNavbar() {
       <nav
         className={`sticky top-0 z-50 border-b transition-all duration-300 w-full max-w-full ${
           scrolled
-            ? 'bg-white/85 dark:bg-[#0e0712]/90 backdrop-blur-xl shadow-md border-slate-200/80 dark:border-pink-500/20 py-2.5 sm:py-3'
-            : 'bg-white/95 dark:bg-[#0d0710]/95 backdrop-blur-md border-slate-200/80 dark:border-white/10 py-3.5 sm:py-4.5'
+            ? 'bg-[#F7F5F2]/90 dark:bg-[#151218]/90 backdrop-blur-xl shadow-xs border-[#E8E1E5] dark:border-[#3A3040] py-2.5 sm:py-3'
+            : 'bg-[#F7F5F2]/95 dark:bg-[#151218]/95 backdrop-blur-md border-[#E8E1E5] dark:border-[#3A3040] py-3.5 sm:py-4.5'
         } px-3 sm:px-6`}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] flex items-center justify-center font-black text-base sm:text-xl text-white shadow-md shadow-pink-900/10 shrink-0 group-hover:rotate-12 transition-transform duration-300">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#4B263F] dark:bg-[#2B2230] dark:border dark:border-[#3A3040] flex items-center justify-center font-black text-base sm:text-xl text-white dark:text-[#D6A0B4] shadow-md shadow-[#4B263F]/15 shrink-0 group-hover:rotate-12 transition-transform duration-300">
               ✂
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-black text-base sm:text-xl text-slate-900 dark:text-white tracking-tight">
+              <span className="font-black text-base sm:text-xl text-[#242126] dark:text-[#F5EFF5] tracking-tight">
                 SalonPro
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-600 dark:text-slate-300">
-            <a href="#problems" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors">Problems We Solve</a>
-            <a href="#features" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors">Features & POS</a>
-            <a href="#how-it-works" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors">How It Works</a>
-            <a href="#pricing" className="hover:text-[#b3135b] dark:hover:text-pink-400 transition-colors flex items-center gap-1 font-bold text-[#b3135b] dark:text-pink-400">
+          <div className="hidden lg:flex items-center gap-7 text-xs font-semibold text-[#77717A] dark:text-[#B5AAB8]">
+            <a href="#problems" className="hover:text-[#4B263F] dark:hover:text-[#D6A0B4] transition-colors">Problems We Solve</a>
+            <a href="#features" className="hover:text-[#4B263F] dark:hover:text-[#D6A0B4] transition-colors">Features & POS</a>
+            <a href="#how-it-works" className="hover:text-[#4B263F] dark:hover:text-[#D6A0B4] transition-colors">How It Works</a>
+            <a href="#pricing" className="hover:text-[#4B263F] dark:hover:text-[#D6A0B4] transition-colors flex items-center gap-1 font-bold text-[#4B263F] dark:text-[#D6A0B4]">
               <span>7-Day Trial & Pricing</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-pink-100 dark:bg-pink-950/80 text-[#b3135b] dark:text-pink-300 text-[9px] uppercase border dark:border-pink-800/40">Free</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] text-[9px] uppercase border border-[#E8E1E5] dark:border-[#3A3040]">Free</span>
             </a>
           </div>
 
@@ -78,20 +78,20 @@ export default function LandingNavbar() {
             <Link
               href="/dixa-beauty-salon"
               target="_blank"
-              className="px-3 py-2 rounded-xl text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-700/40 text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs hover:scale-105 active:scale-95"
+              className="px-3 py-2 rounded-xl text-[#2F7D68] dark:text-[#55B99A] bg-[#F1EBEF] dark:bg-[#211B24] hover:bg-white dark:hover:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs hover:scale-105 active:scale-95"
             >
               <span>⚡ Live Booking Demo</span>
               <span className="text-[10px]">↗</span>
             </Link>
             <Link
               href="/salon-owner"
-              className="px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-[#b3135b] dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/40 text-xs font-bold transition-all whitespace-nowrap"
+              className="px-3 py-2 rounded-xl text-[#242126] dark:text-[#F5EFF5] hover:text-[#4B263F] dark:hover:text-[#D6A0B4] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] text-xs font-bold transition-all whitespace-nowrap"
             >
               Owner Sign In
             </Link>
             <Link
               href="/register-salon"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-bold transition-all shadow-md shadow-pink-900/15 active:scale-95 whitespace-nowrap flex items-center gap-1.5 hover:shadow-lg hover:shadow-pink-900/25"
+              className="px-4 py-2 rounded-xl bg-[#4B263F] hover:bg-[#3a1c30] text-white dark:bg-[#D6A0B4] dark:hover:bg-[#c48e9f] dark:text-[#151218] text-xs font-bold transition-all shadow-md shadow-[#4B263F]/20 active:scale-95 whitespace-nowrap flex items-center gap-1.5"
             >
               <span>🎁 Start 7-Day Free Trial</span>
               <span>➔</span>
@@ -103,14 +103,14 @@ export default function LandingNavbar() {
             <ThemeToggle />
             <Link
               href="/register-salon"
-              className="px-2.5 py-1.5 rounded-lg bg-[#b3135b] text-white text-[11px] font-bold shadow-xs active:scale-95 whitespace-nowrap"
+              className="px-2.5 py-1.5 rounded-lg bg-[#4B263F] dark:bg-[#D6A0B4] text-white dark:text-[#151218] text-[11px] font-bold shadow-xs active:scale-95 whitespace-nowrap"
             >
               7-Day Trial ➔
             </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#E8E1E5] dark:border-[#3A3040] text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -129,20 +129,20 @@ export default function LandingNavbar() {
           />
 
           {/* Slide Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 z-50 w-72 max-w-[85vw] bg-white dark:bg-[#120817] shadow-2xl flex flex-col justify-between p-5 border-l border-neutral-200 dark:border-pink-500/20 animate-in slide-in-from-right duration-200 text-slate-900 dark:text-white">
+          <div className="fixed inset-y-0 right-0 z-50 w-72 max-w-[85vw] bg-[#F7F5F2] dark:bg-[#151218] shadow-2xl flex flex-col justify-between p-5 border-l border-[#E8E1E5] dark:border-[#3A3040] animate-in slide-in-from-right duration-200 text-[#242126] dark:text-[#F5EFF5]">
             <div className="space-y-5">
               {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E8E1E5] dark:border-[#3A3040]">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center font-bold text-sm">
+                  <div className="w-8 h-8 rounded-xl bg-[#4B263F] dark:bg-[#2B2230] text-white dark:text-[#D6A0B4] flex items-center justify-center font-bold text-sm">
                     ✂
                   </div>
-                  <span className="font-extrabold text-base text-slate-900 dark:text-white">SalonPro</span>
+                  <span className="font-extrabold text-base text-[#242126] dark:text-[#F5EFF5]">SalonPro</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer"
+                  className="p-1.5 text-[#77717A] dark:text-[#B5AAB8] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] rounded-lg cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -150,19 +150,19 @@ export default function LandingNavbar() {
 
               {/* Portal Access Links */}
               <div className="space-y-2">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-2">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8] px-2">
                   Salon Portals
                 </div>
                 <Link
                   href="/register-salon"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] text-white font-bold text-xs shadow-md shadow-pink-900/15"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-[#4B263F] dark:bg-[#D6A0B4] text-white dark:text-[#151218] font-bold text-xs shadow-md shadow-[#4B263F]/20"
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="text-base">🎁</span>
                     <div>
                       <div>Start 7-Day Free Trial</div>
-                      <div className="text-[10px] text-pink-200 font-normal">₹0 setup · No card needed</div>
+                      <div className="text-[10px] text-[#D4AD76] dark:text-[#4B263F] font-semibold">₹0 setup · No card needed</div>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4" />
@@ -171,10 +171,10 @@ export default function LandingNavbar() {
                 <Link
                   href="/salon-owner"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-pink-50 dark:bg-pink-950/40 border border-pink-200 dark:border-pink-800/40 text-[#b3135b] dark:text-pink-300 font-bold text-xs"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-[#F1EBEF] dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] text-[#4B263F] dark:text-[#D6A0B4] font-bold text-xs"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Lock className="w-4 h-4" />
+                    <Lock className="w-4 h-4 text-[#C69A5D]" />
                     <span>Existing Owner Sign In</span>
                   </div>
                   <ArrowRight className="w-4 h-4" />
@@ -183,39 +183,39 @@ export default function LandingNavbar() {
                 <Link
                   href="/portal"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-white dark:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] text-[#242126] dark:text-[#F5EFF5] font-semibold text-xs"
                 >
                   <div className="flex items-center gap-2.5">
-                    <User className="w-4 h-4 text-slate-500" />
+                    <User className="w-4 h-4 text-[#77717A] dark:text-[#B5AAB8]" />
                     <span>Client Portal & Receipts</span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-400" />
+                  <ArrowRight className="w-4 h-4 text-[#77717A]" />
                 </Link>
               </div>
 
               {/* Section Anchors */}
-              <div className="space-y-1 pt-2 border-t border-neutral-100 dark:border-slate-800">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-2 mb-1">
+              <div className="space-y-1 pt-2 border-t border-[#E8E1E5] dark:border-[#3A3040]">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8] px-2 mb-1">
                   Explore
                 </div>
                 <a
                   href="#problems"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230]"
                 >
                   Problems We Solve
                 </a>
                 <a
                   href="#features"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230]"
                 >
                   Features & POS
                 </a>
                 <a
                   href="#how-it-works"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="block px-3 py-2 rounded-xl text-xs font-semibold text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230]"
                 >
                   How It Works
                 </a>
@@ -223,7 +223,7 @@ export default function LandingNavbar() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-4 border-t border-neutral-100 dark:border-slate-800 text-[11px] text-slate-400 text-center">
+            <div className="pt-4 border-t border-[#E8E1E5] dark:border-[#3A3040] text-[11px] text-[#77717A] dark:text-[#B5AAB8] text-center">
               SalonPro Salon Management Platform
             </div>
           </div>

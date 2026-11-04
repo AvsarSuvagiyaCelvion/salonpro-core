@@ -57,7 +57,7 @@ export default function PricingCards() {
           type="button"
           onClick={() => setInterval('monthly')}
           className={`text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
-            interval === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+            interval === 'monthly' ? 'text-[#242126] dark:text-[#F5EFF5]' : 'text-[#77717A] dark:text-[#B5AAB8] hover:text-[#4B263F]'
           }`}
         >
           Monthly Billing
@@ -67,14 +67,14 @@ export default function PricingCards() {
         <button
           type="button"
           onClick={() => setInterval(interval === 'monthly' ? 'yearly' : 'monthly')}
-          className="w-14 h-8 bg-slate-200 dark:bg-slate-800 rounded-full p-1 transition-colors relative cursor-pointer focus:outline-none shadow-inner"
-          style={{ backgroundColor: interval === 'yearly' ? '#b3135b' : undefined }}
+          className="w-14 h-8 bg-[#E8E1E5] dark:bg-[#3A3040] rounded-full p-1 transition-colors relative cursor-pointer focus:outline-none shadow-inner"
+          style={{ backgroundColor: interval === 'yearly' ? '#4B263F' : undefined }}
           aria-label="Toggle Monthly and Yearly Plans"
         >
           <motion.div
             layout
             transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 30 }}
-            className={`w-6 h-6 bg-white rounded-full shadow-md ${
+            className={`w-6 h-6 bg-white dark:bg-[#F5EFF5] rounded-full shadow-md ${
               interval === 'yearly' ? 'ml-auto' : 'mr-auto'
             }`}
           />
@@ -84,14 +84,14 @@ export default function PricingCards() {
           type="button"
           onClick={() => setInterval('yearly')}
           className={`text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
-            interval === 'yearly' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+            interval === 'yearly' ? 'text-[#242126] dark:text-[#F5EFF5]' : 'text-[#77717A] dark:text-[#B5AAB8] hover:text-[#4B263F]'
           }`}
         >
           <span>Yearly Billing</span>
           <motion.span
             animate={shouldReduceMotion ? {} : { y: [0, -3, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[10px] font-black uppercase tracking-wider inline-block shadow-xs border dark:border-emerald-700/50"
+            className="px-2.5 py-0.5 rounded-full bg-[#F1EBEF] dark:bg-[#2B2230] text-[#C69A5D] dark:text-[#D4AD76] text-[10px] font-black uppercase tracking-wider inline-block shadow-xs border border-[#E8E1E5] dark:border-[#3A3040]"
           >
             Save 17% (2 Mo Free)
           </motion.span>
@@ -101,20 +101,20 @@ export default function PricingCards() {
       {/* Plans Grid or Fallback */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-pink-200 border-t-[#b3135b] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#E8E1E5] border-t-[#4B263F] dark:border-t-[#D6A0B4] rounded-full animate-spin" />
         </div>
       ) : plans.length === 0 ? (
-        <div className="max-w-md mx-auto p-8 rounded-2xl bg-white border border-neutral-200 shadow-sm text-center">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-pink-50 flex items-center justify-center text-[#b3135b]">
+        <div className="max-w-md mx-auto p-8 rounded-2xl bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] shadow-sm text-center">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] flex items-center justify-center text-[#4B263F] dark:text-[#D6A0B4]">
             <Sparkles className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-neutral-900 mb-2">Pricing Plans Unavailable</h3>
-          <p className="text-xs text-neutral-600 mb-6">
+          <h3 className="text-base font-bold text-[#242126] dark:text-[#F5EFF5] mb-2">Pricing Plans Unavailable</h3>
+          <p className="text-xs text-[#77717A] dark:text-[#B5AAB8] mb-6">
             We were unable to load our subscription plans right now. Please refresh the page to view current pricing and features.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-5 py-2.5 rounded-xl bg-[#b3135b] text-white text-xs font-bold hover:bg-[#960f4c] transition-colors cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-[#4B263F] dark:bg-[#D6A0B4] text-white dark:text-[#151218] text-xs font-bold hover:bg-[#3A1C30] transition-colors cursor-pointer"
           >
             Refresh Page
           </button>
@@ -152,42 +152,42 @@ export default function PricingCards() {
                 }
                 className={`rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-shadow duration-300 relative ${
                   isPro
-                    ? 'bg-gradient-to-b from-[#2a1630] to-[#1a0c1e] text-white shadow-2xl border-2 border-pink-500/50 scale-102 lg:-translate-y-2'
+                    ? 'bg-gradient-to-b from-[#4B263F] via-[#3A1C30] to-[#211B24] text-white shadow-2xl border-2 border-[#C69A5D]/60 dark:border-[#D4AD76]/80 scale-102 lg:-translate-y-2'
                     : isPremium
-                    ? 'bg-white dark:bg-[#180e1c] text-slate-900 dark:text-white border-2 border-purple-300 dark:border-purple-600/50 shadow-xl'
-                    : 'bg-white dark:bg-[#180e1c] text-slate-900 dark:text-white border border-slate-200 dark:border-pink-500/20 shadow-sm hover:shadow-md'
+                    ? 'bg-white dark:bg-[#211B24] text-[#242126] dark:text-[#F5EFF5] border-2 border-[#B77A91] shadow-xl'
+                    : 'bg-white dark:bg-[#211B24] text-[#242126] dark:text-[#F5EFF5] border border-[#E8E1E5] dark:border-[#3A3040] shadow-sm hover:shadow-md'
                 }`}
               >
                 {isPro && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[11px] font-black uppercase tracking-wider py-1 px-4 rounded-full shadow-md whitespace-nowrap">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#C69A5D] text-[#242126] text-[11px] font-black uppercase tracking-wider py-1 px-4 rounded-full shadow-md whitespace-nowrap">
                     Most Popular · Recommended
                   </div>
                 )}
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className={`text-xl font-black ${isPro ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+                    <h3 className={`text-xl font-black ${isPro ? 'text-white' : 'text-[#242126] dark:text-[#F5EFF5]'}`}>
                       {plan.name}
                     </h3>
                     <span
                       className={`text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full ${
                         isPro
-                          ? 'bg-pink-500/30 text-pink-200 border border-pink-400/30'
+                          ? 'bg-white/20 text-[#D4AD76] border border-white/20'
                           : isPremium
-                          ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                          ? 'bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] border border-[#E8E1E5] dark:border-[#3A3040]'
+                          : 'bg-[#F1EBEF] dark:bg-[#2B2230] text-[#77717A] dark:text-[#B5AAB8] border border-[#E8E1E5] dark:border-[#3A3040]'
                       }`}
                     >
                       {plan.slug.toUpperCase()}
                     </span>
                   </div>
 
-                  <p className={`text-xs mb-6 min-h-[36px] ${isPro ? 'text-pink-100/80' : 'text-slate-500 dark:text-slate-400'}`}>
+                  <p className={`text-xs mb-6 min-h-[36px] ${isPro ? 'text-[#E8E1E5]' : 'text-[#77717A] dark:text-[#B5AAB8]'}`}>
                     {plan.description || 'Full salon cloud suite with automated scheduling & billing'}
                   </p>
 
                   {/* Price Display with Animated Rolling Number */}
-                  <div className="mb-6 pb-6 border-b border-slate-100/20 dark:border-slate-800">
+                  <div className={`mb-6 pb-6 border-b ${isPro ? 'border-white/15' : 'border-[#E8E1E5] dark:border-[#3A3040]'}`}>
                     <div className="flex items-baseline gap-1 overflow-hidden">
                       <span className="text-2xl font-bold">₹</span>
                       <AnimatePresence mode="wait" initial={false}>
@@ -202,35 +202,35 @@ export default function PricingCards() {
                           {displayPrice.toLocaleString('en-IN')}
                         </motion.span>
                       </AnimatePresence>
-                      <span className={`text-xs ${isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <span className={`text-xs ${isPro ? 'text-[#D4AD76]' : 'text-[#77717A] dark:text-[#B5AAB8]'}`}>
                         / month
                       </span>
                     </div>
                     {interval === 'yearly' && (
-                      <div className={`text-[11px] font-semibold mt-1 ${isPro ? 'text-emerald-300' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                      <div className={`text-[11px] font-semibold mt-1 ${isPro ? 'text-[#D4AD76]' : 'text-[#2F7D68] dark:text-[#55B99A]'}`}>
                         Billed ₹{yearlyPrice.toLocaleString('en-IN')} annually (2 months free)
                       </div>
                     )}
                     {interval === 'monthly' && (
-                      <div className={`text-[11px] mt-1 ${isPro ? 'text-pink-200/70' : 'text-slate-400'}`}>
+                      <div className={`text-[11px] mt-1 ${isPro ? 'text-white/70' : 'text-[#77717A] dark:text-[#B5AAB8]'}`}>
                         Billed monthly · Cancel anytime
                       </div>
                     )}
                   </div>
 
                   {/* Core Limits Summary */}
-                  <div className={`mb-5 p-3 rounded-2xl text-xs space-y-1.5 ${isPro ? 'bg-white/10' : 'bg-slate-50 dark:bg-slate-900/60'}`}>
+                  <div className={`mb-5 p-3 rounded-2xl text-xs space-y-1.5 ${isPro ? 'bg-white/10' : 'bg-[#F1EBEF] dark:bg-[#2B2230]'}`}>
                     <div className="flex items-center justify-between">
-                      <span className={isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}>Staff capacity:</span>
-                      <strong className={isPro ? 'text-white' : 'text-slate-900 dark:text-white'}>{staffLimit}</strong>
+                      <span className={isPro ? 'text-[#E8E1E5]' : 'text-[#77717A] dark:text-[#B5AAB8]'}>Staff capacity:</span>
+                      <strong className={isPro ? 'text-white' : 'text-[#242126] dark:text-[#F5EFF5]'}>{staffLimit}</strong>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}>Service catalog:</span>
-                      <strong className={isPro ? 'text-white' : 'text-slate-900 dark:text-white'}>{servicesLimit}</strong>
+                      <span className={isPro ? 'text-[#E8E1E5]' : 'text-[#77717A] dark:text-[#B5AAB8]'}>Service catalog:</span>
+                      <strong className={isPro ? 'text-white' : 'text-[#242126] dark:text-[#F5EFF5]'}>{servicesLimit}</strong>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={isPro ? 'text-pink-200' : 'text-slate-500 dark:text-slate-400'}>WhatsApp quota:</span>
-                      <strong className={isPro ? 'text-white' : 'text-slate-900 dark:text-white'}>{waLimit}</strong>
+                      <span className={isPro ? 'text-[#E8E1E5]' : 'text-[#77717A] dark:text-[#B5AAB8]'}>WhatsApp quota:</span>
+                      <strong className={isPro ? 'text-white' : 'text-[#242126] dark:text-[#F5EFF5]'}>{waLimit}</strong>
                     </div>
                   </div>
 
@@ -238,27 +238,27 @@ export default function PricingCards() {
                   <div className="space-y-2.5 text-xs pb-6">
                     {(Array.isArray(plan.features) ? plan.features : []).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
-                        <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isPro ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
-                        <span className={isPro ? 'text-pink-50' : 'text-slate-700 dark:text-slate-200'}>{feat}</span>
+                        <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isPro ? 'text-[#D4AD76]' : 'text-[#2F7D68] dark:text-[#55B99A]'}`} />
+                        <span className={isPro ? 'text-[#F5EFF5]' : 'text-[#242126] dark:text-[#F5EFF5]'}>{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Action Button */}
-                <div className="pt-4 border-t border-slate-100/20">
+                <div className={`pt-4 border-t ${isPro ? 'border-white/15' : 'border-[#E8E1E5] dark:border-[#3A3040]'}`}>
                   <Link
                     href="/register-salon"
                     className={`w-full py-3.5 px-4 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 ${
                       isPro
-                        ? 'bg-gradient-to-r from-pink-500 to-[#d62475] hover:from-pink-600 hover:to-[#b3135b] text-white shadow-pink-900/40'
-                        : 'bg-slate-900 hover:bg-slate-800 text-white'
+                        ? 'bg-[#C69A5D] hover:bg-[#b08447] text-[#242126] shadow-[#C69A5D]/20'
+                        : 'bg-[#4B263F] hover:bg-[#3A1C30] text-white dark:bg-[#D6A0B4] dark:hover:bg-[#C48E9F] dark:text-[#151218]'
                     }`}
                   >
                     <span>Start 7-Day Free Trial</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
-                  <p className={`text-center text-[10px] mt-2 ${isPro ? 'text-pink-200/70' : 'text-slate-400'}`}>
+                  <p className={`text-center text-[10px] mt-2 ${isPro ? 'text-white/70' : 'text-[#77717A] dark:text-[#B5AAB8]'}`}>
                     Includes 7 days of full Pro evaluation with ₹0 charged today.
                   </p>
                 </div>

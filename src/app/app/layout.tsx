@@ -300,15 +300,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen lg:h-screen flex flex-col bg-[#faf8fa] text-[#2a1630] overflow-x-hidden lg:overflow-hidden">
+    <div className="min-h-screen lg:h-screen flex flex-col bg-[#F7F5F2] dark:bg-[#151218] text-[#242126] dark:text-[#F5EFF5] overflow-x-hidden lg:overflow-hidden transition-colors duration-300">
       {/* Top Professional Trial Notification Banner (Only shown if on active 7-Day trial) */}
       {subscription?.isTrial && !subscription?.isTrialExpired && (
-        <div className="shrink-0 bg-gradient-to-r from-purple-900 via-pink-900 to-[#b3135b] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-pink-700 shadow-xs">
+        <div className="shrink-0 bg-gradient-to-r from-[#4B263F] via-[#381c2f] to-[#4B263F] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-[#B77A91]/30 shadow-xs">
           <div className="flex items-center gap-1.5 truncate text-[11px] sm:text-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-ping"></span>
+            <span className="w-2 h-2 rounded-full bg-[#55B99A] shrink-0 animate-ping"></span>
             <span className="truncate">
               <strong>🎁 Free Trial:</strong>{' '}
-              <span className="font-extrabold text-amber-300 underline decoration-amber-400">
+              <span className="font-extrabold text-[#D4AD76] underline decoration-[#D4AD76]">
                 {subscription.trialDaysRemaining} day{subscription.trialDaysRemaining === 1 ? '' : 's'} remaining
               </span>
             </span>
@@ -317,16 +317,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => setShowPlanModal(true)}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-pink-900 font-extrabold text-[10px] sm:text-[11px] shadow-sm hover:bg-pink-50 transition-all cursor-pointer active:scale-95"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white text-[#4B263F] font-extrabold text-[10px] sm:text-[11px] shadow-sm hover:bg-[#F1EBEF] transition-all cursor-pointer active:scale-95"
             >
-              <Zap className="w-3 h-3 text-pink-700 fill-pink-600" />
+              <Zap className="w-3 h-3 text-[#C69A5D] fill-[#C69A5D]" />
               <span>Upgrade</span>
             </button>
             {salon?.slug && (
               <Link
                 href={`/${salon.slug}`}
                 target="_blank"
-                className="hidden sm:inline-flex items-center gap-1 text-[11px] text-pink-200 hover:text-white transition-colors underline ml-2"
+                className="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#D6A0B4] hover:text-white transition-colors underline ml-2"
               >
                 <span>Live Booking</span>
                 <ExternalLink className="w-3 h-3" />
@@ -338,11 +338,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Active Paid Plan Banner (Shown when salon has active paid subscription) */}
       {!subscription?.isTrial && subscription?.status === 'active' && !(subscription as any)?.isSubscriptionExpiringSoon && (
-        <div className="shrink-0 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-emerald-800 shadow-xs">
+        <div className="shrink-0 bg-gradient-to-r from-[#2F7D68] via-slate-900 to-[#2F7D68] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-emerald-800 shadow-xs">
           <div className="flex items-center gap-2 truncate text-[11px] sm:text-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+            <span className="w-2 h-2 rounded-full bg-[#55B99A] shrink-0"></span>
             <span className="truncate">
-              <strong className="text-emerald-300 font-black">💎 {subscription.currentPlan?.name || 'Pro'} Active:</strong>{' '}
+              <strong className="text-[#55B99A] font-black">💎 {subscription.currentPlan?.name || 'Pro'} Active:</strong>{' '}
               <span className="text-emerald-100 font-bold">
                 {(subscription as any)?.subscriptionDaysRemaining ?? 30} days remaining
               </span>
@@ -376,7 +376,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Paid Plan Expiring Soon Banner (<= 7 days remaining) */}
       {Boolean((subscription as any)?.isSubscriptionExpiringSoon && !subscription?.isTrial) && (
-        <div className="shrink-0 bg-gradient-to-r from-amber-800 via-rose-900 to-[#b3135b] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-amber-600 shadow-xs">
+        <div className="shrink-0 bg-gradient-to-r from-amber-800 via-rose-900 to-[#4B263F] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-amber-600 shadow-xs">
           <div className="flex items-center gap-1.5 truncate text-[11px] sm:text-xs">
             <span className="w-2 h-2 rounded-full bg-amber-300 shrink-0 animate-ping"></span>
             <span className="truncate">
@@ -401,26 +401,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Top Header */}
-      <header className="sticky top-0 shrink-0 h-14 sm:h-16 bg-white/95 backdrop-blur-md border-b border-neutral-200/80 z-30 px-3 sm:px-6 flex items-center justify-between shadow-xs">
+      <header className="sticky top-0 shrink-0 h-14 sm:h-16 bg-white/95 dark:bg-[#211B24]/95 backdrop-blur-md border-b border-[#E8E1E5] dark:border-[#3A3040] z-30 px-3 sm:px-6 flex items-center justify-between shadow-2xs transition-colors duration-300">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-1.5 sm:p-2 rounded-xl text-neutral-700 hover:bg-neutral-100 focus:outline-none cursor-pointer transition-colors shrink-0"
+            className="lg:hidden p-1.5 sm:p-2 rounded-xl text-[#77717A] dark:text-[#B5AAB8] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] focus:outline-none cursor-pointer transition-colors shrink-0"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
           <Link href="/app" className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#4B263F] to-[#B77A91] dark:from-[#D6A0B4] dark:to-[#B77A91] text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
-              <span className="font-extrabold text-sm sm:text-base text-[#2a1630] tracking-tight block leading-tight truncate max-w-[140px] sm:max-w-xs">
+              <span className="font-extrabold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5] tracking-tight block leading-tight truncate max-w-[140px] sm:max-w-xs">
                 {salon?.name || process.env.NEXT_PUBLIC_DEFAULT_SALON_NAME || 'Pari Beauty Studio - Branch 1'}
               </span>
-              <span className="text-[10px] sm:text-[11px] text-neutral-500 hidden sm:block -mt-0.5 truncate">
+              <span className="text-[10px] sm:text-[11px] text-[#77717A] dark:text-[#B5AAB8] hidden sm:block -mt-0.5 truncate">
                 Salon Business ERP
               </span>
             </div>
@@ -429,8 +429,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Top actions */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden md:flex items-center gap-2 text-xs text-neutral-600 bg-pink-50/70 border border-pink-100/80 py-1.5 px-3 rounded-full">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <div className="hidden md:flex items-center gap-2 text-xs text-[#77717A] dark:text-[#B5AAB8] bg-[#F1EBEF] dark:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] py-1.5 px-3 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-pulse"></span>
             <span>
               Studio Open ({salon?.open_time ? salon.open_time.slice(0, 5) : '09:00'} - {salon?.close_time ? salon.close_time.slice(0, 5) : '21:00'})
             </span>
@@ -440,7 +440,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             onClick={handleLogout}
             disabled={loggingOut}
             title="Sign out of ERP"
-            className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600 hover:text-red-600 hover:bg-red-50 p-2 sm:py-1.5 sm:px-3 rounded-xl transition-colors cursor-pointer border border-neutral-200"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#C65B62] dark:text-[#EF858B] hover:bg-[#C65B62]/10 p-2 sm:py-1.5 sm:px-3 rounded-xl transition-colors cursor-pointer border border-[#E8E1E5] dark:border-[#3A3040]"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
@@ -455,24 +455,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop blur overlay */}
           <div
-            className="fixed inset-0 bg-neutral-900/60 backdrop-blur-xs transition-opacity duration-300"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Slide Drawer Panel */}
-          <div className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full bg-white shadow-2xl flex flex-col p-4 sm:p-5 animate-slide-left border-r border-neutral-200 overflow-hidden">
+          <div className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full bg-white dark:bg-[#211B24] shadow-2xl flex flex-col p-4 sm:p-5 animate-slide-left border-r border-[#E8E1E5] dark:border-[#3A3040] overflow-hidden">
             <div className="flex-1 min-h-0 overflow-y-auto space-y-4 no-scrollbar pr-1">
               {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E8E1E5] dark:border-[#3A3040]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#4B263F] to-[#B77A91] dark:from-[#D6A0B4] dark:to-[#B77A91] text-white flex items-center justify-center font-bold text-lg shadow-sm">
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <span className="font-extrabold text-sm text-[#2a1630] block leading-tight truncate">
+                    <span className="font-extrabold text-sm text-[#242126] dark:text-[#F5EFF5] block leading-tight truncate">
                       {salon?.name || process.env.NEXT_PUBLIC_DEFAULT_SALON_NAME || 'Pari Beauty Studio - Branch 1'}
                     </span>
-                    <span className="text-[10px] text-pink-700 font-bold bg-pink-50 px-1.5 py-0.5 rounded border border-pink-200">
+                    <span className="text-[10px] text-[#4B263F] dark:text-[#D6A0B4] font-bold bg-[#F1EBEF] dark:bg-[#2B2230] px-1.5 py-0.5 rounded border border-[#E8E1E5] dark:border-[#3A3040]">
                       Salon Owner ERP
                     </span>
                   </div>
@@ -480,7 +480,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 flex items-center justify-center text-sm font-bold cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-[#F1EBEF] dark:bg-[#2B2230] hover:bg-[#E8E1E5] dark:hover:bg-[#3A3040] text-[#77717A] dark:text-[#B5AAB8] flex items-center justify-center text-sm font-bold cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -488,7 +488,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
               {/* Navigation Items */}
               <nav className="space-y-1">
-                <div className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider px-2 mb-1.5">
+                <div className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider px-2 mb-1.5">
                   Management Tools
                 </div>
                 {navItems.map((item) => {
@@ -507,18 +507,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 ${
                         isActive
-                          ? 'bg-[#b3135b] text-white shadow-md shadow-[#b3135b]/20 font-bold'
+                          ? 'bg-[#4B263F] text-white dark:bg-[#D6A0B4] dark:text-[#151218] shadow-md shadow-[#4B263F]/20 font-bold'
                           : isLocked
-                          ? 'text-neutral-500 hover:bg-neutral-100/80'
-                          : 'text-neutral-700 hover:bg-pink-50/70 hover:translate-x-1'
+                          ? 'text-[#77717A] dark:text-[#B5AAB8] hover:bg-[#F1EBEF]/80 dark:hover:bg-[#2B2230]/80'
+                          : 'text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] hover:translate-x-1'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLocked ? 'text-neutral-400' : 'text-neutral-500'}`} />
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-white dark:text-[#151218]' : isLocked ? 'text-[#77717A] dark:text-[#B5AAB8]' : 'text-[#B77A91] dark:text-[#D6A0B4]'}`} />
                         <span>{item.name}</span>
                       </div>
                       {isLocked && (
-                        <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
+                        <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#C69A5D]/20 text-[#C69A5D] dark:text-[#D4AD76]">
                           <Lock className="w-2.5 h-2.5" />
                           <span>{item.requiredPlanName || 'PRO'}</span>
                         </span>
@@ -530,14 +530,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
               {/* Public Booking Link */}
               {salon?.slug && (
-                <div className="pt-2 border-t border-neutral-100">
+                <div className="pt-2 border-t border-[#E8E1E5] dark:border-[#3A3040]">
                   <a
                     href={`/${salon.slug}`}
                     target="_blank"
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-pink-700 bg-pink-50 border border-pink-200/80 transition-all hover:bg-pink-100"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-[#4B263F] dark:text-[#D6A0B4] bg-[#F1EBEF] dark:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] transition-all hover:opacity-90"
                   >
                     <span className="flex items-center gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-[#b3135b]" />
+                      <Sparkles className="w-3.5 h-3.5 text-[#C69A5D] dark:text-[#D4AD76]" />
                       <span>Client Booking Page</span>
                     </span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -547,24 +547,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Bottom Account & Sign Out */}
-            <div className="shrink-0 pt-3 border-t border-neutral-100 space-y-2">
+            <div className="shrink-0 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] space-y-2">
               <button
                 type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   setShowPlanModal(true);
                 }}
-                className="w-full py-2 px-3 rounded-xl bg-pink-50 hover:bg-pink-100 text-[#b3135b] border border-pink-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2 px-3 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] hover:opacity-90 text-[#4B263F] dark:text-[#D6A0B4] border border-[#E8E1E5] dark:border-[#3A3040] text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <Zap className="w-3.5 h-3.5 text-pink-700" />
+                <Zap className="w-3.5 h-3.5 text-[#C69A5D] dark:text-[#D4AD76]" />
                 <span>Subscription & Billing</span>
               </button>
 
-              <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
-                <div className="text-[10px] text-neutral-400 uppercase font-bold">
+              <div className="p-2.5 rounded-xl bg-[#F7F5F2] dark:bg-[#151218] border border-[#E8E1E5] dark:border-[#3A3040]">
+                <div className="text-[10px] text-[#77717A] dark:text-[#B5AAB8] uppercase font-bold">
                   {user?.role === 'owner' ? 'Logged In Owner' : user?.role === 'manager' ? 'Logged In Manager' : 'Logged In User'}
                 </div>
-                <div className="text-xs font-bold text-[#2a1630] truncate mt-0.5">
+                <div className="text-xs font-bold text-[#242126] dark:text-[#F5EFF5] truncate mt-0.5">
                   {user?.email || 'pari.branch1@gmail.com'}
                 </div>
               </div>
@@ -572,9 +572,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={handleLogout}
                 disabled={loggingOut}
-                className="w-full py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-98"
+                className="w-full py-2.5 px-3 rounded-xl bg-[#C65B62]/10 hover:bg-[#C65B62]/20 text-[#C65B62] dark:text-[#EF858B] border border-[#C65B62]/30 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer active:scale-98"
               >
-                <LogOut className="w-4 h-4 text-red-600" />
+                <LogOut className="w-4 h-4 text-[#C65B62] dark:text-[#EF858B]" />
                 <span>{loggingOut ? 'Signing out...' : 'Sign Out of ERP'}</span>
               </button>
             </div>
@@ -584,9 +584,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1 flex overflow-visible lg:overflow-hidden">
         {/* Left Sidebar (Desktop & Large Screens) */}
-        <aside className="hidden lg:flex w-64 xl:w-72 bg-white border-r border-neutral-200/80 flex-col h-full shrink-0 select-none">
+        <aside className="hidden lg:flex w-64 xl:w-72 bg-white dark:bg-[#211B24] border-r border-[#E8E1E5] dark:border-[#3A3040] flex-col h-full shrink-0 select-none transition-colors duration-300">
           <div className="flex-1 overflow-y-auto py-3.5 px-3 space-y-0.5 no-scrollbar">
-            <div className="px-3 pb-1.5 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+            <div className="px-3 pb-1.5 text-[10px] font-bold text-[#77717A] dark:text-[#B5AAB8] uppercase tracking-wider">
               Management
             </div>
             <nav className="space-y-0.5">
@@ -605,18 +605,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     href={item.href}
                     className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                       isActive
-                        ? 'bg-[#b3135b] text-white shadow-md shadow-[#b3135b]/20 font-semibold'
+                        ? 'bg-[#4B263F] text-white dark:bg-[#D6A0B4] dark:text-[#151218] shadow-md shadow-[#4B263F]/20 font-semibold'
                         : isLocked
-                        ? 'text-neutral-500 hover:bg-neutral-100/80'
-                        : 'text-neutral-700 hover:bg-pink-50/60 hover:text-[#b3135b]'
+                        ? 'text-[#77717A] dark:text-[#B5AAB8] hover:bg-[#F1EBEF]/80 dark:hover:bg-[#2B2230]/80'
+                        : 'text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] hover:text-[#4B263F] dark:hover:text-[#D6A0B4]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLocked ? 'text-neutral-400' : 'text-neutral-500'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white dark:text-[#151218]' : isLocked ? 'text-[#77717A] dark:text-[#B5AAB8]' : 'text-[#B77A91] dark:text-[#D6A0B4]'}`} />
                       <span>{item.name}</span>
                     </div>
                     {isLocked && (
-                      <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800">
+                      <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#C69A5D]/20 text-[#C69A5D] dark:text-[#D4AD76]">
                         <Lock className="w-2.5 h-2.5" />
                         <span>{item.requiredPlanName || 'PRO'}</span>
                       </span>
@@ -627,14 +627,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </nav>
           </div>
 
-          <div className="p-3 border-t border-neutral-200/80 bg-neutral-50/60 shrink-0">
-            <div className="p-2.5 rounded-2xl bg-white border border-neutral-200/80 shadow-2xs">
-              <div className="text-[10px] text-neutral-400 mb-0.5 font-bold uppercase">Signed in as:</div>
-              <div className="text-xs font-semibold text-[#2a1630] truncate" title={user?.email || 'pari.branch1@gmail.com'}>
+          <div className="p-3 border-t border-[#E8E1E5] dark:border-[#3A3040] bg-[#F7F5F2] dark:bg-[#151218] shrink-0">
+            <div className="p-2.5 rounded-2xl bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs">
+              <div className="text-[10px] text-[#77717A] dark:text-[#B5AAB8] mb-0.5 font-bold uppercase">Signed in as:</div>
+              <div className="text-xs font-semibold text-[#242126] dark:text-[#F5EFF5] truncate" title={user?.email || 'pari.branch1@gmail.com'}>
                 {user?.email || 'pari.branch1@gmail.com'}
               </div>
-              <div className="text-[10px] text-emerald-600 font-semibold mt-0.5 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <div className="text-[10px] text-[#2F7D68] dark:text-[#55B99A] font-semibold mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2F7D68] dark:bg-[#55B99A]"></span>
                 <span className="capitalize">{user?.role || 'Owner'} Account</span>
               </div>
             </div>

@@ -1,0 +1,119 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { ShieldCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
+
+export default function DoubleBookingDemo() {
+  const shouldReduceMotion = useReducedMotion();
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
+
+  useEffect(() => {
+    if (shouldReduceMotion) return;
+
+    // Cycle through animation steps:
+    // 0: Slot empty
+    // 1: Client 1 enters 4:00 PM slot (Green)
+    // 2: Client 2 tries to enter same slot -> Collision! (Red Shake)
+    // 3: SalonPro blocks Client 2 with "Slot Protected" badge
+    const timer = setInterval(() => {
+      setStep((prev) => ((prev + 1) % 4) as any);
+    }, 2400);
+
+    return () => clearInterval(timer);
+  }, [shouldReduceMotion]);
+
+  return (
+    <div className="mt-5 p-4 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl relative overflow-hidden">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-xs">
+        <span className="font-bold text-slate-200">Interactive Conflict Engine</span>
+        <span className="text-[10px] font-mono text-pink-400 font-semibold">Slot: 04:00 PM (Stylist: Priya)</span>
+      </div>
+
+      <div className="py-3 flex flex-col sm:flex-row items-center justify-center gap-3">
+        {/* The 4:00 PM Slot Box */}
+        <motion.div
+          animate={
+            step === 2
+              ? { x: [-6, 6, -5, 5, -2, 2, 0], borderColor: '#ef4444' }
+              : step >= 1
+              ? { borderColor: '#10b981' }
+              : { borderColor: '#334155' }
+          }
+          transition={{ duration: 0.4 }}
+          className={`w-full sm:w-64 p-3 rounded-xl border-2 transition-colors ${
+            step === 2
+              ? 'bg-rose-950/60 border-rose-500'
+              : step >= 1
+              ? 'bg-emerald-950/40 border-emerald-500/80'
+              : 'bg-slate-800/80 border-slate-700'
+          }`}
+        >
+          <div className="text-[10px] text-slate-400 font-mono flex items-center justify-between mb-1.5">
+            <span>Primary Slot: 04:00 PM</span>
+            {step >= 1 && <span className="text-emerald-400 font-bold">● Occupied</span>}
+          </div>
+
+          {/* Client 1 Chip */}
+          <AnimatePresence>
+            {step >= 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: -15, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="p-2 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-between shadow-md"
+              >
+                <span>Client A (Pooja P.)</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-slate-950" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Client 2 Attempt / Rejection */}
+          <AnimatePresence>
+            {step === 2 && (
+              <motion.div
+                initial={{ opacity: 0, y: -15, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="mt-2 p-2 rounded-lg bg-rose-500 text-white font-bold text-xs flex items-center justify-between shadow-md"
+              >
+                <span>Client B (Concurrent Attempt)</span>
+                <AlertCircle className="w-3.5 h-3.5 text-white" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Advisory Lock Action Callout */}
+        <div className="text-center sm:text-left min-w-[180px]">
+          {step === 0 && (
+            <span className="text-xs text-slate-400">Waiting for booking requests...</span>
+          )}
+          {step === 1 && (
+            <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 justify-center sm:justify-start">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Client A Confirmed!</span>
+            </span>
+          )}
+          {step === 2 && (
+            <span className="text-xs text-rose-400 font-bold flex items-center gap-1 justify-center sm:justify-start animate-bounce">
+              <AlertCircle className="w-3.5 h-3.5" />
+              <span>Collision Detected!</span>
+            </span>
+          )}
+          {step === 3 && (
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-500/20 text-pink-300 border border-pink-500/40 text-xs font-bold"
+            >
+              <ShieldCheck className="w-4 h-4 text-pink-400" />
+              <span>Slot Protected (409 Handled)</span>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

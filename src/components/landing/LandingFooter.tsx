@@ -209,7 +209,7 @@ export default function LandingFooter() {
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center md:text-left">
           <div className="space-y-1">
             <p className="text-slate-400 font-medium">
-              © {new Date().getFullYear()} SalonPro Software Platform. All rights reserved.
+              © 2026 SalonPro Software Platform. All rights reserved.
             </p>
             <p className="text-[11px] text-slate-600">
               Designed & engineered for professional salons, studios, and wellness spas across India.

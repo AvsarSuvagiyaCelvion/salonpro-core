@@ -1,11 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Sparkles, Building2, Lock, User, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, Lock, User } from 'lucide-react';
 
 export default function LandingNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
@@ -28,11 +38,17 @@ export default function LandingNavbar() {
         </Link>
       </div>
 
-      <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-3 sm:px-6 py-3 sm:py-4 w-full max-w-full">
+      <nav
+        className={`sticky top-0 z-50 border-b border-slate-200/80 transition-all duration-300 w-full max-w-full ${
+          scrolled
+            ? 'bg-white/80 backdrop-blur-xl shadow-md py-2.5 sm:py-3'
+            : 'bg-white/95 backdrop-blur-md py-3.5 sm:py-4.5'
+        } px-3 sm:px-6`}
+      >
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] flex items-center justify-center font-black text-base sm:text-xl text-white shadow-md shadow-pink-900/10 shrink-0">
+          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] flex items-center justify-center font-black text-base sm:text-xl text-white shadow-md shadow-pink-900/10 shrink-0 group-hover:rotate-12 transition-transform duration-300">
               ✂
             </div>
             <div className="flex items-center gap-1.5">
@@ -58,7 +74,7 @@ export default function LandingNavbar() {
             <Link
               href="/dixa-beauty-salon"
               target="_blank"
-              className="px-3 py-2 rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs"
+              className="px-3 py-2 rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs hover:scale-105 active:scale-95"
             >
               <span>⚡ Live Booking Demo</span>
               <span className="text-[10px]">↗</span>
@@ -71,7 +87,7 @@ export default function LandingNavbar() {
             </Link>
             <Link
               href="/register-salon"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-bold transition-all shadow-md shadow-pink-900/15 active:scale-95 whitespace-nowrap flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs font-bold transition-all shadow-md shadow-pink-900/15 active:scale-95 whitespace-nowrap flex items-center gap-1.5 hover:shadow-lg hover:shadow-pink-900/25"
             >
               <span>🎁 Start 7-Day Free Trial</span>
               <span>➔</span>
@@ -108,7 +124,7 @@ export default function LandingNavbar() {
           />
 
           {/* Slide Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 z-50 w-72 max-w-[85vw] bg-white shadow-2xl flex flex-col justify-between p-5 animate-slide-left border-l border-neutral-200">
+          <div className="fixed inset-y-0 right-0 z-50 w-72 max-w-[85vw] bg-white shadow-2xl flex flex-col justify-between p-5 border-l border-neutral-200 animate-in slide-in-from-right duration-200">
             <div className="space-y-5">
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-neutral-100">

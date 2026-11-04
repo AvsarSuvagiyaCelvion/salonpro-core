@@ -48,7 +48,7 @@ export default function MarketingLandingPage() {
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
           <span className="text-emerald-300 font-extrabold">LIVE DEMO AVAILABLE</span>
           <span className="text-slate-500">·</span>
-          <span className="text-slate-300">Next.js 16 Multi-Tenant SaaS</span>
+          <span className="text-slate-300">Smart Salon & Spa Management Suite</span>
         </div>
 
         <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.22] sm:leading-[1.15] max-w-4xl mx-auto break-normal">
@@ -102,7 +102,7 @@ export default function MarketingLandingPage() {
           </span>
           <span className="flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Full multi-tenant source code</span>
+            <span>Complete All-in-One Salon System</span>
           </span>
         </div>
 
@@ -434,7 +434,7 @@ export default function MarketingLandingPage() {
           <div className="flex items-center gap-2.5">
             <span className="font-extrabold text-sm text-slate-900">SalonPro</span>
             <span>·</span>
-            <span>Multi-Tenant Cloud Salon & Spa Suite</span>
+            <span>All-in-One Salon & Spa Management Suite</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-slate-600 font-semibold text-xs">

@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Terms of Service | SalonPro',
-  description: 'Terms of Service and Customer Agreement for SalonPro multi-tenant SaaS platform.',
+  description: 'Terms of Service and Customer Agreement for SalonPro Salon Management Platform.',
 };
 
 export default function TermsPage() {

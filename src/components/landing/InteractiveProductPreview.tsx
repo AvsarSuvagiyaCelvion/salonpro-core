@@ -403,12 +403,12 @@ export default function InteractiveProductPreview() {
           <div className="flex items-center gap-3 text-slate-600">
             <span className="flex items-center gap-1 text-slate-900 font-bold">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Full Source Code Included</span>
+              <span>100% Secure & Cloud-Hosted</span>
             </span>
             <span className="hidden sm:inline">·</span>
             <span className="hidden sm:flex items-center gap-1">
               <ShieldCheck className="w-4 h-4 text-purple-600" />
-              <span>Next.js 16 + Supabase Multi-Tenant</span>
+              <span>99.9% Uptime · Automated WhatsApp Sync</span>
             </span>
           </div>
 

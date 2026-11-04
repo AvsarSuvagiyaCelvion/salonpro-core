@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Privacy Policy | SalonPro',
-  description: 'Privacy Policy for SalonPro salon management SaaS platform.',
+  description: 'Privacy Policy for SalonPro salon management platform.',
 };
 
 export default function PrivacyPage() {
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-base font-bold text-slate-900 mb-2">2. How We Use Information</h2>
             <p>
-              Information collected is used strictly to deliver the SalonPro SaaS service: scheduling bookings, sending automated WhatsApp appointment confirmations and digital PDF bills, computing staff commissions, and maintaining secure salon workspace operations.
+              Information collected is used strictly to deliver the SalonPro software service: scheduling bookings, sending automated WhatsApp appointment confirmations and digital PDF bills, computing staff commissions, and maintaining secure salon workspace operations.
             </p>
           </section>
 

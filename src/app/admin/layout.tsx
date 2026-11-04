@@ -143,7 +143,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex items-center gap-2 shrink-0">
           <div className="hidden md:flex items-center gap-2 text-xs text-slate-600 bg-amber-50/80 border border-amber-200/80 py-1.5 px-3 rounded-full">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="font-medium text-slate-700">Platform Active (Supabase Cloud)</span>
+            <span className="font-medium text-slate-700">Platform Online · Cloud Active</span>
           </div>
 
           <button

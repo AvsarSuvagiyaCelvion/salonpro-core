@@ -18,6 +18,11 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: 'SalonPro - Modern Salon & Spa Management Platform',
   description: 'Next-generation salon operating system and client management portal.',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({

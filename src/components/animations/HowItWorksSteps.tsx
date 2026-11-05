@@ -89,7 +89,7 @@ export default function HowItWorksSteps() {
             </div>
 
             {/* Step Card Body with Ultra-Luxurious Warm Ivory & Plum Styling */}
-            <div className="flex-1 w-full bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] rounded-2xl sm:rounded-3xl p-6 shadow-xs group-hover:shadow-lg group-hover:border-[#B77A91]/60 dark:group-hover:border-[#D6A0B4]/40 transition-all duration-300">
+            <div className="flex-1 w-full bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs group-hover:shadow-lg group-hover:border-[#B77A91]/60 dark:group-hover:border-[#D6A0B4]/40 transition-all duration-300">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
                 <h4 className="text-base sm:text-lg font-bold text-[#242126] dark:text-[#F5EFF5]">{step.title}</h4>
 
@@ -98,15 +98,15 @@ export default function HowItWorksSteps() {
                   <Link
                     href="/dixa-beauty-salon"
                     target="_blank"
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] hover:bg-white dark:hover:bg-[#3A3040] border border-[#E8E1E5] dark:border-[#3A3040] text-[#4B263F] dark:text-[#D6A0B4] text-xs font-mono font-bold transition-colors w-fit"
+                    className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] hover:bg-white dark:hover:bg-[#3A3040] border border-[#E8E1E5] dark:border-[#3A3040] text-[#4B263F] dark:text-[#D6A0B4] text-[11px] sm:text-xs font-mono font-bold transition-colors w-fit max-w-full"
                   >
-                    <span>{step.urlPath}</span>
-                    <span className="text-[10px] bg-[#4B263F] dark:bg-[#D6A0B4] text-white dark:text-[#151218] px-1.5 py-0.2 rounded font-sans">
+                    <span className="truncate">{step.urlPath}</span>
+                    <span className="text-[10px] bg-[#4B263F] dark:bg-[#D6A0B4] text-white dark:text-[#151218] px-1.5 py-0.2 rounded font-sans shrink-0">
                       Open ↗
                     </span>
                   </Link>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] text-[#77717A] dark:text-[#B5AAB8] text-xs font-mono font-bold w-fit">
+                  <span className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] text-[#77717A] dark:text-[#B5AAB8] text-[11px] sm:text-xs font-mono font-bold w-fit max-w-full truncate">
                     {step.urlPath}
                   </span>
                 )}

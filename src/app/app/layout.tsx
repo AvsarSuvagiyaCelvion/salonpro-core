@@ -642,7 +642,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 overflow-x-hidden lg:overflow-y-auto p-3.5 sm:p-6 lg:p-8 w-full max-w-full pb-24 md:pb-8 touch-scroll">
+        <main className="flex-1 overflow-x-hidden lg:overflow-y-auto p-2.5 xs:p-3.5 sm:p-6 lg:p-8 w-full max-w-full pb-24 md:pb-8 touch-scroll">
           <div className="max-w-7xl mx-auto w-full">
             {isExpiredLockout ? (
             <div className="max-w-4xl mx-auto py-8">

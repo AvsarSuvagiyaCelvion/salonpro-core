@@ -28,30 +28,31 @@ export default function InteractiveProductPreview() {
       {/* Main Container Window */}
       <div className="relative bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] rounded-3xl shadow-2xl shadow-[#4B263F]/5 dark:shadow-black/40 overflow-hidden transition-colors duration-300">
         {/* Top Browser / App Header */}
-        <div className="bg-[#4B263F] dark:bg-[#151218] text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-[#3A3040]">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-[#EF858B] inline-block" />
-              <span className="w-3 h-3 rounded-full bg-[#D4AD76] inline-block" />
-              <span className="w-3 h-3 rounded-full bg-[#55B99A] inline-block" />
+        <div className="bg-[#4B263F] dark:bg-[#151218] text-white px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 border-b border-[#3A3040]">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#EF858B] inline-block" />
+              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#D4AD76] inline-block" />
+              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#55B99A] inline-block" />
             </div>
-            <div className="hidden sm:flex items-center gap-2 ml-3 px-3 py-1 rounded-xl bg-black/20 text-[#B5AAB8] text-xs font-mono">
+            <div className="hidden sm:flex items-center gap-2 ml-2 px-2.5 py-1 rounded-xl bg-black/20 text-[#B5AAB8] text-xs font-mono truncate">
               <span className="text-[#55B99A]">https://</span>
               <span>salonpro.in/app/live</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#2F7D68]/30 dark:bg-[#55B99A]/20 text-[#55B99A] border border-[#55B99A]/30">
-              <span className="w-2 h-2 rounded-full bg-[#55B99A] animate-pulse" />
-              <span>Studio Active · Real-time Sync</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-[#2F7D68]/30 dark:bg-[#55B99A]/20 text-[#55B99A] border border-[#55B99A]/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#55B99A] animate-pulse" />
+              <span className="hidden min-[400px]:inline">Studio Active</span>
+              <span className="min-[400px]:hidden">Active</span>
             </span>
             <Link
               href="/dixa-beauty-salon"
               target="_blank"
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-[#B77A91] hover:bg-[#a66a81] text-white text-xs font-bold transition-all shadow-xs"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-xl bg-[#B77A91] hover:bg-[#a66a81] text-white text-[11px] sm:text-xs font-bold transition-all shadow-xs shrink-0"
             >
-              <span>Test Live Demo</span>
+              <span>Demo</span>
               <ExternalLink className="w-3 h-3" />
             </Link>
           </div>
@@ -412,17 +413,17 @@ export default function InteractiveProductPreview() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <Link
               href="/login"
-              className="px-3.5 py-1.5 rounded-xl bg-[#F1EBEF] hover:bg-[#E8E1E5] dark:bg-[#2B2230] dark:hover:bg-[#3A3040] text-[#242126] dark:text-[#F5EFF5] font-bold text-xs transition-all"
+              className="text-center px-3 py-1.5 rounded-xl bg-[#F1EBEF] hover:bg-[#E8E1E5] dark:bg-[#2B2230] dark:hover:bg-[#3A3040] text-[#242126] dark:text-[#F5EFF5] font-bold text-xs transition-all"
             >
               Owner Portal Login ➔
             </Link>
             <Link
               href="/dixa-beauty-salon"
               target="_blank"
-              className="px-4 py-1.5 rounded-xl bg-[#4B263F] hover:bg-[#381c2f] dark:bg-[#D6A0B4] dark:hover:bg-[#c98ea3] text-white dark:text-[#151218] font-extrabold text-xs shadow-xs transition-all"
+              className="text-center px-3.5 py-1.5 rounded-xl bg-[#4B263F] hover:bg-[#381c2f] dark:bg-[#D6A0B4] dark:hover:bg-[#c98ea3] text-white dark:text-[#151218] font-extrabold text-xs shadow-xs transition-all"
             >
               Open Live Salon Demo ➔
             </Link>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { CheckCircle2, Clock, Scissors, Receipt, MessageSquare, Sparkles } from 'lucide-react';
+import { CheckCircle2, Scissors, Receipt, MessageSquare } from 'lucide-react';
 
 interface KanbanCard {
   id: string;
@@ -49,7 +49,7 @@ export default function KanbanDemo() {
   useEffect(() => {
     if (shouldReduceMotion) return;
 
-    // Loop cycle: automatically transition cards between columns every 3.5 seconds
+    // Loop cycle: automatically transition cards between columns every 3.8 seconds
     const interval = setInterval(() => {
       setCards((prev) => {
         return prev.map((card) => {
@@ -94,17 +94,17 @@ export default function KanbanDemo() {
   const billingCards = cards.filter((c) => c.col === 'billing');
 
   return (
-    <div className="relative w-full bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-2xl text-white overflow-hidden">
+    <div className="relative w-full bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xl text-[#242126] dark:text-[#F5EFF5] overflow-hidden transition-colors duration-300">
       {/* Header Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs">
+      <div className="flex items-center justify-between pb-3 border-b border-[#E8E1E5] dark:border-[#3A3040] text-xs">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-          <span className="font-bold text-white tracking-wide">Live Studio Floor</span>
-          <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 font-semibold">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-ping inline-block" />
+          <span className="font-bold tracking-wide">Live Studio Floor</span>
+          <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] border border-[#E8E1E5] dark:border-[#3A3040] font-semibold">
             Auto-Sync
           </span>
         </div>
-        <div className="text-[11px] text-slate-400 font-mono">
+        <div className="text-[11px] text-[#77717A] dark:text-[#B5AAB8] font-mono">
           <span>Today: 18 Sessions</span>
         </div>
       </div>
@@ -112,10 +112,10 @@ export default function KanbanDemo() {
       {/* 3 Kanban Columns */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
         {/* Col 1: Waiting */}
-        <div className="bg-slate-950/60 rounded-2xl p-2.5 border border-slate-800/80 min-h-[140px] flex flex-col">
+        <div className="bg-[#F7F5F2] dark:bg-[#151218] rounded-xl sm:rounded-2xl p-2.5 border border-[#E8E1E5] dark:border-[#3A3040] min-h-[130px] flex flex-col">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#C69A5D] dark:text-[#D4AD76] flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C69A5D] dark:bg-[#D4AD76]" />
               Waiting ({waitingCards.length})
             </span>
           </div>
@@ -130,13 +130,13 @@ export default function KanbanDemo() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80 shadow-md text-left"
+                  className="p-2.5 rounded-xl bg-white dark:bg-[#2B2230] border border-[#E8E1E5] dark:border-[#3A3040] shadow-xs text-left"
                 >
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-100">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#242126] dark:text-[#F5EFF5]">
                     <span>{card.name}</span>
-                    <span className="text-[10px] text-amber-300 font-mono">{card.price}</span>
+                    <span className="text-[10px] text-[#C69A5D] dark:text-[#D4AD76] font-mono">{card.price}</span>
                   </div>
-                  <p className="text-[10px] text-slate-400 truncate">{card.service}</p>
+                  <p className="text-[10px] text-[#77717A] dark:text-[#B5AAB8] truncate">{card.service}</p>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -144,10 +144,10 @@ export default function KanbanDemo() {
         </div>
 
         {/* Col 2: In Chair */}
-        <div className="bg-slate-950/60 rounded-2xl p-2.5 border border-pink-500/40 min-h-[140px] flex flex-col ring-1 ring-pink-500/30">
+        <div className="bg-[#F7F5F2] dark:bg-[#151218] rounded-xl sm:rounded-2xl p-2.5 border border-[#B77A91] dark:border-[#D6A0B4] min-h-[130px] flex flex-col ring-1 ring-[#B77A91]/30">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-pink-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#4B263F] dark:text-[#D6A0B4] flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4B263F] dark:bg-[#D6A0B4] animate-pulse" />
               In Chair ({chairCards.length})
             </span>
           </div>
@@ -162,14 +162,14 @@ export default function KanbanDemo() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="p-2.5 rounded-xl bg-gradient-to-r from-pink-950/80 to-purple-950/70 border border-pink-500/50 shadow-md text-left"
+                  className="p-2.5 rounded-xl bg-white dark:bg-[#2B2230] border border-[#B77A91]/60 dark:border-[#D6A0B4]/60 shadow-xs text-left"
                 >
-                  <div className="flex items-center justify-between text-xs font-bold text-pink-100">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#4B263F] dark:text-[#D6A0B4]">
                     <span>{card.name}</span>
-                    <span className="text-[10px] text-pink-400 font-mono">{card.price}</span>
+                    <span className="text-[10px] font-mono">{card.price}</span>
                   </div>
-                  <p className="text-[10px] text-slate-300 truncate">{card.service}</p>
-                  <div className="text-[9px] text-pink-300/80 flex items-center gap-1 pt-0.5">
+                  <p className="text-[10px] text-[#77717A] dark:text-[#B5AAB8] truncate">{card.service}</p>
+                  <div className="text-[9px] text-[#B77A91] dark:text-[#D6A0B4] flex items-center gap-1 pt-0.5">
                     <Scissors className="w-2.5 h-2.5" />
                     <span>Stylist: {card.stylist}</span>
                   </div>
@@ -180,10 +180,10 @@ export default function KanbanDemo() {
         </div>
 
         {/* Col 3: Ready for Billing */}
-        <div className="bg-slate-950/60 rounded-2xl p-2.5 border border-slate-800/80 min-h-[140px] flex flex-col">
+        <div className="bg-[#F7F5F2] dark:bg-[#151218] rounded-xl sm:rounded-2xl p-2.5 border border-[#E8E1E5] dark:border-[#3A3040] min-h-[130px] flex flex-col">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#2F7D68] dark:text-[#55B99A] flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2F7D68] dark:bg-[#55B99A]" />
               Ready for Bill ({billingCards.length})
             </span>
           </div>
@@ -198,17 +198,17 @@ export default function KanbanDemo() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="p-2.5 rounded-xl bg-slate-800/90 border border-emerald-500/40 shadow-md text-left"
+                  className="p-2.5 rounded-xl bg-white dark:bg-[#2B2230] border border-[#2F7D68]/40 dark:border-[#55B99A]/40 shadow-xs text-left"
                 >
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-100">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#242126] dark:text-[#F5EFF5]">
                     <span>{card.name}</span>
-                    <span className="text-[10px] text-emerald-400 font-mono font-bold">
+                    <span className="text-[10px] text-[#2F7D68] dark:text-[#55B99A] font-mono font-bold">
                       {card.price}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 truncate">{card.service}</p>
+                  <p className="text-[10px] text-[#77717A] dark:text-[#B5AAB8] truncate">{card.service}</p>
                   <div className="pt-1">
-                    <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                    <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-[#2F7D68]/15 dark:bg-[#55B99A]/20 text-[#2F7D68] dark:text-[#55B99A] border border-[#2F7D68]/30 dark:border-[#55B99A]/30 font-semibold">
                       <Receipt className="w-2.5 h-2.5" />
                       <span>Ready for GST Invoice</span>
                     </span>
@@ -227,15 +227,15 @@ export default function KanbanDemo() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute bottom-2 right-2 bg-emerald-600/95 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl shadow-emerald-950/40 z-30"
+            className="absolute bottom-2 right-2 max-w-[calc(100%-1rem)] bg-[#2F7D68] dark:bg-[#55B99A] text-white dark:text-[#151218] text-[10px] sm:text-[11px] font-semibold px-2.5 sm:px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl z-30"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-white" />
-            <span className="flex items-center gap-1">
+            <MessageSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="flex items-center gap-1 truncate">
               <span>Sending WhatsApp</span>
-              <span className="inline-flex gap-0.5">
-                <span className="w-1 h-1 rounded-full bg-white animate-bounce" />
-                <span className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.15s]" />
-                <span className="w-1 h-1 rounded-full bg-white animate-bounce [animation-delay:0.3s]" />
+              <span className="inline-flex gap-0.5 shrink-0">
+                <span className="w-1 h-1 rounded-full bg-current animate-bounce" />
+                <span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:0.15s]" />
+                <span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:0.3s]" />
               </span>
             </span>
           </motion.div>
@@ -246,14 +246,13 @@ export default function KanbanDemo() {
             initial={{ opacity: 0, y: 15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute bottom-2 right-2 bg-emerald-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl shadow-emerald-950/50 z-30 border border-emerald-400/30"
+            className="absolute bottom-2 right-2 max-w-[calc(100%-1rem)] bg-[#2F7D68] dark:bg-[#55B99A] text-white dark:text-[#151218] text-[10px] sm:text-[11px] font-bold px-2.5 sm:px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl z-30 border border-white/20"
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0" />
-            <span>Booking confirmed ✅ 4:00 PM with Stylist</span>
+            <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="truncate">Booking confirmed ✅ 4:00 PM with Stylist</span>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
 }
-

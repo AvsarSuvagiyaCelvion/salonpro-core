@@ -25,9 +25,9 @@ export default function DoubleBookingDemo() {
 
   return (
     <div className="mt-5 p-4 rounded-2xl bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] text-[#242126] dark:text-[#F5EFF5] shadow-md relative overflow-hidden transition-colors duration-300">
-      <div className="flex items-center justify-between pb-2 border-b border-[#E8E1E5] dark:border-[#3A3040] text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-[#E8E1E5] dark:border-[#3A3040] text-xs">
         <span className="font-bold text-[#242126] dark:text-[#F5EFF5]">Interactive Conflict Engine</span>
-        <span className="text-[10px] font-mono text-[#4B263F] dark:text-[#D6A0B4] font-semibold">Slot: 04:00 PM (Stylist: Priya)</span>
+        <span className="text-[10px] font-mono text-[#4B263F] dark:text-[#D6A0B4] font-semibold">Slot: 04:00 PM</span>
       </div>
 
       <div className="py-3 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -41,7 +41,7 @@ export default function DoubleBookingDemo() {
               : { borderColor: '#E8E1E5' }
           }
           transition={{ duration: 0.4 }}
-          className={`w-full sm:w-64 p-3 rounded-xl border-2 transition-colors ${
+          className={`w-full max-w-[280px] sm:w-64 p-3 rounded-xl border-2 transition-colors ${
             step === 2
               ? 'bg-[#C65B62]/10 dark:bg-[#EF858B]/15 border-[#C65B62] dark:border-[#EF858B]'
               : step >= 1
@@ -86,7 +86,7 @@ export default function DoubleBookingDemo() {
         </motion.div>
 
         {/* Advisory Lock Action Callout */}
-        <div className="text-center sm:text-left min-w-[180px]">
+        <div className="text-center sm:text-left min-w-0 sm:min-w-[180px]">
           {step === 0 && (
             <span className="text-xs text-[#77717A] dark:text-[#B5AAB8]">Waiting for booking requests...</span>
           )}

@@ -17,7 +17,6 @@ export default function Typewriter({
   speedMs = 50,
 }: TypewriterProps) {
   const shouldReduceMotion = useReducedMotion();
-  const fullText = `${firstLine}\n${secondLine}`;
   const hasRunRef = useRef(false);
 
   // Initialize with full text if already typed in this session or reduced motion requested
@@ -25,7 +24,7 @@ export default function Typewriter({
     if (typeof window !== 'undefined') {
       const alreadyDone = sessionStorage.getItem('salonpro_typewriter_done');
       if (alreadyDone === 'true' || shouldReduceMotion) {
-        return fullText.length;
+        return secondLine.length;
       }
     }
     return 0;
@@ -45,14 +44,14 @@ export default function Typewriter({
     // If already typed once in this session, trigger onComplete immediately and exit
     if (typeof window !== 'undefined' && sessionStorage.getItem('salonpro_typewriter_done') === 'true') {
       setIsDone(true);
-      setDisplayedCount(fullText.length);
+      setDisplayedCount(secondLine.length);
       onComplete?.();
       return;
     }
 
     if (shouldReduceMotion) {
       setIsDone(true);
-      setDisplayedCount(fullText.length);
+      setDisplayedCount(secondLine.length);
       onComplete?.();
       return;
     }
@@ -67,7 +66,7 @@ export default function Typewriter({
       currentIndex += 1;
       setDisplayedCount(currentIndex);
 
-      if (currentIndex >= fullText.length) {
+      if (currentIndex >= secondLine.length) {
         setIsDone(true);
         try {
           sessionStorage.setItem('salonpro_typewriter_done', 'true');
@@ -76,57 +75,41 @@ export default function Typewriter({
         return;
       }
 
-      // Add a natural brief pause (150ms) between the first line and second line
-      const delay = currentIndex === firstLine.length ? 150 : speedMs;
-      timerId = setTimeout(typeNextChar, delay);
+      timerId = setTimeout(typeNextChar, speedMs);
     };
 
-    timerId = setTimeout(typeNextChar, 100);
+    // Short initial delay before second line starts typing
+    timerId = setTimeout(typeNextChar, 180);
 
     return () => clearTimeout(timerId);
-  }, [fullText, firstLine.length, speedMs, shouldReduceMotion, onComplete]);
+  }, [secondLine, speedMs, shouldReduceMotion, onComplete]);
 
-  // Split currently displayed text across the two lines
-  const firstLineCount = Math.min(displayedCount, firstLine.length);
-  const displayedFirst = firstLine.slice(0, firstLineCount);
-
-  // If first line done, remaining chars go to second line (+1 for newline separator)
-  const secondLineChars = Math.max(0, displayedCount - firstLine.length - 1);
-  const displayedSecond = secondLine.slice(0, secondLineChars);
+  const displayedSecond = secondLine.slice(0, displayedCount);
 
   return (
-    <div className="relative max-w-4xl mx-auto">
-      {/* Invisible Clone to strictly reserve height and prevent layout shift (CLS 0) */}
-      <h1
-        aria-hidden="true"
-        className="opacity-0 pointer-events-none select-none text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.22] sm:leading-[1.15] break-normal"
-      >
-        {firstLine} <br className="hidden sm:block" />
-        <span className="bg-gradient-to-r from-[#4B263F] via-[#B77A91] to-[#C69A5D] dark:from-[#D6A0B4] dark:via-[#B77A91] dark:to-[#D4AD76] bg-clip-text text-transparent">
-          {secondLine}
+    <div className="relative max-w-4xl mx-auto px-1 sm:px-2">
+      <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#242126] dark:text-[#F5EFF5] tracking-tight leading-[1.25] sm:leading-[1.15]">
+        {/* Static First Line - Always immediately visible without typing lag */}
+        <span className="block mb-1 sm:mb-2">{firstLine}</span>
+
+        {/* Dynamic Typewriter Second Line with Zero Layout Shift (CLS 0) */}
+        <span className="relative inline-block min-h-[1.2em]">
+          {/* Invisible Clone reserving exact bounding box on all device sizes */}
+          <span
+            aria-hidden="true"
+            className="opacity-0 select-none pointer-events-none"
+          >
+            {secondLine}
+          </span>
+
+          {/* Real-time Character-by-Character Typed Text */}
+          <span className="absolute inset-0 left-0 top-0 bg-gradient-to-r from-[#4B263F] via-[#B77A91] to-[#C69A5D] dark:from-[#D6A0B4] dark:via-[#B77A91] dark:to-[#D4AD76] bg-clip-text text-transparent">
+            {displayedSecond}
+            {!isDone && (
+              <span className="inline-block w-[2.5px] sm:w-[3.5px] h-[0.85em] bg-[#4B263F] dark:bg-[#D6A0B4] ml-1 align-baseline animate-pulse" />
+            )}
+          </span>
         </span>
-      </h1>
-
-      {/* Actual Live Animated Typewriter Element */}
-      <h1 className="absolute inset-0 text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#242126] dark:text-[#F5EFF5] tracking-tight leading-[1.22] sm:leading-[1.15] break-normal">
-        <span>{displayedFirst}</span>
-        {displayedCount <= firstLine.length && (
-          <span className="inline-block w-[3px] h-[0.85em] bg-[#4B263F] dark:bg-[#D6A0B4] ml-1 align-baseline animate-pulse" />
-        )}
-
-        {displayedCount > firstLine.length && (
-          <>
-            <br className="hidden sm:block" />{' '}
-            <span className="bg-gradient-to-r from-[#4B263F] via-[#B77A91] to-[#C69A5D] dark:from-[#D6A0B4] dark:via-[#B77A91] dark:to-[#D4AD76] bg-clip-text text-transparent">
-              {displayedSecond}
-            </span>
-            <span
-              className={`inline-block w-[3px] h-[0.85em] bg-[#4B263F] dark:bg-[#D6A0B4] ml-1 align-baseline ${
-                isDone ? 'hidden' : 'animate-pulse'
-              }`}
-            />
-          </>
-        )}
       </h1>
     </div>
   );

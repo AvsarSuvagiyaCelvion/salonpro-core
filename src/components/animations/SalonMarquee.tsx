@@ -82,7 +82,7 @@ export default function SalonMarquee() {
           {duplicatedList.map((item, idx) => (
             <div
               key={`${item.name}-${idx}`}
-              className="w-[280px] sm:w-[320px] p-4 rounded-2xl bg-white dark:bg-[#151218] border border-[#E8E1E5] dark:border-[#3A3040] shadow-xs shrink-0 flex flex-col justify-between transition-colors duration-300"
+              className="w-[250px] xs:w-[280px] sm:w-[320px] p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#151218] border border-[#E8E1E5] dark:border-[#3A3040] shadow-xs shrink-0 flex flex-col justify-between transition-colors duration-300"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">

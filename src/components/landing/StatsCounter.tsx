@@ -118,22 +118,22 @@ function CounterCard({ item }: { item: StatItem }) {
   return (
     <div
       ref={cardRef}
-      className={`group relative p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#211B24] border ${item.borderClass} shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between`}
+      className={`group relative p-2.5 xs:p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#211B24] border ${item.borderClass} shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between`}
     >
       {/* Top micro badge */}
-      <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl ${item.bgLightClass} flex items-center justify-center transition-transform group-hover:scale-110`}>
-          <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${item.colorClass}`} />
+      <div className="flex items-center justify-between mb-1.5 sm:mb-3">
+        <span className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl ${item.bgLightClass} flex items-center justify-center transition-transform group-hover:scale-110`}>
+          <Icon className={`w-3 h-3 sm:w-4 sm:h-4 ${item.colorClass}`} />
         </span>
         <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-ping" />
       </div>
 
       {/* Counter value */}
       <div className="my-0.5 sm:my-1">
-        <div className={`text-2xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight ${item.colorClass} flex items-baseline justify-center sm:justify-start gap-0.5`}>
+        <div className={`text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight ${item.colorClass} flex items-baseline justify-center sm:justify-start gap-0.5`}>
           <span>{item.prefix || ''}</span>
           <span className="tabular-nums">{count}</span>
-          <span className="text-lg sm:text-2xl lg:text-3xl font-extrabold">{item.suffix || ''}</span>
+          <span className="text-base sm:text-2xl lg:text-3xl font-extrabold">{item.suffix || ''}</span>
         </div>
       </div>
 

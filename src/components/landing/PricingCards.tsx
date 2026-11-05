@@ -52,7 +52,7 @@ export default function PricingCards() {
   return (
     <div className="w-full">
       {/* Monthly / Yearly Billing Toggle */}
-      <div className="flex items-center justify-center gap-3 mb-10 select-none">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10 select-none px-2">
         <button
           type="button"
           onClick={() => setInterval('monthly')}
@@ -67,14 +67,14 @@ export default function PricingCards() {
         <button
           type="button"
           onClick={() => setInterval(interval === 'monthly' ? 'yearly' : 'monthly')}
-          className="w-14 h-8 bg-[#E8E1E5] dark:bg-[#3A3040] rounded-full p-1 transition-colors relative cursor-pointer focus:outline-none shadow-inner"
+          className="w-12 sm:w-14 h-7 sm:h-8 bg-[#E8E1E5] dark:bg-[#3A3040] rounded-full p-1 transition-colors relative cursor-pointer focus:outline-none shadow-inner shrink-0"
           style={{ backgroundColor: interval === 'yearly' ? '#4B263F' : undefined }}
           aria-label="Toggle Monthly and Yearly Plans"
         >
           <motion.div
             layout
             transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 30 }}
-            className={`w-6 h-6 bg-white dark:bg-[#F5EFF5] rounded-full shadow-md ${
+            className={`w-5 sm:w-6 h-5 sm:h-6 bg-white dark:bg-[#F5EFF5] rounded-full shadow-md ${
               interval === 'yearly' ? 'ml-auto' : 'mr-auto'
             }`}
           />
@@ -83,7 +83,7 @@ export default function PricingCards() {
         <button
           type="button"
           onClick={() => setInterval('yearly')}
-          className={`text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
+          className={`text-xs sm:text-sm font-bold flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer ${
             interval === 'yearly' ? 'text-[#242126] dark:text-[#F5EFF5]' : 'text-[#77717A] dark:text-[#B5AAB8] hover:text-[#4B263F]'
           }`}
         >
@@ -91,9 +91,9 @@ export default function PricingCards() {
           <motion.span
             animate={shouldReduceMotion ? {} : { y: [0, -3, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="px-2.5 py-0.5 rounded-full bg-[#F1EBEF] dark:bg-[#2B2230] text-[#C69A5D] dark:text-[#D4AD76] text-[10px] font-black uppercase tracking-wider inline-block shadow-xs border border-[#E8E1E5] dark:border-[#3A3040]"
+            className="px-2 py-0.5 rounded-full bg-[#F1EBEF] dark:bg-[#2B2230] text-[#C69A5D] dark:text-[#D4AD76] text-[9px] sm:text-[10px] font-black uppercase tracking-wider inline-block shadow-xs border border-[#E8E1E5] dark:border-[#3A3040]"
           >
-            Save 17% (2 Mo Free)
+            Save 17%
           </motion.span>
         </button>
       </div>

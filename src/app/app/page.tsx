@@ -125,21 +125,21 @@ export default function DashboardPage() {
     : 1000;
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 text-[#242126] dark:text-[#F5EFF5] transition-colors duration-300">
       {/* Page Title & Period Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5] tracking-tight">
             Dashboard Overview
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+          <p className="text-xs sm:text-sm text-[#77717A] dark:text-[#B5AAB8] mt-0.5 sm:mt-1">
             Real-time business performance, earnings, and appointments
           </p>
         </div>
 
         {/* Period Selector & Quick Actions */}
-        <div className="flex items-center gap-2">
-          <div className="bg-white border border-neutral-200 p-1 rounded-2xl flex shadow-sm">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] p-1 rounded-2xl flex shadow-2xs">
             {[
               { id: 'today', label: 'Today' },
               { id: '7d', label: 'Last 7 Days' },
@@ -148,10 +148,10 @@ export default function DashboardPage() {
               <button
                 key={p.id}
                 onClick={() => setPeriod(p.id as any)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   period === p.id
-                    ? 'bg-[#b3135b] text-white shadow-sm'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
+                    ? 'bg-[#4B263F] text-white dark:bg-[#D6A0B4] dark:text-[#151218] shadow-xs'
+                    : 'text-[#77717A] dark:text-[#B5AAB8] hover:text-[#242126] dark:hover:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230]'
                 }`}
               >
                 {p.label}
@@ -163,9 +163,9 @@ export default function DashboardPage() {
             <Link
               href={`/${salonSlug}`}
               target="_blank"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-neutral-100 hover:bg-neutral-200 text-[#2a1630] text-xs font-semibold border border-neutral-200 shadow-sm transition-all"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white dark:bg-[#211B24] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] text-[#242126] dark:text-[#F5EFF5] text-xs font-semibold border border-[#E8E1E5] dark:border-[#3A3040] shadow-xs transition-all"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-[#b3135b]" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#4B263F] dark:text-[#D6A0B4]" />
               <span>Public Booking</span>
             </Link>
           )}
@@ -174,18 +174,18 @@ export default function DashboardPage() {
 
       {/* 7-Day Free Trial Daily Countdown Card */}
       {subscription?.isTrial && !subscription?.isTrialExpired && (
-        <div className="bg-gradient-to-r from-[#2a1630] via-[#451430] to-[#b3135b] text-white p-5 sm:p-6 rounded-3xl shadow-lg border border-pink-500/30 relative overflow-hidden animate-fadeIn">
+        <div className="bg-gradient-to-r from-[#4B263F] via-[#381c2f] to-[#4B263F] text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-[#B77A91]/30 relative overflow-hidden animate-fadeIn">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1.5 max-w-xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/20 text-pink-200 border border-pink-400/30 text-[11px] font-bold">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>7-Day Free Trial</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white border border-white/20 text-[11px] font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-[#D4AD76]" />
+                <span>7-Day Free Trial Active</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                <span className="text-amber-300 underline decoration-amber-400">{subscription.trialDaysRemaining} Day{subscription.trialDaysRemaining === 1 ? '' : 's'} Remaining</span> in Free Trial
+                <span className="text-[#D4AD76] underline decoration-[#D4AD76]">{subscription.trialDaysRemaining} Day{subscription.trialDaysRemaining === 1 ? '' : 's'} Remaining</span> in Free Trial
               </h2>
-              <p className="text-xs sm:text-sm text-pink-100/90 leading-relaxed">
-                All Pro management tools, calendar booking, and GST billing are active. Choose an official plan (Basic, Pro, Premium) anytime to prevent service interruption.
+              <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                All Pro management tools, calendar booking, and GST billing are active. Choose an official plan anytime to prevent service interruption.
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
@@ -196,9 +196,9 @@ export default function DashboardPage() {
                     window.dispatchEvent(new CustomEvent('open-plan-modal'));
                   }
                 }}
-                className="px-5 py-3 rounded-2xl bg-white hover:bg-pink-50 text-[#b3135b] font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white hover:bg-[#F1EBEF] text-[#4B263F] font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
               >
-                <Zap className="w-4 h-4 text-[#b3135b] fill-[#b3135b]" />
+                <Zap className="w-4 h-4 text-[#C69A5D] fill-[#C69A5D]" />
                 <span>Choose Official Plan ➔</span>
               </button>
             </div>
@@ -208,7 +208,7 @@ export default function DashboardPage() {
 
       {/* Paid Plan Expiry Reminder Card (<= 7 days) */}
       {Boolean(subscription?.isSubscriptionExpiringSoon && !subscription?.isTrial) && (
-        <div className="bg-gradient-to-r from-amber-950 via-rose-950 to-amber-900 text-white p-5 sm:p-6 rounded-3xl shadow-lg border border-amber-500/40 relative overflow-hidden animate-fadeIn">
+        <div className="bg-gradient-to-r from-amber-950 via-rose-950 to-amber-900 text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-amber-500/40 relative overflow-hidden animate-fadeIn">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1.5 max-w-xl">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30 text-[11px] font-bold">
@@ -230,7 +230,7 @@ export default function DashboardPage() {
                     window.dispatchEvent(new CustomEvent('open-plan-modal'));
                   }
                 }}
-                className="px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
               >
                 <Zap className="w-4 h-4 text-amber-900 fill-amber-900" />
                 <span>Renew / Upgrade Plan ➔</span>
@@ -241,143 +241,143 @@ export default function DashboardPage() {
       )}
 
       {/* 4 Primary KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
         {/* Total Revenue */}
-        <div className="bg-white p-5 rounded-3xl border border-neutral-200 shadow-sm relative overflow-hidden group hover:border-[#b3135b]/40 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
               Revenue
             </span>
-            <div className="w-9 h-9 rounded-2xl bg-[#b3135b]/10 text-[#b3135b] flex items-center justify-center font-bold">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] flex items-center justify-center font-bold text-xs sm:text-sm">
               ₹
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#2a1630]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
             {loading ? (
-              <div className="h-8 w-24 bg-neutral-100 animate-pulse rounded-lg" />
+              <div className="h-7 w-20 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
             ) : (
               `₹${data?.totalRevenue.toLocaleString('en-IN')}`
             )}
           </div>
-          <div className="mt-2 text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>From verified client payments</span>
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#2F7D68] dark:text-[#55B99A] font-semibold flex items-center gap-1">
+            <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            <span className="truncate">Verified payments</span>
           </div>
         </div>
 
         {/* Completed Sessions */}
-        <div className="bg-white p-5 rounded-3xl border border-neutral-200 shadow-sm relative overflow-hidden group hover:border-[#b3135b]/40 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
               Sessions Done
             </span>
-            <div className="w-9 h-9 rounded-2xl bg-pink-500/10 text-pink-600 flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#B77A91] dark:text-[#D6A0B4] flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#2a1630]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
             {loading ? (
-              <div className="h-8 w-16 bg-neutral-100 animate-pulse rounded-lg" />
+              <div className="h-7 w-12 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
             ) : (
               data?.completedSessions
             )}
           </div>
-          <div className="mt-2 text-[11px] text-neutral-500 font-medium">
-            Completed treatments in period
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#77717A] dark:text-[#B5AAB8] font-medium truncate">
+            Completed in period
           </div>
         </div>
 
         {/* Registered Clients */}
-        <div className="bg-white p-5 rounded-3xl border border-neutral-200 shadow-sm relative overflow-hidden group hover:border-[#b3135b]/40 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
               Client Base
             </span>
-            <div className="w-9 h-9 rounded-2xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#C69A5D] dark:text-[#D4AD76] flex items-center justify-center">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#2a1630]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
             {loading ? (
-              <div className="h-8 w-16 bg-neutral-100 animate-pulse rounded-lg" />
+              <div className="h-7 w-12 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
             ) : (
               data?.totalCustomers
             )}
           </div>
-          <div className="mt-2 text-[11px] text-neutral-500 font-medium">
-            Active salon clients registered
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#77717A] dark:text-[#B5AAB8] font-medium truncate">
+            Salon clients registered
           </div>
         </div>
 
         {/* Active Staff */}
-        <div className="bg-white p-5 rounded-3xl border border-neutral-200 shadow-sm relative overflow-hidden group hover:border-[#b3135b]/40 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-              Active Stylists
+        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
+              Stylists
             </span>
-            <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-              <UserCheck className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#2F7D68] dark:text-[#55B99A] flex items-center justify-center">
+              <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-[#2a1630]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
             {loading ? (
-              <div className="h-8 w-12 bg-neutral-100 animate-pulse rounded-lg" />
+              <div className="h-7 w-12 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
             ) : (
               data?.activeStaff
             )}
           </div>
-          <div className="mt-2 text-[11px] text-emerald-600 font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Available for booking</span>
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#2F7D68] dark:text-[#55B99A] font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-pulse shrink-0" />
+            <span className="truncate">Available for booking</span>
           </div>
         </div>
       </div>
 
       {/* Daily Revenue Chart Section */}
-      <div className="bg-white p-4 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#b3135b] animate-ping" />
-              <h2 className="text-base sm:text-lg font-bold text-[#2a1630]">Revenue Trajectory & Daily Performance</h2>
+              <span className="w-2 h-2 rounded-full bg-[#4B263F] dark:bg-[#D6A0B4] animate-ping" />
+              <h2 className="text-base sm:text-lg font-bold text-[#242126] dark:text-[#F5EFF5]">Revenue Trajectory & Daily Performance</h2>
             </div>
-            <p className="text-xs text-neutral-400">Smooth trendline of verified client billing in this period</p>
+            <p className="text-xs text-[#77717A] dark:text-[#B5AAB8]">Smooth trendline of verified client billing in this period</p>
           </div>
-          <div className="text-xs font-mono font-bold text-neutral-600 bg-neutral-50 px-3 py-1.5 rounded-xl border border-neutral-200/80">
+          <div className="text-xs font-mono font-bold text-[#242126] dark:text-[#F5EFF5] bg-[#F1EBEF] dark:bg-[#2B2230] px-3 py-1.5 rounded-xl border border-[#E8E1E5] dark:border-[#3A3040] w-fit">
             Peak Day: ₹{maxChartAmount.toLocaleString('en-IN')}
           </div>
         </div>
 
         {/* Interactive SVG Area Chart */}
         {loading ? (
-          <div className="h-52 w-full bg-neutral-50 rounded-2xl animate-pulse flex items-center justify-center text-xs text-neutral-400">
+          <div className="h-52 w-full bg-[#F7F5F2] dark:bg-[#151218] rounded-2xl animate-pulse flex items-center justify-center text-xs text-[#77717A] dark:text-[#B5AAB8]">
             Loading chart analytics...
           </div>
         ) : !data?.chartData || data.chartData.length === 0 ? (
-          <div className="h-52 w-full flex items-center justify-center text-xs text-neutral-400">
+          <div className="h-52 w-full flex items-center justify-center text-xs text-[#77717A] dark:text-[#B5AAB8]">
             No transaction records found for this period
           </div>
         ) : (
           <AreaTrendChart
             data={data.chartData.map((d) => ({ label: d.label, value: d.amount }))}
-            color="#b3135b"
+            color="#4B263F"
             height={220}
           />
         )}
       </div>
 
       {/* 2x2 Performance Analytics Grid (Full responsive breathing room) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Popular Services Ranking Chart */}
-        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Top Services Performance</h3>
-              <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">By Revenue</span>
+              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Top Services Performance</h3>
+              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">By Revenue</span>
             </div>
 
             {data?.popularServices.length === 0 ? (
-              <div className="text-xs text-neutral-400 py-8 text-center">No service data in this period</div>
+              <div className="text-xs text-[#77717A] dark:text-[#B5AAB8] py-8 text-center">No service data in this period</div>
             ) : (
               <BarComparisonChart
                 items={data?.popularServices.map((svc) => ({
@@ -385,7 +385,7 @@ export default function DashboardPage() {
                   label: svc.name,
                   sublabel: `${svc.count} booked`,
                   value: Number(svc.revenue),
-                  color: '#b3135b',
+                  color: '#4B263F',
                 })) || []}
               />
             )}
@@ -393,27 +393,27 @@ export default function DashboardPage() {
 
           <Link
             href="/app/services"
-            className="mt-4 pt-3 border-t border-neutral-100 text-xs font-semibold text-[#b3135b] hover:underline flex items-center justify-center gap-1"
+            className="mt-4 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] text-xs font-semibold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center justify-center gap-1"
           >
             Manage Services Catalog →
           </Link>
         </div>
 
         {/* Visual Revenue Breakdown Donut */}
-        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Service Category Share</h3>
-              <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Distribution</span>
+              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Service Category Share</h3>
+              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">Distribution</span>
             </div>
 
             {(!data?.totalRevenue || data.totalRevenue === 0) ? (
-              <div className="py-8 text-center text-neutral-400">
-                <div className="w-12 h-12 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center mx-auto mb-2">
+              <div className="py-8 text-center text-[#77717A] dark:text-[#B5AAB8]">
+                <div className="w-12 h-12 rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#B77A91] dark:text-[#D6A0B4] flex items-center justify-center mx-auto mb-2">
                   <PieChart className="w-6 h-6" />
                 </div>
-                <p className="text-xs font-semibold text-neutral-600">No revenue data in this period</p>
-                <p className="text-[11px] text-neutral-400 mt-0.5">Category breakdown will update after client invoices</p>
+                <p className="text-xs font-semibold text-[#242126] dark:text-[#F5EFF5]">No revenue data in this period</p>
+                <p className="text-[11px] text-[#77717A] dark:text-[#B5AAB8] mt-0.5">Category breakdown will update after client invoices</p>
               </div>
             ) : (
               <DonutDistributionChart
@@ -422,10 +422,10 @@ export default function DashboardPage() {
                 centerLabel="Revenue"
                 centerValue={`₹${(data.totalRevenue > 1000 ? Math.round(data.totalRevenue / 1000) + 'k' : data.totalRevenue)}`}
                 data={[
-                  { label: 'Hair & Styling', value: Math.max(1, Math.round(data.totalRevenue * 0.45)), color: '#b3135b' },
-                  { label: 'Facial & Skin', value: Math.max(1, Math.round(data.totalRevenue * 0.25)), color: '#8b5cf6' },
-                  { label: 'Spa & Massage', value: Math.max(1, Math.round(data.totalRevenue * 0.18)), color: '#ec4899' },
-                  { label: 'Retail Products', value: Math.max(1, Math.round(data.totalRevenue * 0.12)), color: '#10b981' },
+                  { label: 'Hair & Styling', value: Math.max(1, Math.round(data.totalRevenue * 0.45)), color: '#4B263F' },
+                  { label: 'Facial & Skin', value: Math.max(1, Math.round(data.totalRevenue * 0.25)), color: '#B77A91' },
+                  { label: 'Spa & Massage', value: Math.max(1, Math.round(data.totalRevenue * 0.18)), color: '#C69A5D' },
+                  { label: 'Retail Products', value: Math.max(1, Math.round(data.totalRevenue * 0.12)), color: '#2F7D68' },
                 ]}
               />
             )}
@@ -433,18 +433,18 @@ export default function DashboardPage() {
 
           <Link
             href="/app/reports"
-            className="mt-4 pt-3 border-t border-neutral-100 text-xs font-semibold text-[#b3135b] hover:underline flex items-center justify-center gap-1"
+            className="mt-4 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] text-xs font-semibold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center justify-center gap-1"
           >
             Detailed Financial Ledger →
           </Link>
         </div>
 
         {/* Peak Hours Traffic Density */}
-        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Peak Rush Hours</h3>
-              <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Peak Rush Hours</h3>
+              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">
                 {salonHours.open} - {salonHours.close}
               </span>
             </div>
@@ -456,31 +456,31 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
-            <span>Peak slot: <strong>5 PM - 6 PM</strong></span>
-            <span className="text-pink-600 font-bold">Highest booking density</span>
+          <div className="mt-4 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] flex items-center justify-between text-xs text-[#77717A] dark:text-[#B5AAB8]">
+            <span>Peak slot: <strong className="text-[#242126] dark:text-[#F5EFF5]">5 PM - 6 PM</strong></span>
+            <span className="text-[#2F7D68] dark:text-[#55B99A] font-bold">Highest density</span>
           </div>
         </div>
 
         {/* Invoice Payment Status Counts */}
-        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-neutral-200 shadow-sm flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Payment Health</h3>
-              <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Settlements</span>
+              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Payment Health</h3>
+              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">Settlements</span>
             </div>
 
             <div className="space-y-4 pt-2">
               {/* Paid Invoices */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span className="text-emerald-700 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-[#2F7D68] dark:text-[#55B99A] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#2F7D68] dark:bg-[#55B99A]" />
                     Fully Paid Invoices
                   </span>
-                  <span className="font-bold text-[#2a1630]">{data?.paymentStatusCounts.paid || 0}</span>
+                  <span className="font-bold text-[#242126] dark:text-[#F5EFF5]">{data?.paymentStatusCounts.paid || 0}</span>
                 </div>
-                <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#F1EBEF] dark:bg-[#2B2230] rounded-full overflow-hidden">
                   <div
                     style={{
                       width: `${
@@ -494,7 +494,7 @@ export default function DashboardPage() {
                         100
                       }%`,
                     }}
-                    className="h-full bg-emerald-500 rounded-full transition-all"
+                    className="h-full bg-[#2F7D68] dark:bg-[#55B99A] rounded-full transition-all"
                   />
                 </div>
               </div>
@@ -502,13 +502,13 @@ export default function DashboardPage() {
               {/* Partial Invoices */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span className="text-amber-700 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  <span className="text-[#C69A5D] dark:text-[#D4AD76] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#C69A5D] dark:bg-[#D4AD76]" />
                     Partially Paid Invoices
                   </span>
-                  <span className="font-bold text-[#2a1630]">{data?.paymentStatusCounts.partial || 0}</span>
+                  <span className="font-bold text-[#242126] dark:text-[#F5EFF5]">{data?.paymentStatusCounts.partial || 0}</span>
                 </div>
-                <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#F1EBEF] dark:bg-[#2B2230] rounded-full overflow-hidden">
                   <div
                     style={{
                       width: `${
@@ -522,7 +522,7 @@ export default function DashboardPage() {
                         100
                       }%`,
                     }}
-                    className="h-full bg-amber-500 rounded-full transition-all"
+                    className="h-full bg-[#C69A5D] dark:bg-[#D4AD76] rounded-full transition-all"
                   />
                 </div>
               </div>
@@ -530,13 +530,13 @@ export default function DashboardPage() {
               {/* Pending Invoices */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span className="text-rose-700 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  <span className="text-[#C65B62] dark:text-[#EF858B] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#C65B62] dark:bg-[#EF858B]" />
                     Unpaid Pending Invoices
                   </span>
-                  <span className="font-bold text-[#2a1630]">{data?.paymentStatusCounts.pending || 0}</span>
+                  <span className="font-bold text-[#242126] dark:text-[#F5EFF5]">{data?.paymentStatusCounts.pending || 0}</span>
                 </div>
-                <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#F1EBEF] dark:bg-[#2B2230] rounded-full overflow-hidden">
                   <div
                     style={{
                       width: `${
@@ -550,7 +550,7 @@ export default function DashboardPage() {
                         100
                       }%`,
                     }}
-                    className="h-full bg-rose-500 rounded-full transition-all"
+                    className="h-full bg-[#C65B62] dark:bg-[#EF858B] rounded-full transition-all"
                   />
                 </div>
               </div>
@@ -559,7 +559,7 @@ export default function DashboardPage() {
 
           <Link
             href="/app/billing"
-            className="mt-6 pt-3 border-t border-neutral-100 text-xs font-semibold text-[#b3135b] hover:underline flex items-center justify-center gap-1"
+            className="mt-6 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] text-xs font-semibold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center justify-center gap-1"
           >
             Process Billing & Invoices →
           </Link>
@@ -567,17 +567,17 @@ export default function DashboardPage() {
       </div>
 
       {/* Bottom Grid: Upcoming Appointments & Low Stock Warnings */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Upcoming Appointments */}
-        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm">
+        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-sm sm:text-base text-[#2a1630]">Upcoming Appointments</h3>
-              <p className="text-xs text-neutral-400">Next scheduled salon visits</p>
+              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Upcoming Appointments</h3>
+              <p className="text-xs text-[#77717A] dark:text-[#B5AAB8]">Next scheduled salon visits</p>
             </div>
             <Link
               href="/app/appointments"
-              className="text-xs font-bold text-[#b3135b] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center gap-1"
             >
               All Appointments →
             </Link>
@@ -585,26 +585,26 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             {!data?.recentAppointments || data.recentAppointments.length === 0 ? (
-              <div className="text-xs text-neutral-400 py-6 text-center">No scheduled appointments</div>
+              <div className="text-xs text-[#77717A] dark:text-[#B5AAB8] py-6 text-center">No scheduled appointments</div>
             ) : (
               data.recentAppointments.map((appt) => (
                 <div
                   key={appt.id}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-[#F7F5F2] dark:bg-[#151218] border border-[#E8E1E5] dark:border-[#3A3040]"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#b3135b]/10 text-[#b3135b] flex items-center justify-center font-bold text-xs text-center leading-tight">
+                    <div className="w-9 h-9 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] flex items-center justify-center font-bold text-xs text-center leading-tight">
                       {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-[#2a1630]">{appt.customer_name}</div>
-                      <div className="text-[11px] text-neutral-500">
+                      <div className="text-xs font-bold text-[#242126] dark:text-[#F5EFF5]">{appt.customer_name}</div>
+                      <div className="text-[11px] text-[#77717A] dark:text-[#B5AAB8]">
                         {appt.service_name} · Stylist: {appt.staff_name}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-pink-50 text-[#b3135b] border border-pink-200">
+                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] border border-[#E8E1E5] dark:border-[#3A3040]">
                       {appt.status}
                     </span>
                   </div>
@@ -615,20 +615,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Low Stock Product Alerts */}
-        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm">
+        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-sm sm:text-base text-[#2a1630] flex items-center gap-2">
+              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5] flex items-center gap-2">
                 <span>Inventory Alerts</span>
                 {data?.lowStockProducts && data.lowStockProducts.length > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-[#C65B62] dark:bg-[#EF858B] animate-ping" />
                 )}
               </h3>
-              <p className="text-xs text-neutral-400">Products at or below reorder threshold</p>
+              <p className="text-xs text-[#77717A] dark:text-[#B5AAB8]">Products at or below reorder threshold</p>
             </div>
             <Link
               href="/app/live"
-              className="text-xs font-bold text-[#b3135b] hover:underline"
+              className="text-xs font-bold text-[#4B263F] dark:text-[#D6A0B4] hover:underline"
             >
               Open Live Studio →
             </Link>
@@ -636,26 +636,26 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             {!data?.lowStockProducts || data.lowStockProducts.length === 0 ? (
-              <div className="text-xs text-emerald-600 font-medium py-6 text-center bg-emerald-50 rounded-2xl border border-emerald-100">
+              <div className="text-xs text-[#2F7D68] dark:text-[#55B99A] font-medium py-6 text-center bg-[#2F7D68]/10 dark:bg-[#55B99A]/15 rounded-2xl border border-[#2F7D68]/20 dark:border-[#55B99A]/30">
                 ✓ All retail product stocks are healthy!
               </div>
             ) : (
               data.lowStockProducts.map((p, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3.5 rounded-2xl bg-rose-50/60 border border-rose-200/60"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-[#C65B62]/10 dark:bg-[#EF858B]/15 border border-[#C65B62]/30 dark:border-[#EF858B]/30"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs">
+                    <div className="w-9 h-9 rounded-xl bg-[#C65B62]/20 text-[#C65B62] dark:text-[#EF858B] flex items-center justify-center font-bold text-xs">
                       <AlertTriangle className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-neutral-800">{p.name}</div>
-                      <div className="text-[11px] text-neutral-500">Retail: ₹{Number(p.price)}</div>
+                      <div className="text-xs font-bold text-[#242126] dark:text-[#F5EFF5]">{p.name}</div>
+                      <div className="text-[11px] text-[#77717A] dark:text-[#B5AAB8]">Retail: ₹{Number(p.price)}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-bold text-rose-600 bg-rose-100 px-2.5 py-1 rounded-xl">
+                    <span className="text-xs font-bold text-[#C65B62] dark:text-[#EF858B] bg-white dark:bg-[#211B24] border border-[#C65B62]/40 px-2.5 py-1 rounded-xl">
                       {p.stock} left (Min: {p.min_stock})
                     </span>
                   </div>

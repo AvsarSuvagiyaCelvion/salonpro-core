@@ -21,38 +21,38 @@ export default function LandingNavbar() {
   return (
     <>
       {/* Top Demo & Offer Announcement Ribbon in Regal Plum + Champagne Gold */}
-      <div className="bg-[#4B263F] text-[#F1EBEF] text-[11px] sm:text-xs py-2 px-3 text-center font-medium tracking-wide flex items-center justify-center gap-2 relative z-50">
-        <span className="bg-[#C69A5D] text-[#242126] px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">
+      <div className="bg-[#4B263F] text-[#F1EBEF] text-[10px] sm:text-xs py-1.5 px-2.5 text-center font-medium tracking-wide flex items-center justify-center gap-1.5 sm:gap-2 relative z-50">
+        <span className="bg-[#C69A5D] text-[#242126] px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider shrink-0">
           7-Day Free Trial
         </span>
         <span className="hidden sm:inline">
           Test-drive SalonPro free for 7 days with zero upfront payment & no credit card required!
         </span>
-        <span className="sm:hidden">
-          7-Day Free Trial · Zero Upfront Payment!
+        <span className="sm:hidden text-[10px] text-white/90 truncate max-w-[160px]">
+          Zero Upfront Payment
         </span>
         <Link
           href="/register-salon"
-          className="underline font-bold text-[#D4AD76] hover:text-white ml-1 whitespace-nowrap"
+          className="font-bold text-[#D4AD76] hover:text-white underline text-[10px] sm:text-xs whitespace-nowrap shrink-0"
         >
-          Start Free Trial ➔
+          Start ➔
         </Link>
       </div>
 
       <nav
         className={`sticky top-0 z-50 border-b transition-all duration-300 w-full max-w-full ${
           scrolled
-            ? 'bg-[#F7F5F2]/90 dark:bg-[#151218]/90 backdrop-blur-xl shadow-xs border-[#E8E1E5] dark:border-[#3A3040] py-2.5 sm:py-3'
-            : 'bg-[#F7F5F2]/95 dark:bg-[#151218]/95 backdrop-blur-md border-[#E8E1E5] dark:border-[#3A3040] py-3.5 sm:py-4.5'
-        } px-3 sm:px-6`}
+            ? 'bg-[#F7F5F2]/90 dark:bg-[#151218]/90 backdrop-blur-xl shadow-xs border-[#E8E1E5] dark:border-[#3A3040] py-2 sm:py-3'
+            : 'bg-[#F7F5F2]/95 dark:bg-[#151218]/95 backdrop-blur-md border-[#E8E1E5] dark:border-[#3A3040] py-2.5 sm:py-4.5'
+        } px-2.5 sm:px-6`}
       >
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#4B263F] dark:bg-[#2B2230] dark:border dark:border-[#3A3040] flex items-center justify-center font-black text-base sm:text-xl text-white dark:text-[#D6A0B4] shadow-md shadow-[#4B263F]/15 shrink-0 group-hover:rotate-12 transition-transform duration-300">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0 group">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#4B263F] dark:bg-[#2B2230] dark:border dark:border-[#3A3040] flex items-center justify-center font-black text-sm sm:text-xl text-white dark:text-[#D6A0B4] shadow-md shadow-[#4B263F]/15 shrink-0 group-hover:rotate-12 transition-transform duration-300">
               ✂
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <span className="font-black text-base sm:text-xl text-[#242126] dark:text-[#F5EFF5] tracking-tight">
                 SalonPro
               </span>
@@ -99,21 +99,21 @@ export default function LandingNavbar() {
           </div>
 
           {/* Mobile Right Controls (< 640px) */}
-          <div className="flex sm:hidden items-center gap-2">
+          <div className="flex sm:hidden items-center gap-1.5">
             <ThemeToggle />
             <Link
               href="/register-salon"
-              className="px-2.5 py-1.5 rounded-lg bg-[#4B263F] dark:bg-[#D6A0B4] text-white dark:text-[#151218] text-[11px] font-bold shadow-xs active:scale-95 whitespace-nowrap"
+              className="hidden min-[380px]:inline-flex px-2 py-1.5 rounded-lg bg-[#4B263F] dark:bg-[#D6A0B4] text-white dark:text-[#151218] text-[10px] font-bold shadow-xs active:scale-95 whitespace-nowrap"
             >
-              7-Day Trial ➔
+              Trial ➔
             </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg border border-[#E8E1E5] dark:border-[#3A3040] text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#E8E1E5] dark:border-[#3A3040] text-[#242126] dark:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] cursor-pointer shrink-0"
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>

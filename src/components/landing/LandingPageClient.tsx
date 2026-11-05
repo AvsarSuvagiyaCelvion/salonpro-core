@@ -63,11 +63,11 @@ export default function LandingPageClient() {
           <FloatingIcons />
 
           {/* Live Beacon Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4B263F] dark:bg-[#2B2230] border border-[#E8E1E5]/40 dark:border-[#3A3040] text-white text-[11px] sm:text-xs font-bold mb-5 sm:mb-6 shadow-md shadow-[#4B263F]/15 max-w-full">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-ping inline-block" />
-            <span className="text-[#D4AD76] font-extrabold tracking-wide">LIVE DEMO AVAILABLE</span>
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-[#4B263F] dark:bg-[#2B2230] border border-[#E8E1E5]/40 dark:border-[#3A3040] text-white text-[10px] sm:text-xs font-bold mb-4 sm:mb-6 shadow-md shadow-[#4B263F]/15 max-w-full">
+            <span className="w-2 h-2 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-ping inline-block shrink-0" />
+            <span className="text-[#D4AD76] font-extrabold tracking-wide shrink-0">LIVE DEMO</span>
             <span className="text-white/40">·</span>
-            <span className="text-[#F5EFF5]/90">Smart Salon & Spa Management Suite</span>
+            <span className="text-[#F5EFF5]/90 truncate">Smart Salon & Spa Suite</span>
           </div>
 
           {/* H1 Typewriter Effect with Invisible CLS Barrier & Blinking Pink Caret */}

@@ -27,12 +27,12 @@ export default function LandingFooter() {
         {/* Main Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 sm:gap-12 pb-14 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
           {/* Column 1: Brand & Overview (Spans 2 cols on desktop) */}
-          <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="flex items-center gap-2.5 inline-flex">
+          <div className="lg:col-span-2 space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
+            <Link href="/" className="flex items-center justify-center md:justify-start gap-2.5 inline-flex">
               <div className="w-10 h-10 rounded-2xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xl text-[#D4A77F] shadow-md shadow-black/10">
                 ✂
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col text-left">
                 <span className="font-black text-xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-none">
                   SalonPro
                 </span>
@@ -42,17 +42,17 @@ export default function LandingFooter() {
               </div>
             </Link>
 
-            <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] leading-relaxed max-w-sm">
+            <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] leading-relaxed max-w-sm mx-auto md:mx-0">
               The modern all-in-one salon management suite built for hair studios, beauty parlours, unisex salons, and luxury wellness spas across India.
             </p>
 
             {/* Direct Contact Pills */}
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2 pt-2 flex flex-col items-center md:items-start w-full">
               <a
                 href={`https://wa.me/91${supportPhone}?text=Hello%20SalonPro%20Team,%20I%20am%20interested%20in%20a%20live%20walkthrough.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-[#10B981] hover:opacity-85 transition-opacity"
+                className="inline-flex items-center justify-center md:justify-start gap-2 text-xs font-semibold text-[#10B981] hover:opacity-85 transition-opacity"
               >
                 <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
                 <span>WhatsApp: +91 {supportPhone}</span>
@@ -60,7 +60,7 @@ export default function LandingFooter() {
               <div className="block">
                 <a
                   href={`mailto:${supportEmail}`}
-                  className="inline-flex items-center gap-1.5 text-xs text-[#6B7280] hover:text-[#1F2937] dark:text-[#A0A8B8] dark:hover:text-[#FFFFFF] transition-colors"
+                  className="inline-flex items-center justify-center md:justify-start gap-1.5 text-xs text-[#6B7280] hover:text-[#1F2937] dark:text-[#A0A8B8] dark:hover:text-[#FFFFFF] transition-colors"
                 >
                   <Mail className="w-3.5 h-3.5 text-[#D4A77F]" />
                   <span>{supportEmail}</span>
@@ -69,7 +69,7 @@ export default function LandingFooter() {
             </div>
 
             {/* Trust Badges */}
-            <div className="pt-3 flex flex-wrap gap-2 text-[11px]">
+            <div className="pt-3 flex flex-wrap justify-center md:justify-start gap-2 text-[11px]">
               <span className="px-2.5 py-1 rounded-xl bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF] font-medium inline-flex items-center gap-1 shadow-2xs">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#D4A77F]" />
                 <span>256-Bit SSL Encrypted</span>
@@ -82,11 +82,11 @@ export default function LandingFooter() {
           </div>
 
           {/* Column 2: Product & Modules */}
-          <div className="space-y-3">
+          <div className="space-y-3 text-center md:text-left">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937] dark:text-[#FFFFFF]">
               Features & Modules
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-xs flex flex-col items-center md:items-start">
               <li>
                 <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
                   Client Booking Engine
@@ -126,39 +126,48 @@ export default function LandingFooter() {
           </div>
 
           {/* Column 3: Live Portals & Demos */}
-          <div className="space-y-3">
+          <div className="space-y-3 text-center md:text-left">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937] dark:text-[#FFFFFF]">
               Live Portals
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-xs flex flex-col items-center md:items-start">
               <li>
                 <Link
                   href="/dixa-beauty-salon"
                   target="_blank"
-                  className="text-[#10B981] font-semibold inline-flex items-center gap-1 hover:underline"
+                  className="text-[#10B981] font-semibold inline-flex items-center justify-center md:justify-start gap-1 hover:underline"
                 >
                   <span>⚡ Live Booking Demo</span>
                   <ExternalLink className="w-3 h-3" />
                 </Link>
               </li>
               <li>
-                <Link href="/salon-owner" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center gap-1">
+                <a
+                  href="/api/demo/owner-login"
+                  className="text-amber-500 font-semibold inline-flex items-center justify-center md:justify-start gap-1 hover:underline"
+                >
+                  <span>🖥️ Owner ERP Demo (1-Click)</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </li>
+              <li>
+                <Link href="/salon-owner" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start gap-1">
                   <Lock className="w-3 h-3 text-[#6B7280] dark:text-[#A0A8B8]" />
                   <span>Salon Owner Sign In</span>
                 </Link>
               </li>
               <li>
-                <Link href="/register-salon" className="text-[#D4A77F] font-bold hover:underline">
+                <Link href="/register-salon" className="text-[#D4A77F] font-bold hover:underline inline-flex items-center justify-center md:justify-start">
                   Start 7-Day Free Trial
                 </Link>
               </li>
               <li>
-                <Link href="/portal" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/portal" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
                   Customer Appointment Portal
                 </Link>
               </li>
               <li>
-                <Link href="/admin/login" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors text-[#6B7280] dark:text-[#A0A8B8]">
+                <Link href="/admin/login" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors text-[#6B7280] dark:text-[#A0A8B8] inline-flex items-center justify-center md:justify-start">
                   Platform Admin Access
                 </Link>
               </li>
@@ -166,28 +175,28 @@ export default function LandingFooter() {
           </div>
 
           {/* Column 4: Legal & Policies */}
-          <div className="space-y-3">
+          <div className="space-y-3 text-center md:text-left">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#1F2937] dark:text-[#FFFFFF]">
               Legal & Support
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-xs flex flex-col items-center md:items-start">
               <li>
-                <Link href="/terms" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/terms" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
                   Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/privacy" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/refund-policy" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/refund-policy" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
                   Refund & Cancellation Policy
                 </Link>
               </li>
               <li>
-                <a href="#pricing" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <a href="#pricing" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
                   Subscription Pricing
                 </a>
               </li>
@@ -196,7 +205,7 @@ export default function LandingFooter() {
                   href={`https://wa.me/91${supportPhone}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors"
+                  className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start"
                 >
                   Help Desk & Onboarding
                 </a>
@@ -207,7 +216,7 @@ export default function LandingFooter() {
 
         {/* Bottom Strip: Clean, balanced copyright & quick legal links */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B7280] dark:text-[#A0A8B8] text-center sm:text-left">
-          <div className="space-y-1">
+          <div className="space-y-1 text-center sm:text-left">
             <p className="text-[#1F2937] dark:text-[#FFFFFF] font-medium">
               © 2026 SalonPro. All rights reserved.
             </p>

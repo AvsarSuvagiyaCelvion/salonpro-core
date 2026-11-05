@@ -413,12 +413,12 @@ export default function LiveStudioPage() {
       {/* Top Studio Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-pink-50 text-[#b3135b] flex items-center justify-center">
-            <Radio className="w-5 h-5 animate-pulse text-[#b3135b]" />
+          <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center">
+            <Radio className="w-5 h-5 animate-pulse text-[#D4A77F]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-extrabold text-[#2a1630]">
+              <h1 className="text-xl font-extrabold text-[#1F2937] dark:text-white">
                 Live Studio Floor
               </h1>
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -451,7 +451,7 @@ export default function LiveStudioPage() {
               setWaitName('');
               setIsWaitModalOpen(true);
             }}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer whitespace-nowrap"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Add Customer to Waiting</span>
@@ -497,7 +497,7 @@ export default function LiveStudioPage() {
           <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80 mb-3">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <h2 className="text-sm font-bold text-[#2a1630] uppercase tracking-wider">
+              <h2 className="text-sm font-bold text-[#1F2937] dark:text-white uppercase tracking-wider">
                 1. Waiting Area
               </h2>
             </div>
@@ -523,7 +523,7 @@ export default function LiveStudioPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="font-bold text-sm text-[#2a1630]">
+                      <div className="font-bold text-sm text-[#1F2937] dark:text-white">
                         {w.customer_name}
                       </div>
                       <div className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
@@ -548,7 +548,7 @@ export default function LiveStudioPage() {
 
                     <button
                       onClick={() => handleStartSession(w.customer_id, w.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#b3135b] hover:bg-[#960f4c] text-white font-semibold cursor-pointer shadow-xs active:scale-95 transition-all"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold font-semibold cursor-pointer shadow-xs active:scale-95 transition-all"
                     >
                       <Play className="w-3 h-3 fill-white" />
                       <span>Start Session</span>
@@ -565,7 +565,7 @@ export default function LiveStudioPage() {
           <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80 mb-3">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
-              <h2 className="text-sm font-bold text-[#2a1630] uppercase tracking-wider">
+              <h2 className="text-sm font-bold text-[#1F2937] dark:text-white uppercase tracking-wider">
                 2. In Service
               </h2>
             </div>
@@ -598,7 +598,7 @@ export default function LiveStudioPage() {
                     {/* Header */}
                     <div className="flex items-start justify-between pb-2 border-b border-neutral-100">
                       <div>
-                        <div className="font-bold text-sm text-[#2a1630]">
+                        <div className="font-bold text-sm text-[#1F2937] dark:text-white">
                           {s.customer_name}
                         </div>
                         <div className="text-[11px] text-neutral-400">
@@ -658,7 +658,7 @@ export default function LiveStudioPage() {
                     <div className="pt-2 border-t border-neutral-100 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-semibold text-neutral-500">Running Total:</span>
-                        <span className="font-black text-sm text-[#2a1630]">
+                        <span className="font-black text-sm text-[#1F2937] dark:text-white">
                           ₹{total.toLocaleString('en-IN')}
                         </span>
                       </div>
@@ -670,7 +670,7 @@ export default function LiveStudioPage() {
                             setSelectedServiceId(services[0]?.id || '');
                             setSelectedStaffId(staff[0]?.id || '');
                           }}
-                          className="py-1.5 px-2 rounded-lg border border-pink-200 bg-pink-50/50 hover:bg-pink-100/60 text-[#b3135b] font-semibold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="py-1.5 px-2 rounded-lg border border-[#D4A77F]/30 bg-[#D4A77F]/15 hover:bg-pink-100/60 text-[#D4A77F] font-semibold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
                         >
                           <Scissors className="w-3.5 h-3.5" />
                           <span>+ Service</span>
@@ -714,7 +714,7 @@ export default function LiveStudioPage() {
                           }
                         }}
                         disabled={s.items.length === 0}
-                        className="w-full py-2 px-3 rounded-lg bg-[#2a1630] hover:bg-[#3f2248] text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors"
+                        className="w-full py-2 px-3 rounded-lg bg-[#10141F] hover:bg-[#3f2248] text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 text-pink-400" />
                         <span>Complete Session</span>
@@ -732,7 +732,7 @@ export default function LiveStudioPage() {
           <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80 mb-3">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <h2 className="text-sm font-bold text-[#2a1630] uppercase tracking-wider">
+              <h2 className="text-sm font-bold text-[#1F2937] dark:text-white uppercase tracking-wider">
                 3. To Collect
               </h2>
             </div>
@@ -764,7 +764,7 @@ export default function LiveStudioPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-xs font-mono text-[#b3135b]">
+                          <span className="font-bold text-xs font-mono text-[#D4A77F]">
                             {inv.number}
                           </span>
                           <span
@@ -777,12 +777,12 @@ export default function LiveStudioPage() {
                             {isPaid ? 'PAID' : 'DUE'}
                           </span>
                         </div>
-                        <div className="font-bold text-sm text-[#2a1630] mt-0.5">
+                        <div className="font-bold text-sm text-[#1F2937] dark:text-white mt-0.5">
                           {inv.customer_name}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-black text-[#2a1630]">
+                        <div className="text-sm font-black text-[#1F2937] dark:text-white">
                           ₹{Number(inv.total).toLocaleString('en-IN')}
                         </div>
                         {Number(inv.discount_amount) > 0 && (
@@ -849,8 +849,8 @@ export default function LiveStudioPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <h2 className="text-base font-bold text-[#2a1630] flex items-center gap-2">
-                <User className="w-4 h-4 text-[#b3135b]" />
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <User className="w-4 h-4 text-[#D4A77F]" />
                 <span>Add Customer to Waiting Lounge</span>
               </h2>
               <button
@@ -872,7 +872,7 @@ export default function LiveStudioPage() {
                   value={waitMobile}
                   onChange={(e) => handleSearchCustomers(e.target.value)}
                   placeholder="e.g. 9825012345"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
 
                 {/* Suggestions Dropdown */}
@@ -887,7 +887,7 @@ export default function LiveStudioPage() {
                           setWaitName(cust.name);
                           setCustomerSuggestions([]);
                         }}
-                        className="w-full p-2 text-left hover:bg-pink-50/50 flex items-center justify-between text-xs cursor-pointer"
+                        className="w-full p-2 text-left hover:bg-[#D4A77F]/15 flex items-center justify-between text-xs cursor-pointer"
                       >
                         <span className="font-semibold text-neutral-800">{cust.name}</span>
                         <span className="text-neutral-500 font-mono">+91 {cust.mobile}</span>
@@ -907,7 +907,7 @@ export default function LiveStudioPage() {
                   value={waitName}
                   onChange={(e) => setWaitName(e.target.value)}
                   placeholder="e.g. Neha Mehta"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -922,7 +922,7 @@ export default function LiveStudioPage() {
                 <button
                   type="submit"
                   disabled={waitSubmitting}
-                  className="px-4 py-2 text-xs font-semibold bg-[#b3135b] hover:bg-[#960f4c] text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {waitSubmitting ? 'Adding...' : 'Add to Waiting'}
                 </button>
@@ -937,8 +937,8 @@ export default function LiveStudioPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <h2 className="text-base font-bold text-[#2a1630] flex items-center gap-2">
-                <Scissors className="w-4 h-4 text-[#b3135b]" />
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <Scissors className="w-4 h-4 text-[#D4A77F]" />
                 <span>Add Service ({serviceModalSession.customer_name})</span>
               </h2>
               <button
@@ -957,7 +957,7 @@ export default function LiveStudioPage() {
                 <select
                   value={selectedServiceId}
                   onChange={(e) => setSelectedServiceId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white"
                 >
                   {services.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -974,7 +974,7 @@ export default function LiveStudioPage() {
                 <select
                   value={selectedStaffId}
                   onChange={(e) => setSelectedStaffId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white"
                 >
                   {staff.map((st) => (
                     <option key={st.id} value={st.id}>
@@ -994,7 +994,7 @@ export default function LiveStudioPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold bg-[#b3135b] hover:bg-[#960f4c] text-white rounded-xl shadow-md cursor-pointer"
+                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer"
                 >
                   Add Service
                 </button>
@@ -1009,7 +1009,7 @@ export default function LiveStudioPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <h2 className="text-base font-bold text-[#2a1630] flex items-center gap-2">
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
                 <Package className="w-4 h-4 text-purple-600" />
                 <span>Add Product ({productModalSession.customer_name})</span>
               </h2>
@@ -1029,7 +1029,7 @@ export default function LiveStudioPage() {
                 <select
                   value={selectedProductId}
                   onChange={(e) => setSelectedProductId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white"
                 >
                   {products.map((p) => (
                     <option key={p.id} value={p.id} disabled={p.stock <= 0}>
@@ -1049,7 +1049,7 @@ export default function LiveStudioPage() {
                   max="10"
                   value={productQty}
                   onChange={(e) => setProductQty(parseInt(e.target.value, 10))}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -1078,8 +1078,8 @@ export default function LiveStudioPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-lg w-full p-6 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <h2 className="text-base font-bold text-[#2a1630] flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-[#b3135b]" />
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-[#D4A77F]" />
                 <span>Complete Session & Apply Discounts</span>
               </h2>
               <button
@@ -1194,16 +1194,16 @@ export default function LiveStudioPage() {
                   </div>
 
                   {/* Grand Total */}
-                  <div className="p-3 bg-pink-50/70 border border-pink-200 rounded-xl flex items-center justify-between">
+                  <div className="p-3 bg-[#D4A77F]/15 border border-[#D4A77F]/30 rounded-xl flex items-center justify-between">
                     <div>
-                      <span className="text-xs font-bold text-[#2a1630] uppercase">
+                      <span className="text-xs font-bold text-[#1F2937] dark:text-white uppercase">
                         Invoice Total:
                       </span>
                       <div className="text-[11px] text-emerald-700">
                         Discounts applied: ₹{(srvDisc + prodDisc).toFixed(2)}
                       </div>
                     </div>
-                    <div className="text-2xl font-black text-[#b3135b]">
+                    <div className="text-2xl font-black text-[#D4A77F]">
                       ₹{grandTotal.toFixed(2)}
                     </div>
                   </div>
@@ -1219,7 +1219,7 @@ export default function LiveStudioPage() {
                     <button
                       type="submit"
                       disabled={completing}
-                      className="px-4 py-2 text-xs font-semibold bg-[#b3135b] hover:bg-[#960f4c] text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                      className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                     >
                       {completing ? 'Generating Bill...' : 'Complete & Generate Invoice'}
                     </button>
@@ -1236,7 +1236,7 @@ export default function LiveStudioPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <h2 className="text-base font-bold text-[#2a1630] flex items-center gap-2">
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-emerald-600" />
                 <span>Collect Payment ({paymentModalInvoice.number})</span>
               </h2>
@@ -1276,7 +1276,7 @@ export default function LiveStudioPage() {
                       onClick={() => setPayMethod(m)}
                       className={`py-2 text-xs font-semibold uppercase rounded-xl border transition-all cursor-pointer ${
                         payMethod === m
-                          ? 'border-[#b3135b] bg-pink-50 text-[#b3135b] shadow-xs'
+                          ? 'border-[#D4A77F] bg-[#D4A77F]/10 text-[#D4A77F] shadow-xs'
                           : 'border-neutral-200 text-neutral-600 hover:bg-neutral-50'
                       }`}
                     >
@@ -1296,7 +1296,7 @@ export default function LiveStudioPage() {
                   required
                   value={payAmount}
                   onChange={(e) => setPayAmount(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none font-bold text-sm"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none font-bold text-sm"
                 />
               </div>
 
@@ -1309,7 +1309,7 @@ export default function LiveStudioPage() {
                   placeholder="e.g. UPI/12345678 or Cash"
                   value={payRef}
                   onChange={(e) => setPayRef(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 

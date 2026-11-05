@@ -236,7 +236,7 @@ export default function CustomersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Client Directory
           </h1>
           <p className="text-sm text-neutral-500 mt-0.5">
@@ -259,7 +259,7 @@ export default function CustomersPage() {
 
           <button
             onClick={openAddModal}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer whitespace-nowrap"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Client</span>
@@ -298,7 +298,7 @@ export default function CustomersPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by client name, mobile or email..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-xs text-neutral-800 focus:outline-none focus:border-[#b3135b] focus:ring-1 focus:ring-[#b3135b]"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 bg-white text-xs text-neutral-800 focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
         />
       </div>
 
@@ -328,14 +328,14 @@ export default function CustomersPage() {
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {customers.map((c) => (
-                  <tr key={c.id} className="hover:bg-pink-50/20 transition-colors">
+                  <tr key={c.id} className="hover:bg-[#D4A77F]/10 transition-colors">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-pink-50 text-[#b3135b] flex items-center justify-center font-bold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center font-bold text-xs">
                           {c.name.slice(0, 1)}
                         </div>
                         <div>
-                          <div className="font-bold text-sm text-[#2a1630]">
+                          <div className="font-bold text-sm text-[#1F2937] dark:text-white">
                             {c.name}
                           </div>
                           <div className="text-[10px] text-neutral-400">
@@ -365,7 +365,7 @@ export default function CustomersPage() {
                         </p>
                       ) : null}
                       {c.birthday && (
-                        <div className="flex items-center gap-1 text-[11px] text-pink-700">
+                        <div className="flex items-center gap-1 text-[11px] text-[#D4A77F]">
                           <Calendar className="w-3 h-3 text-pink-500" />
                           <span>B'day: {new Date(c.birthday).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
                         </div>
@@ -378,7 +378,7 @@ export default function CustomersPage() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <div className="font-bold text-sm text-[#2a1630]">
+                      <div className="font-bold text-sm text-[#1F2937] dark:text-white">
                         ₹{Number(c.total_spent).toLocaleString('en-IN')}
                       </div>
                       <div className="text-[10px] text-neutral-400">
@@ -389,7 +389,7 @@ export default function CustomersPage() {
                     <td className="py-3 px-4 text-center">
                       <button
                         onClick={() => openCustomerBillsModal(c)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-pink-200 bg-pink-50 hover:bg-pink-100/70 text-[#b3135b] font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D4A77F]/30 bg-[#D4A77F]/10 hover:bg-pink-100/70 text-[#D4A77F] font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
                         title="View all bills & services for this customer"
                       >
                         <Receipt className="w-3.5 h-3.5" />
@@ -399,7 +399,7 @@ export default function CustomersPage() {
                     <td className="py-3 px-4 text-right space-x-1">
                       <button
                         onClick={() => openEditModal(c)}
-                        className="p-1.5 text-neutral-500 hover:text-[#b3135b] hover:bg-pink-50 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-500 hover:text-[#D4A77F] hover:bg-[#D4A77F]/10 rounded-lg transition-colors cursor-pointer"
                         title="Edit client profile"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -451,11 +451,11 @@ export default function CustomersPage() {
             {/* Modal Header */}
             <div className="flex items-start justify-between pb-3 border-b border-neutral-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-pink-50 text-[#b3135b] flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center font-bold text-sm">
                   <Receipt className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#2a1630]">
+                  <h2 className="text-base font-bold text-[#1F2937] dark:text-white">
                     Bill History: {selectedCustomerForBills.name}
                   </h2>
                   <p className="text-xs text-neutral-500 flex items-center gap-1.5 mt-0.5">
@@ -493,7 +493,7 @@ export default function CustomersPage() {
                     {/* Invoice top summary */}
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-sm text-[#b3135b]">
+                        <span className="font-mono font-bold text-sm text-[#D4A77F]">
                           {inv.number}
                         </span>
                         <span
@@ -532,7 +532,7 @@ export default function CustomersPage() {
                           <div key={idx} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-1.5">
                               {item.kind === 'service' ? (
-                                <Scissors className="w-3 h-3 text-[#b3135b]" />
+                                <Scissors className="w-3 h-3 text-[#D4A77F]" />
                               ) : (
                                 <Package className="w-3 h-3 text-purple-600" />
                               )}
@@ -567,7 +567,7 @@ export default function CustomersPage() {
                             </span>
                           )}
                         </div>
-                        <div className="text-sm font-black text-[#2a1630]">
+                        <div className="text-sm font-black text-[#1F2937] dark:text-white">
                           Bill Total: ₹{Number(inv.total).toLocaleString('en-IN')}
                         </div>
                       </div>
@@ -599,8 +599,8 @@ export default function CustomersPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
-              <h2 className="text-lg font-bold text-[#2a1630] flex items-center gap-2">
-                <Users className="w-4 h-4 text-[#b3135b]" />
+              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#D4A77F]" />
                 <span>{editingCustomer ? 'Edit Client Profile' : 'Register New Client'}</span>
               </h2>
               <button
@@ -622,7 +622,7 @@ export default function CustomersPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Radhika Sharma"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -636,7 +636,7 @@ export default function CustomersPage() {
                   value={formMobile}
                   onChange={(e) => setFormMobile(e.target.value)}
                   placeholder="e.g. 9825012345"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -649,7 +649,7 @@ export default function CustomersPage() {
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder="e.g. radhika@example.com"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -661,7 +661,7 @@ export default function CustomersPage() {
                   type="date"
                   value={formBirthday}
                   onChange={(e) => setFormBirthday(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -674,7 +674,7 @@ export default function CustomersPage() {
                   value={formNote}
                   onChange={(e) => setFormNote(e.target.value)}
                   placeholder="e.g. Likes mild shampoo, allergic to ammonia, prefers morning slots..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -689,7 +689,7 @@ export default function CustomersPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 text-xs font-semibold bg-[#b3135b] hover:bg-[#960f4c] text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : editingCustomer ? 'Update Profile' : 'Add Client'}
                 </button>
@@ -756,7 +756,7 @@ export default function CustomersPage() {
                         onClick={() => setBroadcastAudience('all')}
                         className={`p-3 rounded-2xl border text-left cursor-pointer transition-all ${
                           broadcastAudience === 'all'
-                            ? 'bg-pink-50/60 border-[#b3135b] ring-1 ring-[#b3135b]'
+                            ? 'bg-[#D4A77F]/15 border-[#D4A77F] ring-1 ring-[#D4A77F]'
                             : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100'
                         }`}
                       >
@@ -771,7 +771,7 @@ export default function CustomersPage() {
                         onClick={() => setBroadcastAudience('regulars')}
                         className={`p-3 rounded-2xl border text-left cursor-pointer transition-all ${
                           broadcastAudience === 'regulars'
-                            ? 'bg-pink-50/60 border-[#b3135b] ring-1 ring-[#b3135b]'
+                            ? 'bg-[#D4A77F]/15 border-[#D4A77F] ring-1 ring-[#D4A77F]'
                             : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100'
                         }`}
                       >
@@ -796,7 +796,7 @@ export default function CustomersPage() {
                             'Special Festival Offer! 🌸 Enjoy 20% OFF on all Hair & Facial treatments this week at our salon. Book your slot online in 15 seconds!'
                           )
                         }
-                        className="text-[10px] text-[#b3135b] font-semibold hover:underline"
+                        className="text-[10px] text-[#D4A77F] font-semibold hover:underline"
                       >
                         Load Template
                       </button>
@@ -806,7 +806,7 @@ export default function CustomersPage() {
                       value={broadcastMessage}
                       onChange={(e) => setBroadcastMessage(e.target.value)}
                       placeholder="Type your WhatsApp offer text..."
-                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                     />
                   </div>
 
@@ -846,7 +846,7 @@ export default function CustomersPage() {
                     </div>
                     <div className="flex items-center justify-between text-xs font-extrabold text-amber-950 pt-1 border-t border-amber-200">
                       <span>Total Estimated Cost:</span>
-                      <span className="text-[#b3135b]">
+                      <span className="text-[#D4A77F]">
                         ₹
                         {(
                           (broadcastAudience === 'all'

@@ -186,7 +186,7 @@ export default function ServicesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Service Catalog
           </h1>
           <p className="text-sm text-neutral-500 mt-0.5">
@@ -196,7 +196,7 @@ export default function ServicesPage() {
 
         <button
           onClick={openAddModal}
-          className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer w-full sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Service</span>
@@ -235,7 +235,7 @@ export default function ServicesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search service by name or description..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-neutral-200 bg-white text-xs text-neutral-800 focus:outline-none focus:border-[#b3135b]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-neutral-200 bg-white text-xs text-neutral-800 focus:outline-none focus:border-[#D4A77F]"
           />
         </div>
 
@@ -246,7 +246,7 @@ export default function ServicesPage() {
               onClick={() => setCategoryFilter(cat)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
                 categoryFilter === cat
-                  ? 'bg-[#2a1630] text-white shadow-xs'
+                  ? 'bg-[#10141F] text-white shadow-xs'
                   : 'bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50'
               }`}
             >
@@ -281,9 +281,9 @@ export default function ServicesPage() {
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {filteredServices.map((service) => (
-                  <tr key={service.id} className="hover:bg-pink-50/20 transition-colors">
+                  <tr key={service.id} className="hover:bg-[#D4A77F]/10 transition-colors">
                     <td className="py-3 px-4 max-w-xs">
-                      <div className="font-bold text-sm text-[#2a1630]">
+                      <div className="font-bold text-sm text-[#1F2937] dark:text-white">
                         {service.name}
                       </div>
                       {service.description && (
@@ -326,7 +326,7 @@ export default function ServicesPage() {
                     <td className="py-3 px-4 text-right space-x-1">
                       <button
                         onClick={() => openEditModal(service)}
-                        className="p-1.5 text-neutral-500 hover:text-[#b3135b] hover:bg-pink-50 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-500 hover:text-[#D4A77F] hover:bg-[#D4A77F]/10 rounded-lg transition-colors cursor-pointer"
                         title="Edit service"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -352,8 +352,8 @@ export default function ServicesPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
             <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
-              <h2 className="text-lg font-bold text-[#2a1630] flex items-center gap-2">
-                <Scissors className="w-4 h-4 text-[#b3135b]" />
+              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <Scissors className="w-4 h-4 text-[#D4A77F]" />
                 <span>{editingService ? 'Edit Service' : 'Add New Service'}</span>
               </h2>
               <button
@@ -375,7 +375,7 @@ export default function ServicesPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Balayage Hair Color"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] focus:ring-1 focus:ring-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -387,7 +387,7 @@ export default function ServicesPage() {
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none bg-white"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white"
                   >
                     <option value="Hair">Hair</option>
                     <option value="Skin">Skin</option>
@@ -410,7 +410,7 @@ export default function ServicesPage() {
                     step="1"
                     value={formDuration}
                     onChange={(e) => setFormDuration(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                   />
                 </div>
               </div>
@@ -427,7 +427,7 @@ export default function ServicesPage() {
                   value={formPrice}
                   onChange={(e) => setFormPrice(e.target.value)}
                   placeholder="e.g. 499, 999 or 1099"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -440,7 +440,7 @@ export default function ServicesPage() {
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Short description of the procedure..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -450,7 +450,7 @@ export default function ServicesPage() {
                   id="online_toggle"
                   checked={formOnline}
                   onChange={(e) => setFormOnline(e.target.checked)}
-                  className="rounded text-[#b3135b] focus:ring-[#b3135b] cursor-pointer"
+                  className="rounded text-[#D4A77F] focus:ring-[#D4A77F] cursor-pointer"
                 />
                 <label htmlFor="online_toggle" className="text-xs text-neutral-700 cursor-pointer select-none">
                   Enable for public online appointment booking
@@ -468,7 +468,7 @@ export default function ServicesPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 text-xs font-semibold bg-[#b3135b] hover:bg-[#960f4c] text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : editingService ? 'Update Service' : 'Add Service'}
                 </button>

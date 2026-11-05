@@ -99,7 +99,7 @@ export default function Typewriter({
 
   return (
     <div className="relative max-w-4xl mx-auto px-1 sm:px-2">
-      <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#242126] dark:text-[#F5EFF5] tracking-tight leading-[1.25] sm:leading-[1.15]">
+      <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-[1.25] sm:leading-[1.15]">
         {/* Static First Line - Always immediately visible without lag */}
         <span className="block mb-1 sm:mb-2">{firstLine}</span>
 
@@ -113,10 +113,10 @@ export default function Typewriter({
             {secondLine}
           </span>
 
-          {/* Real-time Character-by-Character Typed Text */}
-          <span className="absolute inset-0 left-0 top-0 bg-gradient-to-r from-[#4B263F] via-[#B77A91] to-[#C69A5D] dark:from-[#D6A0B4] dark:via-[#B77A91] dark:to-[#D4AD76] bg-clip-text text-transparent">
+          {/* Real-time Character-by-Character Typed Text with Champagne Gold Accent */}
+          <span className="absolute inset-0 left-0 top-0 bg-gradient-to-r from-[#D4A77F] via-[#B8905F] to-[#D4A77F] bg-clip-text text-transparent">
             {displayedSecond}
-            <span className="inline-block w-[2.5px] sm:w-[3.5px] h-[0.85em] bg-[#4B263F] dark:bg-[#D6A0B4] ml-1 align-baseline animate-pulse" />
+            <span className="inline-block w-[2.5px] sm:w-[3.5px] h-[0.85em] bg-[#D4A77F] ml-1 align-baseline animate-pulse" />
           </span>
         </span>
       </h1>

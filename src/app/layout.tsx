@@ -1,23 +1,29 @@
 import type { Metadata } from 'next';
-import { Bricolage_Grotesque, DM_Sans } from 'next/font/google';
+import { Manrope, Inter, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
-const bricolage = Bricolage_Grotesque({
-  variable: '--font-bricolage',
+const manrope = Manrope({
+  variable: '--font-manrope',
   subsets: ['latin'],
   display: 'swap',
 });
 
-const dmSans = DM_Sans({
-  variable: '--font-dm-sans',
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  variable: '--font-playfair',
   subsets: ['latin'],
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'SalonPro - Modern Salon & Spa Management Platform',
-  description: 'Next-generation salon operating system and client management portal.',
+  title: 'SalonPro - Modern Luxury Salon & Spa Management Platform',
+  description: 'Next-generation salon operating system, live studio Kanban, client booking, and 10-second POS billing.',
   icons: {
     icon: '/icon.svg',
     shortcut: '/icon.svg',
@@ -34,7 +40,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${bricolage.variable} ${dmSans.variable} h-full`}
+      className={`${manrope.variable} ${inter.variable} ${playfair.variable} h-full`}
     >
       <head>
         <script
@@ -43,7 +49,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full font-sans antialiased bg-[#F7F5F2] text-[#242126] dark:bg-[#151218] dark:text-[#F5EFF5] transition-colors duration-300">
+      <body className="min-h-full font-sans antialiased bg-white text-[#1F2937] dark:bg-[#080B12] dark:text-[#FFFFFF] transition-colors duration-200">
         {children}
         <Analytics />
       </body>

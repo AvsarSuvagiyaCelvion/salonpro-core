@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       [
         name.trim(),
         cleanSlug,
-        brand_color || '#b3135b',
+        brand_color || '#D4A77F',
         open_time || '10:00:00',
         close_time || '19:00:00',
         phone || null,

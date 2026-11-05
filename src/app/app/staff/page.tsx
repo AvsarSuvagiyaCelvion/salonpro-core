@@ -204,7 +204,7 @@ export default function StaffPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Staff & Specialists
           </h1>
           <p className="text-sm text-neutral-500 mt-0.5">
@@ -214,7 +214,7 @@ export default function StaffPage() {
 
         <button
           onClick={openAddModal}
-          className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer w-full sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Add Staff Member</span>
@@ -272,14 +272,14 @@ export default function StaffPage() {
               </thead>
               <tbody className="divide-y divide-neutral-100">
                 {staffList.map((staff) => (
-                  <tr key={staff.id} className="hover:bg-pink-50/20 transition-colors">
+                  <tr key={staff.id} className="hover:bg-[#D4A77F]/10 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#2a1630] to-[#b3135b] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#1F2937] to-[#D4A77F] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
                           {staff.name.slice(0, 2)}
                         </div>
                         <div>
-                          <div className="font-bold text-sm text-[#2a1630]">
+                          <div className="font-bold text-sm text-[#1F2937] dark:text-white">
                             {staff.name}
                           </div>
                           <div className="text-[11px] text-neutral-400">
@@ -294,7 +294,7 @@ export default function StaffPage() {
                     <td className="py-3.5 px-4">
                       <div className="text-[11px] space-y-0.5">
                         <div className="text-neutral-700">
-                          Services: <span className="font-bold text-[#b3135b]">{staff.service_commission_pct}%</span>
+                          Services: <span className="font-bold text-[#D4A77F]">{staff.service_commission_pct}%</span>
                         </div>
                         <div className="text-neutral-500">
                           Products: <span className="font-bold text-emerald-700">{staff.product_commission_pct}%</span>
@@ -366,7 +366,7 @@ export default function StaffPage() {
                     <td className="py-3.5 px-4 text-right space-x-1">
                       <button
                         onClick={() => openEditModal(staff)}
-                        className="p-1.5 text-neutral-500 hover:text-[#b3135b] hover:bg-pink-50 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-500 hover:text-[#D4A77F] hover:bg-[#D4A77F]/10 rounded-lg transition-colors cursor-pointer"
                         title="Edit staff"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -392,8 +392,8 @@ export default function StaffPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-lg w-full p-6 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
-              <h2 className="text-lg font-bold text-[#2a1630] flex items-center gap-2">
-                <UserCheck className="w-4 h-4 text-[#b3135b]" />
+              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-[#D4A77F]" />
                 <span>{editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}</span>
               </h2>
               <button
@@ -415,7 +415,7 @@ export default function StaffPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Pooja Dave"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -429,7 +429,7 @@ export default function StaffPage() {
                   value={formRole}
                   onChange={(e) => setFormRole(e.target.value)}
                   placeholder="e.g. Senior Hair Colorist"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -445,7 +445,7 @@ export default function StaffPage() {
                     step="0.5"
                     value={formServiceComm}
                     onChange={(e) => setFormServiceComm(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                   />
                 </div>
 
@@ -460,7 +460,7 @@ export default function StaffPage() {
                     step="0.5"
                     value={formProductComm}
                     onChange={(e) => setFormProductComm(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                   />
                 </div>
               </div>
@@ -480,7 +480,7 @@ export default function StaffPage() {
                         type="checkbox"
                         checked={formSelectedServices.includes(srv.id)}
                         onChange={() => toggleServiceSelection(srv.id)}
-                        className="rounded text-[#b3135b] focus:ring-[#b3135b]"
+                        className="rounded text-[#D4A77F] focus:ring-[#D4A77F]"
                       />
                       <span className="truncate">{srv.name}</span>
                     </label>
@@ -496,7 +496,7 @@ export default function StaffPage() {
                     id="staff_active_toggle"
                     checked={formActive}
                     onChange={(e) => setFormActive(e.target.checked)}
-                    className="rounded text-[#b3135b] focus:ring-[#b3135b] cursor-pointer"
+                    className="rounded text-[#D4A77F] focus:ring-[#D4A77F] cursor-pointer"
                   />
                   <label htmlFor="staff_active_toggle" className="text-xs text-neutral-700 cursor-pointer select-none">
                     Currently Working (Uncheck if on long leave)
@@ -509,7 +509,7 @@ export default function StaffPage() {
                     id="staff_online_toggle"
                     checked={formShowOnline}
                     onChange={(e) => setFormShowOnline(e.target.checked)}
-                    className="rounded text-[#b3135b] focus:ring-[#b3135b] cursor-pointer"
+                    className="rounded text-[#D4A77F] focus:ring-[#D4A77F] cursor-pointer"
                   />
                   <label htmlFor="staff_online_toggle" className="text-xs text-neutral-700 cursor-pointer select-none">
                     Show on online client booking page
@@ -528,7 +528,7 @@ export default function StaffPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 text-xs font-semibold bg-[#b3135b] hover:bg-[#960f4c] text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : editingStaff ? 'Update Staff' : 'Add Staff Member'}
                 </button>

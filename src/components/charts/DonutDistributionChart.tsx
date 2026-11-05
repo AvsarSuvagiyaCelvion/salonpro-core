@@ -32,9 +32,9 @@ export default function DonutDistributionChart({
     return (
       <div
         style={{ width: size, height: size }}
-        className="rounded-full border-4 border-dashed border-neutral-200 flex flex-col items-center justify-center text-center p-4 mx-auto"
+        className="rounded-full border-4 border-dashed border-[#E5E7EB] dark:border-[#2A2F3A] flex flex-col items-center justify-center text-center p-4 mx-auto"
       >
-        <span className="text-[11px] font-bold text-neutral-400">No data available</span>
+        <span className="text-[11px] font-bold text-[#9CA3AF]">No data available</span>
       </div>
     );
   }
@@ -54,90 +54,76 @@ export default function DonutDistributionChart({
             cy={size / 2}
             r={radius}
             fill="transparent"
-            stroke="#f1f5f9"
+            stroke="currentColor"
+            className="text-[#F3F4F6] dark:text-[#1C2230]"
             strokeWidth={thickness}
           />
 
-          {/* Slices group rotated around center (size/2, size/2) */}
-          <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-            {data.map((slice, i) => {
-              const percentage = slice.value / total;
-              const isSingleItem = data.length === 1;
-              const strokeDasharray = isSingleItem
-                ? undefined
-                : `${Math.max(1, percentage * circumference)} ${circumference}`;
-              const strokeDashoffset = isSingleItem ? undefined : -accumulatedAngle * circumference;
-              accumulatedAngle += percentage;
-              const isHovered = hoveredIdx === i;
+          {/* Slices */}
+          {data.map((item, idx) => {
+            const fraction = item.value / total;
+            const strokeDasharray = `${fraction * circumference} ${circumference}`;
+            const strokeDashoffset = -accumulatedAngle;
+            accumulatedAngle += fraction * circumference;
+            const isHovered = hoveredIdx === idx;
 
-              return (
-                <circle
-                  key={i}
-                  cx={size / 2}
-                  cy={size / 2}
-                  r={radius}
-                  fill="transparent"
-                  stroke={slice.color}
-                  strokeWidth={isHovered ? thickness + 4 : thickness}
-                  strokeDasharray={strokeDasharray}
-                  strokeDashoffset={strokeDashoffset}
-                  className="transition-all duration-200 cursor-pointer"
-                  onMouseEnter={() => setHoveredIdx(i)}
-                  onMouseLeave={() => setHoveredIdx(null)}
-                />
-              );
-            })}
-          </g>
+            return (
+              <circle
+                key={idx}
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                fill="transparent"
+                stroke={item.color}
+                strokeWidth={isHovered ? thickness + 4 : thickness}
+                strokeDasharray={strokeDasharray}
+                strokeDashoffset={strokeDashoffset}
+                strokeLinecap="butt"
+                transform={`rotate(-90 ${size / 2} ${size / 2})`}
+                className="transition-all duration-200 cursor-pointer"
+                onMouseEnter={() => setHoveredIdx(idx)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              />
+            );
+          })}
         </svg>
 
-        {/* Center Metric */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-2">
-          <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider truncate max-w-[85px]">
-            {hoveredIdx !== null ? data[hoveredIdx].label : centerLabel}
+        {/* Center Text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+          <span className="text-base sm:text-lg font-black text-[#1F2937] dark:text-[#FFFFFF] font-mono leading-none">
+            {centerValue ?? total}
           </span>
-          <span className="text-lg font-black text-neutral-900 leading-tight">
-            {hoveredIdx !== null
-              ? `${Math.round((data[hoveredIdx].value / total) * 100)}%`
-              : centerValue !== undefined
-              ? centerValue
-              : total}
+          <span className="text-[10px] text-[#6B7280] dark:text-[#A0A8B8] uppercase font-bold mt-1">
+            {hoveredIdx !== null ? data[hoveredIdx].label : centerLabel}
           </span>
         </div>
       </div>
 
-      {/* Legend - Clean stacked full width list */}
-      <div className="space-y-1.5 w-full min-w-0">
-        {data.map((slice, i) => {
-          const pct = Math.round((slice.value / total) * 100);
-          const isHovered = hoveredIdx === i;
+      {/* Legend */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full text-xs">
+        {data.map((item, idx) => {
+          const pct = Math.round((item.value / total) * 100);
+          const isHovered = hoveredIdx === idx;
+
           return (
             <div
-              key={i}
-              onMouseEnter={() => setHoveredIdx(i)}
+              key={idx}
+              onMouseEnter={() => setHoveredIdx(idx)}
               onMouseLeave={() => setHoveredIdx(null)}
-              className={`flex items-center justify-between p-1.5 sm:p-2 rounded-xl transition-all cursor-pointer gap-2 ${
-                isHovered ? 'bg-slate-100/80 scale-101 font-bold' : 'hover:bg-slate-50'
+              className={`flex items-center justify-between p-1.5 rounded-xl transition-all cursor-pointer ${
+                isHovered ? 'bg-[#F3F4F6] dark:bg-[#1C2230] scale-102' : 'hover:bg-[#F3F4F6]/50 dark:hover:bg-[#1C2230]/50'
               }`}
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="flex items-center gap-2 min-w-0">
                 <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
-                  style={{ backgroundColor: slice.color }}
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: item.color }}
                 />
-                <span className="text-xs text-slate-700 truncate font-semibold" title={slice.label}>
-                  {slice.label}
-                </span>
+                <span className="font-semibold text-[#1F2937] dark:text-[#FFFFFF] truncate">{item.label}</span>
               </div>
-              <div className="flex items-center gap-2.5 text-xs font-mono shrink-0 ml-2">
-                <span className="font-bold text-slate-900">
-                  {typeof slice.value === 'number' && slice.value > 1000
-                    ? `₹${slice.value.toLocaleString('en-IN')}`
-                    : slice.value}
-                </span>
-                <span className="text-[10px] text-slate-400 font-semibold min-w-[32px] text-right">
-                  {pct}%
-                </span>
-              </div>
+              <span className="font-mono text-[#6B7280] dark:text-[#A0A8B8] font-bold text-[11px] shrink-0">
+                {item.value} ({pct}%)
+              </span>
             </div>
           );
         })}
@@ -145,4 +131,3 @@ export default function DonutDistributionChart({
     </div>
   );
 }
-

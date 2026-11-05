@@ -153,7 +153,7 @@ export default function PrintReceiptButton({
       doc.setFontSize(7.5);
       doc.text('INVOICE NO', rightX, y + 7, { align: 'right' });
 
-      doc.setTextColor(179, 19, 91); // #b3135b
+      doc.setTextColor(212, 167, 127); // #D4A77F
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.text(invoice.number, rightX, y + 14, { align: 'right' });
@@ -343,7 +343,7 @@ export default function PrintReceiptButton({
         type="button"
         onClick={handleDownloadPdf}
         disabled={downloading}
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#b3135b] to-[#d62475] hover:from-[#9c0f4e] hover:to-[#b3135b] text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-pink-900/20 transition-all active:scale-95 cursor-pointer disabled:opacity-70 border-0 outline-none"
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs sm:text-sm font-bold shadow-lg shadow-[#D4A77F]/20 transition-all active:scale-95 cursor-pointer disabled:opacity-70 border-0 outline-none"
       >
         {downloading ? (
           <>

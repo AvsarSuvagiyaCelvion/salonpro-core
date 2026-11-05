@@ -221,7 +221,7 @@ export default function MembershipsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Memberships & Packages
           </h1>
           <p className="text-xs sm:text-sm text-neutral-500 mt-1">
@@ -232,7 +232,7 @@ export default function MembershipsPage() {
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => handleOpenAssign()}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] text-white text-xs font-bold shadow-md transition-all active:scale-95 whitespace-nowrap"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs font-bold shadow-md transition-all active:scale-95 whitespace-nowrap"
           >
             <Sparkles className="w-4 h-4" />
             <span>Assign to Customer</span>
@@ -277,7 +277,7 @@ export default function MembershipsPage() {
           onClick={() => setActiveTab('memberships')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'memberships'
-              ? 'border-[#b3135b] text-[#b3135b]'
+              ? 'border-[#D4A77F] text-[#D4A77F]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
           }`}
         >
@@ -289,7 +289,7 @@ export default function MembershipsPage() {
           onClick={() => setActiveTab('packages')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'packages'
-              ? 'border-[#b3135b] text-[#b3135b]'
+              ? 'border-[#D4A77F] text-[#D4A77F]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
           }`}
         >
@@ -301,7 +301,7 @@ export default function MembershipsPage() {
           onClick={() => setActiveTab('subscriptions')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'subscriptions'
-              ? 'border-[#b3135b] text-[#b3135b]'
+              ? 'border-[#D4A77F] text-[#D4A77F]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
           }`}
         >
@@ -316,13 +316,13 @@ export default function MembershipsPage() {
           {membershipPlans.map((plan) => (
             <div
               key={plan.id}
-              className="bg-white rounded-3xl p-6 border border-neutral-200 shadow-sm flex flex-col justify-between hover:border-[#b3135b]/40 transition-all relative overflow-hidden group"
+              className="bg-white rounded-3xl p-6 border border-neutral-200 shadow-sm flex flex-col justify-between hover:border-[#D4A77F]/40 transition-all relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-pink-500/10 to-transparent rounded-bl-full pointer-events-none" />
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] uppercase font-extrabold tracking-wider bg-pink-50 text-[#b3135b] px-3 py-1 rounded-full border border-pink-100">
+                  <span className="text-[10px] uppercase font-extrabold tracking-wider bg-[#D4A77F]/10 text-[#D4A77F] px-3 py-1 rounded-full border border-[#D4A77F]/20">
                     VIP Plan
                   </span>
                   <span className="text-xs text-neutral-400 flex items-center gap-1 font-medium">
@@ -331,7 +331,7 @@ export default function MembershipsPage() {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-black text-[#2a1630]">{plan.name}</h3>
+                <h3 className="text-xl font-black text-[#1F2937] dark:text-white">{plan.name}</h3>
 
                 <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2.5 text-xs">
                   <div className="flex items-center justify-between text-neutral-700">
@@ -339,7 +339,7 @@ export default function MembershipsPage() {
                       <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                       Services Discount:
                     </span>
-                    <span className="font-extrabold text-[#b3135b] text-sm">
+                    <span className="font-extrabold text-[#D4A77F] text-sm">
                       {plan.services_discount_pct}% OFF
                     </span>
                   </div>
@@ -359,7 +359,7 @@ export default function MembershipsPage() {
               <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block">Subscription Fee</span>
-                  <span className="text-xl font-black text-[#2a1630]">
+                  <span className="text-xl font-black text-[#1F2937] dark:text-white">
                     ₹{Number(plan.price).toLocaleString('en-IN')}
                   </span>
                 </div>
@@ -395,7 +395,7 @@ export default function MembershipsPage() {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-black text-[#2a1630]">{pkg.name}</h3>
+                <h3 className="text-xl font-black text-[#1F2937] dark:text-white">{pkg.name}</h3>
 
                 <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2">
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
@@ -417,7 +417,7 @@ export default function MembershipsPage() {
               <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block">Package Price</span>
-                  <span className="text-xl font-black text-[#2a1630]">
+                  <span className="text-xl font-black text-[#1F2937] dark:text-white">
                     ₹{Number(pkg.price).toLocaleString('en-IN')}
                   </span>
                 </div>
@@ -462,7 +462,7 @@ export default function MembershipsPage() {
                   subscriptions.map((sub) => (
                     <tr key={sub.id} className="hover:bg-neutral-50/60 transition-colors">
                       <td className="py-4 px-6">
-                        <div className="font-bold text-[#2a1630] text-sm">{sub.customer_name}</div>
+                        <div className="font-bold text-[#1F2937] dark:text-white text-sm">{sub.customer_name}</div>
                         <div className="text-[11px] text-neutral-400 font-mono">+91 {sub.customer_mobile}</div>
                       </td>
 
@@ -478,7 +478,7 @@ export default function MembershipsPage() {
 
                       <td className="py-4 px-4 text-center">
                         {sub.kind === 'membership' ? (
-                          <span className="text-[11px] font-bold text-[#b3135b] bg-pink-50 px-2 py-1 rounded-lg border border-pink-100">
+                          <span className="text-[11px] font-bold text-[#D4A77F] bg-[#D4A77F]/10 px-2 py-1 rounded-lg border border-[#D4A77F]/20">
                             {sub.services_discount_pct}% Svc / {sub.products_discount_pct}% Prod
                           </span>
                         ) : (
@@ -494,7 +494,7 @@ export default function MembershipsPage() {
                         </span>
                       </td>
 
-                      <td className="py-4 px-4 text-right font-extrabold text-[#2a1630]">
+                      <td className="py-4 px-4 text-right font-extrabold text-[#1F2937] dark:text-white">
                         ₹{Number(sub.amount_paid).toLocaleString('en-IN')}
                       </td>
 
@@ -523,8 +523,8 @@ export default function MembershipsPage() {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-neutral-200">
             <div className="flex justify-between items-center pb-3 border-b border-neutral-100 mb-5">
-              <h2 className="text-lg font-bold text-[#2a1630] flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#b3135b]" />
+              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#D4A77F]" />
                 <span>Assign Plan to Client</span>
               </h2>
               <button
@@ -538,13 +538,13 @@ export default function MembershipsPage() {
             <form onSubmit={handleAssignSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                  Select Customer <span className="text-pink-600">*</span>
+                  Select Customer <span className="text-[#D4A77F]">*</span>
                 </label>
                 <select
                   required
                   value={assignCustomerId}
                   onChange={(e) => setAssignCustomerId(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 >
                   {customers.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -570,7 +570,7 @@ export default function MembershipsPage() {
                     }}
                     className={`py-2 rounded-xl text-xs font-bold transition-all ${
                       assignKind === 'membership'
-                        ? 'bg-[#b3135b] text-white shadow-sm'
+                        ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm'
                         : 'bg-neutral-100 text-neutral-600'
                     }`}
                   >
@@ -588,7 +588,7 @@ export default function MembershipsPage() {
                     }}
                     className={`py-2 rounded-xl text-xs font-bold transition-all ${
                       assignKind === 'package'
-                        ? 'bg-[#b3135b] text-white shadow-sm'
+                        ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm'
                         : 'bg-neutral-100 text-neutral-600'
                     }`}
                   >
@@ -599,7 +599,7 @@ export default function MembershipsPage() {
 
               <div>
                 <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                  Select Specific Plan <span className="text-pink-600">*</span>
+                  Select Specific Plan <span className="text-[#D4A77F]">*</span>
                 </label>
                 <select
                   required
@@ -615,7 +615,7 @@ export default function MembershipsPage() {
                       if (p) setAssignAmountPaid(p.price.toString());
                     }
                   }}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 >
                   {assignKind === 'membership'
                     ? membershipPlans.map((m) => (
@@ -633,7 +633,7 @@ export default function MembershipsPage() {
 
               <div>
                 <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                  Subscription Fee Paid (₹) <span className="text-pink-600">*</span>
+                  Subscription Fee Paid (₹) <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
                   type="number"
@@ -641,7 +641,7 @@ export default function MembershipsPage() {
                   required
                   value={assignAmountPaid}
                   onChange={(e) => setAssignAmountPaid(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-bold text-[#2a1630] focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-bold text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
 
@@ -656,7 +656,7 @@ export default function MembershipsPage() {
                 <button
                   type="submit"
                   disabled={assigning}
-                  className="px-6 py-2.5 text-xs font-bold bg-[#b3135b] hover:bg-[#99104e] text-white rounded-2xl shadow-md disabled:opacity-50"
+                  className="px-6 py-2.5 text-xs font-bold bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-2xl shadow-md disabled:opacity-50"
                 >
                   {assigning ? 'Assigning...' : 'Confirm Assignment'}
                 </button>
@@ -671,7 +671,7 @@ export default function MembershipsPage() {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-neutral-200">
             <div className="flex justify-between items-center pb-3 border-b border-neutral-100 mb-5">
-              <h2 className="text-lg font-bold text-[#2a1630]">
+              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white">
                 Create New Plan
               </h2>
               <button
@@ -689,7 +689,7 @@ export default function MembershipsPage() {
                   onClick={() => setCreateKind('membership')}
                   className={`py-2 rounded-xl text-xs font-bold transition-all ${
                     createKind === 'membership'
-                      ? 'bg-[#b3135b] text-white'
+                      ? 'bg-[#D4A77F] text-[#080B12] font-bold'
                       : 'bg-neutral-100 text-neutral-600'
                   }`}
                 >
@@ -700,7 +700,7 @@ export default function MembershipsPage() {
                   onClick={() => setCreateKind('package')}
                   className={`py-2 rounded-xl text-xs font-bold transition-all ${
                     createKind === 'package'
-                      ? 'bg-[#b3135b] text-white'
+                      ? 'bg-[#D4A77F] text-[#080B12] font-bold'
                       : 'bg-neutral-100 text-neutral-600'
                   }`}
                 >
@@ -710,7 +710,7 @@ export default function MembershipsPage() {
 
               <div>
                 <label className="block text-xs font-bold text-neutral-700 mb-1">
-                  Plan Name <span className="text-pink-600">*</span>
+                  Plan Name <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
                   type="text"
@@ -718,14 +718,14 @@ export default function MembershipsPage() {
                   placeholder={createKind === 'membership' ? 'e.g. Platinum VIP Member' : 'e.g. Total Bridal Glow'}
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1">
-                    Price (₹) <span className="text-pink-600">*</span>
+                    Price (₹) <span className="text-[#D4A77F]">*</span>
                   </label>
                   <input
                     type="number"
@@ -733,7 +733,7 @@ export default function MembershipsPage() {
                     placeholder="2999"
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-bold focus:outline-none focus:border-[#b3135b]"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-bold focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
 
@@ -747,15 +747,15 @@ export default function MembershipsPage() {
                     required
                     value={formValidity}
                     onChange={(e) => setFormValidity(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
               </div>
 
               {createKind === 'membership' && (
-                <div className="grid grid-cols-2 gap-3 p-3 bg-pink-50/60 rounded-2xl border border-pink-100">
+                <div className="grid grid-cols-2 gap-3 p-3 bg-[#D4A77F]/15 rounded-2xl border border-[#D4A77F]/20">
                   <div>
-                    <label className="block text-xs font-bold text-[#b3135b] mb-1">
+                    <label className="block text-xs font-bold text-[#D4A77F] mb-1">
                       Services Discount %
                     </label>
                     <input
@@ -764,7 +764,7 @@ export default function MembershipsPage() {
                       max={100}
                       value={formSvcDiscount}
                       onChange={(e) => setFormSvcDiscount(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-pink-200 text-sm font-bold text-[#b3135b] focus:outline-none"
+                      className="w-full px-3 py-2 rounded-xl border border-[#D4A77F]/30 text-sm font-bold text-[#D4A77F] focus:outline-none"
                     />
                   </div>
 
@@ -795,7 +795,7 @@ export default function MembershipsPage() {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-6 py-2.5 text-xs font-bold bg-[#b3135b] hover:bg-[#99104e] text-white rounded-2xl shadow-md disabled:opacity-50"
+                  className="px-6 py-2.5 text-xs font-bold bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-2xl shadow-md disabled:opacity-50"
                 >
                   {creating ? 'Saving...' : 'Create Plan'}
                 </button>

@@ -21,7 +21,7 @@ export default function PageLoader() {
 
     const timer = setTimeout(() => {
       setIsVisible(false);
-    }, 750);
+    }, 700);
 
     return () => clearTimeout(timer);
   }, []);
@@ -33,13 +33,13 @@ export default function PageLoader() {
           key="page-loader"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="fixed inset-0 z-[99999] bg-[#1a0c1e] flex flex-col items-center justify-center pointer-events-none select-none"
+          transition={{ duration: 0.25, ease: 'easeInOut' }}
+          className="fixed inset-0 z-[99999] bg-[#080B12] flex flex-col items-center justify-center pointer-events-none select-none"
         >
           <div className="relative flex flex-col items-center">
-            {/* GPU Hardware-Accelerated Snappy Scissors Cut (100% smooth, no JS stutter) */}
+            {/* GPU Hardware-Accelerated Snappy Scissors Cut in Champagne Gold */}
             <div
-              className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center text-3xl font-black shadow-2xl shadow-pink-600/40 mb-3"
+              className="w-16 h-16 rounded-2xl bg-[#10141F] border border-[#2A2F3A] text-[#D4A77F] flex items-center justify-center text-3xl font-black shadow-2xl shadow-black/50 mb-3"
               style={{
                 willChange: 'transform, opacity',
                 animation: 'snipAndPulse 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
@@ -51,14 +51,14 @@ export default function PageLoader() {
             {/* Logo Text Reveal */}
             <div className="text-center">
               <h2 className="text-xl font-black text-white tracking-tight">SalonPro</h2>
-              <p className="text-[10px] text-pink-300 font-semibold uppercase tracking-widest mt-0.5">
-                Operating System for Salons
+              <p className="text-[10px] text-[#D4A77F] font-semibold uppercase tracking-widest mt-0.5">
+                Modern Salon Operating System
               </p>
             </div>
 
             {/* Snipping Line */}
             <div
-              className="h-[2px] bg-gradient-to-r from-transparent via-pink-400 to-transparent mt-3 rounded-full"
+              className="h-[2px] bg-gradient-to-r from-transparent via-[#D4A77F] to-transparent mt-3 rounded-full"
               style={{
                 width: '120px',
                 animation: 'expandLine 0.6s ease-out forwards',

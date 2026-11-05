@@ -125,21 +125,21 @@ export default function DashboardPage() {
     : 1000;
 
   return (
-    <div className="space-y-6 pb-12 text-[#242126] dark:text-[#F5EFF5] transition-colors duration-300">
+    <div className="space-y-6 pb-12 text-[#1F2937] dark:text-[#FFFFFF] transition-colors duration-300">
       {/* Page Title & Period Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5] tracking-tight">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
             Dashboard Overview
           </h1>
-          <p className="text-xs sm:text-sm text-[#77717A] dark:text-[#B5AAB8] mt-0.5 sm:mt-1">
+          <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-0.5 sm:mt-1">
             Real-time business performance, earnings, and appointments
           </p>
         </div>
 
         {/* Period Selector & Quick Actions */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] p-1 rounded-2xl flex shadow-2xs">
+          <div className="bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] p-1 rounded-2xl flex shadow-2xs">
             {[
               { id: 'today', label: 'Today' },
               { id: '7d', label: 'Last 7 Days' },
@@ -150,8 +150,8 @@ export default function DashboardPage() {
                 onClick={() => setPeriod(p.id as any)}
                 className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   period === p.id
-                    ? 'bg-[#4B263F] text-white dark:bg-[#D6A0B4] dark:text-[#151218] shadow-xs'
-                    : 'text-[#77717A] dark:text-[#B5AAB8] hover:text-[#242126] dark:hover:text-[#F5EFF5] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230]'
+                    ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs'
+                    : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230]'
                 }`}
               >
                 {p.label}
@@ -163,9 +163,9 @@ export default function DashboardPage() {
             <Link
               href={`/${salonSlug}`}
               target="_blank"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white dark:bg-[#211B24] hover:bg-[#F1EBEF] dark:hover:bg-[#2B2230] text-[#242126] dark:text-[#F5EFF5] text-xs font-semibold border border-[#E8E1E5] dark:border-[#3A3040] shadow-xs transition-all"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white dark:bg-[#141926] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF] text-xs font-semibold border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-xs transition-all"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-[#4B263F] dark:text-[#D6A0B4]" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#D4A77F]" />
               <span>Public Booking</span>
             </Link>
           )}
@@ -174,17 +174,17 @@ export default function DashboardPage() {
 
       {/* 7-Day Free Trial Daily Countdown Card */}
       {subscription?.isTrial && !subscription?.isTrialExpired && (
-        <div className="bg-gradient-to-r from-[#4B263F] via-[#381c2f] to-[#4B263F] text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-[#B77A91]/30 relative overflow-hidden animate-fadeIn">
+        <div className="bg-[#10141F] text-[#FFFFFF] p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-[#D4A77F]/30 relative overflow-hidden animate-fadeIn">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1.5 max-w-xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white border border-white/20 text-[11px] font-bold">
-                <Sparkles className="w-3.5 h-3.5 text-[#D4AD76]" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30 text-[11px] font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
                 <span>7-Day Free Trial Active</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                <span className="text-[#D4AD76] underline decoration-[#D4AD76]">{subscription.trialDaysRemaining} Day{subscription.trialDaysRemaining === 1 ? '' : 's'} Remaining</span> in Free Trial
+                <span className="text-[#D4A77F] underline decoration-[#D4A77F]">{subscription.trialDaysRemaining} Day{subscription.trialDaysRemaining === 1 ? '' : 's'} Remaining</span> in Free Trial
               </h2>
-              <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#A0A8B8] leading-relaxed">
                 All Pro management tools, calendar booking, and GST billing are active. Choose an official plan anytime to prevent service interruption.
               </p>
             </div>
@@ -196,9 +196,9 @@ export default function DashboardPage() {
                     window.dispatchEvent(new CustomEvent('open-plan-modal'));
                   }
                 }}
-                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white hover:bg-[#F1EBEF] text-[#4B263F] font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
               >
-                <Zap className="w-4 h-4 text-[#C69A5D] fill-[#C69A5D]" />
+                <Zap className="w-4 h-4 text-[#080B12] fill-[#080B12]" />
                 <span>Choose Official Plan ➔</span>
               </button>
             </div>
@@ -208,17 +208,17 @@ export default function DashboardPage() {
 
       {/* Paid Plan Expiry Reminder Card (<= 7 days) */}
       {Boolean(subscription?.isSubscriptionExpiringSoon && !subscription?.isTrial) && (
-        <div className="bg-gradient-to-r from-amber-950 via-rose-950 to-amber-900 text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-amber-500/40 relative overflow-hidden animate-fadeIn">
+        <div className="bg-[#10141F] text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-lg border border-[#F59E0B]/40 relative overflow-hidden animate-fadeIn">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1.5 max-w-xl">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30 text-[11px] font-bold">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-300" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/30 text-[11px] font-bold">
+                <AlertTriangle className="w-3.5 h-3.5 text-[#F59E0B]" />
                 <span>Plan Ending Soon</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Your {subscription.currentPlan?.name || 'Subscription'} Plan Expires in <span className="text-amber-300 underline decoration-amber-400">{subscription.subscriptionDaysRemaining} Day{subscription.subscriptionDaysRemaining === 1 ? '' : 's'}</span>
+                Your {subscription.currentPlan?.name || 'Subscription'} Plan Expires in <span className="text-[#D4A77F] underline decoration-[#D4A77F]">{subscription.subscriptionDaysRemaining} Day{subscription.subscriptionDaysRemaining === 1 ? '' : 's'}</span>
               </h2>
-              <p className="text-xs sm:text-sm text-amber-100/90 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#A0A8B8] leading-relaxed">
                 Your plan ends on {subscription.subscriptionEndsAt ? new Date(subscription.subscriptionEndsAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'soon'}. Renew now to keep online client appointments, WhatsApp notifications, and stylist tools running uninterrupted.
               </p>
             </div>
@@ -230,9 +230,9 @@ export default function DashboardPage() {
                     window.dispatchEvent(new CustomEvent('open-plan-modal'));
                   }
                 }}
-                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-extrabold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
               >
-                <Zap className="w-4 h-4 text-amber-900 fill-amber-900" />
+                <Zap className="w-4 h-4 text-[#080B12] fill-[#080B12]" />
                 <span>Renew / Upgrade Plan ➔</span>
               </button>
             </div>
@@ -243,141 +243,141 @@ export default function DashboardPage() {
       {/* 4 Primary KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
         {/* Total Revenue */}
-        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+        <div className="bg-white dark:bg-[#141926] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Revenue
             </span>
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] flex items-center justify-center font-bold text-xs sm:text-sm">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center font-bold text-xs sm:text-sm">
               ₹
             </div>
           </div>
-          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? (
-              <div className="h-7 w-20 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
+              <div className="h-7 w-20 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
               `₹${data?.totalRevenue.toLocaleString('en-IN')}`
             )}
           </div>
-          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#2F7D68] dark:text-[#55B99A] font-semibold flex items-center gap-1">
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#10B981] font-semibold flex items-center gap-1">
             <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span className="truncate">Verified payments</span>
           </div>
         </div>
 
         {/* Completed Sessions */}
-        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+        <div className="bg-white dark:bg-[#141926] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Sessions Done
             </span>
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#B77A91] dark:text-[#D6A0B4] flex items-center justify-center">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? (
-              <div className="h-7 w-12 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
+              <div className="h-7 w-12 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
               data?.completedSessions
             )}
           </div>
-          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#77717A] dark:text-[#B5AAB8] font-medium truncate">
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] font-medium truncate">
             Completed in period
           </div>
         </div>
 
         {/* Registered Clients */}
-        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+        <div className="bg-white dark:bg-[#141926] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Client Base
             </span>
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#C69A5D] dark:text-[#D4AD76] flex items-center justify-center">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center">
               <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? (
-              <div className="h-7 w-12 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
+              <div className="h-7 w-12 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
               data?.totalCustomers
             )}
           </div>
-          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#77717A] dark:text-[#B5AAB8] font-medium truncate">
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] font-medium truncate">
             Salon clients registered
           </div>
         </div>
 
         {/* Active Staff */}
-        <div className="bg-white dark:bg-[#211B24] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs relative overflow-hidden group hover:border-[#B77A91]/60 transition-all">
+        <div className="bg-white dark:bg-[#141926] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
           <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#77717A] dark:text-[#B5AAB8]">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Stylists
             </span>
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#2F7D68] dark:text-[#55B99A] flex items-center justify-center">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#10B981] flex items-center justify-center">
               <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#242126] dark:text-[#F5EFF5]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? (
-              <div className="h-7 w-12 bg-[#F1EBEF] dark:bg-[#2B2230] animate-pulse rounded-lg" />
+              <div className="h-7 w-12 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
               data?.activeStaff
             )}
           </div>
-          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#2F7D68] dark:text-[#55B99A] font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2F7D68] dark:bg-[#55B99A] animate-pulse shrink-0" />
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#10B981] font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse shrink-0" />
             <span className="truncate">Available for booking</span>
           </div>
         </div>
       </div>
 
       {/* Daily Revenue Chart Section */}
-      <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs overflow-hidden">
+      <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#4B263F] dark:bg-[#D6A0B4] animate-ping" />
-              <h2 className="text-base sm:text-lg font-bold text-[#242126] dark:text-[#F5EFF5]">Revenue Trajectory & Daily Performance</h2>
+              <span className="w-2 h-2 rounded-full bg-[#D4A77F] animate-ping" />
+              <h2 className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-[#FFFFFF]">Revenue Trajectory & Daily Performance</h2>
             </div>
-            <p className="text-xs text-[#77717A] dark:text-[#B5AAB8]">Smooth trendline of verified client billing in this period</p>
+            <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Smooth trendline of verified client billing in this period</p>
           </div>
-          <div className="text-xs font-mono font-bold text-[#242126] dark:text-[#F5EFF5] bg-[#F1EBEF] dark:bg-[#2B2230] px-3 py-1.5 rounded-xl border border-[#E8E1E5] dark:border-[#3A3040] w-fit">
+          <div className="text-xs font-mono font-bold text-[#1F2937] dark:text-[#FFFFFF] bg-[#F3F4F6] dark:bg-[#1C2230] px-3 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] w-fit">
             Peak Day: ₹{maxChartAmount.toLocaleString('en-IN')}
           </div>
         </div>
 
         {/* Interactive SVG Area Chart */}
         {loading ? (
-          <div className="h-52 w-full bg-[#F7F5F2] dark:bg-[#151218] rounded-2xl animate-pulse flex items-center justify-center text-xs text-[#77717A] dark:text-[#B5AAB8]">
+          <div className="h-52 w-full bg-[#F8F9FA] dark:bg-[#080B12] rounded-2xl animate-pulse flex items-center justify-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
             Loading chart analytics...
           </div>
         ) : !data?.chartData || data.chartData.length === 0 ? (
-          <div className="h-52 w-full flex items-center justify-center text-xs text-[#77717A] dark:text-[#B5AAB8]">
+          <div className="h-52 w-full flex items-center justify-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
             No transaction records found for this period
           </div>
         ) : (
           <AreaTrendChart
             data={data.chartData.map((d) => ({ label: d.label, value: d.amount }))}
-            color="#4B263F"
+            color="#D4A77F"
             height={220}
           />
         )}
       </div>
 
-      {/* 2x2 Performance Analytics Grid (Full responsive breathing room) */}
+      {/* 2x2 Performance Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Popular Services Ranking Chart */}
-        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Top Services Performance</h3>
-              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">By Revenue</span>
+              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Top Services Performance</h3>
+              <span className="text-[10px] uppercase font-bold text-[#6B7280] dark:text-[#A0A8B8] tracking-wider">By Revenue</span>
             </div>
 
             {data?.popularServices.length === 0 ? (
-              <div className="text-xs text-[#77717A] dark:text-[#B5AAB8] py-8 text-center">No service data in this period</div>
+              <div className="text-xs text-[#6B7280] dark:text-[#A0A8B8] py-8 text-center">No service data in this period</div>
             ) : (
               <BarComparisonChart
                 items={data?.popularServices.map((svc) => ({
@@ -385,7 +385,7 @@ export default function DashboardPage() {
                   label: svc.name,
                   sublabel: `${svc.count} booked`,
                   value: Number(svc.revenue),
-                  color: '#4B263F',
+                  color: '#D4A77F',
                 })) || []}
               />
             )}
@@ -393,27 +393,27 @@ export default function DashboardPage() {
 
           <Link
             href="/app/services"
-            className="mt-4 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] text-xs font-semibold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center justify-center gap-1"
+            className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1"
           >
             Manage Services Catalog →
           </Link>
         </div>
 
         {/* Visual Revenue Breakdown Donut */}
-        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Service Category Share</h3>
-              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">Distribution</span>
+              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Service Category Share</h3>
+              <span className="text-[10px] uppercase font-bold text-[#6B7280] dark:text-[#A0A8B8] tracking-wider">Distribution</span>
             </div>
 
             {(!data?.totalRevenue || data.totalRevenue === 0) ? (
-              <div className="py-8 text-center text-[#77717A] dark:text-[#B5AAB8]">
-                <div className="w-12 h-12 rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#B77A91] dark:text-[#D6A0B4] flex items-center justify-center mx-auto mb-2">
+              <div className="py-8 text-center text-[#6B7280] dark:text-[#A0A8B8]">
+                <div className="w-12 h-12 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center mx-auto mb-2">
                   <PieChart className="w-6 h-6" />
                 </div>
-                <p className="text-xs font-semibold text-[#242126] dark:text-[#F5EFF5]">No revenue data in this period</p>
-                <p className="text-[11px] text-[#77717A] dark:text-[#B5AAB8] mt-0.5">Category breakdown will update after client invoices</p>
+                <p className="text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF]">No revenue data in this period</p>
+                <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-0.5">Category breakdown will update after client invoices</p>
               </div>
             ) : (
               <DonutDistributionChart
@@ -422,10 +422,10 @@ export default function DashboardPage() {
                 centerLabel="Revenue"
                 centerValue={`₹${(data.totalRevenue > 1000 ? Math.round(data.totalRevenue / 1000) + 'k' : data.totalRevenue)}`}
                 data={[
-                  { label: 'Hair & Styling', value: Math.max(1, Math.round(data.totalRevenue * 0.45)), color: '#4B263F' },
-                  { label: 'Facial & Skin', value: Math.max(1, Math.round(data.totalRevenue * 0.25)), color: '#B77A91' },
-                  { label: 'Spa & Massage', value: Math.max(1, Math.round(data.totalRevenue * 0.18)), color: '#C69A5D' },
-                  { label: 'Retail Products', value: Math.max(1, Math.round(data.totalRevenue * 0.12)), color: '#2F7D68' },
+                  { label: 'Hair & Styling', value: Math.max(1, Math.round(data.totalRevenue * 0.45)), color: '#D4A77F' },
+                  { label: 'Facial & Skin', value: Math.max(1, Math.round(data.totalRevenue * 0.25)), color: '#B8905F' },
+                  { label: 'Spa & Massage', value: Math.max(1, Math.round(data.totalRevenue * 0.18)), color: '#10B981' },
+                  { label: 'Retail Products', value: Math.max(1, Math.round(data.totalRevenue * 0.12)), color: '#F59E0B' },
                 ]}
               />
             )}
@@ -433,18 +433,18 @@ export default function DashboardPage() {
 
           <Link
             href="/app/reports"
-            className="mt-4 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] text-xs font-semibold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center justify-center gap-1"
+            className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1"
           >
             Detailed Financial Ledger →
           </Link>
         </div>
 
         {/* Peak Hours Traffic Density */}
-        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Peak Rush Hours</h3>
-              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">
+              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Peak Rush Hours</h3>
+              <span className="text-[10px] uppercase font-bold text-[#6B7280] dark:text-[#A0A8B8] tracking-wider">
                 {salonHours.open} - {salonHours.close}
               </span>
             </div>
@@ -456,31 +456,31 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="mt-4 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] flex items-center justify-between text-xs text-[#77717A] dark:text-[#B5AAB8]">
-            <span>Peak slot: <strong className="text-[#242126] dark:text-[#F5EFF5]">5 PM - 6 PM</strong></span>
-            <span className="text-[#2F7D68] dark:text-[#55B99A] font-bold">Highest density</span>
+          <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] flex items-center justify-between text-xs text-[#6B7280] dark:text-[#A0A8B8]">
+            <span>Peak slot: <strong className="text-[#1F2937] dark:text-[#FFFFFF]">5 PM - 6 PM</strong></span>
+            <span className="text-[#10B981] font-bold">Highest density</span>
           </div>
         </div>
 
         {/* Invoice Payment Status Counts */}
-        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Payment Health</h3>
-              <span className="text-[10px] uppercase font-bold text-[#77717A] dark:text-[#B5AAB8] tracking-wider">Settlements</span>
+              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Payment Health</h3>
+              <span className="text-[10px] uppercase font-bold text-[#6B7280] dark:text-[#A0A8B8] tracking-wider">Settlements</span>
             </div>
 
             <div className="space-y-4 pt-2">
               {/* Paid Invoices */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span className="text-[#2F7D68] dark:text-[#55B99A] flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#2F7D68] dark:bg-[#55B99A]" />
+                  <span className="text-[#10B981] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#10B981]" />
                     Fully Paid Invoices
                   </span>
-                  <span className="font-bold text-[#242126] dark:text-[#F5EFF5]">{data?.paymentStatusCounts.paid || 0}</span>
+                  <span className="font-bold text-[#1F2937] dark:text-[#FFFFFF]">{data?.paymentStatusCounts.paid || 0}</span>
                 </div>
-                <div className="w-full h-2 bg-[#F1EBEF] dark:bg-[#2B2230] rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#F3F4F6] dark:bg-[#1C2230] rounded-full overflow-hidden">
                   <div
                     style={{
                       width: `${
@@ -494,7 +494,7 @@ export default function DashboardPage() {
                         100
                       }%`,
                     }}
-                    className="h-full bg-[#2F7D68] dark:bg-[#55B99A] rounded-full transition-all"
+                    className="h-full bg-[#10B981] rounded-full transition-all"
                   />
                 </div>
               </div>
@@ -502,13 +502,13 @@ export default function DashboardPage() {
               {/* Partial Invoices */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span className="text-[#C69A5D] dark:text-[#D4AD76] flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#C69A5D] dark:bg-[#D4AD76]" />
+                  <span className="text-[#F59E0B] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
                     Partially Paid Invoices
                   </span>
-                  <span className="font-bold text-[#242126] dark:text-[#F5EFF5]">{data?.paymentStatusCounts.partial || 0}</span>
+                  <span className="font-bold text-[#1F2937] dark:text-[#FFFFFF]">{data?.paymentStatusCounts.partial || 0}</span>
                 </div>
-                <div className="w-full h-2 bg-[#F1EBEF] dark:bg-[#2B2230] rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#F3F4F6] dark:bg-[#1C2230] rounded-full overflow-hidden">
                   <div
                     style={{
                       width: `${
@@ -522,7 +522,7 @@ export default function DashboardPage() {
                         100
                       }%`,
                     }}
-                    className="h-full bg-[#C69A5D] dark:bg-[#D4AD76] rounded-full transition-all"
+                    className="h-full bg-[#F59E0B] rounded-full transition-all"
                   />
                 </div>
               </div>
@@ -530,13 +530,13 @@ export default function DashboardPage() {
               {/* Pending Invoices */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span className="text-[#C65B62] dark:text-[#EF858B] flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#C65B62] dark:bg-[#EF858B]" />
+                  <span className="text-[#EF4444] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#EF4444]" />
                     Unpaid Pending Invoices
                   </span>
-                  <span className="font-bold text-[#242126] dark:text-[#F5EFF5]">{data?.paymentStatusCounts.pending || 0}</span>
+                  <span className="font-bold text-[#1F2937] dark:text-[#FFFFFF]">{data?.paymentStatusCounts.pending || 0}</span>
                 </div>
-                <div className="w-full h-2 bg-[#F1EBEF] dark:bg-[#2B2230] rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-[#F3F4F6] dark:bg-[#1C2230] rounded-full overflow-hidden">
                   <div
                     style={{
                       width: `${
@@ -550,7 +550,7 @@ export default function DashboardPage() {
                         100
                       }%`,
                     }}
-                    className="h-full bg-[#C65B62] dark:bg-[#EF858B] rounded-full transition-all"
+                    className="h-full bg-[#EF4444] rounded-full transition-all"
                   />
                 </div>
               </div>
@@ -559,7 +559,7 @@ export default function DashboardPage() {
 
           <Link
             href="/app/billing"
-            className="mt-6 pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] text-xs font-semibold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center justify-center gap-1"
+            className="mt-6 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1"
           >
             Process Billing & Invoices →
           </Link>
@@ -569,15 +569,15 @@ export default function DashboardPage() {
       {/* Bottom Grid: Upcoming Appointments & Low Stock Warnings */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Upcoming Appointments */}
-        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs">
+        <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5]">Upcoming Appointments</h3>
-              <p className="text-xs text-[#77717A] dark:text-[#B5AAB8]">Next scheduled salon visits</p>
+              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Upcoming Appointments</h3>
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Next scheduled salon visits</p>
             </div>
             <Link
               href="/app/appointments"
-              className="text-xs font-bold text-[#4B263F] dark:text-[#D6A0B4] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center gap-1"
             >
               All Appointments →
             </Link>
@@ -585,26 +585,26 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             {!data?.recentAppointments || data.recentAppointments.length === 0 ? (
-              <div className="text-xs text-[#77717A] dark:text-[#B5AAB8] py-6 text-center">No scheduled appointments</div>
+              <div className="text-xs text-[#6B7280] dark:text-[#A0A8B8] py-6 text-center">No scheduled appointments</div>
             ) : (
               data.recentAppointments.map((appt) => (
                 <div
                   key={appt.id}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-[#F7F5F2] dark:bg-[#151218] border border-[#E8E1E5] dark:border-[#3A3040]"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-[#F8F9FA] dark:bg-[#080B12] border border-[#E5E7EB] dark:border-[#2A2F3A]"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] flex items-center justify-center font-bold text-xs text-center leading-tight">
+                    <div className="w-9 h-9 rounded-xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center font-bold text-xs text-center leading-tight">
                       {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-[#242126] dark:text-[#F5EFF5]">{appt.customer_name}</div>
-                      <div className="text-[11px] text-[#77717A] dark:text-[#B5AAB8]">
+                      <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF]">{appt.customer_name}</div>
+                      <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
                         {appt.service_name} · Stylist: {appt.staff_name}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-[#F1EBEF] dark:bg-[#2B2230] text-[#4B263F] dark:text-[#D6A0B4] border border-[#E8E1E5] dark:border-[#3A3040]">
+                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] border border-[#E5E7EB] dark:border-[#2A2F3A]">
                       {appt.status}
                     </span>
                   </div>
@@ -615,20 +615,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Low Stock Product Alerts */}
-        <div className="bg-white dark:bg-[#211B24] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E8E1E5] dark:border-[#3A3040] shadow-2xs">
+        <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-sm sm:text-base text-[#242126] dark:text-[#F5EFF5] flex items-center gap-2">
+              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] flex items-center gap-2">
                 <span>Inventory Alerts</span>
                 {data?.lowStockProducts && data.lowStockProducts.length > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-[#C65B62] dark:bg-[#EF858B] animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-ping" />
                 )}
               </h3>
-              <p className="text-xs text-[#77717A] dark:text-[#B5AAB8]">Products at or below reorder threshold</p>
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Products at or below reorder threshold</p>
             </div>
             <Link
               href="/app/live"
-              className="text-xs font-bold text-[#4B263F] dark:text-[#D6A0B4] hover:underline"
+              className="text-xs font-bold text-[#D4A77F] hover:text-[#B8905F] hover:underline"
             >
               Open Live Studio →
             </Link>
@@ -636,26 +636,26 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             {!data?.lowStockProducts || data.lowStockProducts.length === 0 ? (
-              <div className="text-xs text-[#2F7D68] dark:text-[#55B99A] font-medium py-6 text-center bg-[#2F7D68]/10 dark:bg-[#55B99A]/15 rounded-2xl border border-[#2F7D68]/20 dark:border-[#55B99A]/30">
+              <div className="text-xs text-[#10B981] font-medium py-6 text-center bg-[#10B981]/10 rounded-2xl border border-[#10B981]/20">
                 ✓ All retail product stocks are healthy!
               </div>
             ) : (
               data.lowStockProducts.map((p, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-[#C65B62]/10 dark:bg-[#EF858B]/15 border border-[#C65B62]/30 dark:border-[#EF858B]/30"
+                  className="flex items-center justify-between p-3 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/30"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#C65B62]/20 text-[#C65B62] dark:text-[#EF858B] flex items-center justify-center font-bold text-xs">
+                    <div className="w-9 h-9 rounded-xl bg-[#EF4444]/20 text-[#EF4444] flex items-center justify-center font-bold text-xs">
                       <AlertTriangle className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-[#242126] dark:text-[#F5EFF5]">{p.name}</div>
-                      <div className="text-[11px] text-[#77717A] dark:text-[#B5AAB8]">Retail: ₹{Number(p.price)}</div>
+                      <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF]">{p.name}</div>
+                      <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">Retail: ₹{Number(p.price)}</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-bold text-[#C65B62] dark:text-[#EF858B] bg-white dark:bg-[#211B24] border border-[#C65B62]/40 px-2.5 py-1 rounded-xl">
+                    <span className="text-xs font-bold text-[#EF4444] bg-white dark:bg-[#141926] border border-[#EF4444]/40 px-2.5 py-1 rounded-xl">
                       {p.stock} left (Min: {p.min_stock})
                     </span>
                   </div>

@@ -258,8 +258,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-900 flex flex-col items-center justify-center p-4">
-        <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-[#141926] flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 border-4 border-[#D4A77F] border-t-transparent rounded-full animate-spin"></div>
         <p className="mt-4 text-neutral-400 text-sm font-medium">Loading salon booking portal...</p>
       </div>
     );
@@ -267,7 +267,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
   if (error || !salon) {
     return (
-      <div className="min-h-screen bg-neutral-900 flex flex-col items-center justify-center p-4 text-center">
+      <div className="min-h-screen bg-[#141926] flex flex-col items-center justify-center p-4 text-center">
         <div className="w-16 h-16 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center text-2xl font-bold mb-4">
           !
         </div>
@@ -279,17 +279,17 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
   if (salon.booking_enabled === false) {
     return (
-      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6 text-center text-white">
-        <div className="w-20 h-20 rounded-3xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-3xl mb-4 shadow-xl">
+      <div className="min-h-screen bg-[#080B12] flex flex-col items-center justify-center p-6 text-center text-white">
+        <div className="w-20 h-20 rounded-3xl bg-[#141926] border border-[#2A2F3A] flex items-center justify-center text-3xl mb-4 shadow-xl">
           🔒
         </div>
         <h1 className="text-2xl font-extrabold text-white mb-2">Booking is closed</h1>
         <p className="text-sm text-neutral-400 max-w-sm mb-6">
           Online appointments for {salon.name} are currently paused by the salon manager.
         </p>
-        <div className="bg-neutral-900 p-4 rounded-2xl border border-neutral-800 text-xs text-neutral-300">
+        <div className="bg-[#141926] p-4 rounded-2xl border border-[#2A2F3A] text-xs text-neutral-300">
           For inquiries or appointments, please call the salon at:
-          <span className="block text-sm font-bold text-pink-400 mt-1 font-mono">
+          <span className="block text-sm font-bold text-[#D4A77F] mt-1 font-mono">
             {salon.phone || '+91 98250 12345'}
           </span>
         </div>
@@ -311,7 +311,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
     ? services
     : services.filter((s) => s.category === selectedCategory);
 
-  const brandColor = salon.brand_color || '#b3135b';
+  const brandColor = salon.brand_color || '#D4A77F';
 
   // Quick Customer Login Handler
   async function handleCustomerQuickLogin(e: React.FormEvent) {
@@ -491,10 +491,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-pink-500 selection:text-white">
+    <div className="min-h-screen bg-[#080B12] text-neutral-100 flex flex-col font-sans selection:bg-[#D4A77F] selection:text-[#080B12]">
       {/* Top Salon Hero Banner */}
       <div 
-        className="relative overflow-hidden border-b border-neutral-800 pb-6"
+        className="relative overflow-hidden border-b border-[#2A2F3A] pb-6"
         style={{
           background: `radial-gradient(ellipse at top, ${brandColor}40 0%, #0a0a0a 75%)`,
         }}
@@ -516,7 +516,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             {activeCustomer ? (
               <>
                 <span>👤 {activeCustomer.name.split(' ')[0]}</span>
-                <span className="text-[10px] text-pink-300 font-bold">My Records</span>
+                <span className="text-[10px] text-[#D4A77F] font-bold">My Records</span>
               </>
             ) : (
               <span>Client Portal →</span>
@@ -550,12 +550,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <div key={st.num} className="flex-1 flex flex-col items-center">
                   <div
                     className={`w-full h-1.5 rounded-full transition-all duration-300 ${
-                      currentStep >= st.num ? 'bg-pink-500' : 'bg-neutral-800'
+                      currentStep >= st.num ? 'bg-[#D4A77F]' : 'bg-[#1C2230]'
                     }`}
                   />
                   <span
                     className={`text-[10px] mt-1 font-medium transition-colors ${
-                      currentStep >= st.num ? 'text-pink-400' : 'text-neutral-500'
+                      currentStep >= st.num ? 'text-[#D4A77F]' : 'text-[#747D8D]'
                     }`}
                   >
                     {st.label}
@@ -594,8 +594,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                     selectedCategory === cat
-                      ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/20'
-                      : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
+                      ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-lg shadow-[#D4A77F]/20'
+                      : 'bg-[#141926] text-neutral-400 hover:text-white border border-[#2A2F3A]'
                   }`}
                 >
                   {cat}
@@ -613,14 +613,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     onClick={() => handleSelectService(svc)}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer flex justify-between items-center ${
                       isSelected
-                        ? 'bg-neutral-900 border-pink-500 ring-2 ring-pink-500/20'
-                        : 'bg-neutral-900/60 hover:bg-neutral-900 border-neutral-800'
+                        ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
+                        : 'bg-[#141926]/60 hover:bg-[#141926] border-[#2A2F3A]'
                     }`}
                   >
                     <div className="flex-1 pr-3">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-sm sm:text-base text-white">{svc.name}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-400 font-medium">
+                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#1C2230] text-neutral-400 font-medium">
                           {svc.category}
                         </span>
                       </div>
@@ -628,7 +628,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         <p className="text-xs text-neutral-400 mt-1 line-clamp-2">{svc.description}</p>
                       )}
                       <div className="flex items-center gap-3 mt-2 text-xs text-neutral-400">
-                        <span className="flex items-center gap-1 text-pink-400 font-medium">
+                        <span className="flex items-center gap-1 text-[#D4A77F] font-medium">
                           ⏱ {svc.duration_min} mins
                         </span>
                       </div>
@@ -641,8 +641,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         type="button"
                         className={`mt-2 px-3.5 py-1 rounded-xl text-xs font-semibold transition-all ${
                           isSelected
-                            ? 'bg-pink-500 text-white shadow-md'
-                            : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                            ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-md'
+                            : 'bg-[#1C2230] text-neutral-300 hover:bg-neutral-700'
                         }`}
                       >
                         {isSelected ? 'Selected ✓' : 'Select'}
@@ -654,7 +654,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Floating Next Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-neutral-950/90 backdrop-blur-md border-t border-neutral-800 z-10 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#080B12]/90 backdrop-blur-md border-t border-[#2A2F3A] z-10 flex justify-center">
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <div>
                   {selectedService ? (
@@ -670,7 +670,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   type="button"
                   disabled={!selectedService}
                   onClick={() => updateStep(2)}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95"
+                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95"
                 >
                   Continue →
                 </button>
@@ -686,7 +686,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div>
                 <button
                   onClick={() => updateStep(1)}
-                  className="text-xs text-pink-400 hover:underline mb-1 inline-block"
+                  className="text-xs text-[#D4A77F] hover:underline mb-1 inline-block"
                 >
                   ← Back to Services
                 </button>
@@ -703,8 +703,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 onClick={() => setSelectedStaffId('anyone')}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                   selectedStaffId === 'anyone'
-                    ? 'bg-neutral-900 border-pink-500 ring-2 ring-pink-500/20'
-                    : 'bg-neutral-900/60 hover:bg-neutral-900 border-neutral-800'
+                    ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
+                    : 'bg-[#141926]/60 hover:bg-[#141926] border-[#2A2F3A]'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -718,7 +718,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                    selectedStaffId === 'anyone' ? 'border-pink-500 bg-pink-500 text-white text-xs' : 'border-neutral-700'
+                    selectedStaffId === 'anyone' ? 'border-[#D4A77F] bg-[#D4A77F] text-[#080B12] font-bold text-xs' : 'border-[#2A2F3A]'
                   }`}
                 >
                   {selectedStaffId === 'anyone' && '✓'}
@@ -734,12 +734,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     onClick={() => setSelectedStaffId(st.id)}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
-                        ? 'bg-neutral-900 border-pink-500 ring-2 ring-pink-500/20'
-                        : 'bg-neutral-900/60 hover:bg-neutral-900 border-neutral-800'
+                        ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
+                        : 'bg-[#141926]/60 hover:bg-[#141926] border-[#2A2F3A]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-neutral-800 text-pink-400 flex items-center justify-center font-bold text-base border border-neutral-700">
+                      <div className="w-11 h-11 rounded-2xl bg-[#1C2230] text-[#D4A77F] flex items-center justify-center font-bold text-base border border-[#2A2F3A]">
                         {st.name.charAt(0)}
                       </div>
                       <div>
@@ -749,7 +749,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     </div>
                     <div
                       className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                        isSelected ? 'border-pink-500 bg-pink-500 text-white text-xs' : 'border-neutral-700'
+                        isSelected ? 'border-[#D4A77F] bg-[#D4A77F] text-[#080B12] font-bold text-xs' : 'border-[#2A2F3A]'
                       }`}
                     >
                       {isSelected && '✓'}
@@ -763,14 +763,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => updateStep(1)}
-                  className="px-4 py-2.5 rounded-2xl bg-neutral-900 text-neutral-300 text-xs font-semibold hover:bg-neutral-800 cursor-pointer"
+                  className="px-4 py-2.5 rounded-2xl bg-[#141926] text-neutral-300 text-xs font-semibold hover:bg-[#1C2230] cursor-pointer"
                 >
                   ← Back to Services
                 </button>
                 <button
                   type="button"
                   onClick={() => updateStep(3)}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95 cursor-pointer"
+                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
                 >
                   Select Date & Time →
                 </button>
@@ -778,19 +778,19 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Floating Next Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-neutral-950/90 backdrop-blur-md border-t border-neutral-800 z-10 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#080B12]/90 backdrop-blur-md border-t border-[#2A2F3A] z-10 flex justify-center">
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <button
                   type="button"
                   onClick={() => updateStep(1)}
-                  className="px-4 py-2.5 rounded-2xl bg-neutral-900 text-neutral-300 text-xs font-semibold hover:bg-neutral-800"
+                  className="px-4 py-2.5 rounded-2xl bg-[#141926] text-neutral-300 text-xs font-semibold hover:bg-[#1C2230]"
                 >
                   ← Back
                 </button>
                 <button
                   type="button"
                   onClick={() => updateStep(3)}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95"
+                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95"
                 >
                   Select Date & Time →
                 </button>
@@ -806,7 +806,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div>
                 <button
                   onClick={() => updateStep(2)}
-                  className="text-xs text-pink-400 hover:underline mb-1 inline-block"
+                  className="text-xs text-[#D4A77F] hover:underline mb-1 inline-block"
                 >
                   ← Back to Stylist
                 </button>
@@ -836,10 +836,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       }}
                       className={`flex flex-col items-center justify-center shrink-0 min-w-[84px] sm:min-w-[92px] px-2.5 py-3 rounded-2xl border transition-all cursor-pointer ${
                         d.isClosed
-                          ? 'opacity-30 cursor-not-allowed bg-neutral-900/40 border-neutral-800'
+                          ? 'opacity-30 cursor-not-allowed bg-[#141926]/40 border-[#2A2F3A]'
                           : isSelected
-                          ? 'bg-pink-500 border-pink-500 text-white shadow-lg shadow-pink-500/25 scale-102'
-                          : 'bg-neutral-900/80 border-neutral-800 text-neutral-300 hover:bg-neutral-900'
+                          ? 'bg-pink-500 border-[#D4A77F] text-white shadow-lg shadow-[#D4A77F]/20 scale-102'
+                          : 'bg-[#141926]/80 border-[#2A2F3A] text-neutral-300 hover:bg-[#141926]'
                       }`}
                     >
                       <span className="text-[10px] uppercase font-bold opacity-80 tracking-wider">{d.dayName}</span>
@@ -867,19 +867,19 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   Available Slots ({availableSlots.length})
                 </label>
                 {selectedSlot && (
-                  <span className="text-xs text-pink-400 font-semibold">
+                  <span className="text-xs text-[#D4A77F] font-semibold">
                     Selected: {selectedSlot.formattedTime}
                   </span>
                 )}
               </div>
 
               {slotsLoading ? (
-                <div className="py-12 flex flex-col items-center justify-center bg-neutral-900/40 rounded-3xl border border-neutral-800">
-                  <div className="w-8 h-8 border-3 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="py-12 flex flex-col items-center justify-center bg-[#141926]/40 rounded-3xl border border-[#2A2F3A]">
+                  <div className="w-8 h-8 border-3 border-[#D4A77F] border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-xs text-neutral-400 mt-3">Finding available free slots...</p>
                 </div>
               ) : availableSlots.length === 0 ? (
-                <div className="py-10 px-4 text-center bg-neutral-900/40 rounded-3xl border border-neutral-800">
+                <div className="py-10 px-4 text-center bg-[#141926]/40 rounded-3xl border border-[#2A2F3A]">
                   <span className="text-2xl block mb-2">🗓️</span>
                   <p className="text-xs sm:text-sm text-neutral-300 font-medium">
                     {slotNotice || 'The shop is closed for today. Please book an appointment for another date.'}
@@ -894,7 +894,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           setSelectedSlot(null);
                         }
                       }}
-                      className="mt-4 px-5 py-2.5 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
+                      className="mt-4 px-5 py-2.5 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
                     >
                       <span>👉 View Available Slots for Tomorrow</span>
                     </button>
@@ -918,8 +918,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         onClick={() => handleSelectSlot(slot)}
                         className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-pink-500 border-pink-500 text-white font-bold shadow-lg shadow-pink-500/30 scale-102'
-                            : 'bg-neutral-900/80 border-neutral-800 hover:border-neutral-700 text-neutral-200'
+                            ? 'bg-pink-500 border-[#D4A77F] text-white font-bold shadow-lg shadow-[#D4A77F]/20 scale-102'
+                            : 'bg-[#141926]/80 border-[#2A2F3A] hover:border-[#2A2F3A] text-neutral-200'
                         }`}
                       >
                         <div className="text-xs sm:text-sm font-semibold">{slot.formattedTime}</div>
@@ -937,12 +937,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Floating Next Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-neutral-950/90 backdrop-blur-md border-t border-neutral-800 z-10 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#080B12]/90 backdrop-blur-md border-t border-[#2A2F3A] z-10 flex justify-center">
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <button
                   type="button"
                   onClick={() => updateStep(2)}
-                  className="px-4 py-2.5 rounded-2xl bg-neutral-900 text-neutral-300 text-xs font-semibold hover:bg-neutral-800 cursor-pointer"
+                  className="px-4 py-2.5 rounded-2xl bg-[#141926] text-neutral-300 text-xs font-semibold hover:bg-[#1C2230] cursor-pointer"
                 >
                   ← Back
                 </button>
@@ -950,7 +950,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   type="button"
                   disabled={!selectedSlot}
                   onClick={handleProceedToDetails}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-pink-500/25 active:scale-95 cursor-pointer"
+                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
                 >
                   Enter Details →
                 </button>
@@ -966,7 +966,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div>
                 <button
                   onClick={() => updateStep(3)}
-                  className="text-xs text-pink-400 hover:underline mb-1 inline-block"
+                  className="text-xs text-[#D4A77F] hover:underline mb-1 inline-block"
                 >
                   ← Back to Slot Selection
                 </button>
@@ -978,11 +978,11 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Booking Summary Box */}
-            <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-5 mb-6">
-              <div className="text-[10px] uppercase font-bold tracking-wider text-pink-400 mb-2">
+            <div className="bg-[#141926] border border-[#2A2F3A] rounded-3xl p-5 mb-6">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-[#D4A77F] mb-2">
                 Booking Summary
               </div>
-              <div className="flex justify-between items-center border-b border-neutral-800 pb-3 mb-3">
+              <div className="flex justify-between items-center border-b border-[#2A2F3A] pb-3 mb-3">
                 <div>
                   <div className="font-bold text-base text-white">{selectedService?.name}</div>
                   <div className="text-xs text-neutral-400">
@@ -1037,14 +1037,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     setCustomerName('');
                     setCustomerMobile('');
                   }}
-                  className="px-3.5 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-semibold self-start sm:self-auto transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#1C2230] hover:bg-neutral-700 text-neutral-300 text-xs font-semibold self-start sm:self-auto transition-all"
                 >
                   Switch / Log Out
                 </button>
               </div>
             ) : (
               <div className="mb-5">
-                <div className="flex rounded-2xl bg-neutral-900 border border-neutral-800 p-1 mb-4">
+                <div className="flex rounded-2xl bg-[#141926] border border-[#2A2F3A] p-1 mb-4">
                   <button
                     type="button"
                     onClick={() => {
@@ -1053,7 +1053,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     }}
                     className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
                       customerAuthMode === 'new'
-                        ? 'bg-pink-500 text-white shadow-md'
+                        ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-md'
                         : 'text-neutral-400 hover:text-white'
                     }`}
                   >
@@ -1067,7 +1067,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     }}
                     className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
                       customerAuthMode === 'existing'
-                        ? 'bg-pink-500 text-white shadow-md'
+                        ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-md'
                         : 'text-neutral-400 hover:text-white'
                     }`}
                   >
@@ -1076,8 +1076,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 </div>
 
                 {customerAuthMode === 'existing' && (
-                  <div className="bg-neutral-900/90 border border-neutral-800 rounded-3xl p-5 mb-4 space-y-3">
-                    <div className="text-xs font-bold text-pink-400 uppercase tracking-wider">
+                  <div className="bg-[#141926]/90 border border-[#2A2F3A] rounded-3xl p-5 mb-4 space-y-3">
+                    <div className="text-xs font-bold text-[#D4A77F] uppercase tracking-wider">
                       Quick Login to Autofill Profile
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1090,7 +1090,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           placeholder="9898023456"
                           value={customerMobile}
                           onChange={(e) => setCustomerMobile(e.target.value)}
-                          className="w-full bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:border-pink-500"
+                          className="w-full bg-[#080B12] border border-[#2A2F3A] rounded-xl px-3 py-2 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:border-[#D4A77F]"
                         />
                       </div>
                       <div>
@@ -1105,7 +1105,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           placeholder="Enter PIN"
                           value={loginPin}
                           onChange={(e) => setLoginPin(e.target.value)}
-                          className="w-full bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-sm text-white text-center font-mono focus:outline-none focus:border-pink-500"
+                          className="w-full bg-[#080B12] border border-[#2A2F3A] rounded-xl px-3 py-2 text-sm text-white text-center font-mono focus:outline-none focus:border-[#D4A77F]"
                         />
                       </div>
                     </div>
@@ -1113,7 +1113,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       type="button"
                       disabled={verifyingLogin}
                       onClick={handleCustomerQuickLogin}
-                      className="w-full py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 border border-neutral-700"
+                      className="w-full py-2.5 rounded-xl bg-[#1C2230] hover:bg-neutral-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 border border-[#2A2F3A]"
                     >
                       {verifyingLogin ? 'Verifying...' : 'Verify & Load My Profile ➔'}
                     </button>
@@ -1126,7 +1126,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             <form onSubmit={handleBookAppointment} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Your Full Name <span className="text-pink-500">*</span>
+                  Your Full Name <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
                   type="text"
@@ -1134,13 +1134,13 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   placeholder="e.g. Diya Joshi"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+                  className="w-full bg-[#141926] border border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-pink-500"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Mobile Number (WhatsApp) <span className="text-pink-500">*</span>
+                  Mobile Number (WhatsApp) <span className="text-[#D4A77F]">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-3 text-sm text-neutral-500 font-mono">+91</span>
@@ -1150,7 +1150,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     placeholder="9898023456"
                     value={customerMobile}
                     onChange={(e) => setCustomerMobile(e.target.value)}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl pl-14 pr-4 py-3 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+                    className="w-full bg-[#141926] border border-[#2A2F3A] rounded-2xl pl-14 pr-4 py-3 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-pink-500"
                   />
                 </div>
               </div>
@@ -1164,17 +1164,17 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   placeholder="e.g. First time visiting, prefer sensitive skin products"
                   value={bookingNote}
                   onChange={(e) => setBookingNote(e.target.value)}
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500"
+                  className="w-full bg-[#141926] border border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-pink-500"
                 />
               </div>
 
               {/* 4-digit verification code / portal PIN */}
               {!activeCustomer && (
-                <div className="bg-pink-500/10 border border-pink-500/30 rounded-2xl p-4">
+                <div className="bg-[#D4A77F]/15 border border-[#D4A77F]/30 rounded-2xl p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
                     <div>
-                      <label className="block text-xs font-bold text-pink-300 mb-1.5">
-                        Set 4-Digit Security PIN <span className="text-pink-500">*</span>
+                      <label className="block text-xs font-bold text-[#D4A77F] mb-1.5">
+                        Set 4-Digit Security PIN <span className="text-[#D4A77F]">*</span>
                       </label>
                       <input
                         type="password"
@@ -1183,12 +1183,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         placeholder="Enter 4-digit PIN"
                         value={verificationCode}
                         onChange={(e) => setVerificationCode(e.target.value)}
-                        className="w-full bg-neutral-900/90 border border-pink-500/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-pink-500"
+                        className="w-full bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-[#D4A77F]"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-pink-300 mb-1.5">
-                        Confirm 4-Digit PIN <span className="text-pink-500">*</span>
+                      <label className="block text-xs font-bold text-[#D4A77F] mb-1.5">
+                        Confirm 4-Digit PIN <span className="text-[#D4A77F]">*</span>
                       </label>
                       <input
                         type="password"
@@ -1197,7 +1197,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         placeholder="Re-enter 4-digit PIN"
                         value={confirmVerificationCode}
                         onChange={(e) => setConfirmVerificationCode(e.target.value)}
-                        className="w-full bg-neutral-900/90 border border-pink-500/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-pink-500"
+                        className="w-full bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-[#D4A77F]"
                       />
                     </div>
                   </div>
@@ -1220,7 +1220,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 disabled:opacity-50 text-white font-extrabold text-base shadow-xl shadow-pink-500/25 transition-all active:scale-98 flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold disabled:opacity-50 text-base shadow-xl shadow-[#D4A77F]/20 transition-all active:scale-98 flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>
@@ -1248,8 +1248,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </p>
 
             {/* Appointment Card */}
-            <div className="mt-6 bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-left max-w-md mx-auto shadow-xl">
-              <div className="text-[10px] uppercase font-bold tracking-wider text-pink-400 mb-1">
+            <div className="mt-6 bg-[#141926] border border-[#2A2F3A] rounded-3xl p-6 text-left max-w-md mx-auto shadow-xl">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-[#D4A77F] mb-1">
                 Confirmed Appointment
               </div>
               <div className="text-xl font-extrabold text-white">{confirmedBooking.serviceName}</div>
@@ -1257,7 +1257,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 Stylist: <span className="text-white font-semibold">{confirmedBooking.staffName}</span>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-neutral-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="mt-4 pt-4 border-t border-[#2A2F3A] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className="text-neutral-500 block text-[10px] uppercase font-bold">Date</span>
                   <span className="font-bold text-white">{confirmedBooking.formattedDate}</span>
@@ -1319,7 +1319,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center items-center">
               <Link
                 href="/portal"
-                className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-pink-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold  text-xs sm:text-sm shadow-xl shadow-[#D4A77F]/20 transition-all flex items-center justify-center gap-2 active:scale-95"
               >
                 <span>👤 Go to My Account & Invoices Portal →</span>
               </Link>
@@ -1332,18 +1332,18 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   setConfirmedBooking(null);
                   setSubmitError(null);
                 }}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-bold border border-neutral-800 transition-all active:scale-95"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[#141926] hover:bg-[#1C2230] text-neutral-300 text-xs font-bold border border-[#2A2F3A] transition-all active:scale-95"
               >
                 Book Another Appointment ↺
               </button>
             </div>
 
             {/* Account Records Reminder Card */}
-            <div className="mt-5 p-4 rounded-2xl bg-neutral-900/80 border border-neutral-800 text-neutral-400 text-xs flex items-center justify-center gap-2 max-w-md mx-auto text-center leading-relaxed">
+            <div className="mt-5 p-4 rounded-2xl bg-[#141926]/80 border border-[#2A2F3A] text-neutral-400 text-xs flex items-center justify-center gap-2 max-w-md mx-auto text-center leading-relaxed">
               <span>💡</span>
               <span>
                 Your customer record is permanently stored! You can log in anytime at{' '}
-                <Link href="/portal" className="text-pink-400 underline font-semibold">/portal</Link> with mobile{' '}
+                <Link href="/portal" className="text-[#D4A77F] underline font-semibold">/portal</Link> with mobile{' '}
                 <strong className="text-white font-mono">{confirmedBooking.cleanMobile}</strong> and PIN{' '}
                 <strong className="text-white font-mono">{confirmedBooking.customerPin || '••••'}</strong> to review your past visits, itemized bills, and VIP benefits.
               </span>

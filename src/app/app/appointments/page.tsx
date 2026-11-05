@@ -345,7 +345,7 @@ export default function AppointmentsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Appointments & Booking Roster
           </h1>
           <p className="text-sm text-neutral-500 mt-0.5">
@@ -356,7 +356,7 @@ export default function AppointmentsPage() {
         <button
           type="button"
           onClick={() => openCreateModal()}
-          className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#b3135b] hover:bg-[#960f4c] text-white text-xs font-semibold shadow-md shadow-[#b3135b]/20 transition-all cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center gap-2 py-2.5 px-4 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>New Appointment</span>
@@ -420,7 +420,7 @@ export default function AppointmentsPage() {
             onClick={() => setViewMode('calendar')}
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'calendar'
-                ? 'bg-[#b3135b] text-white shadow-xs'
+                ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs'
                 : 'text-neutral-600 hover:bg-neutral-50'
             }`}
           >
@@ -433,7 +433,7 @@ export default function AppointmentsPage() {
             onClick={() => setViewMode('cards')}
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               viewMode === 'cards'
-                ? 'bg-[#b3135b] text-white shadow-xs'
+                ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs'
                 : 'text-neutral-600 hover:bg-neutral-50'
             }`}
           >
@@ -449,7 +449,7 @@ export default function AppointmentsPage() {
               onClick={() => setDateRangeFilter('next7')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 dateRangeFilter === 'next7'
-                  ? 'bg-[#2a1630] text-white shadow-xs'
+                  ? 'bg-[#10141F] text-white shadow-xs'
                   : 'text-neutral-600 hover:bg-neutral-50'
               }`}
             >
@@ -459,7 +459,7 @@ export default function AppointmentsPage() {
               onClick={() => setDateRangeFilter('today')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 dateRangeFilter === 'today'
-                  ? 'bg-[#2a1630] text-white shadow-xs'
+                  ? 'bg-[#10141F] text-white shadow-xs'
                   : 'text-neutral-600 hover:bg-neutral-50'
               }`}
             >
@@ -469,7 +469,7 @@ export default function AppointmentsPage() {
               onClick={() => setDateRangeFilter('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 dateRangeFilter === 'all'
-                  ? 'bg-[#2a1630] text-white shadow-xs'
+                  ? 'bg-[#10141F] text-white shadow-xs'
                   : 'text-neutral-600 hover:bg-neutral-50'
               }`}
             >
@@ -492,7 +492,7 @@ export default function AppointmentsPage() {
               onClick={handleToday}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                 calendarDate === todayDate
-                  ? 'bg-pink-100 text-[#b3135b]'
+                  ? 'bg-pink-100 text-[#D4A77F]'
                   : 'text-neutral-600 hover:bg-neutral-100'
               }`}
             >
@@ -503,7 +503,7 @@ export default function AppointmentsPage() {
               type="date"
               value={calendarDate}
               onChange={(e) => setCalendarDate(e.target.value)}
-              className="px-2 py-1 text-xs font-bold text-neutral-800 border border-neutral-200 rounded-lg focus:outline-none focus:border-[#b3135b]"
+              className="px-2 py-1 text-xs font-bold text-neutral-800 border border-neutral-200 rounded-lg focus:outline-none focus:border-[#D4A77F]"
             />
 
             <button
@@ -525,7 +525,7 @@ export default function AppointmentsPage() {
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize whitespace-nowrap transition-colors cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-[#b3135b] text-white shadow-xs font-semibold'
+                  ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs font-semibold'
                   : 'bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50'
               }`}
             >
@@ -547,8 +547,8 @@ export default function AppointmentsPage() {
           <div className="p-4 sm:p-5 bg-gradient-to-r from-neutral-50 to-pink-50/40 border-b border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4 text-[#b3135b]" />
-                <h2 className="font-extrabold text-sm sm:text-base text-[#2a1630]">
+                <CalendarIcon className="w-4 h-4 text-[#D4A77F]" />
+                <h2 className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-white">
                   {calendarDate
                     ? new Date(calendarDate + 'T00:00:00').toLocaleDateString('en-IN', {
                         weekday: 'long',
@@ -568,7 +568,7 @@ export default function AppointmentsPage() {
               <span className="text-xs font-bold text-neutral-500">
                 Bookings for Day:
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-[#b3135b] text-white text-xs font-black">
+              <span className="px-2.5 py-1 rounded-full bg-[#D4A77F] text-[#080B12] font-bold text-xs font-black">
                 {appointments.length}
               </span>
             </div>
@@ -595,9 +595,9 @@ export default function AppointmentsPage() {
                   className="flex flex-col sm:flex-row items-stretch sm:items-start min-h-[82px] p-3 sm:p-4 hover:bg-neutral-50/50 transition-colors gap-3 sm:gap-4"
                 >
                   {/* Time Label Column */}
-                  <div className="w-24 sm:w-28 flex-shrink-0 flex sm:flex-col justify-between sm:justify-start items-center sm:items-start pt-1 text-xs font-black text-[#2a1630]">
+                  <div className="w-24 sm:w-28 flex-shrink-0 flex sm:flex-col justify-between sm:justify-start items-center sm:items-start pt-1 text-xs font-black text-[#1F2937] dark:text-white">
                     <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#b3135b]" />
+                      <Clock className="w-3.5 h-3.5 text-[#D4A77F]" />
                       <span>{hourFormatted}</span>
                     </div>
                     <span className="text-[10px] text-neutral-400 font-normal sm:mt-0.5">
@@ -611,7 +611,7 @@ export default function AppointmentsPage() {
                       <button
                         type="button"
                         onClick={() => openCreateModal(`${hour.toString().padStart(2, '0')}:00`, calendarDate)}
-                        className="w-full h-12 border-2 border-dashed border-neutral-200 hover:border-[#b3135b]/60 rounded-2xl flex items-center justify-center gap-1.5 text-xs text-neutral-400 hover:text-[#b3135b] hover:bg-pink-50/20 transition-all cursor-pointer group"
+                        className="w-full h-12 border-2 border-dashed border-neutral-200 hover:border-[#D4A77F]/60 rounded-2xl flex items-center justify-center gap-1.5 text-xs text-neutral-400 hover:text-[#D4A77F] hover:bg-[#D4A77F]/10 transition-all cursor-pointer group"
                       >
                         <Plus className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                         <span>Empty Slot ({hourFormatted}) — Click to Book Appointment</span>
@@ -636,12 +636,12 @@ export default function AppointmentsPage() {
                                   ? 'bg-emerald-50/50 border-emerald-300'
                                   : isCancelled
                                   ? 'bg-neutral-100/70 border-neutral-200 opacity-60'
-                                  : 'bg-white border-pink-200/90 hover:border-[#b3135b] shadow-xs'
+                                  : 'bg-white border-[#D4A77F]/30 hover:border-[#D4A77F] shadow-xs'
                               }`}
                             >
                               <div>
                                 <div className="flex items-center justify-between gap-1 mb-1.5">
-                                  <span className="text-xs font-black text-[#b3135b] flex items-center gap-1">
+                                  <span className="text-xs font-black text-[#D4A77F] flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
                                     {startDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })} -{' '}
                                     {endDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
@@ -662,7 +662,7 @@ export default function AppointmentsPage() {
                                   </span>
                                 </div>
 
-                                <div className="font-extrabold text-sm text-[#2a1630] truncate">
+                                <div className="font-extrabold text-sm text-[#1F2937] dark:text-white truncate">
                                   {appt.customer_name}
                                 </div>
                                 <div className="text-[11px] text-neutral-500 flex items-center gap-1">
@@ -679,7 +679,7 @@ export default function AppointmentsPage() {
                                       Stylist: {appt.staff_name}
                                     </span>
                                   </div>
-                                  <span className="font-black text-[#b3135b] text-xs shrink-0">
+                                  <span className="font-black text-[#D4A77F] text-xs shrink-0">
                                     ₹{Number(appt.service_price).toLocaleString('en-IN')}
                                   </span>
                                 </div>
@@ -707,7 +707,7 @@ export default function AppointmentsPage() {
                                   <button
                                     type="button"
                                     onClick={() => handleStartSessionFromAppt(appt.id)}
-                                    className="flex-1 py-1.5 px-2.5 rounded-lg bg-[#b3135b] hover:bg-[#960f4c] text-white text-[11px] font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1"
+                                    className="flex-1 py-1.5 px-2.5 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-[11px] font-bold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1"
                                   >
                                     <Play className="w-2.5 h-2.5 fill-white" />
                                     <span>Start POS</span>
@@ -770,7 +770,7 @@ export default function AppointmentsPage() {
                 <div>
                   <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-neutral-100">
                     <div className="flex flex-col gap-0.5">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#b3135b]">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#D4A77F]">
                         <Clock className="w-3.5 h-3.5" />
                         <span>
                           {startDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })} -{' '}
@@ -799,7 +799,7 @@ export default function AppointmentsPage() {
 
                   {/* Customer Info */}
                   <div className="pt-2.5">
-                    <div className="font-bold text-base text-[#2a1630]">
+                    <div className="font-bold text-base text-[#1F2937] dark:text-white">
                       {appt.customer_name}
                     </div>
                     <div className="text-xs text-neutral-400 flex items-center gap-1 mt-0.5">
@@ -812,7 +812,7 @@ export default function AppointmentsPage() {
                   <div className="mt-3 bg-neutral-50/80 p-2.5 rounded-xl border border-neutral-200/60 text-xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-neutral-800 flex items-center gap-1.5">
-                        <Scissors className="w-3 h-3 text-[#b3135b]" />
+                        <Scissors className="w-3 h-3 text-[#D4A77F]" />
                         <span>{appt.service_name}</span>
                       </span>
                       <span className="font-bold text-neutral-900">
@@ -848,7 +848,7 @@ export default function AppointmentsPage() {
                       </button>
                       <button
                         onClick={() => handleStartSessionFromAppt(appt.id)}
-                        className="py-1.5 px-3 rounded-lg bg-[#b3135b] hover:bg-[#960f4c] text-white font-semibold text-xs flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                        className="py-1.5 px-3 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold font-semibold text-xs flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
                       >
                         <Play className="w-3 h-3 fill-white" />
                         <span>Start Session</span>
@@ -871,7 +871,7 @@ export default function AppointmentsPage() {
                       </span>
                       <button
                         onClick={() => handleStartSessionFromAppt(appt.id)}
-                        className="py-1.5 px-3 rounded-lg bg-[#b3135b] hover:bg-[#960f4c] text-white font-semibold text-xs flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                        className="py-1.5 px-3 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold font-semibold text-xs flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
                       >
                         <Play className="w-3 h-3 fill-white" />
                         <span>Start Session</span>
@@ -929,8 +929,8 @@ export default function AppointmentsPage() {
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-lg w-full p-6 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <h2 className="text-base font-bold text-[#2a1630] flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4 text-[#b3135b]" />
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-[#D4A77F]" />
                 <span>Book New Salon Appointment</span>
               </h2>
               <button
@@ -962,7 +962,7 @@ export default function AppointmentsPage() {
                   <button
                     type="button"
                     onClick={() => setIsNewCustomer(!isNewCustomer)}
-                    className="text-xs text-[#b3135b] hover:underline font-semibold cursor-pointer"
+                    className="text-xs text-[#D4A77F] hover:underline font-semibold cursor-pointer"
                   >
                     {isNewCustomer ? 'Select Existing Client' : '+ New Client'}
                   </button>
@@ -972,7 +972,7 @@ export default function AppointmentsPage() {
                   <select
                     value={selectedCustomerId}
                     onChange={(e) => setSelectedCustomerId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none bg-white"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white"
                   >
                     {customers.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -988,7 +988,7 @@ export default function AppointmentsPage() {
                       placeholder="Client Full Name"
                       value={newCustName}
                       onChange={(e) => setNewCustName(e.target.value)}
-                      className="px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                      className="px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                     />
                     <input
                       type="tel"
@@ -996,7 +996,7 @@ export default function AppointmentsPage() {
                       placeholder="Mobile (10 digits)"
                       value={newCustMobile}
                       onChange={(e) => setNewCustMobile(e.target.value)}
-                      className="px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                      className="px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                     />
                   </div>
                 )}
@@ -1013,7 +1013,7 @@ export default function AppointmentsPage() {
                     setSelectedStaffId(e.target.value);
                     setOverlapError(null);
                   }}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none bg-white font-medium"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white font-medium"
                 >
                   {staffList.map((st) => (
                     <option key={st.id} value={st.id}>
@@ -1034,7 +1034,7 @@ export default function AppointmentsPage() {
                     setSelectedServiceId(e.target.value);
                     setOverlapError(null);
                   }}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none bg-white"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white"
                 >
                   {services.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -1058,7 +1058,7 @@ export default function AppointmentsPage() {
                       setFormDate(e.target.value);
                       setOverlapError(null);
                     }}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                   />
                 </div>
 
@@ -1075,16 +1075,16 @@ export default function AppointmentsPage() {
                       setFormTime(e.target.value);
                       setOverlapError(null);
                     }}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                   />
                 </div>
               </div>
 
               {/* Live Slot Calculation Card */}
-              <div className="p-3 bg-pink-50/60 rounded-xl border border-pink-200/80 text-xs flex items-center justify-between">
+              <div className="p-3 bg-[#D4A77F]/15 rounded-xl border border-[#D4A77F]/30 text-xs flex items-center justify-between">
                 <div>
                   <span className="text-neutral-500 block">Calculated Slot Time:</span>
-                  <span className="font-bold text-[#b3135b]">
+                  <span className="font-bold text-[#D4A77F]">
                     {formTime} ➔ {getCalculatedEndTime()} ({duration} mins)
                   </span>
                 </div>
@@ -1106,7 +1106,7 @@ export default function AppointmentsPage() {
                   placeholder="e.g. Client requested ammonia-free color"
                   value={formNote}
                   onChange={(e) => setFormNote(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
@@ -1121,7 +1121,7 @@ export default function AppointmentsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 text-xs font-semibold bg-[#b3135b] hover:bg-[#960f4c] text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'Checking Availability...' : 'Confirm Appointment'}
                 </button>

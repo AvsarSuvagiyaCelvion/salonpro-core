@@ -21,7 +21,7 @@ interface BarComparisonChartProps {
 
 export default function BarComparisonChart({
   items,
-  color = '#b3135b',
+  color = '#D4A77F',
   maxCustomValue,
   currencySymbol = '₹',
 }: BarComparisonChartProps) {
@@ -29,7 +29,7 @@ export default function BarComparisonChart({
 
   if (!items || items.length === 0) {
     return (
-      <div className="py-8 text-center text-xs text-neutral-400">
+      <div className="py-8 text-center text-xs text-[#9CA3AF]">
         No ranking data available
       </div>
     );
@@ -53,30 +53,32 @@ export default function BarComparisonChart({
           >
             <div className="flex items-center justify-between text-xs mb-1.5 gap-2">
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="w-5 h-5 rounded-lg bg-neutral-100 text-neutral-600 flex items-center justify-center font-bold text-[10px] shrink-0">
+                <span className="w-5 h-5 rounded-lg bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center font-bold text-[10px] shrink-0">
                   #{idx + 1}
                 </span>
-                <span className="font-extrabold text-neutral-800 truncate">
+                <span className="font-extrabold text-[#1F2937] dark:text-[#FFFFFF] truncate">
                   {item.label}
                 </span>
                 {item.sublabel && (
-                  <span className="text-[10px] text-neutral-400 truncate hidden sm:inline">
+                  <span className="text-[10px] text-[#6B7280] dark:text-[#A0A8B8] truncate hidden sm:inline">
                     · {item.sublabel}
                   </span>
                 )}
               </div>
-
-              <div className="font-mono text-xs font-black text-neutral-900 shrink-0">
-                {item.formattedValue ||
-                  `${currencySymbol}${item.value.toLocaleString('en-IN')}`}
-              </div>
+              <span className="font-mono font-bold text-[#1F2937] dark:text-[#FFFFFF] text-xs shrink-0">
+                {item.formattedValue || `${currencySymbol}${item.value.toLocaleString('en-IN')}`}
+              </span>
             </div>
 
-            {/* Bar Track & Progress */}
-            <div className="h-3.5 w-full bg-neutral-100 rounded-full overflow-hidden p-0.5 border border-neutral-200/50">
+            {/* Horizontal Track & Animated Fill Bar */}
+            <div className="w-full h-2 rounded-full bg-[#F3F4F6] dark:bg-[#1C2230] overflow-hidden">
               <div
-                style={{ width: `${pct}%`, backgroundColor: barColor }}
-                className="h-full rounded-full transition-all duration-500 ease-out shadow-xs group-hover:brightness-110"
+                className="h-full rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${pct}%`,
+                  backgroundColor: barColor,
+                  filter: isHovered ? 'brightness(1.15)' : 'none',
+                }}
               />
             </div>
           </div>
@@ -85,4 +87,3 @@ export default function BarComparisonChart({
     </div>
   );
 }
-

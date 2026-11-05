@@ -217,7 +217,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="py-20 flex flex-col items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#b3135b] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-[#D4A77F] border-t-transparent rounded-full animate-spin"></div>
         <p className="text-xs text-neutral-400 mt-3 font-medium">Loading settings...</p>
       </div>
     );
@@ -230,7 +230,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Salon Settings
           </h1>
           <p className="text-xs sm:text-sm text-neutral-500 mt-1">
@@ -243,7 +243,7 @@ export default function SettingsPage() {
           type="button"
           onClick={handleSaveSettings}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95 self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95 self-start sm:self-auto"
         >
           <Save className="w-4 h-4" />
           <span>{saving ? 'Saving Changes...' : 'Save Settings'}</span>
@@ -279,7 +279,7 @@ export default function SettingsPage() {
               onClick={() => setActiveSection(tab.id as any)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
                 isActive
-                  ? 'bg-[#b3135b] text-white shadow-sm'
+                  ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm'
                   : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200'
               }`}
             >
@@ -295,7 +295,7 @@ export default function SettingsPage() {
         {activeSection === 'salon' && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-6">
             <div>
-              <h2 className="text-base font-bold text-[#2a1630]">Salon Information</h2>
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white">Salon Information</h2>
               <p className="text-xs text-neutral-400 mt-0.5">
                 Public information shown to clients on digital invoices and booking
               </p>
@@ -305,14 +305,14 @@ export default function SettingsPage() {
               {/* Salon Name */}
               <div className="sm:col-span-2">
                 <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                  Salon Name <span className="text-pink-600">*</span>
+                  Salon Name <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b] focus:ring-1 focus:ring-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                   placeholder="e.g. Glow Studio"
                 />
               </div>
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b] focus:ring-1 focus:ring-[#b3135b]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                     placeholder="e.g. 101, Titanium Square, Thaltej, Ahmedabad"
                   />
                 </div>
@@ -345,7 +345,7 @@ export default function SettingsPage() {
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#b3135b] focus:ring-1 focus:ring-[#b3135b]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                     placeholder="+91 98250 12345"
                   />
                 </div>
@@ -375,7 +375,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-center gap-4">
                   <div
-                    className="w-16 h-16 rounded-2xl bg-[#b3135b] flex items-center justify-center font-bold text-white text-2xl shadow-md overflow-hidden relative"
+                    className="w-16 h-16 rounded-2xl bg-[#D4A77F] flex items-center justify-center font-bold text-white text-2xl shadow-md overflow-hidden relative"
                   >
                     {logoUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
@@ -443,7 +443,7 @@ export default function SettingsPage() {
                   <Link
                     href={`/${slug}`}
                     target="_blank"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#b3135b] text-white text-xs font-semibold shadow-xs hover:bg-[#99104e] transition-all"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] text-[#080B12] font-bold text-xs shadow-xs hover:bg-[#B8905F] transition-all"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>Open</span>
@@ -454,7 +454,7 @@ export default function SettingsPage() {
               {/* Enable / Disable Online Booking Switch */}
               <div className="mt-4 pt-4 border-t border-neutral-200/60 flex items-center justify-between">
                 <div>
-                  <span className="font-bold text-xs text-[#2a1630]">Accept Online Client Bookings</span>
+                  <span className="font-bold text-xs text-[#1F2937] dark:text-white">Accept Online Client Bookings</span>
                   <p className="text-[11px] text-neutral-500">
                     When disabled, the public page displays &quot;Booking is closed&quot;
                   </p>
@@ -474,7 +474,7 @@ export default function SettingsPage() {
 
             {/* Operating Hours */}
             <div>
-              <h3 className="text-sm font-bold text-[#2a1630] mb-3">Operating Hours</h3>
+              <h3 className="text-sm font-bold text-[#1F2937] dark:text-white mb-3">Operating Hours</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 mb-1.5">
@@ -484,7 +484,7 @@ export default function SettingsPage() {
                     type="time"
                     value={openTime}
                     onChange={(e) => setOpenTime(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#b3135b]"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
 
@@ -496,7 +496,7 @@ export default function SettingsPage() {
                     type="time"
                     value={closeTime}
                     onChange={(e) => setCloseTime(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#b3135b]"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
               </div>
@@ -517,7 +517,7 @@ export default function SettingsPage() {
                       onClick={() => toggleWorkingDay(d.day)}
                       className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
                         isOpen
-                          ? 'bg-[#b3135b] text-white shadow-sm'
+                          ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm'
                           : 'bg-neutral-100 text-neutral-400 hover:bg-neutral-200'
                       }`}
                     >
@@ -540,7 +540,7 @@ export default function SettingsPage() {
                 <select
                   value={slotMinutes}
                   onChange={(e) => setSlotMinutes(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 >
                   <option value={15}>15 minutes</option>
                   <option value={20}>20 minutes</option>
@@ -557,7 +557,7 @@ export default function SettingsPage() {
                 <select
                   value={bufferMinutes}
                   onChange={(e) => setBufferMinutes(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 >
                   <option value={0}>No buffer (0 mins)</option>
                   <option value={5}>5 minutes</option>
@@ -577,7 +577,7 @@ export default function SettingsPage() {
                   max={48}
                   value={minAdvanceHours}
                   onChange={(e) => setMinAdvanceHours(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
 
@@ -591,7 +591,7 @@ export default function SettingsPage() {
                   max={60}
                   value={maxAdvanceDays}
                   onChange={(e) => setMaxAdvanceDays(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#b3135b]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
             </div>
@@ -599,7 +599,7 @@ export default function SettingsPage() {
             {/* WhatsApp Reminders toggle */}
             <div className="pt-4 border-t border-neutral-100 flex items-center justify-between">
               <div>
-                <span className="font-bold text-xs text-[#2a1630]">Send WhatsApp Booking Reminders</span>
+                <span className="font-bold text-xs text-[#1F2937] dark:text-white">Send WhatsApp Booking Reminders</span>
                 <p className="text-[11px] text-neutral-500">
                   Sends scheduled reminder message to customer 2 hours prior to visit
                 </p>
@@ -623,7 +623,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={saving}
-            className="px-8 py-3.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] disabled:opacity-50 text-white font-extrabold text-sm shadow-lg shadow-[#b3135b]/25 transition-all active:scale-95 flex items-center gap-2"
+            className="px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-white font-extrabold text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? 'Saving Settings...' : 'Save All Settings'}</span>

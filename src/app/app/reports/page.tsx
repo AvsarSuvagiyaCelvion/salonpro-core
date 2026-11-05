@@ -122,7 +122,7 @@ export default function ReportsPage() {
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Reports & Analytics
           </h1>
           <p className="text-xs sm:text-sm text-neutral-500 mt-1">
@@ -144,7 +144,7 @@ export default function ReportsPage() {
                 onClick={() => setPeriod(p.id as any)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 ${
                   period === p.id
-                    ? 'bg-[#b3135b] text-white shadow-sm'
+                    ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm'
                     : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
                 }`}
               >
@@ -169,7 +169,7 @@ export default function ReportsPage() {
           onClick={() => setActiveTab('overview')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'overview'
-              ? 'border-[#b3135b] text-[#b3135b]'
+              ? 'border-[#D4A77F] text-[#D4A77F]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
           }`}
         >
@@ -181,7 +181,7 @@ export default function ReportsPage() {
           onClick={() => setActiveTab('staff')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'staff'
-              ? 'border-[#b3135b] text-[#b3135b]'
+              ? 'border-[#D4A77F] text-[#D4A77F]'
               : 'border-transparent text-neutral-400 hover:text-neutral-600'
           }`}
         >
@@ -199,7 +199,7 @@ export default function ReportsPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
                 Total Revenue
               </span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] mt-2">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white mt-2">
                 {loading ? '...' : `₹${data?.overview.totalRevenue.toLocaleString('en-IN')}`}
               </div>
               <p className="text-[11px] text-emerald-600 font-semibold mt-1">
@@ -211,7 +211,7 @@ export default function ReportsPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
                 Completed Sessions
               </span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] mt-2">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white mt-2">
                 {loading ? '...' : data?.overview.totalSessions}
               </div>
               <p className="text-[11px] text-neutral-500 font-medium mt-1">
@@ -223,7 +223,7 @@ export default function ReportsPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
                 Average Session Value
               </span>
-              <div className="text-2xl sm:text-3xl font-extrabold text-[#2a1630] mt-2">
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white mt-2">
                 {loading ? '...' : `₹${data?.overview.avgSessionValue.toLocaleString('en-IN')}`}
               </div>
               <p className="text-[11px] text-purple-600 font-semibold mt-1">
@@ -236,7 +236,7 @@ export default function ReportsPage() {
           <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-bold text-base text-[#2a1630]">Revenue by Payment Method</h3>
+                <h3 className="font-bold text-base text-[#1F2937] dark:text-white">Revenue by Payment Method</h3>
                 <p className="text-xs text-neutral-400">Collections distribution across digital and cash modes</p>
               </div>
             </div>
@@ -271,7 +271,7 @@ export default function ReportsPage() {
                     <span className={`w-3 h-3 rounded-full ${getMethodColor(pm.method)}`} />
                     <span className="font-bold uppercase text-xs text-neutral-700">{pm.method}</span>
                   </div>
-                  <div className="text-xl font-extrabold text-[#2a1630]">
+                  <div className="text-xl font-extrabold text-[#1F2937] dark:text-white">
                     ₹{pm.amount.toLocaleString('en-IN')}
                   </div>
                   <div className="flex justify-between items-center text-xs text-neutral-500 mt-1">
@@ -285,7 +285,7 @@ export default function ReportsPage() {
 
           {/* Payment Status Breakdown */}
           <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm">
-            <h3 className="font-bold text-base text-[#2a1630] mb-4">Invoice Status Summary</h3>
+            <h3 className="font-bold text-base text-[#1F2937] dark:text-white mb-4">Invoice Status Summary</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80">
                 <div className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Paid Invoices</div>
@@ -325,7 +325,7 @@ export default function ReportsPage() {
       {activeTab === 'staff' && (
         <div className="space-y-6">
           {/* Commission Simulator Bar */}
-          <div className="bg-gradient-to-r from-[#2a1630] to-[#40122a] text-white p-6 rounded-3xl shadow-md border border-neutral-800">
+          <div className="bg-gradient-to-r from-[#1F2937] to-[#40122a] text-white p-6 rounded-3xl shadow-md border border-neutral-800">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-pink-400">
@@ -399,7 +399,7 @@ export default function ReportsPage() {
 
           {/* Visual Staff Revenue Ranking Chart */}
           <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm">
-            <h4 className="font-extrabold text-base text-[#2a1630] mb-1">
+            <h4 className="font-extrabold text-base text-[#1F2937] dark:text-white mb-1">
               Stylist Revenue Contribution Ranking
             </h4>
             <p className="text-xs text-neutral-400 mb-4">
@@ -414,7 +414,7 @@ export default function ReportsPage() {
                   label: st.name,
                   sublabel: `${st.sessions} treatments`,
                   value: st.totalRevenue,
-                  color: '#b3135b',
+                  color: '#D4A77F',
                 }))}
               />
             )}
@@ -448,11 +448,11 @@ export default function ReportsPage() {
                       <tr key={st.id} className="hover:bg-neutral-50/60 transition-colors">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-[#b3135b]/10 text-[#b3135b] font-bold flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] font-bold flex items-center justify-center">
                               {st.name.charAt(0)}
                             </div>
                             <div>
-                              <div className="font-bold text-[#2a1630] text-sm">{st.name}</div>
+                              <div className="font-bold text-[#1F2937] dark:text-white text-sm">{st.name}</div>
                               <div className="text-[10px] text-neutral-400">{st.roleTitle || 'Stylist'}</div>
                             </div>
                           </div>
@@ -470,7 +470,7 @@ export default function ReportsPage() {
                           ₹{st.productsRevenue.toLocaleString('en-IN')}
                         </td>
 
-                        <td className="py-4 px-4 text-right font-bold text-[#2a1630]">
+                        <td className="py-4 px-4 text-right font-bold text-[#1F2937] dark:text-white">
                           ₹{st.totalRevenue.toLocaleString('en-IN')}
                         </td>
 
@@ -481,7 +481,7 @@ export default function ReportsPage() {
                         </td>
 
                         <td className="py-4 px-6 text-right">
-                          <span className="font-extrabold text-sm text-[#b3135b] bg-pink-50 px-2.5 py-1 rounded-xl border border-pink-200">
+                          <span className="font-extrabold text-sm text-[#D4A77F] bg-[#D4A77F]/10 px-2.5 py-1 rounded-xl border border-[#D4A77F]/30">
                             ₹{st.calculatedCommission.toLocaleString('en-IN')}
                           </span>
                         </td>
@@ -492,7 +492,7 @@ export default function ReportsPage() {
 
                 {/* Table Footer Totals */}
                 {staffRows.length > 0 && (
-                  <tfoot className="bg-neutral-50/80 border-t-2 border-neutral-300 font-bold text-[#2a1630]">
+                  <tfoot className="bg-neutral-50/80 border-t-2 border-neutral-300 font-bold text-[#1F2937] dark:text-white">
                     <tr>
                       <td className="py-4 px-6">Totals</td>
                       <td className="py-4 px-4 text-center">{totalStaffSessions}</td>
@@ -506,7 +506,7 @@ export default function ReportsPage() {
                         ₹{totalStaffRevenue.toLocaleString('en-IN')}
                       </td>
                       <td className="py-4 px-4 text-center text-neutral-400">-</td>
-                      <td className="py-4 px-6 text-right text-base text-[#b3135b]">
+                      <td className="py-4 px-6 text-right text-base text-[#D4A77F]">
                         ₹{totalStaffCommissionPayout.toLocaleString('en-IN')}
                       </td>
                     </tr>

@@ -47,7 +47,7 @@ export default function MagneticButton({
           particleCount: 80,
           spread: 70,
           origin: { y: 0.7 },
-          colors: ['#4B263F', '#B77A91', '#C69A5D', '#D4AD76', '#2F7D68'],
+          colors: ['#D4A77F', '#B8905F', '#10141F', '#10B981', '#F59E0B'],
         });
       } catch {}
     }

@@ -16,7 +16,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       {/* Ultra-thin gradient scroll progress bar at top */}
       <motion.div
         style={{ scaleX }}
-        className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#b3135b] via-[#e63985] to-amber-400 z-[9999] origin-left pointer-events-none shadow-sm shadow-pink-500/30"
+        className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#D4A77F] via-[#B8905F] to-[#D4A77F] z-[9999] origin-left pointer-events-none shadow-sm shadow-[#D4A77F]/30"
       />
       {children}
     </>

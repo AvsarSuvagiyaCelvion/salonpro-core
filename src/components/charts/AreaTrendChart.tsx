@@ -19,7 +19,7 @@ interface AreaTrendChartProps {
 
 export default function AreaTrendChart({
   data,
-  color = '#b3135b',
+  color = '#D4A77F',
   gradientId = 'trendGradient',
   currencySymbol = '₹',
   height = 200,
@@ -31,7 +31,7 @@ export default function AreaTrendChart({
     return (
       <div
         style={{ height }}
-        className="w-full flex items-center justify-center text-xs text-neutral-400 bg-neutral-50/50 rounded-2xl border border-neutral-100"
+        className="w-full flex items-center justify-center text-xs text-[#9CA3AF] bg-[#F8F9FA] dark:bg-[#080B12] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A]"
       >
         No trend records available for this period
       </div>
@@ -75,10 +75,10 @@ export default function AreaTrendChart({
       {/* Active Hover Floating Tooltip */}
       {activePoint && (
         <div
-          className="absolute -top-3 z-20 pointer-events-none transform -translate-x-1/2 px-3 py-1.5 rounded-xl bg-neutral-900 text-white shadow-xl text-xs font-bold transition-all duration-150 animate-fade-in flex items-center gap-1.5 border border-neutral-700 whitespace-nowrap"
+          className="absolute -top-3 z-20 pointer-events-none transform -translate-x-1/2 px-3 py-1.5 rounded-xl bg-[#10141F] text-white shadow-xl text-xs font-bold transition-all duration-150 animate-fade-in flex items-center gap-1.5 border border-[#2A2F3A] whitespace-nowrap"
           style={{ left: `${Math.max(12, Math.min(88, (activePoint.x / svgWidth) * 100))}%` }}
         >
-          <span className="text-pink-400">{activePoint.label}:</span>
+          <span className="text-[#D4A77F]">{activePoint.label}:</span>
           <span>
             {currencySymbol}
             {activePoint.value.toLocaleString('en-IN')}
@@ -109,7 +109,8 @@ export default function AreaTrendChart({
             y1={paddingY}
             x2={svgWidth - paddingX}
             y2={paddingY}
-            stroke="#f1f5f9"
+            stroke="currentColor"
+            className="text-[#E5E7EB] dark:text-[#2A2F3A]"
             strokeDasharray="4 4"
             strokeWidth="1"
           />
@@ -118,7 +119,8 @@ export default function AreaTrendChart({
             y1={paddingY + innerHeight / 2}
             x2={svgWidth - paddingX}
             y2={paddingY + innerHeight / 2}
-            stroke="#f1f5f9"
+            stroke="currentColor"
+            className="text-[#E5E7EB] dark:text-[#2A2F3A]"
             strokeDasharray="4 4"
             strokeWidth="1"
           />
@@ -127,7 +129,8 @@ export default function AreaTrendChart({
             y1={svgHeight - paddingY}
             x2={svgWidth - paddingX}
             y2={svgHeight - paddingY}
-            stroke="#e2e8f0"
+            stroke="currentColor"
+            className="text-[#E5E7EB] dark:text-[#2A2F3A]"
             strokeWidth="1.5"
           />
 
@@ -181,10 +184,10 @@ export default function AreaTrendChart({
                 <circle
                   cx={pt.x}
                   cy={pt.y}
-                  r={isHovered ? 7 : 4}
-                  fill={isHovered ? color : '#ffffff'}
+                  r={isHovered ? 6 : 4}
+                  fill={isHovered ? color : '#FFFFFF'}
                   stroke={color}
-                  strokeWidth={isHovered ? 3 : 2.5}
+                  strokeWidth={isHovered ? 3 : 2}
                   className="transition-all duration-150"
                 />
               </g>
@@ -193,14 +196,14 @@ export default function AreaTrendChart({
         </svg>
       </div>
 
-      {/* X-Axis Labels */}
+      {/* Bottom X-Axis Date Labels */}
       {showLabels && (
-        <div className="flex justify-between items-center px-6 sm:px-8 pt-2 text-[10px] sm:text-xs font-semibold text-neutral-400">
+        <div className="flex items-center justify-between px-3 mt-2 text-[10px] font-mono text-[#6B7280] dark:text-[#A0A8B8]">
           {data.map((d, i) => (
             <span
               key={i}
-              className={`transition-colors truncate max-w-[65px] text-center ${
-                hoveredIdx === i ? 'text-neutral-900 font-extrabold' : ''
+              className={`transition-colors ${
+                hoveredIdx === i ? 'text-[#D4A77F] font-bold' : ''
               }`}
             >
               {d.label}
@@ -211,4 +214,3 @@ export default function AreaTrendChart({
     </div>
   );
 }
-

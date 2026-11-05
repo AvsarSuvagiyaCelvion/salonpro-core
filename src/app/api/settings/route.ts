@@ -77,7 +77,7 @@ async function handleUpdateSettings(request: Request) {
     if (brand_color !== undefined && brand_color !== null && brand_color !== '') {
       if (!/^#[0-9a-fA-F]{6}$/.test(String(brand_color).trim())) {
         return NextResponse.json(
-          { error: 'Brand color must be a valid 6-digit hex code (e.g. #b3135b).' },
+          { error: 'Brand color must be a valid 6-digit hex code (e.g. #D4A77F).' },
           { status: 400 }
         );
       }

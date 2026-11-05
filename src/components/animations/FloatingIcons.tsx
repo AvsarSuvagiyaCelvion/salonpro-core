@@ -18,7 +18,7 @@ export default function FloatingIcons() {
           animation: 'floatIcon1 7s ease-in-out infinite alternate',
           willChange: 'transform',
         }}
-        className="absolute top-16 left-6 xl:left-14 p-3 rounded-2xl bg-white dark:bg-[#211B24] backdrop-blur-md border border-[#E8E1E5] dark:border-[#3A3040] shadow-md text-[#4B263F] dark:text-[#D6A0B4]"
+        className="absolute top-16 left-6 xl:left-14 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
       >
         <Scissors className="w-5 h-5 xl:w-6 xl:h-6" />
       </div>
@@ -30,7 +30,7 @@ export default function FloatingIcons() {
           animationDelay: '0.8s',
           willChange: 'transform',
         }}
-        className="absolute top-20 right-6 xl:right-16 p-3 rounded-2xl bg-white dark:bg-[#211B24] backdrop-blur-md border border-[#E8E1E5] dark:border-[#3A3040] shadow-md text-[#B77A91] dark:text-[#D6A0B4]"
+        className="absolute top-20 right-6 xl:right-16 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
       >
         <Wind className="w-5 h-5 xl:w-6 xl:h-6" />
       </div>
@@ -42,7 +42,7 @@ export default function FloatingIcons() {
           animationDelay: '1.4s',
           willChange: 'transform',
         }}
-        className="absolute top-72 left-8 p-3 rounded-2xl bg-white dark:bg-[#211B24] backdrop-blur-md border border-[#E8E1E5] dark:border-[#3A3040] shadow-md text-[#C69A5D] dark:text-[#D4AD76]"
+        className="absolute top-72 left-8 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
       >
         <Sparkles className="w-5 h-5" />
       </div>
@@ -54,7 +54,7 @@ export default function FloatingIcons() {
           animationDelay: '2s',
           willChange: 'transform',
         }}
-        className="absolute top-64 right-10 p-3 rounded-2xl bg-white dark:bg-[#211B24] backdrop-blur-md border border-[#E8E1E5] dark:border-[#3A3040] shadow-md text-[#B77A91] dark:text-[#D6A0B4]"
+        className="absolute top-64 right-10 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
       >
         <Feather className="w-5 h-5" />
       </div>
@@ -62,34 +62,34 @@ export default function FloatingIcons() {
       <style jsx>{`
         @keyframes floatIcon1 {
           0% {
-            transform: translate3d(0, -8px, 0) rotate(-6deg);
+            transform: translate3d(0, 0, 0) rotate(0deg);
           }
           100% {
-            transform: translate3d(0, 8px, 0) rotate(6deg);
+            transform: translate3d(10px, -18px, 0) rotate(8deg);
           }
         }
         @keyframes floatIcon2 {
           0% {
-            transform: translate3d(0, 10px, 0) rotate(6deg);
+            transform: translate3d(0, 0, 0) rotate(0deg);
           }
           100% {
-            transform: translate3d(0, -10px, 0) rotate(-4deg);
+            transform: translate3d(-12px, -14px, 0) rotate(-6deg);
           }
         }
         @keyframes floatIcon3 {
           0% {
-            transform: translate3d(0, -10px, 0) rotate(-4deg);
+            transform: translate3d(0, 0, 0) scale(1);
           }
           100% {
-            transform: translate3d(0, 8px, 0) rotate(8deg);
+            transform: translate3d(14px, 12px, 0) scale(1.08);
           }
         }
         @keyframes floatIcon4 {
           0% {
-            transform: translate3d(0, 8px, 0) rotate(5deg);
+            transform: translate3d(0, 0, 0) rotate(0deg);
           }
           100% {
-            transform: translate3d(0, -10px, 0) rotate(-6deg);
+            transform: translate3d(-10px, 16px, 0) rotate(12deg);
           }
         }
       `}</style>

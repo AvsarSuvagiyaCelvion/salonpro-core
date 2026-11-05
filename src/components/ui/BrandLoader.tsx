@@ -21,23 +21,22 @@ export default function BrandLoader({
     <div className="py-14 flex flex-col items-center justify-center text-center animate-fade-in">
       <div className="relative mb-4">
         {/* Pulsing ring */}
-        <div className="absolute inset-0 rounded-3xl bg-pink-500/20 animate-ping opacity-75" />
+        <div className="absolute inset-0 rounded-3xl bg-[#D4A77F]/20 animate-ping opacity-75" />
         {/* Glow backdrop */}
-        <div className={`${boxSize} rounded-3xl bg-gradient-to-tr from-[#b3135b] to-[#e63985] text-white flex items-center justify-center shadow-xl shadow-pink-900/20 ring-4 ring-pink-100`}>
+        <div className={`${boxSize} rounded-3xl bg-[#D4A77F] text-[#080B12] flex items-center justify-center shadow-xl shadow-[#D4A77F]/20 ring-4 ring-[#D4A77F]/20`}>
           <Sparkles className={`${iconSize} animate-pulse`} />
         </div>
       </div>
 
-      <h4 className="text-sm font-black text-[#2a1630] tracking-tight">{message}</h4>
+      <h4 className="text-sm font-black text-[#1F2937] dark:text-white tracking-tight">{message}</h4>
       {submessage && (
-        <p className="text-xs text-neutral-400 mt-1 max-w-xs">{submessage}</p>
+        <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1 max-w-xs">{submessage}</p>
       )}
 
       {/* Modern gradient loading bar */}
-      <div className="w-36 h-1 bg-neutral-100 rounded-full overflow-hidden mt-4">
-        <div className="h-full bg-gradient-to-r from-[#b3135b] via-pink-400 to-[#b3135b] rounded-full animate-loading-bar" />
+      <div className="w-36 h-1 bg-[#E5E7EB] dark:bg-[#2A2F3A] rounded-full overflow-hidden mt-4">
+        <div className="h-full bg-gradient-to-r from-[#D4A77F] via-[#B8905F] to-[#D4A77F] rounded-full animate-loading-bar" />
       </div>
     </div>
   );
 }
-

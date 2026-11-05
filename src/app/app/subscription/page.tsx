@@ -126,7 +126,7 @@ export default function SalonSubscriptionPage() {
           email: orderData.salonEmail || '',
         },
         theme: {
-          color: '#b3135b',
+          color: '#D4A77F',
         },
         modal: {
           ondismiss: function () {
@@ -194,7 +194,7 @@ export default function SalonSubscriptionPage() {
   if (loading) {
     return (
       <div className="py-16 text-center">
-        <div className="w-10 h-10 border-4 border-[#b3135b] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-4 border-[#D4A77F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         <p className="text-xs font-bold text-neutral-500">Loading your subscription status...</p>
       </div>
     );
@@ -266,12 +266,12 @@ export default function SalonSubscriptionPage() {
       {verifyingPayment && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-neutral-100">
-            <div className="w-16 h-16 border-4 border-[#b3135b] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="w-16 h-16 border-4 border-[#D4A77F] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
             <h3 className="text-lg font-black text-neutral-900 mb-1">Verifying Payment...</h3>
             <p className="text-xs text-neutral-500 mb-2">
               Confirming transaction with Razorpay and unlocking all your plan facilities.
             </p>
-            <div className="text-[11px] font-bold text-pink-700 bg-pink-50 py-1 px-3 rounded-full inline-block">
+            <div className="text-[11px] font-bold text-[#D4A77F] bg-[#D4A77F]/10 py-1 px-3 rounded-full inline-block">
               Please do not refresh this window
             </div>
           </div>
@@ -325,7 +325,7 @@ export default function SalonSubscriptionPage() {
             {/* Unlocked Facilities Section */}
             <div className="mt-5 text-left">
               <div className="text-[11px] font-black uppercase tracking-wider text-neutral-400 mb-2 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-pink-600" />
+                <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
                 <span>Your Unlocked Facilities & Capacity</span>
               </div>
 
@@ -366,7 +366,7 @@ export default function SalonSubscriptionPage() {
                 setCelebrationData(null);
                 loadData();
               }}
-              className="w-full mt-6 py-3.5 rounded-2xl bg-[#b3135b] hover:bg-[#9c0f4e] text-white font-extrabold text-xs shadow-lg shadow-pink-900/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              className="w-full mt-6 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold font-extrabold text-xs shadow-lg shadow-[#D4A77F]/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
             >
               <span>Continue to Salon Workspace</span>
               <ArrowRight className="w-4 h-4" />
@@ -376,13 +376,13 @@ export default function SalonSubscriptionPage() {
       )}
 
       {/* 1. Header & Active Plan Status Card */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#2a1630] via-[#3d1538] to-[#1a0a1f] text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-pink-900/30">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#1F2937] via-[#3d1538] to-[#1a0a1f] text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-pink-900/30">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#D4A77F]/100/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-pink-500/20 text-pink-300 border border-pink-500/30">
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4A77F]/100/20 text-pink-300 border border-pink-500/30">
                 Salon Workspace
               </span>
               <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
@@ -456,7 +456,7 @@ export default function SalonSubscriptionPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-black text-[#2a1630]">Resource Consumption & Limits</h3>
+            <h3 className="text-lg font-black text-[#1F2937] dark:text-white">Resource Consumption & Limits</h3>
             <p className="text-xs text-neutral-500">Live tracker for current monthly billing cycle</p>
           </div>
           <span className="text-xs font-bold text-neutral-400">
@@ -469,7 +469,7 @@ export default function SalonSubscriptionPage() {
           <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-pink-50 text-[#b3135b] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center">
                   <Users className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold text-slate-700">Stylists & Staff</span>
@@ -482,7 +482,7 @@ export default function SalonSubscriptionPage() {
             <div className="w-full bg-slate-100 rounded-full h-2.5 my-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full transition-all duration-300 ${
-                  staffUnlimited ? 'bg-pink-500' : staffPct >= 90 ? 'bg-amber-500' : 'bg-[#b3135b]'
+                  staffUnlimited ? 'bg-[#D4A77F]/100' : staffPct >= 90 ? 'bg-amber-500' : 'bg-[#D4A77F]'
                 }`}
                 style={{ width: `${staffPct}%` }}
               />
@@ -564,7 +564,7 @@ export default function SalonSubscriptionPage() {
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h3 className="text-xl font-black text-[#2a1630]">
+            <h3 className="text-xl font-black text-[#1F2937] dark:text-white">
               Explore Subscription Plans
             </h3>
             <p className="text-xs text-neutral-500">
@@ -581,7 +581,7 @@ export default function SalonSubscriptionPage() {
               type="button"
               onClick={() => setInterval(interval === 'monthly' ? 'yearly' : 'monthly')}
               className="w-12 h-6 bg-slate-200 rounded-full p-0.5 transition-colors relative cursor-pointer"
-              style={{ backgroundColor: interval === 'yearly' ? '#b3135b' : '#cbd5e1' }}
+              style={{ backgroundColor: interval === 'yearly' ? '#D4A77F' : '#cbd5e1' }}
             >
               <div
                 className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
@@ -590,7 +590,7 @@ export default function SalonSubscriptionPage() {
               />
             </button>
             <div className="flex items-center gap-1.5">
-              <span className={`text-xs font-bold ${interval === 'yearly' ? 'text-[#b3135b]' : 'text-slate-500'}`}>
+              <span className={`text-xs font-bold ${interval === 'yearly' ? 'text-[#D4A77F]' : 'text-slate-500'}`}>
                 Yearly
               </span>
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
@@ -615,7 +615,7 @@ export default function SalonSubscriptionPage() {
                   isCurrent && isActivePaid
                     ? 'border-emerald-500 shadow-md ring-2 ring-emerald-500/20'
                     : isPopular
-                    ? 'border-[#b3135b] shadow-xl ring-2 ring-pink-500/20'
+                    ? 'border-[#D4A77F] shadow-xl ring-2 ring-pink-500/20'
                     : 'border-neutral-200 shadow-xs hover:border-neutral-300'
                 }`}
               >
@@ -626,7 +626,7 @@ export default function SalonSubscriptionPage() {
                   </div>
                 )}
                 {!isCurrent && isPopular && (
-                  <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#b3135b] text-white shadow-xs flex items-center gap-1">
+                  <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4A77F] text-[#080B12] font-bold shadow-xs flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
                     Most Popular
                   </div>
@@ -658,19 +658,19 @@ export default function SalonSubscriptionPage() {
                   {/* Limits bullets */}
                   <div className="space-y-2 mb-5">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                      <Users className="w-4 h-4 text-[#b3135b] shrink-0" />
+                      <Users className="w-4 h-4 text-[#D4A77F] shrink-0" />
                       <span>
                         {plan.limits?.max_staff === 0 ? 'Unlimited Staff' : `Up to ${plan.limits?.max_staff || 3} Staff Members`}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                      <Scissors className="w-4 h-4 text-[#b3135b] shrink-0" />
+                      <Scissors className="w-4 h-4 text-[#D4A77F] shrink-0" />
                       <span>
                         {plan.limits?.max_services === 0 ? 'Unlimited Services' : `Up to ${plan.limits?.max_services || 30} Services`}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                      <MessageSquare className="w-4 h-4 text-[#b3135b] shrink-0" />
+                      <MessageSquare className="w-4 h-4 text-[#D4A77F] shrink-0" />
                       <span>
                         {(plan.limits?.wa_per_month || 0) === 0 ? '0 WhatsApp Invoices' : `${plan.limits.wa_per_month} WhatsApp/mo`}
                       </span>
@@ -698,7 +698,7 @@ export default function SalonSubscriptionPage() {
                       : isThisActivating
                       ? 'bg-neutral-800 text-white cursor-wait opacity-80'
                       : isPopular
-                      ? 'bg-[#b3135b] hover:bg-[#9c0f4e] text-white shadow-pink-900/20'
+                      ? 'bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold shadow-[#D4A77F]/20'
                       : 'bg-slate-900 hover:bg-slate-800 text-white'
                   }`}
                 >
@@ -749,7 +749,7 @@ export default function SalonSubscriptionPage() {
                       <th
                         key={p.id}
                         className={`py-3 px-4 font-black text-center ${
-                          isPopular ? 'text-[#b3135b] bg-pink-50/40' : 'text-slate-900'
+                          isPopular ? 'text-[#D4A77F] bg-[#D4A77F]/15' : 'text-slate-900'
                         }`}
                       >
                         {p.name} (₹{price.toLocaleString('en-IN')})
@@ -831,7 +831,7 @@ export default function SalonSubscriptionPage() {
           <div className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
             <div>
               <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-[#b3135b]" />
+                <Receipt className="w-4 h-4 text-[#D4A77F]" />
                 <span>Subscription Payment Invoices & Receipts</span>
               </h4>
               <p className="text-xs text-slate-500">

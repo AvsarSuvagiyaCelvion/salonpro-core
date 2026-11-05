@@ -53,7 +53,7 @@ export default function AdminAnalyticsPage() {
   });
 
   const salons = data?.salons || [];
-  const palette = ['#b3135b', '#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#06b6d4'];
+  const palette = ['#D4A77F', '#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#06b6d4'];
 
   const salonDonutData = salons.map((s: any, idx: number) => ({
     label: s.name,
@@ -76,19 +76,19 @@ export default function AdminAnalyticsPage() {
         <span className="text-[11px] font-black uppercase tracking-wider text-pink-600">
           Executive Cloud Intelligence
         </span>
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
           Platform Financials & Visual Analytics
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+        <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-0.5">
           Consolidated revenue, appointment volumes, and tenant salon market shares
         </p>
       </div>
 
       {/* 3 Primary Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Total Billed GMV
             </span>
             <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
@@ -98,27 +98,27 @@ export default function AdminAnalyticsPage() {
           <div className="text-3xl font-black text-emerald-700 font-mono">
             ₹{totalRevenue.toLocaleString('en-IN')}
           </div>
-          <p className="text-xs text-slate-500 mt-2">Cumulative invoices generated across all salon tenants</p>
+          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Cumulative invoices generated across all salon tenants</p>
         </div>
 
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Completed Collections
             </span>
             <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-black text-slate-900 font-mono">
+          <div className="text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] font-mono">
             ₹{totalPaid.toLocaleString('en-IN')}
           </div>
-          <p className="text-xs text-slate-500 mt-2">Verified payments collected via UPI, Cash & Cards</p>
+          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Verified payments collected via UPI, Cash & Cards</p>
         </div>
 
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Appointments Booked
             </span>
             <div className="w-8 h-8 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
@@ -128,33 +128,33 @@ export default function AdminAnalyticsPage() {
           <div className="text-3xl font-black text-pink-700 font-mono">
             {totalAppts}
           </div>
-          <p className="text-xs text-slate-500 mt-2">Online bookings and in-store walk-in sessions</p>
+          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Online bookings and in-store walk-in sessions</p>
         </div>
       </div>
 
       {/* Main Revenue Trajectory Trend Chart */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#b3135b] animate-ping" />
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">Platform GMV Growth Trajectory</h2>
+              <span className="w-2 h-2 rounded-full bg-[#D4A77F] animate-ping" />
+              <h2 className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-[#FFFFFF]">Platform GMV Growth Trajectory</h2>
             </div>
-            <p className="text-xs text-slate-400">Weekly consolidated transaction volume across all salon tenants</p>
+            <p className="text-xs text-[#9CA3AF] dark:text-[#747D8D]">Weekly consolidated transaction volume across all salon tenants</p>
           </div>
-          <div className="text-xs font-mono font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+          <div className="text-xs font-mono font-bold text-[#6B7280] dark:text-[#A0A8B8] bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
             Total GMV: ₹{totalRevenue.toLocaleString('en-IN')}
           </div>
         </div>
 
         {loading ? (
-          <div className="h-52 w-full bg-slate-50 rounded-2xl animate-pulse flex items-center justify-center text-xs text-slate-400">
+          <div className="h-52 w-full bg-slate-50 rounded-2xl animate-pulse flex items-center justify-center text-xs text-[#9CA3AF] dark:text-[#747D8D]">
             Loading analytics graph...
           </div>
         ) : (
           <AreaTrendChart
             data={trendData}
-            color="#b3135b"
+            color="#D4A77F"
             height={220}
           />
         )}
@@ -163,14 +163,14 @@ export default function AdminAnalyticsPage() {
       {/* Visual Analytics Grid: Market Share Donut & Ranking Bar Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Salon Revenue Share Donut Chart */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-extrabold text-base text-slate-900">Tenant Revenue Market Share</h3>
-                <p className="text-xs text-slate-400">Percentage distribution of GMV across active salons</p>
+                <h3 className="font-extrabold text-base text-[#1F2937] dark:text-[#FFFFFF]">Tenant Revenue Market Share</h3>
+                <p className="text-xs text-[#9CA3AF] dark:text-[#747D8D]">Percentage distribution of GMV across active salons</p>
               </div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Donut Graph</span>
+              <span className="text-[10px] uppercase font-bold text-[#9CA3AF] dark:text-[#747D8D] tracking-wider">Donut Graph</span>
             </div>
 
             <div className="py-2">
@@ -180,36 +180,36 @@ export default function AdminAnalyticsPage() {
                 centerLabel="Total Revenue"
                 centerValue={`₹${totalRevenue > 1000 ? Math.round(totalRevenue / 1000) + 'k' : totalRevenue}`}
                 data={salonDonutData.length > 0 ? salonDonutData : [
-                  { label: 'Active Salons', value: 100, color: '#b3135b' }
+                  { label: 'Active Salons', value: 100, color: '#D4A77F' }
                 ]}
               />
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 text-center">
+          <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-[#6B7280] dark:text-[#A0A8B8] text-center">
             Updated in real-time as customer appointments and payments settle
           </div>
         </div>
 
         {/* Branch Performance Rankings Bar Chart */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs flex flex-col justify-between overflow-hidden">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs flex flex-col justify-between overflow-hidden">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-extrabold text-base text-slate-900">Salon Performance Leaderboard</h3>
-                <p className="text-xs text-slate-400">Tenants ranked by verified billing collections</p>
+                <h3 className="font-extrabold text-base text-[#1F2937] dark:text-[#FFFFFF]">Salon Performance Leaderboard</h3>
+                <p className="text-xs text-[#9CA3AF] dark:text-[#747D8D]">Tenants ranked by verified billing collections</p>
               </div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rankings</span>
+              <span className="text-[10px] uppercase font-bold text-[#9CA3AF] dark:text-[#747D8D] tracking-wider">Rankings</span>
             </div>
 
             {salonBarItems.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-400">No salon activity recorded yet</div>
+              <div className="py-8 text-center text-xs text-[#9CA3AF] dark:text-[#747D8D]">No salon activity recorded yet</div>
             ) : (
               <BarComparisonChart items={salonBarItems} />
             )}
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-[#6B7280] dark:text-[#A0A8B8]">
             <span>Total Registered Salons: <strong>{salons.length}</strong></span>
             <span className="text-emerald-700 font-bold">100% Tenant Isolation</span>
           </div>

@@ -54,29 +54,29 @@ export default function AuroraBackground() {
         } as React.CSSProperties
       }
     >
-      {/* Aurora Ambient Blobs with GPU hardware acceleration (will-change: transform) */}
-      <div className="absolute inset-0 opacity-60 dark:opacity-35 transition-opacity duration-500">
-        {/* Blob 1: Premium Plum Radiance */}
+      {/* Aurora Ambient Blobs with GPU hardware acceleration */}
+      <div className="absolute inset-0 opacity-40 dark:opacity-25 transition-opacity duration-500">
+        {/* Blob 1: Champagne Gold Radiance */}
         <div
-          className="absolute -top-32 left-1/4 w-[500px] sm:w-[650px] h-[400px] sm:h-[500px] rounded-full bg-gradient-to-br from-[#B77A91]/20 via-[#4B263F]/15 to-transparent blur-[80px] dark:from-[#D6A0B4]/25 dark:via-[#4B263F]/20"
+          className="absolute -top-32 left-1/4 w-[500px] sm:w-[650px] h-[400px] sm:h-[500px] rounded-full bg-gradient-to-br from-[#D4A77F]/15 via-[#B8905F]/10 to-transparent blur-[90px]"
           style={{
             animation: 'floatBlob1 18s ease-in-out infinite alternate',
             willChange: 'transform',
           }}
         />
 
-        {/* Blob 2: Warm Champagne Gold Ambiance */}
+        {/* Blob 2: Warm Charcoal / Ivory Ambiance */}
         <div
-          className="absolute top-20 right-1/6 w-[450px] sm:w-[550px] h-[380px] sm:h-[450px] rounded-full bg-gradient-to-bl from-[#C69A5D]/15 via-[#B77A91]/10 to-transparent blur-[85px] dark:from-[#D4AD76]/20 dark:via-[#B77A91]/15"
+          className="absolute top-20 right-1/6 w-[450px] sm:w-[550px] h-[380px] sm:h-[450px] rounded-full bg-gradient-to-bl from-[#D4A77F]/12 via-[#1C2230]/10 to-transparent blur-[95px]"
           style={{
             animation: 'floatBlob2 22s ease-in-out infinite alternate',
             willChange: 'transform',
           }}
         />
 
-        {/* Blob 3: Warm Ivory & Rose Plum */}
+        {/* Blob 3: Subtle Gold Accent */}
         <div
-          className="absolute top-72 left-1/3 w-[400px] sm:w-[500px] h-[350px] rounded-full bg-gradient-to-tr from-[#B77A91]/15 via-[#C69A5D]/10 to-transparent blur-[90px] dark:from-[#2B2230]/40 dark:via-[#D6A0B4]/15"
+          className="absolute top-72 left-1/3 w-[400px] sm:w-[500px] h-[350px] rounded-full bg-gradient-to-tr from-[#D4A77F]/10 via-[#B8905F]/8 to-transparent blur-[100px]"
           style={{
             animation: 'floatBlob3 24s ease-in-out infinite alternate',
             willChange: 'transform',
@@ -86,10 +86,10 @@ export default function AuroraBackground() {
 
       {/* Hardware Accelerated Subtle Champagne Spotlight on Desktop */}
       <div
-        className="hidden md:block absolute top-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none blur-3xl opacity-30 dark:opacity-20 transition-opacity"
+        className="hidden md:block absolute top-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none blur-3xl opacity-20 dark:opacity-15 transition-opacity"
         style={{
           transform: 'translate3d(calc(var(--mouse-x) - 250px), calc(var(--mouse-y) - 250px), 0)',
-          background: 'radial-gradient(circle, rgba(198, 154, 93, 0.18) 0%, rgba(183, 122, 145, 0.10) 50%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(212, 167, 127, 0.18) 0%, rgba(184, 144, 95, 0.08) 50%, transparent 70%)',
           willChange: 'transform',
         }}
       />

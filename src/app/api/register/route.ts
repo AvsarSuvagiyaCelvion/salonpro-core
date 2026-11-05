@@ -160,7 +160,7 @@ export async function POST(request: Request) {
       [
         cleanSalonName,
         slug,
-        '#b3135b',
+        '#D4A77F',
         normalizedMobile,
         fullAddress,
         planSlug,

@@ -311,10 +311,10 @@ export default function ProductsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span className="text-[11px] font-black uppercase tracking-wider text-pink-600">
+          <span className="text-[11px] font-black uppercase tracking-wider text-[#D4A77F]">
             Salon Retail & Inventory OS
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#2a1630] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-white tracking-tight">
             Products & Retail Management
           </h1>
           <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
@@ -336,7 +336,7 @@ export default function ProductsPage() {
           <button
             type="button"
             onClick={handleOpenAdd}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#b3135b] hover:bg-[#99104e] text-white text-xs font-extrabold shadow-md shadow-pink-900/20 transition-all cursor-pointer active:scale-95 whitespace-nowrap"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs font-extrabold shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer active:scale-95 whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Add Product</span>
@@ -369,11 +369,11 @@ export default function ProductsPage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
               Total Products
             </span>
-            <div className="w-8 h-8 rounded-xl bg-pink-50 text-[#b3135b] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center">
               <Package className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-[#2a1630]">{products.length}</div>
+          <div className="text-2xl font-black text-[#1F2937] dark:text-white">{products.length}</div>
           <span className="text-[11px] text-neutral-400 mt-0.5 block">Catalog SKUs</span>
         </div>
 
@@ -386,7 +386,7 @@ export default function ProductsPage() {
               <Boxes className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-[#2a1630]">{totalInventoryUnits}</div>
+          <div className="text-2xl font-black text-[#1F2937] dark:text-white">{totalInventoryUnits}</div>
           <span className="text-[11px] text-neutral-400 mt-0.5 block">Physical Units</span>
         </div>
 
@@ -430,7 +430,7 @@ export default function ProductsPage() {
           onClick={() => setActiveTab('inventory')}
           className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'inventory'
-              ? 'bg-[#b3135b] text-white shadow-xs'
+              ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs'
               : 'text-neutral-600 hover:bg-neutral-100'
           }`}
         >
@@ -443,7 +443,7 @@ export default function ProductsPage() {
           onClick={() => setActiveTab('sales')}
           className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'sales'
-              ? 'bg-[#b3135b] text-white shadow-xs'
+              ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs'
               : 'text-neutral-600 hover:bg-neutral-100'
           }`}
         >
@@ -464,7 +464,7 @@ export default function ProductsPage() {
                 placeholder="Search products by name, brand, SKU..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200 text-xs text-[#2a1630] focus:outline-none focus:border-[#b3135b] transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200 text-xs text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F] transition-all"
               />
             </div>
 
@@ -506,7 +506,7 @@ export default function ProductsPage() {
           {/* Product Cards Grid */}
           {loading ? (
             <div className="text-center py-16 bg-white rounded-3xl border border-neutral-200/80">
-              <div className="w-8 h-8 border-3 border-[#b3135b] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <div className="w-8 h-8 border-3 border-[#D4A77F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="text-xs font-bold text-neutral-500">Loading salon inventory...</p>
             </div>
           ) : products.length === 0 ? (
@@ -538,7 +538,7 @@ export default function ProductsPage() {
                             {p.brand}
                           </span>
                         )}
-                        <h3 className="font-extrabold text-sm text-[#2a1630]">{p.name}</h3>
+                        <h3 className="font-extrabold text-sm text-[#1F2937] dark:text-white">{p.name}</h3>
                       </div>
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
@@ -562,7 +562,7 @@ export default function ProductsPage() {
                         <span className="text-[10px] uppercase font-bold text-neutral-400 block">
                           Retail Price
                         </span>
-                        <strong className="text-sm font-black text-[#2a1630]">
+                        <strong className="text-sm font-black text-[#1F2937] dark:text-white">
                           ₹{Number(p.price).toLocaleString('en-IN')}
                         </strong>
                       </div>
@@ -621,7 +621,7 @@ export default function ProductsPage() {
         <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-xs overflow-hidden">
           <div className="p-4 sm:p-5 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="font-extrabold text-base text-[#2a1630]">
+              <h3 className="font-extrabold text-base text-[#1F2937] dark:text-white">
                 Retail Sales & Staff Performance Log
               </h3>
               <p className="text-xs text-neutral-500">
@@ -691,7 +691,7 @@ export default function ProductsPage() {
                         )}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-bold text-[#b3135b] block">
+                        <span className="font-bold text-[#D4A77F] block">
                           {sale.staff_name || 'Counter Sale'}
                         </span>
                         <span className="text-[10px] text-neutral-400">
@@ -731,7 +731,7 @@ export default function ProductsPage() {
                   <ShoppingCart className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-black text-base text-[#2a1630]">Sell Product (Quick POS)</h3>
+                  <h3 className="font-black text-base text-[#1F2937] dark:text-white">Sell Product (Quick POS)</h3>
                   <span className="text-[11px] text-neutral-400">Credit sale & commission to staff</span>
                 </div>
               </div>
@@ -753,7 +753,7 @@ export default function ProductsPage() {
                   <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider">
                     Sale Completed & Recorded
                   </span>
-                  <h4 className="text-xl font-black text-[#2a1630] mt-2">
+                  <h4 className="text-xl font-black text-[#1F2937] dark:text-white mt-2">
                     Invoice #{saleSuccessInfo.invoice.number}
                   </h4>
                   <p className="text-xs text-neutral-500 mt-1">
@@ -770,7 +770,7 @@ export default function ProductsPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Staff Credited:</span>
-                    <strong className="text-[#b3135b]">{saleSuccessInfo.staff.name}</strong>
+                    <strong className="text-[#D4A77F]">{saleSuccessInfo.staff.name}</strong>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Staff Commission Earned:</span>
@@ -816,13 +816,13 @@ export default function ProductsPage() {
                 {/* 1. Select Product */}
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                    Select Product <span className="text-pink-600">*</span>
+                    Select Product <span className="text-[#D4A77F]">*</span>
                   </label>
                   <select
                     required
                     value={sellProductId}
                     onChange={(e) => setSellProductId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 bg-white"
                   >
                     {products.map((p) => (
                       <option key={p.id} value={p.id} disabled={p.stock <= 0}>
@@ -836,7 +836,7 @@ export default function ProductsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                      Quantity <span className="text-pink-600">*</span>
+                      Quantity <span className="text-[#D4A77F]">*</span>
                     </label>
                     <input
                       type="number"
@@ -845,19 +845,19 @@ export default function ProductsPage() {
                       max={selectedProduct ? selectedProduct.stock : 99}
                       value={sellQty}
                       onChange={(e) => setSellQty(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 font-mono"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                      Sold By (Staff) <span className="text-pink-600">*</span>
+                      Sold By (Staff) <span className="text-[#D4A77F]">*</span>
                     </label>
                     <select
                       required
                       value={sellStaffId}
                       onChange={(e) => setSellStaffId(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 bg-white"
                     >
                       {staffList.map((st) => (
                         <option key={st.id} value={st.id}>
@@ -879,7 +879,7 @@ export default function ProductsPage() {
                         type="button"
                         onClick={() => setCustomerSelectionType('new')}
                         className={`font-bold cursor-pointer ${
-                          customerSelectionType === 'new' ? 'text-[#b3135b] underline' : 'text-neutral-400'
+                          customerSelectionType === 'new' ? 'text-[#D4A77F] underline' : 'text-neutral-400'
                         }`}
                       >
                         + Walk-in Client
@@ -890,7 +890,7 @@ export default function ProductsPage() {
                         onClick={() => setCustomerSelectionType('existing')}
                         className={`font-bold cursor-pointer ${
                           customerSelectionType === 'existing'
-                            ? 'text-[#b3135b] underline'
+                            ? 'text-[#D4A77F] underline'
                             : 'text-neutral-400'
                         }`}
                       >
@@ -903,7 +903,7 @@ export default function ProductsPage() {
                     <select
                       value={sellCustomerId}
                       onChange={(e) => setSellCustomerId(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 bg-white"
                     >
                       <option value="">-- Choose Existing Client --</option>
                       {customersList.map((c) => (
@@ -919,14 +919,14 @@ export default function ProductsPage() {
                         placeholder="Client Name"
                         value={sellCustomerName}
                         onChange={(e) => setSellCustomerName(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900"
                       />
                       <input
                         type="tel"
                         placeholder="WhatsApp No. (for bill)"
                         value={sellCustomerMobile}
                         onChange={(e) => setSellCustomerMobile(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 font-mono"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
                       />
                     </div>
                   )}
@@ -945,7 +945,7 @@ export default function ProductsPage() {
                         onClick={() => setSellPaymentMethod(m)}
                         className={`py-2 px-3 rounded-xl border text-xs font-bold uppercase transition-all cursor-pointer ${
                           sellPaymentMethod === m
-                            ? 'border-[#b3135b] bg-pink-50 text-[#b3135b]'
+                            ? 'border-[#D4A77F] bg-[#D4A77F]/10 text-[#D4A77F]'
                             : 'border-neutral-200 text-neutral-600'
                         }`}
                       >
@@ -959,7 +959,7 @@ export default function ProductsPage() {
                 <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200 text-xs space-y-1.5">
                   <div className="flex justify-between font-bold text-neutral-900">
                     <span>Retail Total (₹):</span>
-                    <span className="text-sm font-black text-[#b3135b]">
+                    <span className="text-sm font-black text-[#D4A77F]">
                       ₹{sellTotalPrice.toLocaleString('en-IN')}
                     </span>
                   </div>
@@ -1001,7 +1001,7 @@ export default function ProductsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-xs animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100 mb-4">
-              <h3 className="font-black text-base text-[#2a1630]">
+              <h3 className="font-black text-base text-[#1F2937] dark:text-white">
                 {editingProduct ? 'Edit Retail Product' : 'Add New Retail Product'}
               </h3>
               <button
@@ -1016,7 +1016,7 @@ export default function ProductsPage() {
             <form onSubmit={handleSubmitProduct} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                  Product Name <span className="text-pink-600">*</span>
+                  Product Name <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
                   type="text"
@@ -1024,7 +1024,7 @@ export default function ProductsPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Moroccan Argan Hair Oil"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900"
                 />
               </div>
 
@@ -1038,7 +1038,7 @@ export default function ProductsPage() {
                     value={formBrand}
                     onChange={(e) => setFormBrand(e.target.value)}
                     placeholder="e.g. L'Oreal, Wella"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900"
                   />
                 </div>
                 <div>
@@ -1050,7 +1050,7 @@ export default function ProductsPage() {
                     value={formSku}
                     onChange={(e) => setFormSku(e.target.value)}
                     placeholder="e.g. OIL-001"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
                   />
                 </div>
               </div>
@@ -1058,7 +1058,7 @@ export default function ProductsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                    Selling Price (₹) <span className="text-pink-600">*</span>
+                    Selling Price (₹) <span className="text-[#D4A77F]">*</span>
                   </label>
                   <input
                     type="number"
@@ -1067,7 +1067,7 @@ export default function ProductsPage() {
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
                     placeholder="999"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
                   />
                 </div>
                 <div>
@@ -1080,7 +1080,7 @@ export default function ProductsPage() {
                     value={formCostPrice}
                     onChange={(e) => setFormCostPrice(e.target.value)}
                     placeholder="550"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
                   />
                 </div>
               </div>
@@ -1088,7 +1088,7 @@ export default function ProductsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                    Physical Stock Count <span className="text-pink-600">*</span>
+                    Physical Stock Count <span className="text-[#D4A77F]">*</span>
                   </label>
                   <input
                     type="number"
@@ -1097,7 +1097,7 @@ export default function ProductsPage() {
                     value={formStock}
                     onChange={(e) => setFormStock(e.target.value)}
                     placeholder="10"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
                   />
                 </div>
                 <div>
@@ -1110,7 +1110,7 @@ export default function ProductsPage() {
                     value={formMinStock}
                     onChange={(e) => setFormMinStock(e.target.value)}
                     placeholder="5"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#b3135b] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
                   />
                 </div>
               </div>
@@ -1126,7 +1126,7 @@ export default function ProductsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-[#b3135b] hover:bg-[#99104e] text-white font-extrabold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold font-extrabold text-xs shadow-md transition-all cursor-pointer active:scale-95"
                 >
                   {submitting ? 'Saving...' : editingProduct ? 'Update Product' : 'Add to Inventory'}
                 </button>

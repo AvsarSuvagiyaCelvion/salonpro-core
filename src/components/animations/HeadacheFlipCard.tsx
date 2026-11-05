@@ -23,15 +23,15 @@ export default function HeadacheFlipCard({
   // If reduced motion, show a clean stacked card without 3D flip
   if (shouldReduceMotion) {
     return (
-      <div className="bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] rounded-3xl p-6 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-sm space-y-4">
         <div className="flex items-start gap-3">
           <span className="text-xl">❌</span>
           <div>
-            <h4 className="font-bold text-[#242126] dark:text-[#F5EFF5]">{headacheTitle}</h4>
-            <p className="text-xs text-[#77717A] dark:text-[#B5AAB8] mt-1">{headacheDesc}</p>
+            <h4 className="font-bold text-[#1F2937] dark:text-[#FFFFFF]">{headacheTitle}</h4>
+            <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1">{headacheDesc}</p>
           </div>
         </div>
-        <div className="p-3.5 rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] border border-[#2F7D68]/30 dark:border-[#55B99A]/40 text-[#2F7D68] dark:text-[#55B99A] text-xs">
+        <div className="p-3.5 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#10B981]/30 text-[#10B981] text-xs">
           <strong>{solutionTitle}:</strong> {solutionDesc}
         </div>
       </div>
@@ -53,26 +53,26 @@ export default function HeadacheFlipCard({
       >
         {/* FRONT: The Red Headache */}
         <div
-          className="absolute inset-0 w-full h-full backface-hidden bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col justify-between"
+          className="absolute inset-0 w-full h-full backface-hidden bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col justify-between"
           style={{ backfaceVisibility: 'hidden' }}
         >
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#F1EBEF] dark:bg-[#2B2230] text-[#C65B62] dark:text-[#EF858B] border border-[#E8E1E5] dark:border-[#3A3040] flex items-center justify-center font-bold text-lg shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20 flex items-center justify-center font-bold text-lg shrink-0">
               ❌
             </div>
             <div>
-              <h4 className="text-sm sm:text-base font-bold text-[#242126] dark:text-[#F5EFF5] leading-snug">
+              <h4 className="text-sm sm:text-base font-bold text-[#1F2937] dark:text-[#FFFFFF] leading-snug">
                 {headacheTitle}
               </h4>
-              <p className="text-xs text-[#77717A] dark:text-[#B5AAB8] mt-2 leading-relaxed">
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2 leading-relaxed">
                 {headacheDesc}
               </p>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] flex items-center justify-between text-[11px] text-[#77717A] dark:text-[#B5AAB8]">
-            <span className="text-[#C65B62] dark:text-[#EF858B] font-semibold">Common Salon Struggle</span>
-            <span className="inline-flex items-center gap-1 font-bold text-[#4B263F] dark:text-[#D6A0B4]">
+          <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] flex items-center justify-between text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
+            <span className="text-[#EF4444] font-semibold">Common Salon Struggle</span>
+            <span className="inline-flex items-center gap-1 font-bold text-[#D4A77F]">
               <RotateCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-500" />
               <span>Hover or Tap to see Solution</span>
             </span>
@@ -81,29 +81,29 @@ export default function HeadacheFlipCard({
 
         {/* BACK: The Green SalonPro Solution */}
         <div
-          className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-[#F1EBEF] via-white to-[#F7F5F2] dark:from-[#211B24] dark:via-[#2B2230] dark:to-[#151218] border border-[#2F7D68]/40 dark:border-[#55B99A]/50 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-md flex flex-col justify-between"
+          className="absolute inset-0 w-full h-full backface-hidden bg-[#F8F9FA] dark:bg-[#10141F] border border-[#10B981]/40 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-md flex flex-col justify-between"
           style={{
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
           }}
         >
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#2F7D68] dark:bg-[#55B99A] text-white dark:text-[#151218] flex items-center justify-center font-bold text-lg shrink-0 shadow-md">
+            <div className="w-10 h-10 rounded-2xl bg-[#10B981] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-md">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm sm:text-base font-extrabold text-[#242126] dark:text-[#F5EFF5] leading-snug">
+              <h4 className="text-sm sm:text-base font-extrabold text-[#1F2937] dark:text-[#FFFFFF] leading-snug">
                 {solutionTitle}
               </h4>
-              <p className="text-xs text-[#2F7D68] dark:text-[#55B99A] mt-2 leading-relaxed font-medium">
+              <p className="text-xs text-[#10B981] mt-2 leading-relaxed font-medium">
                 {solutionDesc}
               </p>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-[#E8E1E5] dark:border-[#3A3040] flex items-center justify-between text-[11px] text-[#2F7D68] dark:text-[#55B99A] font-bold">
+          <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] flex items-center justify-between text-[11px] text-[#10B981] font-bold">
             <span>✨ SalonPro Guaranteed</span>
-            <span className="text-[10px] bg-white dark:bg-[#211B24] px-2 py-0.5 rounded-full border border-[#2F7D68]/30 dark:border-[#55B99A]/40">
+            <span className="text-[10px] bg-white dark:bg-[#141926] px-2 py-0.5 rounded-full border border-[#10B981]/30">
               Zero Headache
             </span>
           </div>

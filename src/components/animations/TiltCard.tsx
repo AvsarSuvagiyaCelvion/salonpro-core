@@ -59,16 +59,16 @@ export default function TiltCard({ children, className = '' }: TiltCardProps) {
           transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease',
           willChange: 'transform',
         }}
-        className={`relative p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#211B24] border border-[#E8E1E5] dark:border-[#3A3040] shadow-xs hover:shadow-xl dark:hover:shadow-[#2B2230]/40 hover:border-[#B77A91]/60 dark:hover:border-[#D6A0B4]/40 transition-all duration-300 h-full overflow-hidden group ${className}`}
+        className={`relative p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-xs hover:shadow-xl dark:hover:shadow-black/40 hover:border-[#D4A77F]/60 dark:hover:border-[#D4A77F]/50 transition-all duration-300 h-full overflow-hidden group ${className}`}
       >
-        {/* Subtle radial cursor glow follower in Champagne Gold (CSS variable, 0 React re-renders) */}
+        {/* Subtle radial cursor glow follower in Champagne Gold */}
         <div
           className="absolute w-52 h-52 rounded-full pointer-events-none blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-1"
           style={{
             left: 'var(--glow-x, -200px)',
             top: 'var(--glow-y, -200px)',
             transform: 'translate(-50%, -50%)',
-            background: 'radial-gradient(circle, rgba(198, 154, 93, 0.15) 0%, rgba(183, 122, 145, 0.08) 50%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(212, 167, 127, 0.15) 0%, rgba(184, 144, 95, 0.08) 50%, transparent 70%)',
           }}
         />
         {children}

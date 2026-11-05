@@ -90,7 +90,7 @@ export default async function PublicBillPage({
         
         {/* Top Header Brand Banner */}
         <div className="bg-neutral-900 text-white p-6 sm:p-8 text-center relative">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-pink-500/20 text-pink-400 font-bold text-2xl mb-3 border border-pink-500/30">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#D4A77F]/20 text-[#D4A77F] font-bold text-2xl mb-3 border border-[#D4A77F]/30">
             {invoice.salon_name?.charAt(0) || 'G'}
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">{invoice.salon_name}</h1>

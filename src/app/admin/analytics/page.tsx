@@ -13,14 +13,17 @@ import {
   Users,
   ShieldCheck,
   Clock,
+  Download,
 } from 'lucide-react';
 import AreaTrendChart from '@/components/charts/AreaTrendChart';
 import DonutDistributionChart from '@/components/charts/DonutDistributionChart';
 import BarComparisonChart from '@/components/charts/BarComparisonChart';
+import ReportExportModal from '@/components/reports/ReportExportModal';
 
 export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -71,17 +74,27 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Title */}
-      <div>
-        <span className="text-[11px] font-black uppercase tracking-wider text-pink-600">
-          Executive Cloud Intelligence
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
-          Platform Financials & Visual Analytics
-        </h1>
-        <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-0.5">
-          Consolidated revenue, appointment volumes, and tenant salon market shares
-        </p>
+      {/* Title & Export Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <span className="text-[11px] font-black uppercase tracking-wider text-pink-600">
+            Executive Cloud Intelligence
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+            Platform Financials & Visual Analytics
+          </h1>
+          <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-0.5">
+            Consolidated revenue, appointment volumes, and tenant salon market shares
+          </p>
+        </div>
+
+        <button
+          onClick={() => setExportModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-sm transition-all shrink-0 cursor-pointer self-start sm:self-auto"
+        >
+          <Download className="w-4 h-4 text-[#080B12]" />
+          <span>Export Analytics (CSV & PDF)</span>
+        </button>
       </div>
 
       {/* 3 Primary Metric Cards */}
@@ -215,6 +228,14 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
       </div>
+
+      {/* Export Reports Modal */}
+      <ReportExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        role="admin"
+        salonName="SalonPro Master Governance"
+      />
     </div>
   );
 }

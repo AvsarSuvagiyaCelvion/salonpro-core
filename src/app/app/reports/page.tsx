@@ -13,9 +13,11 @@ import {
   Sparkles,
   ArrowUpRight,
   Printer,
+  Download,
 } from 'lucide-react';
 import DonutDistributionChart from '@/components/charts/DonutDistributionChart';
 import BarComparisonChart from '@/components/charts/BarComparisonChart';
+import ReportExportModal from '@/components/reports/ReportExportModal';
 
 interface PaymentMethodStat {
   method: string;
@@ -58,6 +60,7 @@ export default function ReportsPage() {
   const [period, setPeriod] = useState<'today' | '7d' | '30d' | 'all'>('30d');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ReportsData | null>(null);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   // Global commission adjustment inputs for simulator
   const [globalServiceCommPct, setGlobalServiceCommPct] = useState<number>(10);
@@ -152,6 +155,15 @@ export default function ReportsPage() {
               </button>
             ))}
           </div>
+
+          <button
+            onClick={() => setExportModalOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-semibold text-xs shadow-sm transition-all shrink-0 cursor-pointer"
+            title="Export CSV and PDF Reports"
+          >
+            <Download className="w-3.5 h-3.5 text-[#080B12]" />
+            <span>Export Reports</span>
+          </button>
 
           <button
             onClick={() => window.print()}
@@ -517,6 +529,14 @@ export default function ReportsPage() {
           </div>
         </div>
       )}
+
+      {/* Export Reports Modal */}
+      <ReportExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        role="owner"
+        salonName="Salon Business Intelligence"
+      />
     </div>
   );
 }

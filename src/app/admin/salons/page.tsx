@@ -25,13 +25,16 @@ import {
   Edit2,
   Clock,
   X,
+  Download,
 } from 'lucide-react';
+import ReportExportModal from '@/components/reports/ReportExportModal';
 
 export default function AdminSalonsPage() {
   const [salons, setSalons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   // Add New Salon Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -267,6 +270,16 @@ export default function AdminSalonsPage() {
           </div>
 
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setExportModalOpen(true)}
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer whitespace-nowrap active:scale-95"
+              title="Export Salons Report to CSV and PDF"
+            >
+              <Download className="w-3.5 h-3.5 text-[#D4A77F]" />
+              <span>Export</span>
+            </button>
+
             <button
               type="button"
               onClick={() => {
@@ -863,6 +876,14 @@ export default function AdminSalonsPage() {
         </div>
       </div>
     )}
+
+      {/* Export Reports Modal */}
+      <ReportExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        role="admin"
+        salonName="SalonPro Master Governance"
+      />
     </div>
   );
 }

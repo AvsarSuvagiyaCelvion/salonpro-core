@@ -4,6 +4,7 @@ import { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth';
 import { getSalonPlan } from '@/lib/plan';
 import { normalizeMobile } from '@/lib/phone';
 import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp } from '@/lib/rate-limit';
+import { checkDateHoliday } from '@/lib/holidays';
 import bcrypt from 'bcryptjs';
 
 export async function POST(
@@ -183,6 +184,19 @@ export async function POST(
     if (!workingDays.includes(dayOfWeek)) {
       return NextResponse.json(
         { error: 'The salon is closed on this day. Please select another date.' },
+        { status: 400 }
+      );
+    }
+
+    // Specific salon holiday / temporary closure validation
+    const holidayCheck = await checkDateHoliday(salon.id, String(date).trim());
+    if (holidayCheck.isHoliday && holidayCheck.holiday) {
+      return NextResponse.json(
+        {
+          error: `The salon is closed on this date for "${holidayCheck.holiday.title}". ${holidayCheck.holiday.note || 'Please select another date.'}`,
+          isHoliday: true,
+          holiday: holidayCheck.holiday,
+        },
         { status: 400 }
       );
     }

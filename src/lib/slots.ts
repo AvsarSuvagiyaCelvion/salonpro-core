@@ -1,4 +1,5 @@
 import { query } from './db';
+import { checkDateHoliday } from './holidays';
 
 export interface AvailableSlot {
   time: string; // "10:00"
@@ -30,6 +31,10 @@ export interface SlotAvailabilityResult {
   };
   date: string;
   isClosedDay: boolean;
+  holiday?: {
+    title: string;
+    note: string | null;
+  } | null;
   slots: AvailableSlot[];
 }
 
@@ -124,6 +129,23 @@ export async function getAvailableSlots(params: {
       service,
       date,
       isClosedDay: true,
+      holiday: null,
+      slots: [],
+    };
+  }
+
+  // Check specific salon holiday / temporary closure
+  const holidayCheck = await checkDateHoliday(salon.id, date);
+  if (holidayCheck.isHoliday && holidayCheck.holiday) {
+    return {
+      salon,
+      service,
+      date,
+      isClosedDay: true,
+      holiday: {
+        title: holidayCheck.holiday.title,
+        note: holidayCheck.holiday.note,
+      },
       slots: [],
     };
   }

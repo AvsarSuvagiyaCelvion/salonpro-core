@@ -2,6 +2,7 @@ import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getSalonPlan } from '@/lib/plan';
+import { getSalonHolidays } from '@/lib/holidays';
 
 export async function GET(
   request: Request,
@@ -69,11 +70,15 @@ export async function GET(
       [salon.id]
     );
 
+    // Fetch upcoming holidays/closures
+    const holidays = await getSalonHolidays(salon.id);
+
     return NextResponse.json({
       salon,
       services: servicesRes.rows,
       staff: staffRes.rows,
       staffServices: mappingRes.rows,
+      holidays,
     });
   } catch (error: any) {
     return serverError(error, 'src/app/api/public/[slug]/route.ts');

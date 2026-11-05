@@ -57,7 +57,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [selectedStaffId, setSelectedStaffId] = useState<string>('anyone');
   
   // Date & Slot state
-  const [availableDates, setAvailableDates] = useState<{ dateStr: string; label: string; dayNumber?: string; dayName: string; isClosed: boolean }[]>([]);
+  const [availableDates, setAvailableDates] = useState<{ dateStr: string; label: string; dayNumber?: string; dayName: string; isClosed: boolean; holidayTitle?: string | null; holidayNote?: string | null }[]>([]);
+  const [holidays, setHolidays] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [slotsLoading, setSlotsLoading] = useState<boolean>(false);
   const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
@@ -136,6 +137,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
         setServices(fetchedServices);
         setStaffList(data.staff || []);
         setStaffServices(data.staffServices || []);
+        setHolidays(data.holidays || []);
 
         // Restore selectedService from sessionStorage or default to first service
         if (typeof window !== 'undefined') {
@@ -158,10 +160,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
     loadSalon();
   }, [slug]);
 
-  // 2. Generate date range when salon loads (in Indian Standard Time)
+  // 2. Generate date range when salon or holidays load (in Indian Standard Time)
   useEffect(() => {
     if (!salon) return;
-    const dates: { dateStr: string; label: string; dayNumber?: string; dayName: string; isClosed: boolean }[] = [];
+    const dates: { dateStr: string; label: string; dayNumber?: string; dayName: string; isClosed: boolean; holidayTitle?: string | null; holidayNote?: string | null }[] = [];
     const maxDays = salon.max_advance_days || 14;
     const workingDays = salon.working_days || [1, 2, 3, 4, 5, 6];
 
@@ -174,13 +176,17 @@ export default function BookingWizard({ slug }: { slug: string }) {
       d.setDate(baseDate.getDate() + i);
       const dateStr = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
       const dayOfWeek = new Date(`${dateStr}T12:00:00Z`).getUTCDay();
-      const isClosed = !workingDays.includes(dayOfWeek);
+      
+      const holidayMatch = (holidays || []).find((h: any) => dateStr >= h.start_date && dateStr <= h.end_date);
+      const isClosed = !workingDays.includes(dayOfWeek) || Boolean(holidayMatch);
+      const holidayTitle = holidayMatch ? holidayMatch.title : null;
+      const holidayNote = holidayMatch ? holidayMatch.note : null;
 
       const label = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' });
       const dayNumber = d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' });
       const dayName = d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short' });
 
-      dates.push({ dateStr, label, dayNumber, dayName, isClosed });
+      dates.push({ dateStr, label, dayNumber, dayName, isClosed, holidayTitle, holidayNote });
     }
 
     setAvailableDates(dates);
@@ -189,7 +195,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
     if (firstOpen) {
       setSelectedDate(firstOpen.dateStr);
     }
-  }, [salon]);
+  }, [salon, holidays]);
 
   // 3. Fetch Slots when Service, Staff, or Date changes
   useEffect(() => {
@@ -218,7 +224,11 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
         if (data.isClosedDay) {
           setAvailableSlots([]);
-          setSlotNotice('Salon is closed on this day. Please select another date.');
+          if (data.holiday?.title) {
+            setSlotNotice(`🏖️ Salon is closed on this date for "${data.holiday.title}". ${data.holiday.note || 'Please select another upcoming date.'}`);
+          } else {
+            setSlotNotice('Salon is closed on this day. Please select another date.');
+          }
         } else if (serverSlots.length === 0) {
           setAvailableSlots([]);
           if (isToday) {
@@ -853,7 +863,11 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           <span className="text-[10px] opacity-75">{d.label.split(' ')[1] || ''}</span>
                         </div>
                       )}
-                      {d.isClosed && <span className="text-[9px] text-rose-400 font-bold mt-0.5">Closed</span>}
+                      {d.isClosed && (
+                        <span className="text-[9px] text-rose-400 font-bold mt-0.5 truncate max-w-[76px] px-1 text-center" title={d.holidayTitle || 'Closed'}>
+                          {d.holidayTitle ? '🏖️ Holiday' : 'Closed'}
+                        </span>
+                      )}
                     </button>
                   );
                 })}

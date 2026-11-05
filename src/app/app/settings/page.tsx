@@ -17,6 +17,10 @@ import {
   Phone,
   MapPin,
   AlertCircle,
+  CalendarX,
+  Trash2,
+  Plus,
+  Palmtree,
 } from 'lucide-react';
 
 const DAYS_OF_WEEK = [
@@ -56,7 +60,94 @@ export default function SettingsPage() {
   const [sendReminders, setSendReminders] = useState(true);
 
   // Active section tab
-  const [activeSection, setActiveSection] = useState<'salon' | 'booking'>('salon');
+  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'holidays'>('salon');
+
+  // Holidays & Closures state
+  const [holidaysList, setHolidaysList] = useState<any[]>([]);
+  const [loadingHolidays, setLoadingHolidays] = useState(false);
+  const [holidayTitle, setHolidayTitle] = useState('');
+  const [holidayDateType, setHolidayDateType] = useState<'single' | 'range'>('single');
+  const [holidayStartDate, setHolidayStartDate] = useState('');
+  const [holidayEndDate, setHolidayEndDate] = useState('');
+  const [holidayNote, setHolidayNote] = useState('');
+  const [savingHoliday, setSavingHoliday] = useState(false);
+  const [deletingHolidayId, setDeletingHolidayId] = useState<string | null>(null);
+  const [holidayMessage, setHolidayMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  async function loadHolidays() {
+    try {
+      setLoadingHolidays(true);
+      const res = await fetch('/api/holidays');
+      if (res.ok) {
+        const json = await res.json();
+        setHolidaysList(json.holidays || []);
+      }
+    } catch (err) {
+      console.error('Failed to load holidays:', err);
+    } finally {
+      setLoadingHolidays(false);
+    }
+  }
+
+  useEffect(() => {
+    if (activeSection === 'holidays') {
+      loadHolidays();
+    }
+  }, [activeSection]);
+
+  async function handleAddHoliday(e: React.FormEvent) {
+    e.preventDefault();
+    if (!holidayTitle.trim() || !holidayStartDate) {
+      setHolidayMessage({ type: 'error', text: 'Please enter a title and select a date.' });
+      return;
+    }
+    setSavingHoliday(true);
+    setHolidayMessage(null);
+    try {
+      const finalEnd = holidayDateType === 'single' ? holidayStartDate : (holidayEndDate || holidayStartDate);
+      const res = await fetch('/api/holidays', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: holidayTitle.trim(),
+          startDate: holidayStartDate,
+          endDate: finalEnd,
+          note: holidayNote.trim() || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save holiday');
+
+      setHolidayMessage({ type: 'success', text: `Holiday "${holidayTitle}" scheduled! Clients will see this date as closed.` });
+      setHolidayTitle('');
+      setHolidayStartDate('');
+      setHolidayEndDate('');
+      setHolidayNote('');
+      loadHolidays();
+    } catch (err: any) {
+      setHolidayMessage({ type: 'error', text: err.message });
+    } finally {
+      setSavingHoliday(false);
+    }
+  }
+
+  async function handleDeleteHoliday(id: string) {
+    if (!confirm('Are you sure you want to remove this holiday and restore regular booking slots?')) return;
+    setDeletingHolidayId(id);
+    try {
+      const res = await fetch(`/api/holidays/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        loadHolidays();
+      } else {
+        const d = await res.json().catch(() => ({}));
+        alert(d.error || 'Failed to delete holiday');
+      }
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setDeletingHolidayId(null);
+    }
+  }
 
   useEffect(() => {
     async function loadSettings() {
@@ -270,6 +361,7 @@ export default function SettingsPage() {
         {[
           { id: 'salon', label: 'Salon Details', icon: Store },
           { id: 'booking', label: 'Booking & Timings', icon: Calendar },
+          { id: 'holidays', label: 'Holidays & Closures', icon: Palmtree },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSection === tab.id;
@@ -618,17 +710,281 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Submit Actions */}
-        <div className="flex justify-end pt-4">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-white font-extrabold text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center gap-2"
-          >
-            <Save className="w-4 h-4" />
-            <span>{saving ? 'Saving Settings...' : 'Save All Settings'}</span>
-          </button>
-        </div>
+        {/* ================= SECTION 3: HOLIDAYS & TEMPORARY CLOSURES ================= */}
+        {activeSection === 'holidays' && (
+          <div className="space-y-6">
+            {/* Holiday Notifications */}
+            {holidayMessage && (
+              <div
+                className={`p-4 rounded-2xl border text-xs sm:text-sm flex items-center gap-2 font-medium ${
+                  holidayMessage.type === 'success'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                    : 'bg-rose-50 border-rose-200 text-rose-800'
+                }`}
+              >
+                {holidayMessage.type === 'success' ? (
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                )}
+                <span>{holidayMessage.text}</span>
+              </div>
+            )}
+
+            {/* Schedule New Holiday Card */}
+            <div className="bg-white dark:bg-[#141926] p-6 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-5">
+              <div>
+                <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                  <Palmtree className="w-5 h-5 text-[#D4A77F]" />
+                  <span>Schedule Salon Holiday or Temporary Closure</span>
+                </h2>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                  Block online bookings on specific dates or multi-day vacation periods. Customers will see these dates marked as closed with your custom note.
+                </p>
+              </div>
+
+              {/* Quick Preset Badges */}
+              <div>
+                <span className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider block mb-2">
+                  Quick Suggestions
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    'Diwali Holiday',
+                    'Holi Festival',
+                    'Eid Holiday',
+                    'Annual Staff Vacation',
+                    'Salon Renovation & Cleaning',
+                    'Emergency Maintenance',
+                  ].map((preset) => (
+                    <button
+                      type="button"
+                      key={preset}
+                      onClick={() => setHolidayTitle(preset)}
+                      className="px-2.5 py-1 text-xs rounded-xl border border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50 dark:bg-[#10141F] text-neutral-700 dark:text-neutral-300 hover:border-[#D4A77F] hover:text-[#D4A77F] transition-colors"
+                    >
+                      + {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Form inputs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                    Holiday / Closure Reason *
+                  </label>
+                  <input
+                    type="text"
+                    value={holidayTitle}
+                    onChange={(e) => setHolidayTitle(e.target.value)}
+                    placeholder="e.g. Diwali Vacation, Shop Renovation, Special Event"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-sm text-neutral-900 dark:text-white focus:outline-none focus:border-[#D4A77F]"
+                  />
+                </div>
+
+                {/* Single Day vs Date Range Toggle */}
+                <div className="sm:col-span-2 flex items-center gap-3">
+                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    Duration:
+                  </label>
+                  <div className="inline-flex p-1 rounded-xl bg-neutral-100 dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A]">
+                    <button
+                      type="button"
+                      onClick={() => setHolidayDateType('single')}
+                      className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                        holidayDateType === 'single'
+                          ? 'bg-[#D4A77F] text-black shadow-xs'
+                          : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Single Day
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHolidayDateType('range')}
+                      className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                        holidayDateType === 'range'
+                          ? 'bg-[#D4A77F] text-black shadow-xs'
+                          : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Date Range (Multi-Day)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Date pickers */}
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                    {holidayDateType === 'single' ? 'Closed Date *' : 'Start Date *'}
+                  </label>
+                  <input
+                    type="date"
+                    value={holidayStartDate}
+                    onChange={(e) => setHolidayStartDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-sm text-neutral-900 dark:text-white focus:outline-none focus:border-[#D4A77F]"
+                  />
+                </div>
+
+                {holidayDateType === 'range' && (
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                      End Date (Reopens after) *
+                    </label>
+                    <input
+                      type="date"
+                      value={holidayEndDate}
+                      onChange={(e) => setHolidayEndDate(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-sm text-neutral-900 dark:text-white focus:outline-none focus:border-[#D4A77F]"
+                    />
+                  </div>
+                )}
+
+                {/* Note for clients */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                    Client Notice Note <span className="text-neutral-400 font-normal">(Optional - shown to clients on booking page)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={holidayNote}
+                    onChange={(e) => setHolidayNote(e.target.value)}
+                    placeholder="e.g. Wishing you a wonderful festival! We will reopen on Monday at 10:00 AM."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-sm text-neutral-900 dark:text-white focus:outline-none focus:border-[#D4A77F]"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleAddHoliday}
+                  disabled={savingHoliday}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-black text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{savingHoliday ? 'Scheduling...' : 'Save & Block Booking Slots'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* List of Scheduled Holidays */}
+            <div className="bg-white dark:bg-[#141926] p-6 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-[#1F2937] dark:text-white">
+                    Scheduled Holidays & Closures ({holidaysList.length})
+                  </h3>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                    Active date blocks where clients cannot book appointments
+                  </p>
+                </div>
+              </div>
+
+              {loadingHolidays ? (
+                <div className="py-8 text-center">
+                  <div className="w-6 h-6 border-2 border-[#D4A77F] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <p className="text-xs text-neutral-400 mt-2">Loading holidays...</p>
+                </div>
+              ) : holidaysList.length === 0 ? (
+                <div className="py-10 text-center border-2 border-dashed border-neutral-200 dark:border-[#2A2F3A] rounded-2xl">
+                  <CalendarX className="w-8 h-8 text-neutral-300 dark:text-neutral-600 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                    No upcoming holidays or temporary closures scheduled
+                  </p>
+                  <p className="text-[11px] text-neutral-400 max-w-xs mx-auto mt-1">
+                    Your salon is open according to regular weekly working days. Add a holiday above whenever you plan to take a break or close the shop.
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-neutral-100 dark:divide-[#2A2F3A]">
+                  {holidaysList.map((h) => {
+                    const isSingleDay = h.start_date === h.end_date;
+                    const startDateObj = new Date(h.start_date);
+                    const endDateObj = new Date(h.end_date);
+                    const diffDays = Math.round(
+                      (endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)
+                    ) + 1;
+
+                    return (
+                      <div
+                        key={h.id}
+                        className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/15 text-[#B8905F] dark:text-[#D4A77F] flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                            <Palmtree className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                                {h.title}
+                              </span>
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-500/15 text-rose-500 border border-rose-500/20">
+                                {isSingleDay ? '1 Day Closed' : `${diffDays} Days Closed`}
+                              </span>
+                            </div>
+                            <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-[#D4A77F]" />
+                              <span>
+                                {isSingleDay
+                                  ? startDateObj.toLocaleDateString('en-IN', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })
+                                  : `${startDateObj.toLocaleDateString('en-IN', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })} to ${endDateObj.toLocaleDateString('en-IN', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })}`}
+                              </span>
+                            </div>
+                            {h.note && (
+                              <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-1 italic">
+                                &ldquo;{h.note}&rdquo;
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteHoliday(h.id)}
+                          disabled={deletingHolidayId === h.id}
+                          className="self-end sm:self-auto p-2 rounded-xl text-neutral-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                          title="Remove holiday & reopen bookings"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Submit Actions for Salon and Booking Tabs */}
+        {activeSection !== 'holidays' && (
+          <div className="flex justify-end pt-4">
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-white font-extrabold text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              <span>{saving ? 'Saving Settings...' : 'Save All Settings'}</span>
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );

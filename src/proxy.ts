@@ -28,6 +28,7 @@ const RESERVED_SUBDOMAINS = new Set([
 // Public endpoints that do NOT require authentication
 const PUBLIC_API_PREFIXES = [
   '/api/public/',
+  '/api/demo/',
   '/api/health',
   '/api/plans',
   '/api/login',

@@ -53,10 +53,15 @@ async function handleDemoLogin(request: Request) {
     });
 
     // 3. Construct response (redirect to /app or return JSON)
+    const searchParams = new URL(request.url).searchParams;
+    const isJson = searchParams.get('format') === 'json' || request.headers.get('accept')?.includes('application/json');
+
     const url = new URL('/app', request.url);
     url.searchParams.set('demo', 'true');
 
-    const response = NextResponse.redirect(url);
+    const response = isJson
+      ? NextResponse.json({ success: true, redirectUrl: url.toString() })
+      : NextResponse.redirect(url);
 
     // 4. Set the session cookie
     response.cookies.set({

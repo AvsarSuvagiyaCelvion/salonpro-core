@@ -226,7 +226,7 @@ export default function InteractiveProductPreview() {
                   <h4 className="text-sm sm:text-base font-extrabold text-[#1F2937] dark:text-[#FFFFFF] flex items-center gap-2">
                     <span>Client Online Booking Flow</span>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] border border-[#E5E7EB] dark:border-[#2A2F3A]">
-                      Zero Overlaps Guaranteed
+                      Conflict-Free Slot Engine
                     </span>
                   </h4>
                   <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Public customer booking page linked on Instagram & Google Maps</p>

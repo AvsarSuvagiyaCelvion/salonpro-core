@@ -442,7 +442,7 @@ export default function LandingPageClient() {
           </Reveal>
         </section>
 
-        {/* ================= INFINITE LUXURY SALON TESTIMONIAL MARQUEE ================= */}
+        {/* ================= BUILT FOR EVERY SALON FORMAT MARQUEE ================= */}
         <div className="relative z-10 w-full">
           <SalonMarquee />
         </div>

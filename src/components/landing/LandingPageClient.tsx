@@ -39,18 +39,27 @@ import CalendarSlotsDemo from '@/components/animations/CalendarSlotsDemo';
 import SalonMarquee from '@/components/animations/SalonMarquee';
 
 export default function LandingPageClient() {
-  const [typewriterDone, setTypewriterDone] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('salonpro_typewriter_done') === 'true';
-    }
-    return false;
-  });
+  const [pageReady, setPageReady] = useState(false);
+  const [typewriterDone, setTypewriterDone] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    // Fallback ensure hero content is never blocked
+    const timer = setTimeout(() => {
+      setTypewriterDone(true);
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <SmoothScroll>
-      <PageLoader />
+      {/* High-Performance Branded Scissors Page Loader that reveals first on every page load/reload */}
+      <PageLoader onComplete={() => setPageReady(true)} minDurationMs={1200} />
 
-      <div className="min-h-screen bg-white dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] font-sans selection:bg-[#D4A77F] selection:text-[#080B12] w-full max-w-full overflow-x-hidden relative transition-colors duration-300">
+      <div
+        className={`min-h-screen bg-white dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] font-sans selection:bg-[#D4A77F] selection:text-[#080B12] w-full max-w-full overflow-x-hidden relative transition-opacity duration-500 ${
+          pageReady ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         {/* Animated Aurora Gradient Background with Desktop Cursor Spotlight */}
         <AuroraBackground />
 

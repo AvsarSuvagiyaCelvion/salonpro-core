@@ -19,8 +19,9 @@ export default function CalendarSlotsDemo() {
 
     // Slots fill one after another
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       setFilledCount((prev) => (prev >= 3 ? 1 : prev + 1));
-    }, 1900);
+    }, 2400);
 
     return () => clearInterval(interval);
   }, [shouldReduceMotion]);

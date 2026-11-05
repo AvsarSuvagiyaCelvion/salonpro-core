@@ -17,8 +17,9 @@ export default function DoubleBookingDemo() {
     // 2: Client 2 tries to enter same slot -> Collision! (Red Shake)
     // 3: SalonPro blocks Client 2 with "Slot Protected" badge
     const timer = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       setStep((prev) => ((prev + 1) % 4) as any);
-    }, 2400);
+    }, 2800);
 
     return () => clearInterval(timer);
   }, [shouldReduceMotion]);

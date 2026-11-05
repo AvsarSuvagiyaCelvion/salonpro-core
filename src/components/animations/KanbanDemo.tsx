@@ -49,8 +49,9 @@ export default function KanbanDemo() {
   useEffect(() => {
     if (shouldReduceMotion) return;
 
-    // Loop cycle: automatically transition cards between columns every 3.8 seconds
+    // Loop cycle: automatically transition cards between columns every 4 seconds
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       setCards((prev) => {
         return prev.map((card) => {
           if (card.col === 'waiting') return { ...card, col: 'chair' };
@@ -58,7 +59,7 @@ export default function KanbanDemo() {
           return { ...card, col: 'waiting' };
         });
       });
-    }, 3800);
+    }, 4200);
 
     return () => clearInterval(interval);
   }, [shouldReduceMotion]);
@@ -68,6 +69,7 @@ export default function KanbanDemo() {
 
     // Trigger WhatsApp notification popup cycle
     const bubbleTimer = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       setIsTypingDots(true);
       setShowBubble(false);
 

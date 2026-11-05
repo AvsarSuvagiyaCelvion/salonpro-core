@@ -18,8 +18,9 @@ export default function PosInvoiceDemo() {
     // 3: Add CGST/SGST Taxes
     // 4: Grand total counts up
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       setLineStep((prev) => (prev >= 4 ? 0 : prev + 1));
-    }, 1800);
+    }, 2400);
 
     return () => clearInterval(interval);
   }, [shouldReduceMotion]);

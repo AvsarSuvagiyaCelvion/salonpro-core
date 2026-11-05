@@ -280,3 +280,4 @@ export async function exportToPDF(options: PDFExportOptions) {
   // Trigger browser download
   doc.save(`${filename.replace(/\.pdf$/, '')}.pdf`);
 }
+

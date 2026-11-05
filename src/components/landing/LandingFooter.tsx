@@ -205,32 +205,27 @@ export default function LandingFooter() {
           </div>
         </div>
 
-        {/* Bottom Strip: Copyright + Payment Logos + System Status */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#6B7280] dark:text-[#A0A8B8] text-center md:text-left">
+        {/* Bottom Strip: Clean, balanced copyright & quick legal links */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B7280] dark:text-[#A0A8B8] text-center sm:text-left">
           <div className="space-y-1">
             <p className="text-[#1F2937] dark:text-[#FFFFFF] font-medium">
-              © 2026 SalonPro Software Platform. All rights reserved.
+              © 2026 SalonPro. All rights reserved.
             </p>
             <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
-              Designed & engineered for professional salons, studios, and wellness spas across India.
+              Designed &amp; engineered for modern salons, studios, and wellness spas.
             </p>
           </div>
 
-          {/* Supported Payment Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold">
-            <span className="px-2 py-0.5 rounded-lg bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF]">UPI / QR</span>
-            <span className="px-2 py-0.5 rounded-lg bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF]">GPay</span>
-            <span className="px-2 py-0.5 rounded-lg bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF]">PhonePe</span>
-            <span className="px-2 py-0.5 rounded-lg bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF]">RuPay</span>
-            <span className="px-2 py-0.5 rounded-lg bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF]">Visa</span>
-            <span className="px-2 py-0.5 rounded-lg bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF]">Mastercard</span>
-            <span className="px-2 py-0.5 rounded-lg bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF]">NetBanking</span>
-          </div>
-
-          {/* Status Indicator */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[11px] text-[#1F2937] dark:text-[#FFFFFF] shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-            <span>All Systems Operational</span>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-6 gap-y-2 text-xs">
+            <Link href="/terms" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+              Terms &amp; Conditions
+            </Link>
+            <Link href="/privacy" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/refund-policy" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+              Refund Policy
+            </Link>
           </div>
         </div>
       </div>

@@ -799,7 +799,6 @@ export default function SalonSubscriptionPage() {
                   { label: 'Client Self-Service Reschedule / Cancel', key: 'customer_cancel' },
                   { label: 'Excel / CSV Data Export', key: 'export' },
                   { label: 'Promotional Coupons & Discounts', key: 'coupons' },
-                  { label: 'Client Feedback & Google Reviews', key: 'reviews' },
                   { label: 'Loyalty Reward Points', key: 'loyalty' },
                   { label: 'Custom Domain Verification', key: 'custom_domain' },
                   { label: 'Multi-Branch Platform Management', key: 'multi_branch' },

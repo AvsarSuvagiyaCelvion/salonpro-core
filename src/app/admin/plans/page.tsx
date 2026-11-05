@@ -62,7 +62,6 @@ const ALL_FLAGS: { key: string; label: string; desc: string; category: string }[
   { key: 'customer_cancel', label: 'Customer Reschedule / Cancel', desc: 'Permit clients to manage their appointments online', category: 'Operations' },
   { key: 'export', label: 'Excel / CSV Data Export', desc: 'Download invoices, reports, and customer profiles', category: 'Data & Reporting' },
   { key: 'coupons', label: 'Promotional Coupons', desc: 'Generate discount codes for festival campaigns', category: 'Marketing' },
-  { key: 'reviews', label: 'Client Feedback & Reviews', desc: 'Collect Google/custom ratings after appointment billing', category: 'Marketing' },
   { key: 'loyalty', label: 'Loyalty Reward Points', desc: 'Auto-credit points for customer bill totals', category: 'Marketing' },
   { key: 'custom_domain', label: 'Custom Domain Mapping', desc: 'Host on custom salon domain (requires verified DNS)', category: 'Enterprise' },
   { key: 'multi_branch', label: 'Multi-Branch Support', desc: 'Manage multiple branches under single owner entity', category: 'Enterprise' },

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ShieldCheck, Zap, MessageSquare, TrendingUp } from 'lucide-react';
+import { ShieldCheck, Zap, MessageSquare, Clock } from 'lucide-react';
 
 interface StatItem {
   id: string;
@@ -21,8 +21,8 @@ const stats: StatItem[] = [
     id: 'double-bookings',
     target: 0,
     suffix: '%',
-    label: 'Double-Bookings',
-    subtext: 'Overlap-protected bookings',
+    label: 'Double-Booking Rate',
+    subtext: 'Conflict-free slot protection',
     colorClass: 'text-[#242126] dark:text-[#F5EFF5]',
     bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
     borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
@@ -32,8 +32,8 @@ const stats: StatItem[] = [
     id: 'pos-checkout',
     target: 10,
     suffix: ' Sec',
-    label: 'Built for Indian Salons',
-    subtext: 'GST POS ready with UPI',
+    label: 'GST POS Checkout',
+    subtext: 'Instant itemized billing with UPI',
     colorClass: 'text-[#4B263F] dark:text-[#D6A0B4]',
     bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
     borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
@@ -43,23 +43,23 @@ const stats: StatItem[] = [
     id: 'whatsapp-confirmations',
     target: 100,
     suffix: '%',
-    label: 'Automatic WhatsApp Confirmations',
-    subtext: 'Real-time booking alerts',
+    label: 'WhatsApp Delivery',
+    subtext: 'Instant booking & digital bill alerts',
     colorClass: 'text-[#C69A5D] dark:text-[#D4AD76]',
     bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
     borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
     icon: MessageSquare,
   },
   {
-    id: 'repeat-visits',
-    target: 35,
-    suffix: '%+',
-    label: 'Repeat Visits with VIP Plans',
-    subtext: 'Higher Client Retention',
+    id: 'online-booking',
+    target: 24,
+    suffix: '/7',
+    label: 'Online Self-Booking',
+    subtext: 'Accept clients even when closed',
     colorClass: 'text-[#2F7D68] dark:text-[#55B99A]',
     bgLightClass: 'bg-[#F1EBEF] dark:bg-[#2B2230]',
     borderClass: 'border-[#E8E1E5] dark:border-[#3A3040]',
-    icon: TrendingUp,
+    icon: Clock,
   },
 ];
 

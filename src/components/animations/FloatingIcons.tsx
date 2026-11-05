@@ -10,15 +10,15 @@ export default function FloatingIcons() {
   if (shouldReduceMotion) return null;
 
   return (
-    /* Hidden on mobile to prevent any text occlusion; positioned safely in the desktop margins */
-    <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none select-none -z-5">
+    /* Positioned safely in the side margins; visible on md+ without occluding text */
+    <div className="hidden md:block absolute inset-0 overflow-hidden pointer-events-none select-none z-0">
       {/* 1. Top-Left Floating Scissors */}
       <div
         style={{
-          animation: 'floatIcon1 7s ease-in-out infinite alternate',
+          animation: 'floatBobUpDown1 3.8s ease-in-out infinite',
           willChange: 'transform',
         }}
-        className="absolute top-16 left-6 xl:left-14 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
+        className="absolute top-14 left-4 xl:left-12 p-3 sm:p-3.5 rounded-2xl bg-white/90 dark:bg-[#141926]/90 backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-lg shadow-[#D4A77F]/10 dark:shadow-black/30 text-[#D4A77F] transition-colors"
       >
         <Scissors className="w-5 h-5 xl:w-6 xl:h-6" />
       </div>
@@ -26,11 +26,11 @@ export default function FloatingIcons() {
       {/* 2. Top-Right Floating Hair Dryer / Air Flow */}
       <div
         style={{
-          animation: 'floatIcon2 8s ease-in-out infinite alternate',
-          animationDelay: '0.8s',
+          animation: 'floatBobUpDown2 4.2s ease-in-out infinite',
+          animationDelay: '0.9s',
           willChange: 'transform',
         }}
-        className="absolute top-20 right-6 xl:right-16 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
+        className="absolute top-16 right-4 xl:right-14 p-3 sm:p-3.5 rounded-2xl bg-white/90 dark:bg-[#141926]/90 backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-lg shadow-[#D4A77F]/10 dark:shadow-black/30 text-[#D4A77F] transition-colors"
       >
         <Wind className="w-5 h-5 xl:w-6 xl:h-6" />
       </div>
@@ -38,58 +38,58 @@ export default function FloatingIcons() {
       {/* 3. Mid-Left Luxury Champagne Sparkles */}
       <div
         style={{
-          animation: 'floatIcon3 9s ease-in-out infinite alternate',
-          animationDelay: '1.4s',
+          animation: 'floatBobUpDown3 3.6s ease-in-out infinite',
+          animationDelay: '1.6s',
           willChange: 'transform',
         }}
-        className="absolute top-72 left-8 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
+        className="absolute top-64 left-6 xl:left-16 p-3 sm:p-3.5 rounded-2xl bg-white/90 dark:bg-[#141926]/90 backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-lg shadow-[#D4A77F]/10 dark:shadow-black/30 text-[#D4A77F] transition-colors"
       >
-        <Sparkles className="w-5 h-5" />
+        <Sparkles className="w-5 h-5 xl:w-6 xl:h-6" />
       </div>
 
       {/* 4. Mid-Right Styling Feather */}
       <div
         style={{
-          animation: 'floatIcon4 8.5s ease-in-out infinite alternate',
-          animationDelay: '2s',
+          animation: 'floatBobUpDown4 4.4s ease-in-out infinite',
+          animationDelay: '2.3s',
           willChange: 'transform',
         }}
-        className="absolute top-64 right-10 p-3 rounded-2xl bg-white dark:bg-[#141926] backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-md text-[#D4A77F]"
+        className="absolute top-60 right-6 xl:right-16 p-3 sm:p-3.5 rounded-2xl bg-white/90 dark:bg-[#141926]/90 backdrop-blur-md border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-lg shadow-[#D4A77F]/10 dark:shadow-black/30 text-[#D4A77F] transition-colors"
       >
-        <Feather className="w-5 h-5" />
+        <Feather className="w-5 h-5 xl:w-6 xl:h-6" />
       </div>
 
       <style jsx>{`
-        @keyframes floatIcon1 {
-          0% {
-            transform: translate3d(0, 0, 0) rotate(0deg);
+        @keyframes floatBobUpDown1 {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
           }
-          100% {
-            transform: translate3d(10px, -18px, 0) rotate(8deg);
-          }
-        }
-        @keyframes floatIcon2 {
-          0% {
-            transform: translate3d(0, 0, 0) rotate(0deg);
-          }
-          100% {
-            transform: translate3d(-12px, -14px, 0) rotate(-6deg);
+          50% {
+            transform: translateY(-24px) rotate(8deg);
           }
         }
-        @keyframes floatIcon3 {
-          0% {
-            transform: translate3d(0, 0, 0) scale(1);
+        @keyframes floatBobUpDown2 {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
           }
-          100% {
-            transform: translate3d(14px, 12px, 0) scale(1.08);
+          50% {
+            transform: translateY(-20px) rotate(-8deg);
           }
         }
-        @keyframes floatIcon4 {
-          0% {
-            transform: translate3d(0, 0, 0) rotate(0deg);
+        @keyframes floatBobUpDown3 {
+          0%, 100% {
+            transform: translateY(0px) scale(1);
           }
-          100% {
-            transform: translate3d(-10px, 16px, 0) rotate(12deg);
+          50% {
+            transform: translateY(-22px) scale(1.08);
+          }
+        }
+        @keyframes floatBobUpDown4 {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-26px) rotate(10deg);
           }
         }
       `}</style>

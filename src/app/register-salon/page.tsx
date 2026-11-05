@@ -100,17 +100,16 @@ export default function RegisterSalonPage() {
         throw new Error(data.error || 'Registration failed. Please try again.');
       }
 
+      setRegisteredSalon(data.salon);
       if (planIdToSubmit) {
-        const found = plans.find((p) => p.id === planIdToSubmit);
-        setRegisteredPlanName(found ? found.name : 'Paid Plan');
+        const chosen = plans.find((p) => p.id === planIdToSubmit);
+        setRegisteredPlanName(chosen?.name || 'Pro Plan');
       } else {
         setRegisteredPlanName('7-Day Free Trial');
       }
-
       setShowPaymentModal(false);
-      setRegisteredSalon(data.salon);
     } catch (err: any) {
-      setError(err.message || 'Something went wrong during salon registration.');
+      setError(err.message || 'Something went wrong. Please check your details.');
     } finally {
       setLoading(false);
     }
@@ -156,19 +155,19 @@ export default function RegisterSalonPage() {
             <CheckCircle2 className="w-10 h-10" />
           </div>
 
-          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 inline-block mb-3">
+          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 inline-block mb-3">
             Salon Registered Successfully!
           </span>
 
           <h1 className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-white">
             Welcome, {ownerName}!
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-600 mt-2 max-w-md mx-auto">
-            <strong>{registeredSalon.name}</strong> is now live on SalonPro Cloud. Your cloud POS, staff scheduler, and online booking engine are ready.
+          <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-2 max-w-md mx-auto">
+            <strong className="text-[#1F2937] dark:text-white">{registeredSalon.name}</strong> is now live on SalonPro Cloud. Your cloud POS, staff scheduler, and online booking engine are ready.
           </p>
 
-          <div className="mt-4 p-3 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 text-xs font-bold text-[#D4A77F] flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-purple-600" />
+          <div className="mt-4 p-3 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 text-xs font-bold text-[#8C5E35] dark:text-[#D4A77F] flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#D4A77F]" />
             <span>
               {registeredPlanName === '7-Day Free Trial'
                 ? '🎁 7-Day Free Trial Active (Full access until 7 days)'
@@ -176,11 +175,11 @@ export default function RegisterSalonPage() {
             </span>
           </div>
 
-          <div className="mt-6 p-4 rounded-2xl bg-[#F8F9FA] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-left">
+          <div className="mt-6 p-4 rounded-2xl bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] text-left">
             <div className="text-[11px] font-bold text-[#D4A77F] uppercase tracking-wider mb-1">
               Your Public Booking Link:
             </div>
-            <div className="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-pink-200 text-xs font-mono font-bold text-[#1F2937] dark:text-white break-all">
+            <div className="flex items-center justify-between gap-2 bg-white dark:bg-[#141926] px-3 py-2 rounded-xl border border-[#D4A77F]/30 text-xs font-mono font-bold text-[#1F2937] dark:text-white break-all">
               <span>/{registeredSalon.slug}</span>
               <Link
                 href={`/${registeredSalon.slug}`}
@@ -190,7 +189,7 @@ export default function RegisterSalonPage() {
                 <ExternalLink className="w-4 h-4" />
               </Link>
             </div>
-            <div className="text-[11px] text-neutral-500 mt-1.5">
+            <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1.5">
               Put this link in your Instagram bio and Google Maps profile for 24/7 client appointments.
             </div>
           </div>
@@ -207,10 +206,10 @@ export default function RegisterSalonPage() {
             <Link
               href={`/${registeredSalon.slug}`}
               target="_blank"
-              className="py-3.5 px-5 rounded-2xl bg-white hover:bg-neutral-50 text-neutral-800 font-bold text-sm border border-neutral-300 transition-all flex items-center justify-center gap-1.5"
+              className="py-3.5 px-5 rounded-2xl bg-white dark:bg-[#10141F] hover:bg-neutral-50 dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-white font-bold text-sm border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all flex items-center justify-center gap-1.5"
             >
               <span>View Booking Page</span>
-              <ExternalLink className="w-4 h-4 text-neutral-500" />
+              <ExternalLink className="w-4 h-4 text-[#6B7280] dark:text-[#A0A8B8]" />
             </Link>
           </div>
         </div>
@@ -220,16 +219,16 @@ export default function RegisterSalonPage() {
 
   // ================= REGISTRATION FORM =================
   return (
-    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] font-sans selection:bg-[#D4A77F] selection:text-[#080B12] pb-16">
-      {/* Top Navbar */}
-      <nav className="border-b border-[#E5E7EB] dark:border-[#2A2F3A]/80 bg-white/90 backdrop-blur-md px-4 sm:px-6 py-4 sticky top-0 z-50">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] font-sans selection:bg-[#D4A77F] selection:text-[#080B12] pb-16 transition-colors duration-300">
+      {/* Top Navbar - Fully Adaptive to Light and Dark Mode */}
+      <nav className="border-b border-[#E5E7EB] dark:border-[#2A2F3A] bg-white/95 dark:bg-[#080B12]/95 backdrop-blur-md px-4 sm:px-6 py-3.5 sticky top-0 z-50 transition-colors">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-[#D4A77F] text-[#080B12] flex items-center justify-center font-black text-lg text-white shadow-md shadow-[#D4A77F]/10">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-base text-[#D4A77F] shadow-xs group-hover:rotate-12 transition-transform">
               ✂
             </div>
-            <span className="font-black text-lg sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
-              SalonPro
+            <span className="font-extrabold text-lg sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
+              Salon<span className="text-[#D4A77F]">Pro</span>
             </span>
           </Link>
 
@@ -238,7 +237,7 @@ export default function RegisterSalonPage() {
             <span className="text-[#6B7280] dark:text-[#A0A8B8] hidden sm:inline">Already registered?</span>
             <Link
               href="/salon-owner"
-              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#1F2937] dark:text-white font-bold transition-all border border-[#E5E7EB] dark:border-[#2A2F3A]"
+              className="px-3.5 py-2 rounded-xl bg-[#F3F4F6] hover:bg-[#E5E7EB] dark:bg-[#141926] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-white font-semibold transition-all border border-[#E5E7EB] dark:border-[#2A2F3A] cursor-pointer"
             >
               Sign In to ERP ➔
             </Link>
@@ -249,32 +248,32 @@ export default function RegisterSalonPage() {
       {/* Main Content Area */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F8F9FA] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#D4A77F] text-xs font-bold mb-4 shadow-xs">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#8C5E35] dark:text-[#D4A77F] text-xs font-bold mb-4 shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
             <span>🎁 7-Day Free Trial · No Credit Card Required · ₹0 Today</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-[#1F2937] dark:text-white tracking-tight leading-[1.18]">
-            Create Salon Account & Start 7-Day Free Trial
+            Create Salon Account &amp; Start 7-Day Free Trial
           </h1>
           <p className="text-xs sm:text-base text-[#6B7280] dark:text-[#A0A8B8] mt-3 leading-relaxed">
-            Fill in your details below to launch your private cloud ERP in 60 seconds. You can log in anytime with your registered email & password.
+            Fill in your details below to launch your private cloud ERP in 60 seconds. You can log in anytime with your registered email &amp; password.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Form Box */}
-          <div className="lg:col-span-7 bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-900/5">
+          <div className="lg:col-span-7 bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-900/5 transition-colors">
             <h2 className="text-lg sm:text-xl font-bold text-[#1F2937] dark:text-white mb-1">
-              Salon & Owner Details
+              Salon &amp; Owner Details
             </h2>
             <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mb-6">
               Enter your salon information to setup your private ERP workspace.
             </p>
 
             {error && (
-              <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 animate-slide-up">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div className="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-start gap-2.5 animate-slide-up">
+                <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
@@ -292,7 +291,7 @@ export default function RegisterSalonPage() {
                     value={salonName}
                     onChange={(e) => setSalonName(e.target.value)}
                     placeholder="e.g. Bella Hair Studio & Spa"
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F8F9FA] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#141926]"
+                    className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                   />
                 </div>
               </div>
@@ -309,7 +308,7 @@ export default function RegisterSalonPage() {
                     value={ownerName}
                     onChange={(e) => setOwnerName(e.target.value)}
                     placeholder="e.g. Diya Patel"
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F8F9FA] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#141926]"
+                    className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                   />
                 </div>
               </div>
@@ -327,7 +326,7 @@ export default function RegisterSalonPage() {
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value)}
                       placeholder="9898012345"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F8F9FA] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#141926] font-mono"
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275] font-mono"
                     />
                   </div>
                 </div>
@@ -343,7 +342,7 @@ export default function RegisterSalonPage() {
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder="e.g. Ahmedabad, Surat"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F8F9FA] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#141926]"
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                     />
                   </div>
                 </div>
@@ -361,7 +360,7 @@ export default function RegisterSalonPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="owner@example.com"
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F8F9FA] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#141926]"
+                    className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                   />
                 </div>
               </div>
@@ -378,8 +377,8 @@ export default function RegisterSalonPage() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Min 6 characters"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F8F9FA] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#141926]"
+                      placeholder="Min 8 characters"
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                     />
                   </div>
                 </div>
@@ -396,7 +395,7 @@ export default function RegisterSalonPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Re-enter password"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F8F9FA] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#141926]"
+                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                     />
                   </div>
                 </div>
@@ -415,20 +414,20 @@ export default function RegisterSalonPage() {
                   {/* 7-Day Free Trial Option */}
                   <div
                     onClick={() => setSelectedPlanId('trial')}
-                    className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer bg-white ${
+                    className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer ${
                       selectedPlanId === 'trial'
-                        ? 'border-[#D4A77F] bg-[#D4A77F]/10 ring-2 ring-[#D4A77F]/30'
-                        : 'border-[#E5E7EB] dark:border-[#2A2F3A] hover:border-[#E5E7EB] dark:border-[#2A2F3A]'
+                        ? 'border-[#D4A77F] bg-[#D4A77F]/10 dark:bg-[#D4A77F]/15 ring-2 ring-[#D4A77F]/30'
+                        : 'border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F9FAFB] dark:bg-[#10141F] hover:border-[#D4A77F]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPlanId === 'trial' ? 'border-[#D4A77F]' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'}`}>
+                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedPlanId === 'trial' ? 'border-[#D4A77F]' : 'border-[#9CA3AF] dark:border-[#5A6275]'}`}>
                           {selectedPlanId === 'trial' && <div className="w-2 h-2 rounded-full bg-[#D4A77F]" />}
                         </div>
                         <span className="font-extrabold text-xs text-[#1F2937] dark:text-white">7-Day Free Trial</span>
                       </div>
-                      <span className="text-xs font-black text-emerald-600">₹0 Free</span>
+                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">₹0 Free</span>
                     </div>
                     <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 pl-6">
                       7 days of full ERP access. Auto-locks after day 7 unless subscribed.
@@ -442,25 +441,27 @@ export default function RegisterSalonPage() {
                       <div
                         key={p.id}
                         onClick={() => setSelectedPlanId(p.id)}
-                        className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer bg-white relative ${
+                        className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer relative ${
                           isSelected
-                            ? 'border-[#D4A77F] bg-[#D4A77F]/10 ring-2 ring-[#D4A77F]/30'
-                            : 'border-[#E5E7EB] dark:border-[#2A2F3A] hover:border-[#E5E7EB] dark:border-[#2A2F3A]'
+                            ? 'border-[#D4A77F] bg-[#D4A77F]/10 dark:bg-[#D4A77F]/15 ring-2 ring-[#D4A77F]/30'
+                            : 'border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F9FAFB] dark:bg-[#10141F] hover:border-[#D4A77F]/50'
                         }`}
                       >
                         {p.is_popular && (
-                          <span className="absolute -top-2.5 right-3 bg-[#D4A77F] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
+                          <span className="absolute -top-2.5 right-3 bg-[#D4A77F] text-[#080B12] text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs">
                             Popular
                           </span>
                         )}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-[#D4A77F]' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'}`}>
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-[#D4A77F]' : 'border-[#9CA3AF] dark:border-[#5A6275]'}`}>
                               {isSelected && <div className="w-2 h-2 rounded-full bg-[#D4A77F]" />}
                             </div>
                             <span className="font-extrabold text-xs text-[#1F2937] dark:text-white">{p.name}</span>
                           </div>
-                          <span className="text-xs font-black text-[#1F2937] dark:text-white">₹{Number(p.price).toLocaleString()}</span>
+                          <span className="text-xs font-black text-[#1F2937] dark:text-white font-variant-numeric tabular-nums">
+                            ₹{Number(p.price).toLocaleString()}
+                          </span>
                         </div>
                         <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 pl-6 truncate">
                           {p.description || `${p.billing_interval} subscription`}
@@ -483,11 +484,11 @@ export default function RegisterSalonPage() {
                 />
                 <label htmlFor="terms-checkbox" className="text-xs text-[#6B7280] dark:text-[#A0A8B8] leading-tight cursor-pointer">
                   I agree to the{' '}
-                  <Link href="/terms" target="_blank" className="font-bold text-[#D4A77F] underline">
+                  <Link href="/terms" target="_blank" className="font-bold text-[#D4A77F] hover:underline">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/privacy" target="_blank" className="font-bold text-[#D4A77F] underline">
+                  <Link href="/privacy" target="_blank" className="font-bold text-[#D4A77F] hover:underline">
                     Privacy Policy
                   </Link>
                   .
@@ -497,14 +498,14 @@ export default function RegisterSalonPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-4 py-4 px-6 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-sm shadow-xl shadow-[#D4A77F]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed active:scale-98"
+                className="w-full mt-4 py-4 px-6 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-bold text-sm shadow-xl shadow-[#D4A77F]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed active:scale-98"
               >
                 {loading ? (
                   <span>Setting up your salon ERP...</span>
                 ) : selectedPlanId === 'trial' ? (
-                  <span>Start 7-Day Free Trial & Launch ERP ➔</span>
+                  <span>Start 7-Day Free Trial &amp; Launch ERP ➔</span>
                 ) : (
-                  <span>Proceed to Payment & Activate Plan ➔</span>
+                  <span>Proceed to Payment &amp; Activate Plan ➔</span>
                 )}
               </button>
 
@@ -525,16 +526,16 @@ export default function RegisterSalonPage() {
           {/* Payment Modal */}
           {showPaymentModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080B12]/80 backdrop-blur-xs animate-fade-in">
-              <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-[#E5E7EB] dark:border-[#2A2F3A]">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+              <div className="bg-white dark:bg-[#141926] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-[#E5E7EB] dark:border-[#2A2F3A]">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A] mb-4">
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-5 h-5 text-[#D4A77F]" />
-                    <h3 className="font-black text-[#1F2937] dark:text-white text-base">Payment & Plan Activation</h3>
+                    <h3 className="font-black text-[#1F2937] dark:text-white text-base">Payment &amp; Plan Activation</h3>
                   </div>
                   <button
                     type="button"
                     onClick={() => setShowPaymentModal(false)}
-                    className="p-1 rounded-lg text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:text-white"
+                    className="p-1 rounded-lg text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-white cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -547,7 +548,9 @@ export default function RegisterSalonPage() {
                       <div className="p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 mb-4">
                         <div className="flex items-center justify-between mb-1">
                           <span className="font-extrabold text-sm text-[#1F2937] dark:text-white">{currentSelectedPlan?.name}</span>
-                          <span className="text-lg font-black text-[#D4A77F]">₹{Number(currentSelectedPlan?.price || 0).toLocaleString()}</span>
+                          <span className="text-lg font-black text-[#D4A77F] font-variant-numeric tabular-nums">
+                            ₹{Number(currentSelectedPlan?.price || 0).toLocaleString()}
+                          </span>
                         </div>
                         <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">
                           {currentSelectedPlan?.billing_interval === 'yearly' ? 'Billed annually · 2 months free' : 'Billed monthly · Cancel anytime'}
@@ -565,7 +568,7 @@ export default function RegisterSalonPage() {
                             className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                               paymentMethod === 'upi'
                                 ? 'border-[#D4A77F] bg-[#D4A77F]/15 text-[#D4A77F]'
-                                : 'border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-white'
+                                : 'border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F9FAFB] dark:bg-[#10141F] text-[#1F2937] dark:text-white'
                             }`}
                           >
                             <span>⚡ Instant UPI / QR</span>
@@ -576,7 +579,7 @@ export default function RegisterSalonPage() {
                             className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                               paymentMethod === 'card'
                                 ? 'border-[#D4A77F] bg-[#D4A77F]/15 text-[#D4A77F]'
-                                : 'border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-white'
+                                : 'border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F9FAFB] dark:bg-[#10141F] text-[#1F2937] dark:text-white'
                             }`}
                           >
                             <span>💳 Card / NetBanking</span>
@@ -584,14 +587,14 @@ export default function RegisterSalonPage() {
                         </div>
 
                         {paymentMethod === 'upi' ? (
-                          <div className="p-3.5 rounded-xl bg-slate-50 border border-[#E5E7EB] dark:border-[#2A2F3A] text-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
+                          <div className="p-3.5 rounded-xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] text-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
                             <span className="font-bold text-[#1F2937] dark:text-white block mb-1">Fast UPI QR Simulation</span>
                             <span>Scan with GPay, PhonePe, or Paytm for instant salon onboarding.</span>
                           </div>
                         ) : (
-                          <div className="p-3.5 rounded-xl bg-slate-50 border border-[#E5E7EB] dark:border-[#2A2F3A] text-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
+                          <div className="p-3.5 rounded-xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] text-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
                             <span className="font-bold text-[#1F2937] dark:text-white block mb-1">Card / NetBanking Gateway</span>
-                            <span>Supports Visa, Mastercard, RuPay & all Indian Banks.</span>
+                            <span>Supports Visa, Mastercard, RuPay &amp; all Indian Banks.</span>
                           </div>
                         )}
                       </div>
@@ -616,22 +619,22 @@ export default function RegisterSalonPage() {
           <div className="lg:col-span-5 space-y-5">
             {/* Live Slug Preview Card */}
             <div className="bg-[#10141F] border border-[#D4A77F]/40 rounded-3xl p-6 text-white shadow-xl">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 border border-white/20 inline-block mb-3">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4A77F]/20 text-[#D4A77F] border border-[#D4A77F]/30 inline-block mb-3">
                 Live URL Preview
               </span>
-              <h3 className="text-xl font-black">
+              <h3 className="text-xl font-black text-white">
                 {salonName || 'Your Salon Name'}
               </h3>
-              <p className="text-xs text-pink-100 mt-1">
+              <p className="text-xs text-[#A0A8B8] mt-1">
                 Your customers will book appointments directly at:
               </p>
-              <div className="mt-3 p-3 rounded-2xl bg-black/20 backdrop-blur-md border border-white/20 text-xs font-mono font-bold break-all">
+              <div className="mt-3 p-3 rounded-2xl bg-black/40 backdrop-blur-md border border-[#D4A77F]/30 text-xs font-mono font-bold text-[#D4A77F] break-all">
                 domain.com/{slugPreview}
               </div>
             </div>
 
             {/* Included in Your Account */}
-            <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs">
+            <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs transition-colors">
               <h4 className="font-extrabold text-sm text-[#1F2937] dark:text-white mb-3 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#D4A77F]" />
                 <span>Everything Included in Your Salon Setup:</span>
@@ -639,20 +642,20 @@ export default function RegisterSalonPage() {
 
               <div className="space-y-3 text-xs text-[#6B7280] dark:text-[#A0A8B8]">
                 <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>Zero Overlapping Bookings:</strong> Smart conflict engine prevents double-bookings.</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong className="text-[#1F2937] dark:text-white">Zero Overlapping Bookings:</strong> Smart conflict engine prevents double-bookings.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>POS Billing with GST:</strong> 10-second checkout with split UPI + cash & instant receipts.</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong className="text-[#1F2937] dark:text-white">POS Billing with GST:</strong> 10-second checkout with split UPI + cash &amp; instant receipts.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>Live Kanban Chairs:</strong> Real-time waiting queue and stylist chair occupancy.</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong className="text-[#1F2937] dark:text-white">Live Kanban Chairs:</strong> Real-time waiting queue and stylist chair occupancy.</span>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span><strong>Staff Commission Tracker:</strong> Automated commission calculation on services & products.</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong className="text-[#1F2937] dark:text-white">Staff Commission Tracker:</strong> Automated commission calculation on services &amp; products.</span>
                 </div>
               </div>
             </div>

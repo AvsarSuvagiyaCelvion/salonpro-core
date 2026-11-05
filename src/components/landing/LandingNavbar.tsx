@@ -190,6 +190,18 @@ export default function LandingNavbar() {
                   <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
 
+                <a
+                  href="/api/demo/owner-login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 font-semibold text-xs"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span>🖥️</span>
+                    <span>Try Owner Dashboard Demo</span>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+
                 <Link
                   href="/salon-owner"
                   onClick={() => setMobileMenuOpen(false)}

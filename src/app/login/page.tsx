@@ -271,18 +271,19 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              {/* Buyer & Demo Evaluator Sandbox Notice */}
-              <div className="mt-4 p-3 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 text-[11px] text-[#1F2937] dark:text-[#FFFFFF] flex items-center justify-between gap-2 shadow-xs">
+              {/* 1-Click Salon Owner ERP Demo Test-Drive */}
+              <div className="mt-4 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-[#1F2937] dark:text-[#FFFFFF] flex items-center justify-between gap-2 shadow-xs">
                 <div className="flex items-center gap-1.5 font-medium truncate">
-                  <Sparkles className="w-3.5 h-3.5 text-[#D4A77F] shrink-0" />
-                  <span className="truncate">Evaluating software for acquisition?</span>
+                  <span className="text-amber-500 shrink-0">⚡</span>
+                  <span className="truncate">Want to test-drive without credentials?</span>
                 </div>
-                <Link
-                  href="/register-salon"
-                  className="font-bold text-[#D4A77F] hover:underline shrink-0 text-xs"
+                <a
+                  href="/api/demo/owner-login"
+                  className="font-extrabold text-amber-600 dark:text-amber-400 hover:underline shrink-0 text-xs inline-flex items-center gap-0.5"
                 >
-                  Instant Sandbox ➔
-                </Link>
+                  <span>1-Click Owner Demo</span>
+                  <span>➔</span>
+                </a>
               </div>
             </form>
 

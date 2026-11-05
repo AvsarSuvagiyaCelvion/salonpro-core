@@ -299,6 +299,77 @@ export async function POST(
       );
     }
 
+    const cleanName = String(name).trim();
+
+    // DEMO SHOWCASE SALON: Simulates booking without writing any data to the database
+    if (slug.toLowerCase().trim() === 'dixa-beauty-salon') {
+      const staffVal = await query(
+        `SELECT id, name FROM staff WHERE id = $1 LIMIT 1`,
+        [finalStaffId]
+      );
+      const staffName = staffVal.rows[0]?.name || 'Assigned Stylist';
+
+      const formattedDate = startsAt.toLocaleDateString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+      const formattedTime = startsAt.toLocaleTimeString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+
+      const whatsappMessage = `Hi ${cleanName.split(' ')[0]}, your appointment for *${service.name}* at *${salon.name}* is confirmed for *${formattedDate} at ${formattedTime}* with *${staffName}*. See you soon! ✨`;
+
+      return NextResponse.json({
+        success: true,
+        isDemo: true,
+        message: 'Demo booking simulated! Zero data stored in database.',
+        appointment: {
+          id: `demo_${Date.now()}`,
+          salon_id: salon.id,
+          customer_name: cleanName,
+          customer_mobile: cleanMobile,
+          service_name: service.name,
+          service_price: service.price,
+          duration_min: service.duration_min,
+          staff_name: staffName,
+          starts_at: startsAt.toISOString(),
+          ends_at: endsAt.toISOString(),
+          status: 'scheduled',
+          source: 'online',
+          note: note ? String(note).trim() : null,
+          created_at: new Date().toISOString(),
+        },
+        salon: {
+          name: salon.name,
+          phone: salon.phone,
+          brandColor: salon.brand_color,
+        },
+        service: {
+          name: service.name,
+          price: service.price,
+          duration: service.duration_min,
+        },
+        staff: {
+          id: finalStaffId,
+          name: staffName,
+        },
+        formattedDate,
+        formattedTime,
+        cleanName,
+        cleanMobile,
+        serviceName: service.name,
+        staffName,
+        whatsappMessage,
+        whatsappLink: `https://wa.me/91${cleanMobile}?text=${encodeURIComponent(whatsappMessage)}`,
+      });
+    }
+
     // 6. ATOMIC TRANSACTION WITH POSTGRES ADVISORY LOCK & EXCLUSION CONSTRAINT
     // Lock on salon + staff only so overlapping slots with different start times are serialized
     client = await pool.connect();
@@ -335,7 +406,6 @@ export async function POST(
 
     // Customer lookup or creation INSIDE transaction
     let customerId: string;
-    const cleanName = String(name).trim();
 
     const existingCust = await client.query(
       `SELECT id, name, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,

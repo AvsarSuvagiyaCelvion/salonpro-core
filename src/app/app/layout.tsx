@@ -401,6 +401,36 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
+      {/* Demo Owner ERP Sandbox Banner */}
+      {salon?.slug === 'dixa-beauty-salon' && (
+        <div className="shrink-0 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 text-xs py-1.5 px-3 sm:px-6 font-semibold flex flex-wrap items-center justify-between gap-2 z-40 border-b border-amber-600/40 shadow-xs">
+          <div className="flex items-center gap-2 truncate">
+            <span className="px-2 py-0.5 rounded-full bg-slate-950 text-amber-300 font-extrabold text-[10px] uppercase tracking-wider shrink-0">
+              ⚡ Live Owner ERP Demo
+            </span>
+            <span className="truncate text-[11px] sm:text-xs font-bold text-slate-900">
+              You are exploring the Salon Owner Dashboard in live sandbox demo mode.
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/dixa-beauty-salon"
+              target="_blank"
+              className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-900 text-amber-300 font-bold text-[11px] inline-flex items-center gap-1 shadow-xs transition-all"
+            >
+              <span>Booking Demo</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+            <Link
+              href="/register-salon"
+              className="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-[11px] inline-flex items-center gap-1 shadow-xs transition-all"
+            >
+              <span>Create My Free Salon ➔</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Top Header */}
       <header className="sticky top-0 shrink-0 h-14 sm:h-16 bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#2A2F3A] z-30 px-3 sm:px-6 flex items-center justify-between shadow-2xs transition-colors duration-250">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">

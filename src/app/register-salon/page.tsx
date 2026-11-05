@@ -220,26 +220,30 @@ export default function RegisterSalonPage() {
   // ================= REGISTRATION FORM =================
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] font-sans selection:bg-[#D4A77F] selection:text-[#080B12] pb-16 transition-colors duration-300">
-      {/* Top Navbar - Fully Adaptive to Light and Dark Mode */}
-      <nav className="border-b border-[#E5E7EB] dark:border-[#2A2F3A] bg-white/95 dark:bg-[#080B12]/95 backdrop-blur-md px-4 sm:px-6 py-3.5 sticky top-0 z-50 transition-colors">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-base text-[#D4A77F] shadow-xs group-hover:rotate-12 transition-transform">
+      {/* Top Navbar - Fully Adaptive to Light and Dark Mode & 320px Responsive */}
+      <nav className="border-b border-[#E5E7EB] dark:border-[#2A2F3A] bg-white/95 dark:bg-[#080B12]/95 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3.5 sticky top-0 z-50 transition-colors">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-xs group-hover:rotate-12 transition-transform">
               ✂
             </div>
-            <span className="font-extrabold text-lg sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
+            <span className="font-extrabold text-base sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
               Salon<span className="text-[#D4A77F]">Pro</span>
             </span>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3 text-xs">
-            <ThemeToggle />
-            <span className="text-[#6B7280] dark:text-[#A0A8B8] hidden sm:inline">Already registered?</span>
+          <div className="flex items-center gap-1.5 sm:gap-3 text-xs shrink-0">
+            <div className="scale-90 sm:scale-100 origin-right shrink-0">
+              <ThemeToggle />
+            </div>
+            <span className="text-[#6B7280] dark:text-[#A0A8B8] hidden md:inline">Already registered?</span>
             <Link
               href="/salon-owner"
-              className="px-3.5 py-2 rounded-xl bg-[#F3F4F6] hover:bg-[#E5E7EB] dark:bg-[#141926] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-white font-semibold transition-all border border-[#E5E7EB] dark:border-[#2A2F3A] cursor-pointer"
+              className="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-[#F3F4F6] hover:bg-[#E5E7EB] dark:bg-[#141926] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-white font-semibold text-[11px] sm:text-xs transition-all border border-[#E5E7EB] dark:border-[#2A2F3A] cursor-pointer whitespace-nowrap inline-flex items-center gap-1 shrink-0"
             >
-              Sign In to ERP ➔
+              <span className="hidden sm:inline">Sign In to ERP</span>
+              <span className="sm:hidden">Sign In</span>
+              <span className="shrink-0 font-bold">➔</span>
             </Link>
           </div>
         </div>

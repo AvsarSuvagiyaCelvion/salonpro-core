@@ -524,7 +524,7 @@ export default function CustomersPage() {
                         Services & Items Given:
                       </div>
                       {inv.items.length === 0 ? (
-                        <div className="text-neutral-400 italic text-[11px]">
+                        <div className="text-neutral-400 text-[11px]">
                           Salon Service Treatment
                         </div>
                       ) : (

@@ -657,7 +657,7 @@ export default function BillingPage() {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-neutral-600 italic text-center pt-1 font-sans">
+                <p className="text-[11px] text-neutral-600 text-center pt-1 font-sans">
                   &quot;Thank you for your visit!&quot; 💖
                 </p>
 
@@ -793,7 +793,7 @@ export default function BillingPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-neutral-400 italic py-2">
+                  <p className="text-xs text-neutral-400 py-2">
                     Standard Salon Treatment Service
                   </p>
                 )}
@@ -827,7 +827,7 @@ export default function BillingPage() {
                 )}
               </div>
 
-              <p className="text-[11px] text-neutral-400 text-center italic pt-2">
+              <p className="text-[11px] text-neutral-400 text-center pt-2">
                 &quot;Thank you for your visit!&quot;
               </p>
             </div>

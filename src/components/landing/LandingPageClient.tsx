@@ -93,9 +93,9 @@ export default function LandingPageClient() {
             animate={typewriterDone ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-xs sm:text-base lg:text-lg text-[#6B7280] dark:text-[#A0A8B8] mt-4 sm:mt-6 max-w-2xl mx-auto leading-relaxed px-1">
+            <p className="font-sans font-normal text-base sm:text-lg text-[#6B7280] dark:text-[#A0A8B8] mt-4 sm:mt-6 max-w-[60ch] mx-auto leading-[1.6] px-1">
               The all-in-one operating system for salons & spas:{' '}
-              <strong className="text-[#1F2937] dark:text-[#FFFFFF]">conflict-free online client booking</strong>, live studio Kanban, 10-second GST POS
+              <strong className="text-[#1F2937] dark:text-[#FFFFFF] font-semibold">conflict-free online client booking</strong>, live studio Kanban, 10-second GST POS
               billing, staff commission tracking, and instant WhatsApp receipts.
             </p>
 
@@ -105,7 +105,7 @@ export default function LandingPageClient() {
               <MagneticButton
                 href="/register-salon"
                 withConfetti={true}
-                className="w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-black text-xs sm:text-sm shadow-xl shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center justify-center gap-2 group ring-2 ring-[#D4A77F]/30 cursor-pointer"
+                className="w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-semibold text-[15px] tracking-normal shadow-xl shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center justify-center gap-2 group ring-2 ring-[#D4A77F]/30 cursor-pointer"
               >
                 <span>Start 7-Day Free Trial</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
@@ -114,7 +114,7 @@ export default function LandingPageClient() {
               <Link
                 href="/dixa-beauty-salon"
                 target="_blank"
-                className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#10B981] hover:bg-[#059669] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-[#10B981]/20 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#10B981] hover:bg-[#059669] text-white font-sans font-semibold text-[15px] tracking-normal shadow-md shadow-[#10B981]/20 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
                 <span>⚡ Try Live Booking Demo</span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">1-Click</span>
@@ -122,7 +122,7 @@ export default function LandingPageClient() {
 
               <Link
                 href="/login"
-                className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#141926] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF] font-bold text-xs sm:text-sm border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-5 sm:px-7 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#141926] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF] font-sans font-semibold text-[15px] tracking-normal border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
                 <Lock className="w-4 h-4 text-[#D4A77F]" />
                 <span>Owner Portal</span>
@@ -164,11 +164,11 @@ export default function LandingPageClient() {
         <section id="problems" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24">
           <Reveal>
             <div className="text-center mb-10 sm:mb-14">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#D4A77F] mb-2">Common Salon Headaches</h2>
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+              <h2 className="font-sans font-semibold text-xs sm:text-[13px] tracking-[0.08em] uppercase text-[#D4A77F] mb-2.5">Common Salon Headaches</h2>
+              <h3 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
                 Running a Salon Shouldn&apos;t Feel Like Chaos
               </h3>
-              <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-2 max-w-xl mx-auto leading-relaxed">
+              <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Traditional salons waste hours on manual registers and lose clients due to poor booking coordination.
                 Flip each card to see how SalonPro eliminates every pain point:
               </p>
@@ -220,11 +220,11 @@ export default function LandingPageClient() {
         <section id="how-it-works" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-[#E5E7EB] dark:border-[#2A2F3A]">
           <Reveal>
             <div className="text-center mb-10 sm:mb-14">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#D4A77F] mb-2">Simple Multi-Tenant Workflow</h2>
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+              <h2 className="font-sans font-semibold text-xs sm:text-[13px] tracking-[0.08em] uppercase text-[#D4A77F] mb-2.5">Simple Multi-Tenant Workflow</h2>
+              <h3 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
                 How SalonPro Works in Your Salon (Example: &quot;Priya Salon&quot;)
               </h3>
-              <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-2 max-w-xl mx-auto leading-relaxed">
+              <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Clean segregation between your internal salon operations and what your customers see.
               </p>
             </div>
@@ -240,9 +240,9 @@ export default function LandingPageClient() {
         <section id="features" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-[#E5E7EB] dark:border-[#2A2F3A]">
           <Reveal>
             <div className="text-center mb-10 sm:mb-14">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#D4A77F] mb-2">Everything Included</h2>
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
-                Built from Ground Up for Beauty & Wellness Studios
+              <h2 className="font-sans font-semibold text-xs sm:text-[13px] tracking-[0.08em] uppercase text-[#D4A77F] mb-2.5">Everything Included</h2>
+              <h3 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+                Built from Ground Up for Beauty &amp; Wellness Studios
               </h3>
             </div>
           </Reveal>
@@ -356,14 +356,14 @@ export default function LandingPageClient() {
         <section id="pricing" className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-24 border-t border-[#E5E7EB] dark:border-[#2A2F3A]">
           <Reveal>
             <div className="text-center mb-12 sm:mb-16">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#D4A77F] text-xs font-bold mb-3 shadow-2xs">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#D4A77F] font-sans font-semibold text-xs sm:text-[13px] tracking-[0.08em] uppercase mb-3 shadow-2xs">
                 <Gift className="w-4 h-4 text-[#D4A77F]" />
                 <span>100% Free 7-Day Free Trial</span>
               </div>
-              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+              <h2 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
                 Start Free for 7 Days, Upgrade as You Grow
               </h2>
-              <p className="text-xs sm:text-base text-[#6B7280] dark:text-[#A0A8B8] mt-3 max-w-2xl mx-auto leading-relaxed">
+              <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Every new salon starts with a full-featured <strong>7-Day Free Trial</strong>. Experience real online
                 bookings, POS billing, staff commission tracking, and live chair kanban with zero upfront cost.
               </p>
@@ -423,10 +423,10 @@ export default function LandingPageClient() {
               <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#D4A77F]/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-[#D4A77F]/10 rounded-full blur-3xl pointer-events-none" />
 
-              <h3 className="text-xl sm:text-3xl lg:text-4xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+              <h3 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
                 Ready to Automate Your Salon Operations?
               </h3>
-              <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-3 max-w-lg mx-auto leading-relaxed">
+              <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Join hundreds of forward-thinking salons running with SalonPro. Setup takes under 3 minutes.
               </p>
 

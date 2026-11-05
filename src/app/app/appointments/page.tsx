@@ -685,7 +685,7 @@ export default function AppointmentsPage() {
                                 </div>
 
                                 {appt.note && (
-                                  <p className="text-[10px] text-neutral-500 italic mt-1.5 truncate">
+                                  <p className="text-[10px] text-neutral-500 mt-1.5 truncate">
                                     "{appt.note}"
                                   </p>
                                 )}
@@ -830,7 +830,7 @@ export default function AppointmentsPage() {
                   </div>
 
                   {appt.note && (
-                    <p className="text-[11px] text-neutral-500 italic mt-2">
+                    <p className="text-[11px] text-neutral-500 mt-2">
                       "{appt.note}"
                     </p>
                   )}

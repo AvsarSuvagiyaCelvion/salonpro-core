@@ -320,7 +320,7 @@ export default function StaffPage() {
                     <td className="py-3.5 px-4 max-w-xs">
                       <div className="flex flex-wrap gap-1">
                         {staff.services.length === 0 ? (
-                          <span className="text-[11px] text-neutral-400 italic">None assigned</span>
+                          <span className="text-[11px] text-neutral-400">None assigned</span>
                         ) : (
                           staff.services.map((s) => (
                             <span

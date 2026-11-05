@@ -53,16 +53,16 @@ export default function SalonMarquee() {
     <section className="relative py-12 sm:py-16 bg-[#F8F9FA] dark:bg-[#10141F] border-t border-b border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF] overflow-hidden transition-colors duration-300">
       <div className="max-w-4xl mx-auto px-4 mb-8 sm:mb-10 text-center">
         {/* Accessible Champagne Gold Badge (Contrast >= 4.5:1 on light mode with #8C5E35 and #D4A77F on dark) */}
-        <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#8C5E35] dark:text-[#D4A77F] text-xs font-bold uppercase tracking-wider mb-3 shadow-2xs">
+        <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#8C5E35] dark:text-[#D4A77F] font-sans font-semibold text-xs sm:text-[13px] tracking-[0.08em] uppercase mb-3 shadow-2xs">
           <Sparkles className="w-3.5 h-3.5 text-[#8C5E35] dark:text-[#D4A77F]" />
           <span>BUILT FOR MODERN BEAUTY BUSINESSES</span>
         </span>
 
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+        <h3 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
           Engineered for Salons, Spas &amp; Studios of Every Scale
         </h3>
 
-        <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-xl mx-auto leading-relaxed">
+        <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
           From single-chair boutique studios to multi-chair luxury lounges, SalonPro adapts to your workflow.
         </p>
       </div>

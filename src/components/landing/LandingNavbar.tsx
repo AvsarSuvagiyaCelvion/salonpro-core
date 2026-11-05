@@ -60,13 +60,13 @@ export default function LandingNavbar() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-7 text-xs font-semibold text-[#6B7280] dark:text-[#A0A8B8]">
-            <a href="#problems" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">Problems We Solve</a>
-            <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">Features & POS</a>
-            <a href="#how-it-works" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">How It Works</a>
-            <a href="#pricing" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors flex items-center gap-1 font-bold text-[#1F2937] dark:text-[#FFFFFF]">
-              <span>7-Day Trial & Pricing</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] text-[9px] uppercase border border-[#E5E7EB] dark:border-[#2A2F3A]">Free</span>
+          <div className="hidden lg:flex items-center gap-7 font-sans font-medium text-[15px] text-[#6B7280] dark:text-[#A0A8B8] whitespace-nowrap">
+            <a href="#problems" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors whitespace-nowrap">Problems We Solve</a>
+            <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors whitespace-nowrap">Features &amp; POS</a>
+            <a href="#how-it-works" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors whitespace-nowrap">How It Works</a>
+            <a href="#pricing" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors flex items-center gap-1 font-semibold text-[#1F2937] dark:text-[#FFFFFF] whitespace-nowrap">
+              <span>7-Day Trial &amp; Pricing</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-[#F3F4F6] dark:bg-[#1C2230] text-[#8C5E35] dark:text-[#D4A77F] text-[9px] uppercase border border-[#E5E7EB] dark:border-[#2A2F3A]">Free</span>
             </a>
           </div>
 
@@ -78,20 +78,20 @@ export default function LandingNavbar() {
             <Link
               href="/dixa-beauty-salon"
               target="_blank"
-              className="px-3 py-2 rounded-xl text-[#10B981] bg-[#F3F4F6] dark:bg-[#141926] hover:bg-white dark:hover:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs hover:scale-105 active:scale-95"
+              className="px-3.5 py-2 rounded-xl text-[#10B981] bg-[#F3F4F6] dark:bg-[#141926] hover:bg-white dark:hover:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] font-sans font-semibold text-[14px] sm:text-[15px] tracking-normal transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-xs hover:scale-105 active:scale-95"
             >
               <span>⚡ Live Booking Demo</span>
               <span className="text-[10px]">↗</span>
             </Link>
             <Link
               href="/salon-owner"
-              className="px-3 py-2 rounded-xl text-[#1F2937] dark:text-[#FFFFFF] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-xs font-bold transition-all whitespace-nowrap"
+              className="px-3.5 py-2 rounded-xl text-[#1F2937] dark:text-[#FFFFFF] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] font-sans font-semibold text-[14px] sm:text-[15px] tracking-normal transition-all whitespace-nowrap"
             >
               Owner Sign In
             </Link>
             <Link
               href="/register-salon"
-              className="px-4 py-2 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-extrabold transition-all shadow-md shadow-[#D4A77F]/20 active:scale-95 whitespace-nowrap flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-semibold text-[14px] sm:text-[15px] tracking-normal transition-all shadow-md shadow-[#D4A77F]/20 active:scale-95 whitespace-nowrap flex items-center gap-1.5"
             >
               <span>Start 7-Day Free Trial</span>
               <span>➔</span>

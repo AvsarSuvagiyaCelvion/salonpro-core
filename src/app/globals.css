@@ -3,6 +3,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  /* Site-wide Typography Tokens */
+  --font-heading: var(--font-heading, "Playfair Display", Georgia, "Times New Roman", serif);
+  --font-body: var(--font-body, "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif);
+  --font-gujarati: var(--font-gujarati, "Noto Sans Gujarati", var(--font-body));
+
   /* Exact Light Mode Color Palette */
   --brand-primary: #D4A77F;
   --brand-primary-hover: #B8905F;
@@ -49,9 +54,11 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-body);
+  --font-body: var(--font-body);
+  --font-heading: var(--font-heading);
+  --font-serif: var(--font-heading);
+  --font-gujarati: var(--font-gujarati);
 
   --color-ink: var(--ink);
   --color-accent: var(--accent);
@@ -71,7 +78,7 @@
 }
 
 html, body {
-  font-family: var(--font-manrope), var(--font-inter), sans-serif;
+  font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
   overflow-x: hidden;
@@ -82,14 +89,43 @@ html, body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-manrope), sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+:lang(gu), [lang="gu"] {
+  font-family: var(--font-gujarati);
 }
 
-.font-serif-brand {
-  font-family: var(--font-playfair), serif;
+/* Headings default to Manrope for all general app, dashboard, POS, billing, tables, forms, and modals */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
+}
+
+/* Landing H1: Playfair Display, weight 600, line-height 1.08, letter-spacing -0.01em, size clamp(2.5rem, 6vw, 4.5rem) */
+.landing-h1 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+/* Landing H2: Playfair Display, weight 600, line-height 1.15, size clamp(1.75rem, 4vw, 2.75rem) */
+.landing-h2 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.15;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+/* Hero Italic Gold Word (Playfair italic 500) */
+.hero-italic-gold {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Tabular figures for numbers, prices, tables, KPIs */
+.tabular-nums, table, th, td, [data-tabular="true"], .font-mono {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Global Keyframe Animations */

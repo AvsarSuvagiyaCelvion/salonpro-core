@@ -99,24 +99,30 @@ export default function Typewriter({
 
   return (
     <div className="relative max-w-4xl mx-auto px-1 sm:px-2">
-      <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-[1.25] sm:leading-[1.15]">
-        {/* Static First Line - Always immediately visible without lag */}
-        <span className="block mb-1 sm:mb-2">{firstLine}</span>
+      <h1 className="landing-h1 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-[-0.01em] leading-[1.08] text-[clamp(2.5rem,6vw,4.5rem)]">
+        {/* Static First Line - with exactly ONE gold word in Playfair italic 500 */}
+        <span className="block mb-2 sm:mb-3">
+          Stop Losing{' '}
+          <span className="hero-italic-gold text-[#D4A77F] font-heading font-medium italic">
+            Revenue
+          </span>{' '}
+          to
+        </span>
 
         {/* Dynamic Continuous Infinite Typewriter Second Line with Zero Layout Shift (CLS 0) */}
         <span className="relative inline-block min-h-[1.2em]">
           {/* Invisible Clone reserving exact bounding box on all device sizes */}
           <span
             aria-hidden="true"
-            className="opacity-0 select-none pointer-events-none"
+            className="opacity-0 select-none pointer-events-none not-italic"
           >
             {secondLine}
           </span>
 
           {/* Real-time Character-by-Character Typed Text with Champagne Gold Accent */}
-          <span className="absolute inset-0 left-0 top-0 bg-gradient-to-r from-[#D4A77F] via-[#B8905F] to-[#D4A77F] bg-clip-text text-transparent">
+          <span className="absolute inset-0 left-0 top-0 bg-gradient-to-r from-[#D4A77F] via-[#B8905F] to-[#D4A77F] bg-clip-text text-transparent not-italic">
             {displayedSecond}
-            <span className="inline-block w-[2.5px] sm:w-[3.5px] h-[0.85em] bg-[#D4A77F] ml-1 align-baseline animate-pulse" />
+            <span className="inline-block w-[2.5px] sm:w-[3.5px] h-[0.85em] bg-[#D4A77F] ml-1 align-baseline animate-pulse not-italic" />
           </span>
         </span>
       </h1>

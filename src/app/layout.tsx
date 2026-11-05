@@ -1,24 +1,28 @@
 import type { Metadata } from 'next';
-import { Manrope, Inter, Playfair_Display } from 'next/font/google';
+import { Manrope, Playfair_Display, Noto_Sans_Gujarati } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
-const manrope = Manrope({
-  variable: '--font-manrope',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
 const playfair = Playfair_Display({
-  variable: '--font-playfair',
+  variable: '--font-heading',
   subsets: ['latin'],
   display: 'swap',
+  weight: ['500', '600', '700'],
+  style: ['normal', 'italic'],
+});
+
+const manrope = Manrope({
+  variable: '--font-body',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
+
+const notoGujarati = Noto_Sans_Gujarati({
+  variable: '--font-gujarati',
+  subsets: ['gujarati', 'latin'],
+  display: 'swap',
+  weight: ['400', '600'],
 });
 
 export const metadata: Metadata = {
@@ -40,7 +44,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${manrope.variable} ${inter.variable} ${playfair.variable} h-full`}
+      className={`${playfair.variable} ${manrope.variable} ${notoGujarati.variable} h-full`}
     >
       <head>
         <script

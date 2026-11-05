@@ -614,7 +614,7 @@ export default function LiveStudioPage() {
                     {/* Added Items List */}
                     <div className="py-2.5 space-y-1.5 min-h-[40px]">
                       {s.items.length === 0 ? (
-                        <p className="text-[11px] text-neutral-400 italic py-1">
+                        <p className="text-[11px] text-neutral-400 py-1">
                           No services or products added yet. Click buttons below.
                         </p>
                       ) : (

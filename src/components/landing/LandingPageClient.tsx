@@ -82,9 +82,9 @@ export default function LandingPageClient() {
           {/* H1 Typewriter Effect with Invisible CLS Barrier & Blinking Caret */}
           <Typewriter
             firstLine="Stop Losing Revenue to"
-            secondLine="Paper Registers & Double‑Bookings"
+            words={['Paper Registers', 'Double-Bookings', 'Missed Appointments', 'No-Show Clients']}
             onComplete={() => setTypewriterDone(true)}
-            speedMs={50}
+            speedMs={45}
           />
 
           {/* Staggered Subtitle, CTAs, Badges & Stats (Revealed when Typewriter Finishes) */}

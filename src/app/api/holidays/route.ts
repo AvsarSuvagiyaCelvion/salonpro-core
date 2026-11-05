@@ -62,3 +62,4 @@ export async function POST(request: Request) {
     return serverError(error, 'src/app/api/holidays/route.ts');
   }
 }
+

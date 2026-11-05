@@ -124,3 +124,4 @@ export async function deleteSalonHoliday(
   );
   return res.rows.length > 0;
 }
+

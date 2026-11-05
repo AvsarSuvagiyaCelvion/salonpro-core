@@ -10,3 +10,4 @@ CREATE TABLE IF NOT EXISTS salon_holidays (
 );
 
 CREATE INDEX IF NOT EXISTS idx_salon_holidays_lookup ON salon_holidays (salon_id, start_date, end_date);
+

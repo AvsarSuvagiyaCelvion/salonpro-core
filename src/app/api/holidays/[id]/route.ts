@@ -30,3 +30,4 @@ export async function DELETE(
     return serverError(error, 'src/app/api/holidays/[id]/route.ts');
   }
 }
+

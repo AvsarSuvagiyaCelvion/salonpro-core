@@ -4,6 +4,7 @@ import pool, { query } from '@/lib/db';
 import { clearSalonCache } from '@/lib/salon';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
 import { normalizeMobile } from '@/lib/phone';
+import { checkRateLimit, recordFailedAttempt, getClientIp } from '@/lib/rate-limit';
 
 const RESERVED_SLUGS = new Set([
   'admin',
@@ -30,6 +31,18 @@ const RESERVED_SLUGS = new Set([
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
+  const clientIp = getClientIp(request);
+  const ipRateLimitKey = `register_ip:${clientIp}`;
+
+  // IP rate limit: max 5 salon registrations per hour (3600 seconds)
+  const ipCheck = await checkRateLimit(ipRateLimitKey, 5, 3600);
+  if (ipCheck.isLocked) {
+    return NextResponse.json(
+      { error: 'Too many salon registration requests from this network. Please wait before trying again.' },
+      { status: 429 }
+    );
+  }
+
   const client = await pool.connect();
   let inTransaction = false;
 
@@ -44,6 +57,7 @@ export async function POST(request: Request) {
     const cleanPassword = password?.trim();
 
     if (!cleanSalonName || !cleanOwnerName || !cleanEmail || !cleanMobile) {
+      await recordFailedAttempt(ipRateLimitKey, 5, 3600);
       return NextResponse.json(
         { error: 'Salon name, owner name, email address, and mobile number are required.' },
         { status: 400 }
@@ -51,6 +65,7 @@ export async function POST(request: Request) {
     }
 
     if (!EMAIL_REGEX.test(cleanEmail)) {
+      await recordFailedAttempt(ipRateLimitKey, 5, 3600);
       return NextResponse.json(
         { error: 'Please enter a valid email address.' },
         { status: 400 }
@@ -59,6 +74,7 @@ export async function POST(request: Request) {
 
     const normalizedMobile = normalizeMobile(cleanMobile);
     if (!normalizedMobile) {
+      await recordFailedAttempt(ipRateLimitKey, 5, 3600);
       return NextResponse.json(
         { error: 'Please enter a valid 10-digit mobile number.' },
         { status: 400 }
@@ -66,6 +82,7 @@ export async function POST(request: Request) {
     }
 
     if (!cleanPassword || cleanPassword.length < 8) {
+      await recordFailedAttempt(ipRateLimitKey, 5, 3600);
       return NextResponse.json(
         { error: 'Password is required and must be at least 8 characters long.' },
         { status: 400 }
@@ -73,6 +90,7 @@ export async function POST(request: Request) {
     }
 
     if (confirmPassword !== undefined && cleanPassword !== confirmPassword?.trim()) {
+      await recordFailedAttempt(ipRateLimitKey, 5, 3600);
       return NextResponse.json(
         { error: 'Password and Confirm Password do not match.' },
         { status: 400 }
@@ -192,6 +210,7 @@ export async function POST(request: Request) {
     await client.query('COMMIT');
     inTransaction = false;
     clearSalonCache();
+    await recordFailedAttempt(ipRateLimitKey, 5, 3600);
 
     // 5. Issue multi-tenant session token
     const token = await createSessionToken({

@@ -1,6 +1,7 @@
 import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { query } from '@/lib/db';
 import {
@@ -132,13 +133,16 @@ export async function POST(request: Request) {
     const envAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
     const envAdminPassword = process.env.ADMIN_PASSWORD?.trim();
 
-    if (
-      !authenticatedAdmin &&
-      envAdminEmail &&
-      envAdminPassword &&
-      cleanEmail === envAdminEmail &&
-      cleanPassword === envAdminPassword
-    ) {
+    let isEnvAuthMatch = false;
+    if (!authenticatedAdmin && envAdminEmail && envAdminPassword && cleanEmail === envAdminEmail) {
+      const bInput = Buffer.from(cleanPassword);
+      const bTarget = Buffer.from(envAdminPassword);
+      if (bInput.length === bTarget.length && crypto.timingSafeEqual(bInput, bTarget)) {
+        isEnvAuthMatch = true;
+      }
+    }
+
+    if (isEnvAuthMatch && envAdminEmail) {
       // Bootstrap this admin into the database with bcrypt hash if not already present
       try {
         const hash = await bcrypt.hash(cleanPassword, 10);
@@ -198,7 +202,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 8 * 60 * 60, // 8 hours (aligned with admin session expiry)
     });
 
     return response;

@@ -1,5 +1,14 @@
 import { query } from '@/lib/db';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
+import {
+  COOKIE_NAME,
+  ADMIN_COOKIE_NAME,
+  CUSTOMER_COOKIE_NAME,
+  verifySessionToken,
+  verifyCustomerSessionToken,
+  verifyAdminSessionToken,
+} from '@/lib/auth';
 import PrintReceiptButton from '@/components/receipt/PrintReceiptButton';
 
 export const metadata = {
@@ -28,7 +37,7 @@ export default async function PublicBillPage({
   const { number } = await params;
   const decodedNumber = decodeURIComponent(number);
 
-  // Query invoice strictly by unguessable receipt_token
+  // Query invoice by unguessable receipt_token or sequential invoice number
   const invRes = await query(
     `SELECT i.*, 
             s.name as salon_name, s.address as salon_address, s.phone as salon_phone,
@@ -47,6 +56,43 @@ export default async function PublicBillPage({
   }
 
   const invoice = invRes.rows[0];
+
+  // Anti-IDOR Security: If accessed via sequential invoice number instead of the unguessable receipt_token,
+  // require authenticated caller to be the salon owner/staff, the customer, or platform admin.
+  const isDirectTokenMatch = invoice.receipt_token && decodedNumber === invoice.receipt_token;
+  if (!isDirectTokenMatch) {
+    const cookieStore = await cookies();
+    const ownerToken = cookieStore.get(COOKIE_NAME)?.value;
+    const customerToken = cookieStore.get(CUSTOMER_COOKIE_NAME)?.value;
+    const adminToken = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+
+    let isAuthorized = false;
+
+    if (ownerToken) {
+      const ownerSession = await verifySessionToken(ownerToken);
+      if (ownerSession && ownerSession.salonId === invoice.salon_id) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized && customerToken) {
+      const custSession = await verifyCustomerSessionToken(customerToken);
+      if (custSession && custSession.customerId === invoice.customer_id) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized && adminToken) {
+      const adminSession = await verifyAdminSessionToken(adminToken);
+      if (adminSession) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      notFound();
+    }
+  }
 
   // Fetch session items
   let items: any[] = [];

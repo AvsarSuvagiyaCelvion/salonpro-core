@@ -142,8 +142,10 @@ async function runAudit() {
 
   // Login as Dixa Beauty Salon Owner
   await ownerPage.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
-  await ownerPage.fill('input[type="email"]', 'dixa@gmail.com');
-  await ownerPage.fill('input[type="password"]', 'Salon@123');
+  const testOwnerEmail = process.env.TEST_OWNER_EMAIL || process.env.OWNER_EMAIL || 'dixa@gmail.com';
+  const testOwnerPassword = process.env.TEST_OWNER_PASSWORD || process.env.OWNER_PASSWORD || 'Salon@123';
+  await ownerPage.fill('input[type="email"]', testOwnerEmail);
+  await ownerPage.fill('input[type="password"]', testOwnerPassword);
   await ownerPage.click('button[type="submit"]');
   await ownerPage.waitForURL('**/app**', { timeout: 15000 });
   console.log('✓ Successfully authenticated Salon Owner session');
@@ -177,8 +179,10 @@ async function runAudit() {
 
   // Login as Super Admin
   await adminPage.goto(`${BASE_URL}/admin/login`, { waitUntil: 'networkidle' });
-  await adminPage.fill('input[type="email"]', 'avsarsuvagiya968@gmail.com');
-  await adminPage.fill('input[type="password"]', 'Admin@123');
+  const testAdminEmail = process.env.TEST_ADMIN_EMAIL || process.env.ADMIN_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const testAdminPassword = process.env.TEST_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || 'Admin@123';
+  await adminPage.fill('input[type="email"]', testAdminEmail);
+  await adminPage.fill('input[type="password"]', testAdminPassword);
   await adminPage.click('button[type="submit"]');
   await adminPage.waitForURL('**/admin**', { timeout: 15000 });
   console.log('✓ Successfully authenticated Super Admin session');
@@ -208,3 +212,4 @@ async function runAudit() {
 }
 
 runAudit().catch(console.error);
+

@@ -76,7 +76,7 @@ export async function createAdminSessionToken(payload: { email: string; role?: s
   return await new SignJWT({ ...payload, role: 'super_admin' })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime('8h')
     .sign(getSecretKey());
 }
 

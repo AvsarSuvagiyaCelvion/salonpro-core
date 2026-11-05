@@ -98,8 +98,8 @@ export default function Typewriter({
   const displayedSecond = secondLine.slice(0, displayedCount);
 
   return (
-    <div className="relative max-w-4xl mx-auto px-1 sm:px-2">
-      <h1 className="landing-h1 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-[-0.01em] leading-[1.08] text-[clamp(2.5rem,6vw,4.5rem)]">
+    <div className="relative max-w-5xl mx-auto px-2 sm:px-4">
+      <h1 className="landing-h1 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight sm:tracking-[-0.015em] leading-[1.14] sm:leading-[1.1] text-[clamp(1.75rem,4.2vw,3.5rem)]">
         {/* Static First Line - with exactly ONE gold word in Playfair italic 500 */}
         <span className="block mb-2 sm:mb-3">
           Stop Losing{' '}

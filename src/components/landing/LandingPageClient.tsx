@@ -18,6 +18,7 @@ import {
 
 import LandingNavbar from '@/components/landing/LandingNavbar';
 import LandingFooter from '@/components/landing/LandingFooter';
+import ScrollToTop from '@/components/landing/ScrollToTop';
 import PricingCards from '@/components/landing/PricingCards';
 import StatsCounter from '@/components/landing/StatsCounter';
 import InteractiveProductPreview from '@/components/landing/InteractiveProductPreview';
@@ -466,6 +467,9 @@ export default function LandingPageClient() {
 
         {/* Full Footer */}
         <LandingFooter />
+
+        {/* Floating Scroll to Top Button (Bottom-Right) */}
+        <ScrollToTop />
       </div>
     </SmoothScroll>
   );

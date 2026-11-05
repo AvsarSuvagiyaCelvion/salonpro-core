@@ -10,9 +10,9 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    // Check saved theme or system preference
+    // By default Light mode is active unless user explicitly saved 'dark'
     const saved = localStorage.getItem('salonpro_theme');
-    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (saved === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
     } else {

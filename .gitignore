@@ -44,6 +44,7 @@ next-env.d.ts
 # playwright
 test-results/
 tests/report/
+audit_screenshots/
 
 # database backups & one-off maintenance scripts
 backup-*.sql

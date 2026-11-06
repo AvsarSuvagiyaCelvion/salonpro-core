@@ -21,7 +21,10 @@ import {
   Trash2,
   Plus,
   Palmtree,
+  Images,
 } from 'lucide-react';
+import ImageUploader from '@/components/ui/ImageUploader';
+import { MAX_GALLERY_PHOTOS } from '@/lib/storage';
 
 const DAYS_OF_WEEK = [
   { day: 1, label: 'Mon' },
@@ -47,6 +50,9 @@ export default function SettingsPage() {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [galleryPhotos, setGalleryPhotos] = useState<
+    Array<{ id: string; url: string; storage_path: string; sort_order: number }>
+  >([]);
 
   // Booking settings
   const [bookingEnabled, setBookingEnabled] = useState(true);
@@ -166,6 +172,7 @@ export default function SettingsPage() {
           setAddress(s.address || '');
           setPhone(s.phone || '');
           setLogoUrl(s.logo_url || null);
+          setGalleryPhotos(data.photos || []);
           setBookingEnabled(s.booking_enabled ?? true);
           setOpenTime(s.open_time ? s.open_time.slice(0, 5) : '10:00');
           setCloseTime(s.close_time ? s.close_time.slice(0, 5) : '19:00');
@@ -201,21 +208,42 @@ export default function SettingsPage() {
     loadSettings();
   }, []);
 
-  // Handle Logo Upload (base64 data URL)
-  function handleLogoFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Logo file size must be under 2MB');
-      return;
+  // Gallery Photos Handlers
+  async function handleAddGalleryPhoto(url: string, storagePath: string) {
+    try {
+      const res = await fetch('/api/settings/photos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, storage_path: storagePath }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to save photo');
+      }
+      if (data.photo) {
+        setGalleryPhotos((prev) => [...prev, data.photo]);
+      }
+    } catch (err: any) {
+      alert(err.message || 'Error adding photo to gallery');
     }
+  }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setLogoUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+  async function handleDeleteGalleryPhoto(id: string, storagePath: string) {
+    if (!confirm('Are you sure you want to delete this gallery photo?')) return;
+    try {
+      const res = await fetch('/api/settings/photos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, storage_path: storagePath }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete photo');
+      }
+      setGalleryPhotos((prev) => prev.filter((p) => p.id !== id));
+    } catch (err: any) {
+      alert(err.message || 'Error deleting photo');
+    }
   }
 
   // Toggle working day
@@ -464,47 +492,87 @@ export default function SettingsPage() {
 
               {/* Logo Upload Section */}
               <div className="pt-4 border-t border-neutral-100 sm:col-span-2">
-                <label className="block text-xs font-bold text-neutral-700 mb-2">
-                  Salon Logo (Optional)
-                </label>
+                <ImageUploader
+                  mode="avatar"
+                  type="logo"
+                  value={logoUrl}
+                  onChange={(newUrl) => setLogoUrl(newUrl)}
+                  onRemove={() => setLogoUrl(null)}
+                  label="Salon Logo (Optional)"
+                  helperText="Square image recommended (up to 400px, WebP/JPEG, max 60KB). Displayed on receipts, invoices, and booking pages."
+                />
+              </div>
 
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-16 h-16 rounded-2xl bg-[#D4A77F] flex items-center justify-center font-bold text-white text-2xl shadow-md overflow-hidden relative"
-                  >
-                    {logoUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={logoUrl} alt="Salon Logo" className="w-full h-full object-cover" />
-                    ) : (
-                      name.charAt(0) || 'S'
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold cursor-pointer border border-neutral-200 transition-all">
-                      <Upload className="w-3.5 h-3.5" />
-                      <span>Upload Logo</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoFile}
-                        className="hidden"
-                      />
-                    </label>
-                    {logoUrl && (
-                      <button
-                        type="button"
-                        onClick={() => setLogoUrl(null)}
-                        className="block text-[11px] text-rose-600 hover:underline font-medium"
-                      >
-                        Remove logo
-                      </button>
-                    )}
-                    <p className="text-[10px] text-neutral-400">
-                      Recommended: Square PNG or JPG, max 2MB (displayed on receipts & invoices)
+              {/* Salon Photos Gallery Section */}
+              <div className="pt-6 border-t border-neutral-100 sm:col-span-2 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
+                      <Images className="w-4 h-4 text-[#D4A77F]" />
+                      <span>Salon Photos Gallery</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-mono font-normal">
+                        {galleryPhotos.length} / {MAX_GALLERY_PHOTOS}
+                      </span>
+                    </h3>
+                    <p className="text-xs text-neutral-400 mt-0.5">
+                      Showcase your salon ambience, workstations, and equipment to clients (Max {MAX_GALLERY_PHOTOS} photos).
                     </p>
                   </div>
                 </div>
+
+                {/* Photos Grid */}
+                {galleryPhotos.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    {galleryPhotos.map((photo, idx) => (
+                      <div
+                        key={photo.id || idx}
+                        className="group relative aspect-4/3 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 shadow-xs"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.url}
+                          alt={`Salon photo ${idx + 1}`}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteGalleryPhoto(photo.id, photo.storage_path)}
+                            className="p-1.5 rounded-xl bg-rose-600 text-white hover:bg-rose-700 shadow-md transition-all"
+                            title="Delete photo"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/60 text-[10px] text-white font-mono">
+                          #{idx + 1}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add Photo / Upload Box */}
+                {galleryPhotos.length < MAX_GALLERY_PHOTOS ? (
+                  <div className="bg-neutral-50/70 dark:bg-neutral-900/40 p-4 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700">
+                    <ImageUploader
+                      mode="default"
+                      type="gallery"
+                      onChange={async (newUrl, storagePath) => {
+                        if (!newUrl || !storagePath) return;
+                        await handleAddGalleryPhoto(newUrl, storagePath);
+                      }}
+                      label="Add Photo to Gallery"
+                      helperText="Upload a photo (JPG/PNG/WebP, max 5MB before compression). Automatically optimized up to 1200px."
+                    />
+                  </div>
+                ) : (
+                  <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2 font-medium">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Maximum limit reached ({MAX_GALLERY_PHOTOS}/{MAX_GALLERY_PHOTOS} photos). Delete a photo above to upload a new one.</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

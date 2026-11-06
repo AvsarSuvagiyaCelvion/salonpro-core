@@ -72,6 +72,8 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/api/reports` | `GET` | `src/app/api/reports/route.ts` | `salonpro_session` | Aggregates daily/monthly revenue, staff commission reports, and cash summary. |
 | `/api/export` | `GET` | `src/app/api/export/route.ts` | `salonpro_session` (Feature: `export`) | Exports clients, invoices, appointments, or products as CSV/PDF. Gated by plan. |
 | `/api/settings` | `GET`, `PUT`, `PATCH` | `src/app/api/settings/route.ts` | `salonpro_session` (Role: `owner`) | Reads and saves salon operating rules, buffer gap, advance notice, cancellation policy, and branding. |
+| `/api/settings/photos` | `GET`, `POST`, `DELETE` | `src/app/api/settings/photos/route.ts` | `salonpro_session` (Role: `owner`) | Fetches, adds, or deletes salon gallery photos. Enforces `MAX_GALLERY_PHOTOS = 5`. |
+| `/api/upload` | `POST`, `DELETE` | `src/app/api/upload/route.ts` | `salonpro_session` or `salonpro_customer_session` | Authenticated file upload to Supabase Storage `salon-media` bucket. Validates magic bytes, enforces <=400KB server size limit, rate limits requests, and manages object deletion. |
 | `/api/holidays` | `GET`, `POST` | `src/app/api/holidays/route.ts` | `salonpro_session` (Role: `owner`) | Lists or adds temporary salon closures and holidays. |
 | `/api/holidays/[id]` | `DELETE` | `src/app/api/holidays/[id]/route.ts` | `salonpro_session` (Role: `owner`) | Deletes a salon closure date. |
 | `/api/subscription` | `GET` | `src/app/api/subscription/route.ts` | `salonpro_session` | Fetches active subscription details and trial status. |
@@ -93,6 +95,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `DonutDistributionChart` | `src/components/charts/DonutDistributionChart.tsx` | Visual distribution chart for payment modes (Cash, UPI, Card). |
 | `HourlyRushChart` | `src/components/charts/HourlyRushChart.tsx` | Peak hours hourly rush histogram for salon footfall. |
 | `BrandLoader` | `src/components/ui/BrandLoader.tsx` | Branded spinner for full-screen loading transitions. |
+| `ImageUploader` | `src/components/ui/ImageUploader.tsx` | Client-side image upload and preview component with canvas compression (target <=200KB for gallery, <=60KB square crop for logo/avatar). |
 
 ---
 
@@ -102,6 +105,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 |---|---|---|---|
 | `users` | `id`, `salon_id`, `email`, `password_hash`, `role`, `is_active` | Read / Write | `006_users_and_tenant_auth.sql` |
 | `salons` | `id`, `name`, `slug`, `brand_color`, `logo_url`, `open_time`, `close_time`, `working_days`, `slot_minutes`, `buffer_minutes`, `min_advance_hours`, `max_advance_days`, `cancel_policy_hours`, `invoice_counter`, `plan`, `trial_ends_at`, `subscription_status` | Read / Write | `001_initial_schema.sql`, `003_add_settings_columns.sql`, `008_plans_limits.sql`, `009_auth_rate_limits_and_invoice_counter.sql`, `015_customer_cancel_reschedule.sql` |
+| `salon_photos` | `id`, `salon_id`, `url`, `storage_path`, `sort_order`, `created_at` | Read / Write | `016_salon_photos.sql` |
 | `staff` | `id`, `salon_id`, `name`, `role_title`, `service_commission_pct`, `product_commission_pct`, `active`, `show_online` | Read / Write | `001_initial_schema.sql` |
 | `services` | `id`, `salon_id`, `name`, `category`, `duration_min`, `price`, `online_enabled` | Read / Write | `001_initial_schema.sql` |
 | `staff_services` | `staff_id`, `service_id` | Read / Write | `001_initial_schema.sql` |
@@ -139,10 +143,14 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 4. **Cancelled Appointments**: If cancelled by the customer via self-service, card automatically renders a badge: `Cancelled by customer`.
 
 ### Flow 3: Salon Settings & Policy Setup
-1. **Open Settings**: Owner opens `/app/settings` -> `GET /api/settings` loads salon configuration.
-2. **Operating Rules**: Owner sets open/close times, slot step (e.g. 30m), buffer gap (e.g. 10m), advance notice hours, and cancellation policy window (*"Customers can cancel/reschedule up to ___ hours before"*).
-3. **Save**: Click "Save Settings" -> `PUT /api/settings` validates values (cancellation hours strictly 0-72) and updates `salons` table.
-4. **Temporary Closures**: Owner navigates to "Holidays & Closures" tab to block festival dates or renovation days (`POST /api/holidays`).
+1. **Open Settings**: Owner opens `/app/settings` -> `GET /api/settings` loads salon configuration and existing gallery photos.
+2. **Brand Logo & Gallery Upload**: Owner uploads square brand logo or gallery photos (up to `MAX_GALLERY_PHOTOS = 5`) via `ImageUploader`:
+   - Client compresses image via canvas in-browser (<=200KB for gallery, <=60KB square crop for logo).
+   - Server verifies magic bytes and uploads to Supabase Storage `salon-media` bucket (`POST /api/upload`).
+   - Gallery photo entries are saved in `salon_photos` (`POST /api/settings/photos`).
+3. **Operating Rules**: Owner sets open/close times, slot step (e.g. 30m), buffer gap (e.g. 10m), advance notice hours, and cancellation policy window (*"Customers can cancel/reschedule up to ___ hours before"*).
+4. **Save**: Click "Save Settings" -> `PUT /api/settings` validates values (cancellation hours strictly 0-72, logo path strictly in salon's own storage or existing external URL) and updates `salons` table.
+5. **Temporary Closures**: Owner navigates to "Holidays & Closures" tab to block festival dates or renovation days (`POST /api/holidays`).
 
 ---
 

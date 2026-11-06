@@ -1,0 +1,307 @@
+'use client';
+
+import React, { useState, useRef } from 'react';
+import { Upload, RefreshCw, AlertCircle } from 'lucide-react';
+import { MAX_CLIENT_FILE_SIZE } from '@/lib/storage';
+
+export interface ImageUploaderProps {
+  value?: string | null;
+  onChange: (url: string | null, storagePath?: string | null) => void;
+  onRemove?: () => void;
+  type?: 'logo' | 'gallery' | 'avatar';
+  mode?: 'default' | 'avatar';
+  label?: string;
+  helperText?: string;
+  className?: string;
+  disabled?: boolean;
+}
+
+export default function ImageUploader({
+  value,
+  onChange,
+  onRemove,
+  type = 'logo',
+  mode = 'default',
+  label,
+  helperText,
+  className = '',
+  disabled = false,
+}: ImageUploaderProps) {
+  const isAvatar = mode === 'avatar';
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [uploading, setUploading] = useState(false);
+  const [progressText, setProgressText] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [currentStoragePath, setCurrentStoragePath] = useState<string | null>(null);
+
+  /**
+   * Compresses an image in browser using canvas
+   * Logo/Gallery: max 1200px, target <= 200 KB
+   * Avatar: square crop, max 400px, target <= 60 KB
+   */
+  async function compressImage(file: File): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = async () => {
+        URL.revokeObjectURL(objectUrl);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return reject(new Error('Canvas 2D context unavailable'));
+        }
+
+        const targetSizeBytes = isAvatar ? 60 * 1024 : 200 * 1024; // 60KB or 200KB
+        const maxDimension = isAvatar ? 400 : 1200;
+
+        if (isAvatar) {
+          // Center square crop
+          const minDim = Math.min(img.width, img.height);
+          const sx = (img.width - minDim) / 2;
+          const sy = (img.height - minDim) / 2;
+          const finalDim = Math.min(minDim, maxDimension);
+
+          canvas.width = finalDim;
+          canvas.height = finalDim;
+          ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, finalDim, finalDim);
+        } else {
+          // Aspect ratio preserve
+          let w = img.width;
+          let h = img.height;
+
+          if (w > maxDimension || h > maxDimension) {
+            if (w > h) {
+              h = Math.round((h * maxDimension) / w);
+              w = maxDimension;
+            } else {
+              w = Math.round((w * maxDimension) / h);
+              h = maxDimension;
+            }
+          }
+
+          canvas.width = w;
+          canvas.height = h;
+          ctx.drawImage(img, 0, 0, w, h);
+        }
+
+        // Quality reduction loop
+        const qualities = [0.85, 0.75, 0.65, 0.5, 0.4];
+        let bestBlob: Blob | null = null;
+
+        for (const q of qualities) {
+          const blob: Blob | null = await new Promise((res) => {
+            canvas.toBlob(res, 'image/webp', q);
+          });
+
+          if (blob) {
+            bestBlob = blob;
+            if (blob.size <= targetSizeBytes) {
+              break; // Met size target!
+            }
+          }
+        }
+
+        // If WebP failed or wasn't supported, fallback to JPEG
+        if (!bestBlob) {
+          const fallbackBlob: Blob | null = await new Promise((res) => {
+            canvas.toBlob(res, 'image/jpeg', 0.8);
+          });
+          if (fallbackBlob) bestBlob = fallbackBlob;
+        }
+
+        if (bestBlob) {
+          resolve(bestBlob);
+        } else {
+          reject(new Error('Failed to compress image into valid blob'));
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('Invalid image data. Could not read image.'));
+      };
+
+      img.src = objectUrl;
+    });
+  }
+
+  async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setErrorMessage(null);
+
+    // Immediate size check before any processing: strictly reject >5 MB
+    if (file.size > MAX_CLIENT_FILE_SIZE) {
+      setErrorMessage(`Image exceeds 5MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please pick a smaller image.`);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // MIME type check
+    const validMimes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validMimes.includes(file.type)) {
+      setErrorMessage('Only JPG, PNG, and WebP images are allowed.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setProgressText('Compressing...');
+
+      const compressedBlob = await compressImage(file);
+      setProgressText(`Uploading (${Math.round(compressedBlob.size / 1024)}KB)...`);
+
+      const formData = new FormData();
+      formData.append('file', compressedBlob, `upload-${Date.now()}.webp`);
+      formData.append('type', type);
+      if (currentStoragePath) {
+        formData.append('old_path', currentStoragePath);
+      }
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to upload image.');
+      }
+
+      setCurrentStoragePath(data.storage_path || null);
+      onChange(data.url, data.storage_path);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Image processing or upload failed');
+    } finally {
+      setUploading(false);
+      setProgressText(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  async function handleRemove(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (currentStoragePath) {
+      try {
+        await fetch('/api/upload', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storage_path: currentStoragePath }),
+        });
+      } catch {}
+    }
+
+    setCurrentStoragePath(null);
+    onChange(null, null);
+    if (onRemove) onRemove();
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  return (
+    <div className={`space-y-2 ${className}`}>
+      {label && (
+        <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
+          {label}
+        </label>
+      )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleFileSelected}
+        disabled={disabled || uploading}
+        className="hidden"
+      />
+
+      {value ? (
+        /* Preview with Replace / Remove controls */
+        <div className="relative group inline-block">
+          <div
+            className={`relative overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 ${
+              isAvatar ? 'w-24 h-24 rounded-full' : 'w-48 h-32 rounded-2xl'
+            }`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={value}
+              alt="Uploaded media preview"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+
+            {uploading && (
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex flex-col items-center justify-center p-2 text-center text-white">
+                <RefreshCw className="w-5 h-5 animate-spin text-[#D4A77F]" />
+                <span className="text-[10px] mt-1 font-medium">{progressText || 'Updating...'}</span>
+              </div>
+            )}
+          </div>
+
+          {!disabled && !uploading && (
+            <div className="flex items-center gap-1.5 mt-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-2.5 py-1 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 text-[11px] font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 shadow-2xs transition-all cursor-pointer"
+              >
+                Replace
+              </button>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="px-2.5 py-1 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-[11px] font-semibold hover:bg-rose-100 transition-all cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Empty Upload Dropzone */
+        <div
+          onClick={() => {
+            if (!disabled && !uploading) fileInputRef.current?.click();
+          }}
+          className={`border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-[#D4A77F] dark:hover:border-[#D4A77F] bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all cursor-pointer flex flex-col items-center justify-center p-4 text-center ${
+            isAvatar ? 'w-24 h-24 rounded-full' : 'w-full max-w-sm h-32 rounded-2xl'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {uploading ? (
+            <div className="flex flex-col items-center">
+              <RefreshCw className="w-5 h-5 text-[#D4A77F] animate-spin" />
+              <span className="text-[11px] text-neutral-500 mt-2 font-medium">{progressText || 'Processing...'}</span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center">
+              <Upload className="w-5 h-5 text-neutral-400 group-hover:text-[#D4A77F]" />
+              <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mt-1.5">
+                {isAvatar ? 'Upload Avatar' : 'Click to upload image'}
+              </span>
+              <span className="text-[10px] text-neutral-400 mt-0.5">
+                JPG, PNG, WebP (max 5MB)
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {helperText && !errorMessage && (
+        <p className="text-[10px] text-neutral-400">{helperText}</p>
+      )}
+
+      {errorMessage && (
+        <div className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-1.5">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+    </div>
+  );
+}

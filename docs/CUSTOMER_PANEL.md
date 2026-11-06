@@ -28,7 +28,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 
 | Endpoint | Methods | File Path | Auth Required | What It Does |
 |---|---|---|---|---|
-| `/api/public/[slug]` | `GET` | `src/app/api/public/[slug]/route.ts` | None (Public) | Fetches salon details, service list, active staff, and working days for the booking wizard. |
+| `/api/public/[slug]` | `GET` | `src/app/api/public/[slug]/route.ts` | None (Public) | Fetches salon details, brand logo, gallery photos (`salon_photos`), service list, active staff, and working days for the booking wizard. |
 | `/api/public/[slug]/slots` | `GET` | `src/app/api/public/[slug]/slots/route.ts` | None (Public) | Computes real-time available time slots for a given date, service, and optional staff member. |
 | `/api/public/[slug]/book` | `POST` | `src/app/api/public/[slug]/book/route.ts` | None (Public with rate limit & PIN) | Validates customer PIN, checks concurrency via PostgreSQL advisory locks, and books appointment atomically. |
 | `/api/customer/auth` | `GET`, `POST` | `src/app/api/customer/auth/route.ts` | Cookie for `GET`; None for `POST` | Checks customer session or signs in / registers a new customer using 10-digit mobile & 4-digit PIN. Sets `salonpro_customer_session`. |
@@ -42,7 +42,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 
 | Component | File Path | Purpose |
 |---|---|---|
-| `BookingWizard` | `src/components/booking/BookingWizard.tsx` | Multi-step booking engine (Step 1: Service selection -> Step 2: Stylist -> Step 3: Date/Time slot -> Step 4: Contact & PIN -> Step 5: Confirmation + WhatsApp redirect). |
+| `BookingWizard` | `src/components/booking/BookingWizard.tsx` | Multi-step booking engine (Step 1: Salon gallery & Service selection -> Step 2: Stylist -> Step 3: Date/Time slot -> Step 4: Contact & PIN -> Step 5: Confirmation + WhatsApp redirect). Includes brand logo display and lazy-loaded responsive photo gallery (`loading="lazy"`). |
 | `PrintReceiptButton` | `src/components/receipt/PrintReceiptButton.tsx` | Triggers browser print dialog (`window.print()`) and HTML2PDF receipt generation on `/b/[number]`. |
 
 ---
@@ -51,7 +51,8 @@ The Customer Panel enables salon clients to discover salon services, select styl
 
 | Table | Key Columns Touched | Read/Write | Migration File |
 |---|---|---|---|
-| `salons` | `id`, `name`, `slug`, `phone`, `booking_enabled`, `open_time`, `close_time`, `working_days`, `slot_minutes`, `buffer_minutes`, `min_advance_hours`, `max_advance_days`, `cancel_policy_hours` | Read | `001_initial_schema.sql`, `003_add_settings_columns.sql`, `015_customer_cancel_reschedule.sql` |
+| `salons` | `id`, `name`, `slug`, `brand_color`, `logo_url`, `phone`, `booking_enabled`, `open_time`, `close_time`, `working_days`, `slot_minutes`, `buffer_minutes`, `min_advance_hours`, `max_advance_days`, `cancel_policy_hours` | Read | `001_initial_schema.sql`, `003_add_settings_columns.sql`, `015_customer_cancel_reschedule.sql` |
+| `salon_photos` | `id`, `salon_id`, `url`, `sort_order` | Read | `016_salon_photos.sql` |
 | `services` | `id`, `salon_id`, `name`, `category`, `duration_min`, `price`, `online_enabled` | Read | `001_initial_schema.sql` |
 | `staff` | `id`, `salon_id`, `name`, `role_title`, `active`, `show_online` | Read | `001_initial_schema.sql` |
 | `staff_services` | `staff_id`, `service_id` | Read | `001_initial_schema.sql` |
@@ -67,8 +68,8 @@ The Customer Panel enables salon clients to discover salon services, select styl
 ## 6. Main User Flows
 
 ### Flow 1: Public Online Booking
-1. **Visit salon link**: Client loads `/<slug>` or `/book/<slug>`. `BookingWizard.tsx` calls `GET /api/public/[slug]` to load services, active staff, and operating schedule.
-2. **Step 1 - Pick Service**: User selects category and service. Duration and price are recorded.
+1. **Visit salon link**: Client loads `/<slug>` or `/book/<slug>`. `BookingWizard.tsx` calls `GET /api/public/[slug]` to load brand logo, gallery photos (`salon_photos`), services, active staff, and operating schedule.
+2. **Step 1 - Ambience Gallery & Pick Service**: User browses responsive lazy-loaded salon gallery photos, selects category and service. Duration and price are recorded.
 3. **Step 2 - Pick Stylist**: User selects specific stylist or "Anyone / First Available".
 4. **Step 3 - Pick Date & Slot**: Selecting a date calls `GET /api/public/[slug]/slots?service_id=...&date=...&staff_id=...`. `src/lib/slots.ts` calculates available time slots considering operating hours, buffers, advance rules, existing appointments, and holidays.
 5. **Step 4 - Details & PIN**: Client inputs 10-digit mobile, name, and 4-digit PIN.

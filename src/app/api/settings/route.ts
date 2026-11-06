@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant, requireRole, invalidateUserAuthCache } from '@/lib/api-auth';
 import { requireFeature, invalidateSalonPlanCache } from '@/lib/plan';
+import { isAllowedSalonImageUrl, deleteFromStorage, BUCKET_NAME } from '@/lib/storage';
 
 export async function GET(request: Request) {
   try {
@@ -26,9 +27,18 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Salon not found' }, { status: 404 });
     }
 
+    const photosRes = await query(
+      `SELECT id, url, storage_path, sort_order, created_at
+       FROM salon_photos
+       WHERE salon_id = $1::uuid
+       ORDER BY sort_order ASC, created_at ASC`,
+      [salonId]
+    );
+
     return NextResponse.json(
       {
         salon: res.rows[0],
+        photos: photosRes.rows,
         user: {
           email: auth.session.email,
           role: auth.session.role || 'owner',
@@ -86,9 +96,16 @@ async function handleUpdateSettings(request: Request) {
     }
 
     if (logo_url !== undefined && logo_url !== null && logo_url !== '') {
-      if (!/^https?:\/\//i.test(String(logo_url).trim())) {
+      const cleanLogo = String(logo_url).trim();
+      if (cleanLogo.startsWith('data:')) {
         return NextResponse.json(
-          { error: 'Logo URL must start with http:// or https://.' },
+          { error: 'Base64 data URIs are not allowed. Please upload via the image uploader.' },
+          { status: 400 }
+        );
+      }
+      if (!isAllowedSalonImageUrl(cleanLogo, salonId)) {
+        return NextResponse.json(
+          { error: 'Logo URL must be an allowed URL or hosted in your salon storage folder.' },
           { status: 400 }
         );
       }
@@ -175,6 +192,14 @@ async function handleUpdateSettings(request: Request) {
       if (logo_url !== currentLogo) {
         const logoCheck = await requireFeature('logo_upload', salonId);
         if (!logoCheck.success) return logoCheck.error;
+
+        // If replacing an existing Supabase Storage object, remove old storage file
+        if (currentLogo && currentLogo.includes(`/storage/v1/object/public/${BUCKET_NAME}/salons/${salonId}/`)) {
+          const oldPath = currentLogo.split(`/storage/v1/object/public/${BUCKET_NAME}/`)[1];
+          if (oldPath) {
+            await deleteFromStorage(oldPath);
+          }
+        }
       }
     }
 

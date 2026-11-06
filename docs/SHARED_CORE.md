@@ -91,10 +91,19 @@ In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re
 
 ---
 
-## 7. Storage & File Uploads
-- **Current Architecture**: Salon brand logos are uploaded via client-side `FileReader` as base64 data URLs (`data:image/...;base64,...`) and stored directly in the `salons.logo_url` column in PostgreSQL.
-- **Constraints**: Maximum file size is client-validated to <= 2MB. Saving a new logo requires the `logo_upload` plan feature.
-- **No external S3/Cloud Storage**: There are currently no third-party object storage buckets required; the application does not rely on local filesystem writes for user uploads.
+## 7. Storage & File Uploads (`src/lib/storage.ts`)
+- **Supabase Storage Bucket**: Public-read bucket `salon-media`.
+- **Upload Flow**: Uploads and deletions are performed strictly server-side using `SUPABASE_SERVICE_ROLE_KEY` via `/api/upload` and `/api/settings/photos`.
+- **Client-Side Compression (`ImageUploader.tsx`)**:
+  - Rejects files > 5MB before processing.
+  - Browser canvas compression targeting <= 200KB (max 1200px, WebP/JPEG) for gallery photos, and square center crop <= 60KB (max 400px, WebP/JPEG) for logos and avatars.
+- **Server Validation & Security**:
+  - Magic byte verification (`validateImageSignature`) for JPEG (`FF D8 FF`), PNG (`89 50 4E 47`), and WebP (`RIFF....WEBP`). Rejects SVGs, HTML, EXEs, scripts, and spoofed file extensions.
+  - Strict server-side file size limit of <= 400KB.
+  - Server decides the destination path strictly: `salons/{salon_id}/...` for owners or `customers/{customer_id}/avatar` for customers.
+  - Rejects foreign storage paths and `data:` URIs.
+- **Gallery Photo Limit**: Shared constant `MAX_GALLERY_PHOTOS = 5` enforced server-side. Replacing or deleting an image cleans up the old storage object from Supabase Storage.
+- **Demo Mode**: `dixa-beauty-salon` simulates uploads without writing to storage or database.
 
 ---
 
@@ -164,6 +173,8 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts` an
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Optional | — | Client-side Razorpay key for checkout modal. |
 | `NEXT_PUBLIC_SUPPORT_PHONE` | Optional | `8320653782` | Contact support phone number displayed on landing and login. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Optional | `avsarsuvagiya968@gmail.com` | Contact support email. |
+| `SUPABASE_URL` | Optional | `https://mneftepouqtsyfwgfsyb.supabase.co` | Supabase project URL for Storage REST API operations. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional | — | Supabase service-role secret key (Server-only) for storage uploads and deletions. |
 
 ---
 
@@ -186,4 +197,5 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts` an
 | `013_enable_rls_public_tables.sql` | Enables PostgreSQL Row Level Security (RLS) policies on core tables. |
 | `014_salon_holidays.sql` | Creates `salon_holidays` table for scheduled temporary salon closures. |
 | `015_customer_cancel_reschedule.sql` | Adds `cancel_policy_hours` to `salons` (default 2); adds `cancelled_by`, `cancelled_at`, and `rescheduled_count` to `appointments`. |
+| `016_salon_photos.sql` | Creates `salon_photos` table (`id`, `salon_id`, `url`, `storage_path`, `sort_order`, `created_at`) with RLS and foreign key cascade for gallery photo uploads. |
 

@@ -45,8 +45,18 @@ Key environment variables:
 - `WHATSAPP_CLOUD_API_TOKEN`: Meta Graph API token for automated WhatsApp PDF delivery
 - `WHATSAPP_PHONE_NUMBER_ID`: Meta WhatsApp Phone Number ID
 - `ADMIN_EMAIL` & `ADMIN_PASSWORD`: Super-admin platform credentials
+- `SUPABASE_URL`: Supabase project URL (e.g. `https://xyz.supabase.co`)
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service-role secret key (Server-only; used for authenticated storage uploads and deletions)
 
-### 3. Database Migration
+### 3. Supabase Storage Setup (`salon-media`)
+
+SalonPro uses a public-read Supabase Storage bucket for salon logos, branding images, and gallery photos:
+1. In your **Supabase Dashboard**, navigate to **Storage** → **New Bucket**.
+2. Set **Bucket Name** to: `salon-media`.
+3. Toggle **Public Bucket** to **ON** (Allows public reads of images via CDN URLs without requiring query tokens).
+4. Save bucket settings. Uploads, replacements, and deletions are handled exclusively via the server-side API (`/api/upload` and `/api/settings/photos`) using `SUPABASE_SERVICE_ROLE_KEY`.
+
+### 4. Database Migration
 
 Run all migrations in `supabase/migrations/` sequentially or run:
 

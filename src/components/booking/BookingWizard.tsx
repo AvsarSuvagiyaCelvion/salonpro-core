@@ -42,9 +42,16 @@ interface Slot {
   staffName: string;
 }
 
+interface Photo {
+  id: string;
+  url: string;
+  sort_order: number;
+}
+
 export default function BookingWizard({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
   const [salon, setSalon] = useState<Salon | null>(null);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [staffList, setStaffList] = useState<Staff[]>([]);
   const [staffServices, setStaffServices] = useState<{ staff_id: string; service_id: string }[]>([]);
@@ -133,6 +140,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
         }
         const data = await res.json();
         setSalon(data.salon);
+        setPhotos(data.photos || []);
         const fetchedServices = data.services || [];
         setServices(fetchedServices);
         setStaffList(data.staff || []);
@@ -559,10 +567,15 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
         <div className="max-w-2xl mx-auto px-4 pt-2 text-center">
           <div 
-            className="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center font-bold text-3xl shadow-xl border border-white/20 mb-3"
+            className="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center font-bold text-3xl shadow-xl border border-white/20 mb-3 overflow-hidden"
             style={{ backgroundColor: brandColor, color: '#ffffff' }}
           >
-            {salon.name.charAt(0)}
+            {salon.logo_url ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={salon.logo_url} alt={salon.name} className="w-full h-full object-cover" />
+            ) : (
+              salon.name.charAt(0)
+            )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">{salon.name}</h1>
           <p className="text-xs sm:text-sm text-neutral-400 mt-1 flex items-center justify-center gap-2">
@@ -612,6 +625,36 @@ export default function BookingWizard({ slug }: { slug: string }) {
         {/* STEP 1: SELECT SERVICE */}
         {currentStep === 1 && (
           <div>
+            {/* Salon Gallery */}
+            {photos && photos.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2.5">
+                  <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                    Salon Gallery
+                  </h3>
+                  <span className="text-[11px] text-neutral-500 font-medium">
+                    {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+                  {photos.map((photo, idx) => (
+                    <div
+                      key={photo.id || idx}
+                      className="group aspect-4/3 rounded-2xl overflow-hidden border border-[#2A2F3A] bg-[#141926] relative shadow-sm"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={photo.url}
+                        alt={`${salon.name} photo ${idx + 1}`}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-between items-end mb-4">
               <div>
                 <h2 className="text-lg font-bold text-white">1. Select a Service</h2>

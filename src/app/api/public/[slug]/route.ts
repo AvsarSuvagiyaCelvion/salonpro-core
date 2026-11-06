@@ -73,12 +73,22 @@ export async function GET(
     // Fetch upcoming holidays/closures
     const holidays = await getSalonHolidays(salon.id);
 
+    // Fetch public gallery photos
+    const photosRes = await query(
+      `SELECT id, url, sort_order 
+       FROM salon_photos 
+       WHERE salon_id = $1::uuid 
+       ORDER BY sort_order ASC, created_at ASC`,
+      [salon.id]
+    );
+
     return NextResponse.json({
       salon,
       services: servicesRes.rows,
       staff: staffRes.rows,
       staffServices: mappingRes.rows,
       holidays,
+      photos: photosRes.rows,
     });
   } catch (error: any) {
     return serverError(error, 'src/app/api/public/[slug]/route.ts');

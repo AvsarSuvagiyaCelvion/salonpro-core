@@ -34,11 +34,13 @@ export async function GET() {
     // 2. Execute Salon, Appointments, Invoices, and Plans queries concurrently
     const [salonRes, apptsRes, invRes, plansRes] = await Promise.all([
       query(
-        `SELECT id, name, slug, address, phone, brand_color FROM salons WHERE id = $1 LIMIT 1`,
+        `SELECT id, name, slug, address, phone, brand_color, COALESCE(cancel_policy_hours, 2) as cancel_policy_hours, max_advance_days, min_advance_hours FROM salons WHERE id = $1 LIMIT 1`,
         [customer.salon_id]
       ),
       query(
         `SELECT a.id, a.starts_at, a.ends_at, a.status, a.source, a.note, a.created_at,
+                a.cancelled_by, a.cancelled_at, COALESCE(a.rescheduled_count, 0) as rescheduled_count,
+                a.service_id, a.staff_id,
                 sv.name as service_name, sv.duration_min, sv.price as service_price,
                 st.name as staff_name, st.role_title as staff_role
          FROM appointments a

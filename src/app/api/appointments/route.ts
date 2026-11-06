@@ -21,6 +21,7 @@ export async function GET(request: Request) {
 
     let sql = `
       SELECT a.id, a.salon_id, a.starts_at, a.ends_at, a.status, a.source, a.note, a.created_at,
+             a.cancelled_by, a.cancelled_at, COALESCE(a.rescheduled_count, 0) as rescheduled_count,
              c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile, c.email as customer_email,
              s.id as staff_id, s.name as staff_name, s.role_title as staff_role,
              sv.id as service_id, sv.name as service_name, sv.category as service_category,

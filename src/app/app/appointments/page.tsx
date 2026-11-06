@@ -48,6 +48,9 @@ interface Appointment {
   service_category: string;
   duration_min: number;
   service_price: string | number;
+  cancelled_by?: string | null;
+  cancelled_at?: string | null;
+  rescheduled_count?: number;
 }
 
 interface ServiceOption {
@@ -822,19 +825,28 @@ export default function AppointmentsPage() {
                                         </span>
                                       </span>
 
-                                      <span
-                                        className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                                          isScheduled
-                                            ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
-                                            : isArrived
-                                            ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 animate-pulse'
-                                            : isDone
-                                            ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-300'
-                                            : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
-                                        }`}
-                                      >
-                                        {isArrived ? 'In Chair' : appt.status}
-                                      </span>
+                                      <div className="flex items-center gap-1">
+                                        {appt.rescheduled_count && appt.rescheduled_count > 0 ? (
+                                          <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#D4A77F]/20 text-[#B8905F] dark:text-[#D4A77F]">
+                                            Rescheduled
+                                          </span>
+                                        ) : null}
+                                        <span
+                                          className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                            isScheduled
+                                              ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
+                                              : isArrived
+                                              ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 animate-pulse'
+                                              : isDone
+                                              ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-300'
+                                              : isCancelled && appt.cancelled_by === 'customer'
+                                              ? 'bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900'
+                                              : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
+                                          }`}
+                                        >
+                                          {isArrived ? 'In Chair' : isCancelled && appt.cancelled_by === 'customer' ? 'Cancelled by customer' : appt.status}
+                                        </span>
+                                      </div>
                                     </div>
 
                                     {/* Middle: Customer & Service */}
@@ -1017,19 +1029,28 @@ export default function AppointmentsPage() {
                                 <span className="font-bold text-[#D4A77F] font-variant-numeric tabular-nums">
                                   {timeStr}
                                 </span>
-                                <span
-                                  className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase ${
-                                    appt.status === 'scheduled'
-                                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
-                                      : appt.status === 'arrived'
-                                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
-                                      : appt.status === 'done'
-                                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
-                                      : 'bg-neutral-200 text-neutral-600'
-                                  }`}
-                                >
-                                  {appt.status}
-                                </span>
+                                <div className="flex items-center gap-1">
+                                  {appt.rescheduled_count && appt.rescheduled_count > 0 ? (
+                                    <span className="px-1 py-0.2 rounded text-[7px] font-bold bg-[#D4A77F]/20 text-[#B8905F]">
+                                      Resched
+                                    </span>
+                                  ) : null}
+                                  <span
+                                    className={`px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase ${
+                                      appt.status === 'scheduled'
+                                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300'
+                                        : appt.status === 'arrived'
+                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                                        : appt.status === 'done'
+                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                        : appt.status === 'cancelled' && appt.cancelled_by === 'customer'
+                                        ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
+                                        : 'bg-neutral-200 text-neutral-600'
+                                    }`}
+                                  >
+                                    {appt.status === 'cancelled' && appt.cancelled_by === 'customer' ? 'Cancelled by client' : appt.status}
+                                  </span>
+                                </div>
                               </div>
 
                               <div className="font-bold text-xs text-[#1F2937] dark:text-white truncate">
@@ -1097,19 +1118,28 @@ export default function AppointmentsPage() {
                       </div>
                     </div>
 
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                        appt.status === 'scheduled'
-                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                          : appt.status === 'arrived'
-                          ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                          : appt.status === 'done'
-                          ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                          : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border border-neutral-200 dark:border-neutral-700'
-                      }`}
-                    >
-                      {appt.status}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {appt.rescheduled_count && appt.rescheduled_count > 0 ? (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#D4A77F]/20 text-[#B8905F] dark:text-[#D4A77F] border border-[#D4A77F]/30">
+                          Rescheduled ({appt.rescheduled_count}x)
+                        </span>
+                      ) : null}
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          appt.status === 'scheduled'
+                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                            : appt.status === 'arrived'
+                            ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                            : appt.status === 'done'
+                            ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                            : appt.status === 'cancelled' && appt.cancelled_by === 'customer'
+                            ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900'
+                            : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border border-neutral-200 dark:border-neutral-700'
+                        }`}
+                      >
+                        {appt.status === 'cancelled' && appt.cancelled_by === 'customer' ? 'Cancelled by customer' : appt.status}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="pt-2.5">

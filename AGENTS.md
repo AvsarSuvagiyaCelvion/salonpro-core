@@ -7,3 +7,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Working rules
+
+- Before any task, read `docs/SHARED_CORE.md` and the relevant panel MD (`docs/CUSTOMER_PANEL.md`, `docs/OWNER_PANEL.md`, or `docs/ADMIN_PANEL.md`); use them to locate files instead of exploring the whole repo.
+- After finishing any task, update the affected MD (routes, tables, flows, new migration number) in the same change.
+- New migrations: check the latest number in `docs/SHARED_CORE.md` first.
+- Never trust `salon_id` or `customer_id` from the request body; follow the auth rules in `docs/SHARED_CORE.md`.

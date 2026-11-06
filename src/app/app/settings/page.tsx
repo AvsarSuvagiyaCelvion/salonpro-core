@@ -57,6 +57,7 @@ export default function SettingsPage() {
   const [workingDays, setWorkingDays] = useState<number[]>([1, 2, 3, 4, 5, 6]);
   const [minAdvanceHours, setMinAdvanceHours] = useState(1);
   const [maxAdvanceDays, setMaxAdvanceDays] = useState(14);
+  const [cancelPolicyHours, setCancelPolicyHours] = useState(2);
   const [sendReminders, setSendReminders] = useState(true);
 
   // Active section tab
@@ -173,6 +174,7 @@ export default function SettingsPage() {
           setWorkingDays(s.working_days || [1, 2, 3, 4, 5, 6]);
           setMinAdvanceHours(s.min_advance_hours || 1);
           setMaxAdvanceDays(s.max_advance_days || 14);
+          setCancelPolicyHours(s.cancel_policy_hours !== undefined && s.cancel_policy_hours !== null ? Number(s.cancel_policy_hours) : 2);
           setSendReminders(s.send_reminders ?? true);
 
           if (typeof window !== 'undefined') {
@@ -266,6 +268,7 @@ export default function SettingsPage() {
         working_days: workingDays,
         min_advance_hours: Number(minAdvanceHours),
         max_advance_days: Number(maxAdvanceDays),
+        cancel_policy_hours: Number(cancelPolicyHours),
         send_reminders: sendReminders,
       };
 
@@ -685,6 +688,26 @@ export default function SettingsPage() {
                   onChange={(e) => setMaxAdvanceDays(Number(e.target.value))}
                   className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                  Customers can cancel/reschedule up to ___ hours before
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min={0}
+                    max={72}
+                    value={cancelPolicyHours}
+                    onChange={(e) => setCancelPolicyHours(Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
+                  />
+                  <span className="absolute right-4 top-2.5 text-xs text-neutral-400 font-medium">hours</span>
+                </div>
+                <p className="text-[10px] text-neutral-400 mt-1">
+                  0 = until start. Maximum 72 hours.
+                </p>
               </div>
             </div>
 

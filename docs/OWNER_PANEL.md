@@ -1,0 +1,192 @@
+# Owner & Staff Panel (ERP) Documentation
+
+> **Last verified:** 2026-11-06  
+> **Status:** Verified against source code
+
+---
+
+## 1. Purpose and Users
+The Owner Panel is the operational ERP system for salon owners, managers, and staff to run daily operations: queue and in-chair live sessions, appointment calendar scheduling, POS billing and receipts, customer relationship management (CRM), staff commissions, retail inventory, business analytics, and salon settings.
+
+---
+
+## 2. Page Routes Table
+
+| Route | File Path | What It Does | Key Components Used |
+|---|---|---|---|
+| `/login` | `src/app/login/page.tsx` | Salon owner and staff login page. Includes one-click demo login button for showcase. | Login form |
+| `/salon-owner` | `src/app/salon-owner/page.tsx` | Informational landing page for prospective salon owners redirecting to `/login`. | Landing page layout |
+| `/register` | `src/app/register/page.tsx` | Tenant onboarding page: registers new salon, creates owner credentials, and provisions 14-day Pro trial. | Onboarding form |
+| `/register-salon` | `src/app/register-salon/page.tsx` | Alias for `/register`. | Onboarding form |
+| `/app` | `src/app/app/page.tsx` | Default tenant root route; automatically redirects to `/app/dashboard`. | Next.js redirect |
+| `/app/dashboard` | `src/app/app/dashboard/page.tsx` | Executive summary: daily sales, appointment count, live queue count, monthly revenue, and recent appointments. | `AreaTrendChart`, `StatsCounter` |
+| `/app/live` | `src/app/app/live/page.tsx` | Live floor queue: manages walk-in waiting list, moves clients to "In Chair" sessions, adds services/products, and checks out to POS. | Live Kanban columns |
+| `/app/appointments` | `src/app/app/appointments/page.tsx` | Calendar & schedule management: Multi-Stylist Lanes view, 7-Day Matrix view, and Card list view. Manages status (In Chair, Done, Cancelled). | `SkeletonTable` |
+| `/app/billing` | `src/app/app/billing/page.tsx` | POS Billing & Checkout: invoice generation, discount calculation, payment modes (Cash, UPI, Card), and GST calculation. | POS register form |
+| `/app/customers` | `src/app/app/customers/page.tsx` | Client directory (CRM): search, contact details, total visits, lifetime spend, notes, and VIP status. | Customer list & modal |
+| `/app/services` | `src/app/app/services/page.tsx` | Service catalog: service items, category classification, duration, pricing, and online booking visibility toggle. | Service table & modal |
+| `/app/products` | `src/app/app/products/page.tsx` | Retail inventory: product tracking, stock count, cost price, selling price, and low stock threshold alerts. | Product table & modal |
+| `/app/staff` | `src/app/app/staff/page.tsx` | Staff roster: stylist profiles, roles, service commission %, product commission %, and online scheduling status. | Staff table & modal |
+| `/app/memberships` | `src/app/app/memberships/page.tsx` | VIP membership & package management: discount rules, validity periods, and client assignment. | Membership cards & assignment modal |
+| `/app/reports` | `src/app/app/reports/page.tsx` | Analytics and export: revenue breakdowns, staff commission statements, and CSV/PDF export. | `ReportExportModal`, `BarComparisonChart`, `DonutDistributionChart`, `HourlyRushChart` |
+| `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, and holiday closures. | Settings tab panels |
+| `/app/subscription` | `src/app/app/subscription/page.tsx` | Plan management: current subscription tier, trial status, feature matrix, and Razorpay upgrade/renewal. | Plan cards & Razorpay checkout |
+| `/app/benefits` | `src/app/app/benefits/page.tsx` | Plan comparison matrix showing feature gates between Basic, Pro, and Premium. | Feature comparison table |
+
+---
+
+## 3. API Routes Table
+
+| Endpoint | Methods | File Path | Auth Required | What It Does |
+|---|---|---|---|---|
+| `/api/login` | `POST` | `src/app/api/login/route.ts` | None | Authenticates salon owner/staff via email and password; sets `salonpro_session` cookie. |
+| `/api/register` | `POST` | `src/app/api/register/route.ts` | None | Provisions new salon, owner account, default services, and trial period. |
+| `/api/logout` | `POST` | `src/app/api/logout/route.ts` | `salonpro_session` | Clears `salonpro_session` cookie. |
+| `/api/demo/owner-login` | `GET`, `POST` | `src/app/api/demo/owner-login/route.ts` | None (Public Demo) | Logs user into demo salon workspace (`dixa-beauty-salon`) as owner without credentials. |
+| `/api/dashboard/stats` | `GET` | `src/app/api/dashboard/stats/route.ts` | `salonpro_session` | Returns daily and monthly metrics (revenue, appointments, waiting clients). |
+| `/api/appointments` | `GET`, `POST` | `src/app/api/appointments/route.ts` | `salonpro_session` | Lists filtered appointments or creates new internal owner booking. |
+| `/api/appointments/[id]` | `PATCH`, `DELETE` | `src/app/api/appointments/[id]/route.ts` | `salonpro_session` | Updates appointment status (`arrived`, `cancelled`, `done`) or removes it. |
+| `/api/appointments/[id]/start-session` | `POST` | `src/app/api/appointments/[id]/start-session/route.ts` | `salonpro_session` | Converts scheduled appointment into an active in-chair beauty session. |
+| `/api/live` | `GET` | `src/app/api/live/route.ts` | `salonpro_session` | Returns combined waiting list and active in-chair sessions. |
+| `/api/live/waiting` | `GET`, `POST` | `src/app/api/live/waiting/route.ts` | `salonpro_session` | Adds walk-in client to waiting list. |
+| `/api/live/waiting/[id]` | `DELETE` | `src/app/api/live/waiting/[id]/route.ts` | `salonpro_session` | Removes client from waiting list. |
+| `/api/live/sessions` | `GET`, `POST` | `src/app/api/live/sessions/route.ts` | `salonpro_session` | Creates or lists active in-chair sessions. |
+| `/api/live/sessions/[id]/items` | `GET`, `POST` | `src/app/api/live/sessions/[id]/items/route.ts` | `salonpro_session` | Adds service or product line item to an active session. |
+| `/api/live/sessions/[id]/items/[itemId]` | `DELETE` | `src/app/api/live/sessions/[id]/items/[itemId]/route.ts` | `salonpro_session` | Deletes a line item from an active session. |
+| `/api/live/sessions/[id]/complete` | `POST` | `src/app/api/live/sessions/[id]/complete/route.ts` | `salonpro_session` | Completes session, creates invoice, records payments, updates stock, and awards commission. |
+| `/api/billing` | `GET`, `POST` | `src/app/api/billing/route.ts` | `salonpro_session` | Lists past invoices or creates manual direct POS invoice. |
+| `/api/billing/pay` | `POST` | `src/app/api/billing/pay/route.ts` | `salonpro_session` | Records partial or full payment against an outstanding invoice. |
+| `/api/billing/whatsapp` | `POST` | `src/app/api/billing/whatsapp/route.ts` | `salonpro_session` | Triggers digital receipt WhatsApp message via Cloud API or Twilio. |
+| `/api/customers` | `GET`, `POST` | `src/app/api/customers/route.ts` | `salonpro_session` | Searches/lists clients or creates new customer profile. |
+| `/api/customers/[id]` | `GET`, `PATCH`, `DELETE` | `src/app/api/customers/[id]/route.ts` | `salonpro_session` | Fetches client details, updates profile/notes, or removes client. |
+| `/api/customers/[id]/invoices` | `GET` | `src/app/api/customers/[id]/invoices/route.ts` | `salonpro_session` | Lists all billing history for a specific customer. |
+| `/api/services` | `GET`, `POST` | `src/app/api/services/route.ts` | `salonpro_session` | Lists or creates salon services. Enforces plan service limits. |
+| `/api/services/[id]` | `PATCH`, `DELETE` | `src/app/api/services/[id]/route.ts` | `salonpro_session` | Updates service details/pricing or deletes service. |
+| `/api/products` | `GET`, `POST` | `src/app/api/products/route.ts` | `salonpro_session` | Lists inventory products or adds new retail product. |
+| `/api/products/[id]` | `PATCH`, `DELETE` | `src/app/api/products/[id]/route.ts` | `salonpro_session` | Updates product inventory levels, price, or details. |
+| `/api/products/sell` | `POST` | `src/app/api/products/sell/route.ts` | `salonpro_session` | Direct POS sale for retail products without service session. |
+| `/api/staff` | `GET`, `POST` | `src/app/api/staff/route.ts` | `salonpro_session` | Lists staff or creates new stylist profile. Enforces plan staff limits. |
+| `/api/staff/[id]` | `PATCH`, `DELETE` | `src/app/api/staff/[id]/route.ts` | `salonpro_session` | Updates stylist roles, commission percentages, or deletes staff. |
+| `/api/memberships` | `GET`, `POST` | `src/app/api/memberships/route.ts` | `salonpro_session` (Feature: `memberships`) | Lists or creates VIP membership plans. Gated by plan feature. |
+| `/api/memberships/assign` | `POST` | `src/app/api/memberships/assign/route.ts` | `salonpro_session` (Feature: `memberships`) | Assigns VIP plan to customer. |
+| `/api/reports` | `GET` | `src/app/api/reports/route.ts` | `salonpro_session` | Aggregates daily/monthly revenue, staff commission reports, and cash summary. |
+| `/api/export` | `GET` | `src/app/api/export/route.ts` | `salonpro_session` (Feature: `export`) | Exports clients, invoices, appointments, or products as CSV/PDF. Gated by plan. |
+| `/api/settings` | `GET`, `PUT`, `PATCH` | `src/app/api/settings/route.ts` | `salonpro_session` (Role: `owner`) | Reads and saves salon operating rules, buffer gap, advance notice, cancellation policy, and branding. |
+| `/api/holidays` | `GET`, `POST` | `src/app/api/holidays/route.ts` | `salonpro_session` (Role: `owner`) | Lists or adds temporary salon closures and holidays. |
+| `/api/holidays/[id]` | `DELETE` | `src/app/api/holidays/[id]/route.ts` | `salonpro_session` (Role: `owner`) | Deletes a salon closure date. |
+| `/api/subscription` | `GET` | `src/app/api/subscription/route.ts` | `salonpro_session` | Fetches active subscription details and trial status. |
+| `/api/subscription/payments` | `GET` | `src/app/api/subscription/payments/route.ts` | `salonpro_session` | Fetches Razorpay payment history for the salon. |
+| `/api/subscription/razorpay/create-order` | `POST` | `src/app/api/subscription/razorpay/create-order/route.ts` | `salonpro_session` | Generates Razorpay Order ID for subscription payment. |
+| `/api/subscription/razorpay/verify` | `POST` | `src/app/api/subscription/razorpay/verify/route.ts` | `salonpro_session` | Verifies Razorpay payment signature and updates plan in database. |
+| `/api/subscription/razorpay/webhook` | `POST` | `src/app/api/subscription/razorpay/webhook/route.ts` | Webhook Signature | Receives Razorpay asynchronous subscription event notifications. |
+
+---
+
+## 4. Components Used Only by This Panel
+
+| Component | File Path | Purpose |
+|---|---|---|
+| `SkeletonTable` | `src/components/ui/SkeletonTable.tsx` | Loading skeleton placeholder for tables in appointments, staff, and services. |
+| `ReportExportModal` | `src/components/reports/ReportExportModal.tsx` | Date range selector modal for exporting PDF/CSV reports. |
+| `AreaTrendChart` | `src/components/charts/AreaTrendChart.tsx` | SVG area chart showing revenue trends on dashboard. |
+| `BarComparisonChart` | `src/components/charts/BarComparisonChart.tsx` | Comparison bar chart for service categories in reports. |
+| `DonutDistributionChart` | `src/components/charts/DonutDistributionChart.tsx` | Visual distribution chart for payment modes (Cash, UPI, Card). |
+| `HourlyRushChart` | `src/components/charts/HourlyRushChart.tsx` | Peak hours hourly rush histogram for salon footfall. |
+| `BrandLoader` | `src/components/ui/BrandLoader.tsx` | Branded spinner for full-screen loading transitions. |
+
+---
+
+## 5. Database Tables Touched
+
+| Table | Key Columns Touched | Read/Write | Migration File |
+|---|---|---|---|
+| `users` | `id`, `salon_id`, `email`, `password_hash`, `role`, `is_active` | Read / Write | `006_users_and_tenant_auth.sql` |
+| `salons` | `id`, `name`, `slug`, `brand_color`, `logo_url`, `open_time`, `close_time`, `working_days`, `slot_minutes`, `buffer_minutes`, `min_advance_hours`, `max_advance_days`, `cancel_policy_hours`, `invoice_counter`, `plan`, `trial_ends_at`, `subscription_status` | Read / Write | `001_initial_schema.sql`, `003_add_settings_columns.sql`, `008_plans_limits.sql`, `009_auth_rate_limits_and_invoice_counter.sql`, `015_customer_cancel_reschedule.sql` |
+| `staff` | `id`, `salon_id`, `name`, `role_title`, `service_commission_pct`, `product_commission_pct`, `active`, `show_online` | Read / Write | `001_initial_schema.sql` |
+| `services` | `id`, `salon_id`, `name`, `category`, `duration_min`, `price`, `online_enabled` | Read / Write | `001_initial_schema.sql` |
+| `staff_services` | `staff_id`, `service_id` | Read / Write | `001_initial_schema.sql` |
+| `products` | `id`, `salon_id`, `name`, `brand`, `sku`, `price`, `cost_price`, `stock`, `min_stock`, `active` | Read / Write | `001_initial_schema.sql` |
+| `customers` | `id`, `salon_id`, `name`, `mobile`, `email`, `note`, `pin` | Read / Write | `001_initial_schema.sql`, `012_dedupe_and_unique_customers.sql` |
+| `appointments` | `id`, `salon_id`, `customer_id`, `staff_id`, `service_id`, `starts_at`, `ends_at`, `status`, `source`, `cancelled_by`, `cancelled_at`, `rescheduled_count` | Read / Write | `001_initial_schema.sql`, `015_customer_cancel_reschedule.sql` |
+| `waiting` | `id`, `salon_id`, `customer_id`, `created_at` | Read / Write | `001_initial_schema.sql` |
+| `sessions` | `id`, `salon_id`, `customer_id`, `status`, `started_at` | Read / Write | `001_initial_schema.sql` |
+| `session_items` | `id`, `session_id`, `staff_id`, `item_type`, `item_id`, `quantity`, `price` | Read / Write | `001_initial_schema.sql` |
+| `invoices` | `id`, `salon_id`, `customer_id`, `number`, `receipt_token`, `subtotal`, `discount_amount`, `tax_amount`, `total` | Read / Write | `001_initial_schema.sql`, `007_invoices_tax_and_tenant_indexes.sql`, `010_backfill_invoice_receipt_tokens.sql` |
+| `payments` | `id`, `invoice_id`, `amount`, `payment_method`, `created_at` | Read / Write | `001_initial_schema.sql` |
+| `salon_holidays` | `id`, `salon_id`, `title`, `start_date`, `end_date`, `note` | Read / Write | `014_salon_holidays.sql` |
+| `subscription_payments` | `id`, `salon_id`, `razorpay_order_id`, `razorpay_payment_id`, `amount`, `status` | Read / Write | `011_subscription_payments.sql` |
+
+---
+
+## 6. Main User Flows
+
+### Flow 1: Live Salon Floor (Walk-in to Checkout)
+1. **Walk-in Arrival**: Staff adds client on `/app/live` -> calls `POST /api/live/waiting`.
+2. **Seat in Chair**: Staff clicks "Seat in Chair" -> calls `POST /api/live/sessions` with `customer_id`. Client moves from Waiting to "In Chair" column.
+3. **Add Services & Retail**: Stylist adds service or retail item -> calls `POST /api/live/sessions/[id]/items` with `item_type`, `item_id`, `staff_id`, and `price`.
+4. **Checkout & Bill**: Staff clicks "Complete & Bill" -> calls `POST /api/live/sessions/[id]/complete`:
+   - Atomically increments salon invoice counter (`UPDATE salons SET invoice_counter = invoice_counter + 1`).
+   - Inserts row in `invoices` with unique `receipt_token`.
+   - Records payments in `payments` table.
+   - Decrements inventory stock in `products` for any retail items sold.
+   - Marks session `status = 'completed'`.
+   - Generates digital receipt URL `/b/<receipt_token>`.
+
+### Flow 2: Calendar Appointment Management
+1. **View Schedule**: Stylist opens `/app/appointments`. Can toggle Multi-Stylist Lanes, Weekly Matrix, or Cards view.
+2. **Customer Arrived**: When client arrives, click "Seat in Chair" -> updates appointment status to `arrived` via `PATCH /api/appointments/[id]`.
+3. **Start POS**: Click "Start POS" -> converts appointment into active session via `POST /api/appointments/[id]/start-session`.
+4. **Cancelled Appointments**: If cancelled by the customer via self-service, card automatically renders a badge: `Cancelled by customer`.
+
+### Flow 3: Salon Settings & Policy Setup
+1. **Open Settings**: Owner opens `/app/settings` -> `GET /api/settings` loads salon configuration.
+2. **Operating Rules**: Owner sets open/close times, slot step (e.g. 30m), buffer gap (e.g. 10m), advance notice hours, and cancellation policy window (*"Customers can cancel/reschedule up to ___ hours before"*).
+3. **Save**: Click "Save Settings" -> `PUT /api/settings` validates values (cancellation hours strictly 0-72) and updates `salons` table.
+4. **Temporary Closures**: Owner navigates to "Holidays & Closures" tab to block festival dates or renovation days (`POST /api/holidays`).
+
+---
+
+## 7. Business Rules and Edge Cases
+- **Tenant Isolation**: Every database query strictly filters by `salon_id = auth.session.salonId`. `salon_id` is never read from request body.
+- **Role Enforcement**:
+  - `owner`: Has access to all settings, subscriptions, staff commissions, and deletions.
+  - `staff`: Blocked from viewing financial reports, changing salon settings, or modifying subscriptions (`requireRole(session, ['owner'])` returns 403).
+- **Subscription Gates**:
+  - Gated by `src/lib/plan.ts`.
+  - Basic: Max 3 staff, max 30 services, no logo upload, no custom domain, no export.
+  - Pro: Max 10 staff, max 100 services, logo upload enabled, commission reports, memberships, export enabled.
+  - Premium: Unlimited staff/services, custom domains.
+  - Expired subscriptions return HTTP 402, redirecting owner to `/app/subscription`.
+- **Demo Salon**: The demo salon `dixa-beauty-salon` allows instant one-click login via `/api/demo/owner-login` without entering a password.
+- **Appointments Table Schema**: The `appointments` table has **no** `updated_at` column. Do not write to it.
+
+---
+
+## 8. Shared Dependencies
+- `src/lib/api-auth.ts`: `requireTenant`, `requireRole`, `invalidateUserAuthCache`.
+- `src/lib/auth.ts`: `COOKIE_NAME` (`salonpro_session`), `verifySessionToken`.
+- `src/lib/plan.ts`: `getSalonPlan`, `requireFeature`, `requireLimit`.
+- `src/proxy.ts`: Directs authenticated owners hitting `/login` or `/` to `/app`.
+
+---
+
+## 9. Cross-Panel Effects
+- **Owner Cancellation**: When an owner cancels an appointment via ERP, `cancelled_by` is set to `'owner'`. The customer sees this as cancelled in `/portal`.
+- **Operating Hours Update**: Modifying `open_time`, `buffer_minutes`, or `cancel_policy_hours` immediately alters the slots rendered to clients on `/[slug]` and cancellation eligibility in `/portal`.
+- **Service/Staff Visibility**: Toggling `online_enabled = false` or `show_online = false` immediately hides that service/staff from public booking.
+
+---
+
+## 10. Known Gaps / TODO / UNVERIFIED Items
+- Razorpay Webhook endpoint (`/api/subscription/razorpay/webhook`) expects `RAZORPAY_WEBHOOK_SECRET` in production; in local development, it operates in test mode.
+- Inventory restocking purchase-order management is not yet built (stock is updated directly via product edit or POS checkout).
+
+---
+
+## 11. "Where to Look First" Cheat Sheet
+- **Dashboard metrics calculation**: `src/app/api/dashboard/stats/route.ts`
+- **POS completion & checkout logic**: `src/app/api/live/sessions/[id]/complete/route.ts`
+- **Owner appointments & calendar**: `src/app/app/appointments/page.tsx`
+- **Owner settings & timings**: `src/app/app/settings/page.tsx` & `src/app/api/settings/route.ts`
+- **Commission calculations**: `src/app/api/reports/route.ts`
+

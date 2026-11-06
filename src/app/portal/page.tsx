@@ -12,6 +12,9 @@ import {
   AlertCircle,
   ExternalLink,
   PlusCircle,
+  ShieldAlert,
+  X,
+  Check,
 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 
@@ -29,6 +32,9 @@ interface Salon {
   address: string | null;
   phone: string | null;
   brand_color: string;
+  cancel_policy_hours?: number;
+  max_advance_days?: number;
+  min_advance_hours?: number;
 }
 
 interface Appointment {
@@ -36,11 +42,16 @@ interface Appointment {
   starts_at: string;
   ends_at: string;
   status: string;
+  service_id?: string;
   service_name: string;
   duration_min: number;
   service_price: number;
+  staff_id?: string;
   staff_name: string;
   staff_role: string | null;
+  cancelled_by?: string | null;
+  cancelled_at?: string | null;
+  rescheduled_count?: number;
 }
 
 interface Invoice {
@@ -87,6 +98,119 @@ export default function CustomerPortalPage() {
   const [authConfirmPin, setAuthConfirmPin] = useState('');
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+
+  // Cancel & Reschedule Modals State
+  const [cancelModalAppt, setCancelModalAppt] = useState<Appointment | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  const [rescheduleModalAppt, setRescheduleModalAppt] = useState<Appointment | null>(null);
+  const [rescheduleDate, setRescheduleDate] = useState<string>('');
+  const [rescheduleSlots, setRescheduleSlots] = useState<Array<{ time: string; formattedTime: string; staffId: string; staffName: string }>>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedSlotStaffId, setSelectedSlotStaffId] = useState<string | null>(null);
+  const [rescheduling, setRescheduling] = useState(false);
+  const [rescheduleError, setRescheduleError] = useState<string | null>(null);
+  const [portalMessage, setPortalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  function canModifyAppointment(startsAtStr: string, policyHours: number = 2): boolean {
+    const startsAt = new Date(startsAtStr).getTime();
+    const cutoff = startsAt - policyHours * 3600 * 1000;
+    return Date.now() <= cutoff;
+  }
+
+  async function loadRescheduleSlots(dateStr: string, appt: Appointment) {
+    if (!salon?.slug || !appt.service_id || !dateStr) return;
+    try {
+      setLoadingSlots(true);
+      setRescheduleError(null);
+      setSelectedSlot(null);
+      setSelectedSlotStaffId(null);
+      const url = `/api/public/${salon.slug}/slots?service_id=${appt.service_id}&date=${dateStr}&staff_id=${appt.staff_id || 'anyone'}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to fetch slots');
+      }
+      setRescheduleSlots(data.slots || []);
+    } catch (err: any) {
+      setRescheduleError(err.message || 'Error fetching available slots');
+      setRescheduleSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
+  }
+
+  function handleOpenReschedule(appt: Appointment) {
+    setRescheduleModalAppt(appt);
+    setRescheduleError(null);
+    setSelectedSlot(null);
+    setSelectedSlotStaffId(null);
+    const nowIST = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    setRescheduleDate(nowIST);
+    loadRescheduleSlots(nowIST, appt);
+  }
+
+  async function handleConfirmCancel() {
+    if (!cancelModalAppt) return;
+    setCancelling(true);
+    setCancelError(null);
+    try {
+      const res = await fetch(`/api/customer/appointments/${cancelModalAppt.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel' }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to cancel appointment');
+      }
+      setCancelModalAppt(null);
+      setPortalMessage({ type: 'success', text: 'Appointment cancelled successfully.' });
+      setTimeout(() => setPortalMessage(null), 5000);
+      await loadCustomerRecords();
+    } catch (err: any) {
+      setCancelError(err.message || 'Failed to cancel appointment');
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  async function handleConfirmReschedule() {
+    if (!rescheduleModalAppt || !selectedSlot || !rescheduleDate) return;
+    setRescheduling(true);
+    setRescheduleError(null);
+    try {
+      const res = await fetch(`/api/customer/appointments/${rescheduleModalAppt.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reschedule',
+          date: rescheduleDate,
+          time: selectedSlot,
+          staff_id: selectedSlotStaffId || rescheduleModalAppt.staff_id,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.isOverlap) {
+          if (rescheduleModalAppt) {
+            await loadRescheduleSlots(rescheduleDate, rescheduleModalAppt);
+          }
+        }
+        throw new Error(data.error || 'Failed to reschedule appointment');
+      }
+      setRescheduleModalAppt(null);
+      setPortalMessage({ type: 'success', text: 'Appointment rescheduled successfully!' });
+      setTimeout(() => setPortalMessage(null), 5000);
+      await loadCustomerRecords();
+    } catch (err: any) {
+      setRescheduleError(err.message || 'Failed to reschedule appointment');
+    } finally {
+      setRescheduling(false);
+    }
+  }
 
   async function checkSession() {
     try {
@@ -450,6 +574,23 @@ export default function CustomerPortalPage() {
         {/* ================= TAB 1: APPOINTMENTS ================= */}
         {activeTab === 'appointments' && (
           <div className="space-y-6 animate-fade-in">
+            {portalMessage && (
+              <div
+                className={`p-4 rounded-2xl border text-xs sm:text-sm flex items-center gap-2 font-medium ${
+                  portalMessage.type === 'success'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-300'
+                    : 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-950/40 dark:border-rose-800 dark:text-rose-300'
+                }`}
+              >
+                {portalMessage.type === 'success' ? (
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                )}
+                <span>{portalMessage.text}</span>
+              </div>
+            )}
+
             {/* Upcoming Appointments */}
             <div>
               <h2 className="text-sm font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8] mb-3">
@@ -479,41 +620,104 @@ export default function CustomerPortalPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {upcomingAppts.map((appt) => (
-                    <div
-                      key={appt.id}
-                      className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30 flex flex-col items-center justify-center font-bold">
-                          <span className="text-[10px] uppercase">{new Date(appt.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short' })}</span>
-                          <span className="text-base">{new Date(appt.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' })}</span>
-                        </div>
-                        <div>
-                          <div className="font-bold text-base text-[#1F2937] dark:text-white">{appt.service_name}</div>
-                          <div className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-0.5">
-                            Stylist: <span className="text-[#1F2937] dark:text-white font-semibold">{appt.staff_name}</span> ({appt.staff_role || 'Stylist'})
-                          </div>
-                          <div className="flex items-center gap-2 mt-2 text-xs text-[#6B7280] dark:text-[#A0A8B8]">
-                            <span className="flex items-center gap-1 text-[#D4A77F] font-medium">
-                              <Clock className="w-3.5 h-3.5" />
-                              {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            <span>·</span>
-                            <span>⏱ {appt.duration_min} mins</span>
-                            <span>·</span>
-                            <span className="font-bold text-[#1F2937] dark:text-white">₹{Number(appt.service_price).toLocaleString('en-IN')}</span>
-                          </div>
-                        </div>
-                      </div>
+                  {upcomingAppts.map((appt) => {
+                    const policyHours = salon?.cancel_policy_hours ?? 2;
+                    const isModifiable = canModifyAppointment(appt.starts_at, policyHours);
+                    const isScheduled = appt.status === 'scheduled';
+                    const maxReschedulesReached = (appt.rescheduled_count ?? 0) >= 2;
 
-                      <div className="flex items-center gap-2 self-end sm:self-auto">
-                        <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30">
-                          {appt.status}
-                        </span>
+                    return (
+                      <div
+                        key={appt.id}
+                        className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 shadow-xs space-y-4"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30 flex flex-col items-center justify-center font-bold shrink-0">
+                              <span className="text-[10px] uppercase">
+                                {new Date(appt.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short' })}
+                              </span>
+                              <span className="text-base">
+                                {new Date(appt.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric' })}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="font-bold text-base text-[#1F2937] dark:text-white">{appt.service_name}</div>
+                              <div className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-0.5">
+                                Stylist: <span className="text-[#1F2937] dark:text-white font-semibold">{appt.staff_name}</span> ({appt.staff_role || 'Stylist'})
+                              </div>
+                              <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-[#6B7280] dark:text-[#A0A8B8]">
+                                <span className="flex items-center gap-1 text-[#D4A77F] font-medium">
+                                  <Clock className="w-3.5 h-3.5" />
+                                  {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                                <span>·</span>
+                                <span>⏱ {appt.duration_min} mins</span>
+                                <span>·</span>
+                                <span className="font-bold text-[#1F2937] dark:text-white">₹{Number(appt.service_price).toLocaleString('en-IN')}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 self-start sm:self-center">
+                            {appt.rescheduled_count && appt.rescheduled_count > 0 ? (
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D4A77F]/20 text-[#B8905F] dark:text-[#D4A77F] border border-[#D4A77F]/30">
+                                Rescheduled ({appt.rescheduled_count}x)
+                              </span>
+                            ) : null}
+                            <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30">
+                              {appt.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Policy info and Cancel / Reschedule actions */}
+                        {isScheduled && (
+                          <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-1.5 text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
+                              <ShieldAlert className="w-3.5 h-3.5 text-[#D4A77F] shrink-0" />
+                              <span>Free cancellation up to {policyHours} hour{policyHours === 1 ? '' : 's'} before</span>
+                            </div>
+
+                            {isModifiable ? (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenReschedule(appt)}
+                                  disabled={maxReschedulesReached}
+                                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                                    maxReschedulesReached
+                                      ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
+                                      : 'bg-[#D4A77F]/15 hover:bg-[#D4A77F]/25 text-[#9E6E38] dark:text-[#D4A77F] border border-[#D4A77F]/30 cursor-pointer active:scale-95'
+                                  }`}
+                                  title={maxReschedulesReached ? 'Maximum 2 reschedules reached' : 'Reschedule visit'}
+                                >
+                                  {maxReschedulesReached ? 'Max Reschedules (2/2)' : 'Reschedule'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setCancelModalAppt(appt);
+                                    setCancelError(null);
+                                  }}
+                                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 border border-rose-200 dark:border-rose-900 transition-all cursor-pointer active:scale-95"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="text-[11px] text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-3 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800/60 flex items-center gap-1.5">
+                                <AlertCircle className="w-3.5 h-3.5 shrink-0 text-amber-600" />
+                                <span>
+                                  Cancellation closed. Please call the salon{salon?.phone ? ` at ${salon.phone}` : ''}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -550,7 +754,26 @@ export default function CustomerPortalPage() {
                       </div>
                       <div className="text-right">
                         <div className="font-bold text-[#1F2937] dark:text-white">₹{Number(appt.service_price).toLocaleString('en-IN')}</div>
-                        <span className="text-[10px] text-[#6B7280] dark:text-[#A0A8B8] capitalize">{appt.status}</span>
+                        <div className="flex items-center justify-end gap-1 mt-0.5">
+                          {appt.rescheduled_count && appt.rescheduled_count > 0 ? (
+                            <span className="text-[9px] px-1 py-0.2 rounded bg-[#D4A77F]/20 text-[#B8905F] dark:text-[#D4A77F]">
+                              Rescheduled
+                            </span>
+                          ) : null}
+                          <span
+                            className={`text-[10px] font-bold capitalize ${
+                              appt.status === 'cancelled'
+                                ? 'text-rose-600 dark:text-rose-400'
+                                : 'text-[#6B7280] dark:text-[#A0A8B8]'
+                            }`}
+                          >
+                            {appt.status === 'cancelled'
+                              ? appt.cancelled_by === 'customer'
+                                ? 'Cancelled (by you)'
+                                : 'Cancelled'
+                              : appt.status}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -712,6 +935,199 @@ export default function CustomerPortalPage() {
           </div>
         )}
       </div>
+
+      {/* ================= CANCEL CONFIRMATION MODAL ================= */}
+      {cancelModalAppt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 flex items-center justify-center">
+                  <AlertCircle className="w-4 h-4" />
+                </div>
+                <h3 className="font-extrabold text-base text-[#1F2937] dark:text-white">Cancel Appointment</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCancelModalAppt(null)}
+                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-sm text-[#4B5563] dark:text-[#9CA3AF]">
+              Are you sure you want to cancel your appointment for{' '}
+              <strong className="text-[#1F2937] dark:text-white">{cancelModalAppt.service_name}</strong> with{' '}
+              <strong className="text-[#1F2937] dark:text-white">{cancelModalAppt.staff_name}</strong> on{' '}
+              <strong className="text-[#1F2937] dark:text-white">
+                {new Date(cancelModalAppt.starts_at).toLocaleDateString('en-IN', {
+                  timeZone: 'Asia/Kolkata',
+                  weekday: 'short',
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </strong>{' '}
+              at{' '}
+              <strong className="text-[#1F2937] dark:text-white">
+                {new Date(cancelModalAppt.starts_at).toLocaleTimeString('en-IN', {
+                  timeZone: 'Asia/Kolkata',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </strong>
+              ?
+            </p>
+
+            {cancelError && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{cancelError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-3">
+              <button
+                type="button"
+                disabled={cancelling}
+                onClick={() => setCancelModalAppt(null)}
+                className="px-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all cursor-pointer"
+              >
+                No, Keep Visit
+              </button>
+              <button
+                type="button"
+                disabled={cancelling}
+                onClick={handleConfirmCancel}
+                className="px-4 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {cancelling ? 'Cancelling...' : 'Yes, Cancel Appointment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= RESCHEDULE MODAL ================= */}
+      {rescheduleModalAppt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/20 text-[#B8905F] dark:text-[#D4A77F] flex items-center justify-center font-bold">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-[#1F2937] dark:text-white">Reschedule Appointment</h3>
+                  <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
+                    {rescheduleModalAppt.service_name} · Stylist: {rescheduleModalAppt.staff_name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRescheduleModalAppt(null)}
+                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Date Picker */}
+            <div>
+              <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                Select New Date
+              </label>
+              <input
+                type="date"
+                min={new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })}
+                max={new Date(Date.now() + (salon?.max_advance_days || 30) * 86400000).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })}
+                value={rescheduleDate}
+                onChange={(e) => {
+                  const newD = e.target.value;
+                  setRescheduleDate(newD);
+                  if (rescheduleModalAppt) {
+                    loadRescheduleSlots(newD, rescheduleModalAppt);
+                  }
+                }}
+                className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-sm font-mono text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
+              />
+            </div>
+
+            {/* Available Slots */}
+            <div>
+              <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-2">
+                Choose Time Slot
+              </label>
+
+              {loadingSlots ? (
+                <div className="py-8 flex flex-col items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-[#D4A77F] border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-xs text-neutral-400 mt-2">Checking open slots...</span>
+                </div>
+              ) : rescheduleSlots.length === 0 ? (
+                <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-center text-xs text-neutral-500">
+                  No slots available on this date. Please pick another date.
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-56 overflow-y-auto p-1">
+                  {rescheduleSlots.map((slot) => {
+                    const isSelected = selectedSlot === slot.time;
+                    return (
+                      <button
+                        key={slot.time}
+                        type="button"
+                        onClick={() => {
+                          setSelectedSlot(slot.time);
+                          setSelectedSlotStaffId(slot.staffId);
+                        }}
+                        className={`p-2.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer border ${
+                          isSelected
+                            ? 'bg-[#D4A77F] text-[#080B12] border-[#D4A77F] shadow-sm font-extrabold scale-102'
+                            : 'bg-[#F9FAFB] dark:bg-[#10141F] text-[#1F2937] dark:text-neutral-200 border-[#E5E7EB] dark:border-[#2A2F3A] hover:border-[#D4A77F]'
+                        }`}
+                      >
+                        {slot.formattedTime}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {rescheduleError && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{rescheduleError}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A]">
+              <span className="text-[11px] text-neutral-400">
+                Reschedule {Number(rescheduleModalAppt.rescheduled_count || 0) + 1} of 2
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={rescheduling}
+                  onClick={() => setRescheduleModalAppt(null)}
+                  className="px-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={!selectedSlot || rescheduling}
+                  onClick={handleConfirmReschedule}
+                  className="px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-extrabold shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {rescheduling ? 'Saving...' : 'Confirm Reschedule'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Bottom Dock for Customer Portal */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] px-4 py-2 flex items-center justify-around shadow-2xl">

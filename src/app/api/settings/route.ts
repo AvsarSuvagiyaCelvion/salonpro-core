@@ -14,6 +14,7 @@ export async function GET(request: Request) {
       `SELECT id, name, slug, address, phone, brand_color, logo_url, custom_domain, custom_domain_verified,
               booking_enabled, open_time, close_time, slot_minutes, buffer_minutes,
               working_days, min_advance_hours, max_advance_days, send_reminders,
+              cancel_policy_hours,
               trial_ends_at, subscription_status, subscription_ends_at, subscription_plan_id
        FROM salons
        WHERE id = $1
@@ -71,6 +72,7 @@ async function handleUpdateSettings(request: Request) {
       min_advance_hours,
       max_advance_days,
       send_reminders,
+      cancel_policy_hours,
     } = body;
 
     // 5.3 Validations on settings updates
@@ -154,6 +156,18 @@ async function handleUpdateSettings(request: Request) {
       }
     }
 
+    let parsedCancelPolicyHours: number | null = null;
+    if (cancel_policy_hours !== undefined && cancel_policy_hours !== null && cancel_policy_hours !== '') {
+      const cancelHoursInt = parseInt(cancel_policy_hours, 10);
+      if (isNaN(cancelHoursInt) || cancelHoursInt < 0 || cancelHoursInt > 72) {
+        return NextResponse.json(
+          { error: 'Customers can cancel/reschedule up to 0 to 72 hours before.' },
+          { status: 400 }
+        );
+      }
+      parsedCancelPolicyHours = cancelHoursInt;
+    }
+
     // Feature gating: logo_upload (only enforce if user is actively changing/uploading a new logo)
     if (logo_url !== undefined && logo_url) {
       const curSalon = await query('SELECT logo_url FROM salons WHERE id = $1', [salonId]);
@@ -212,8 +226,9 @@ async function handleUpdateSettings(request: Request) {
            min_advance_hours = COALESCE($12, min_advance_hours),
            max_advance_days = COALESCE($13, max_advance_days),
            send_reminders = COALESCE($14, send_reminders),
-           custom_domain = COALESCE($15, custom_domain)
-       WHERE id = $16
+           custom_domain = COALESCE($15, custom_domain),
+           cancel_policy_hours = COALESCE($16::integer, cancel_policy_hours)
+       WHERE id = $17::uuid
        RETURNING *`,
       [
         name,
@@ -231,6 +246,7 @@ async function handleUpdateSettings(request: Request) {
         max_advance_days,
         send_reminders,
         custom_domain,
+        parsedCancelPolicyHours,
         salonId,
       ]
     );

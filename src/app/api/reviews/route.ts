@@ -3,11 +3,31 @@ import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
 import { serverError } from '@/lib/http';
 import { getSalonPlan } from '@/lib/plan';
+import { DEMO_REVIEWS, DEMO_REVIEW_STATS } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        reviews: DEMO_REVIEWS,
+        stats: DEMO_REVIEW_STATS,
+        staffStats: [
+          { staffId: 'stf-1', staffName: 'Priya Patel', reviewCount: 14, averageRating: 4.9 },
+          { staffId: 'stf-2', staffName: 'Neha Shah', reviewCount: 9, averageRating: 5.0 },
+          { staffId: 'stf-3', staffName: 'Ananya Sharma', reviewCount: 5, averageRating: 4.8 },
+        ],
+        planAllowed: true,
+        pagination: {
+          page: 1,
+          pageSize: 15,
+          totalRecords: DEMO_REVIEWS.length,
+          totalPages: 1,
+        },
+      });
+    }
 
     const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);

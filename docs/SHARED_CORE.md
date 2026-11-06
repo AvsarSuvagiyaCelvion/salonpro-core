@@ -1,6 +1,6 @@
 # Shared Core Architecture & Infrastructure
 
-> **Last verified:** 2026-11-06 (Full access control, exception handling, and error response audit)  
+> **Last verified:** 2026-11-06 (Complete DB cleanup & 100% static in-code demo architecture verified)  
 > **Status:** Verified against source code
 
 ---
@@ -167,11 +167,12 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts` an
 
 ---
 
-## 10. Demo Mode Rules
+## 10. Demo Mode Rules (100% Static In-Code Architecture)
 - **Demo Salon Slug**: `dixa-beauty-salon`.
-- **Public Booking**: In `src/app/api/public/[slug]/book/route.ts`, bookings for `dixa-beauty-salon` simulate success, format WhatsApp links, and return without writing to the database.
-- **Customer Cancellation & Rescheduling**: In `src/app/api/customer/appointments/[id]/route.ts`, simulated success is returned without altering persistent rows.
-- **One-Click Owner Login**: `/api/demo/owner-login` allows public instant sign-in into the demo salon ERP dashboard without password prompts.
+- **Zero Database Dependency**: All demo capabilities for both the client booking showcase (`/[slug]`, slots, bookings) and the salon owner ERP dashboard (`/app`, stats, staff, services, appointments, live studio, reviews, billing) run entirely on static in-memory data defined in `src/lib/demo-data.ts`.
+- **Database Cleansing & Isolation**: The PostgreSQL database contains ZERO demo rows. Resetting or clearing the database (`npm run db:clean`) leaves demo functionality 100% operative and intact.
+- **One-Click Owner Login**: `/api/demo/owner-login` instantly issues a signed JWT session cookie for `owner@dixabeautysalon.in` without performing database queries.
+- **Tenant Context Bypass**: In `src/lib/api-auth.ts`, session verification recognizes `dixa-beauty-salon` and provisions full Pro tier features and limits without querying `users` or `salons` tables.
 - **Production Seed Guard**: `scripts/setup-db.js` blocks `--seed` execution if `NODE_ENV === 'production'`.
 
 ---

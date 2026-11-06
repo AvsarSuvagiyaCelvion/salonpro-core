@@ -120,6 +120,55 @@ export async function requireTenant(
       };
     }
 
+    // Static Demo Owner Workspace Bypass (requires ZERO database rows)
+    if (payload.salonSlug === 'dixa-beauty-salon' || payload.email.toLowerCase() === 'owner@dixabeautysalon.in') {
+      return {
+        session: {
+          email: 'owner@dixabeautysalon.in',
+          role: 'owner',
+          salonId: '00000000-0000-0000-0000-000000000001',
+          userId: '00000000-0000-0000-0000-000000000002',
+          salonSlug: 'dixa-beauty-salon',
+          plan: {
+            salonId: '00000000-0000-0000-0000-000000000001',
+            salonName: 'Dixa Beauty Salon',
+            planSlug: 'pro',
+            planName: 'Pro Studio',
+            status: 'active',
+            isTrial: false,
+            isTrialExpired: false,
+            trialDaysRemaining: 0,
+            trialEndsAt: null,
+            subscriptionEndsAt: '2030-12-31T23:59:59.000Z',
+            subscriptionDaysRemaining: 999,
+            isSubscriptionExpiringSoon: false,
+            customDomainVerified: false,
+            isActive: true,
+            flags: {
+              logo_upload: true,
+              commission_report: true,
+              memberships: true,
+              calendar_view: true,
+              customer_cancel: true,
+              export: true,
+              coupons: true,
+              reviews: true,
+              loyalty: true,
+              custom_domain: false,
+              multi_branch: false,
+              priority_support: false,
+            },
+            limits: {
+              max_staff: 10,
+              max_services: 100,
+              wa_per_month: 500,
+            },
+          },
+        },
+        error: null,
+      };
+    }
+
     const cacheKey = payload.email.toLowerCase();
     const cached = userAuthCache.get(cacheKey);
 

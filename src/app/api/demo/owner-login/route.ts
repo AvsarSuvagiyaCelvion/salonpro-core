@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
+import {
+  DEMO_SALON_ID,
+  DEMO_USER_ID,
+  DEMO_SALON_SLUG,
+  DEMO_OWNER_EMAIL,
+} from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   return handleDemoLogin(request);
@@ -12,58 +17,37 @@ export async function POST(request: Request) {
 
 async function handleDemoLogin(request: Request) {
   try {
-    // 1. Locate the official demo salon (dixa-beauty-salon) or fallback to first active salon
-    let salonRes = await query(
-      `SELECT u.id as user_id, u.email, u.role, u.full_name,
-              s.id as salon_id, s.name as salon_name, s.slug as salon_slug
-       FROM salons s
-       JOIN users u ON u.salon_id = s.id
-       WHERE LOWER(s.slug) = 'dixa-beauty-salon' AND u.role = 'owner'
-       LIMIT 1`
-    );
-
-    if (salonRes.rows.length === 0) {
-      // Fallback: any active salon with an owner
-      salonRes = await query(
-        `SELECT u.id as user_id, u.email, u.role, u.full_name,
-                s.id as salon_id, s.name as salon_name, s.slug as salon_slug
-         FROM salons s
-         JOIN users u ON u.salon_id = s.id
-         WHERE s.is_active = true AND u.role = 'owner'
-         LIMIT 1`
-      );
-    }
-
-    if (salonRes.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'No demo salon workspace available at this moment.' },
-        { status: 404 }
-      );
-    }
-
-    const demoData = salonRes.rows[0];
-
-    // 2. Generate a valid session token for this demo owner
+    // Generate a valid signed session token for static demo owner without DB dependence
     const sessionToken = await createSessionToken({
-      email: demoData.email,
-      role: demoData.role || 'owner',
-      salonId: demoData.salon_id,
-      userId: demoData.user_id,
-      salonSlug: demoData.salon_slug,
+      email: DEMO_OWNER_EMAIL,
+      role: 'owner',
+      salonId: DEMO_SALON_ID,
+      userId: DEMO_USER_ID,
+      salonSlug: DEMO_SALON_SLUG,
     });
 
-    // 3. Construct response (redirect to /app or return JSON)
     const searchParams = new URL(request.url).searchParams;
-    const isJson = searchParams.get('format') === 'json' || request.headers.get('accept')?.includes('application/json');
+    const isJson =
+      searchParams.get('format') === 'json' ||
+      request.headers.get('accept')?.includes('application/json');
 
     const url = new URL('/app', request.url);
     url.searchParams.set('demo', 'true');
 
     const response = isJson
-      ? NextResponse.json({ success: true, redirectUrl: url.toString() })
+      ? NextResponse.json({
+          success: true,
+          message: 'Logged in to Dixa Beauty Salon demo workspace',
+          user: {
+            email: DEMO_OWNER_EMAIL,
+            role: 'owner',
+            salonId: DEMO_SALON_ID,
+            salonSlug: DEMO_SALON_SLUG,
+          },
+          redirectTo: '/app?demo=true',
+        })
       : NextResponse.redirect(url);
 
-    // 4. Set the session cookie
     response.cookies.set({
       name: COOKIE_NAME,
       value: sessionToken,
@@ -71,14 +55,13 @@ async function handleDemoLogin(request: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 7 * 24 * 60 * 60,
     });
 
     return response;
-  } catch (error: any) {
-    console.error('Demo owner login error:', error);
+  } catch (err: any) {
     return NextResponse.json(
-      { error: 'Failed to launch demo salon dashboard.' },
+      { error: 'Failed to initialize demo login session' },
       { status: 500 }
     );
   }

@@ -3,11 +3,24 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
 import { normalizeMobile } from '@/lib/phone';
+import { DEMO_CUSTOMERS } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        customers: DEMO_CUSTOMERS,
+        pagination: {
+          page: 1,
+          pageSize: 50,
+          totalRecords: DEMO_CUSTOMERS.length,
+          totalPages: 1,
+        },
+      });
+    }
 
     const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);

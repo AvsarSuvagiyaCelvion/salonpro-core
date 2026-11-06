@@ -2,6 +2,7 @@ import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { DEMO_APPOINTMENTS } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
@@ -15,6 +16,33 @@ export async function GET(request: Request) {
     const now = new Date();
     // Get current date in Indian Standard Time (Asia/Kolkata)
     const todayIST = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' }); // "YYYY-MM-DD"
+
+    // Static Demo Dashboard Stats (Zero Database Dependency)
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        period,
+        totalRevenue: 14250,
+        completedSessions: 8,
+        totalCustomers: 142,
+        activeStaff: 3,
+        chartData: [
+          { date: todayIST, label: 'Today', amount: 14250 },
+        ],
+        popularServices: [
+          { name: 'Signature Haircut & Styling', times_booked: '64', total_revenue: '41600' },
+          { name: 'Hydra Glow Luxury Facial', times_booked: '48', total_revenue: '86400' },
+          { name: 'Bridal Makeup & Draping', times_booked: '18', total_revenue: '81000' },
+        ],
+        topStaff: [
+          { name: 'Priya Patel', role_title: 'Creative Master Stylist', session_count: '34', total_revenue: '42500' },
+          { name: 'Neha Shah', role_title: 'Senior Skin & Spa Specialist', session_count: '28', total_revenue: '38200' },
+          { name: 'Ananya Sharma', role_title: 'Celebrity Makeup & Nails', session_count: '19', total_revenue: '54000' },
+        ],
+        paymentStatusCounts: { paid: 8, partial: 0, pending: 0 },
+        recentAppointments: DEMO_APPOINTMENTS,
+        lowStockProducts: [],
+      });
+    }
 
     let startIso: string;
     let daysCount = 1;

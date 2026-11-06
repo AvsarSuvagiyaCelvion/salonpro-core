@@ -4,11 +4,24 @@ import { query } from '@/lib/db';
 import { requireTenant, requireRole, invalidateUserAuthCache } from '@/lib/api-auth';
 import { requireFeature, invalidateSalonPlanCache } from '@/lib/plan';
 import { isAllowedSalonImageUrl, deleteFromStorage, BUCKET_NAME } from '@/lib/storage';
+import { DEMO_SALON, DEMO_PHOTOS, DEMO_OWNER_EMAIL } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request, { allowExpired: true });
     if (auth.error) return auth.error;
+
+    // Static Demo Settings
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        salon: DEMO_SALON,
+        photos: DEMO_PHOTOS,
+        user: {
+          email: DEMO_OWNER_EMAIL,
+          role: 'owner',
+        },
+      });
+    }
 
     const salonId = auth.session.salonId;
     const res = await query(
@@ -62,6 +75,15 @@ async function handleUpdateSettings(request: Request) {
 
     const roleErr = requireRole(auth.session, ['owner']);
     if (roleErr) return roleErr;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const body = await request.json().catch(() => ({}));
+      return NextResponse.json({
+        success: true,
+        salon: { ...DEMO_SALON, ...body },
+        message: 'Settings updated successfully (Demo Mode).',
+      });
+    }
 
     const salonId = auth.session.salonId;
     const body = await request.json();

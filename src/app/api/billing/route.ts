@@ -2,11 +2,24 @@ import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { DEMO_INVOICES } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        invoices: DEMO_INVOICES,
+        pagination: {
+          page: 1,
+          pageSize: 50,
+          totalRecords: DEMO_INVOICES.length,
+          totalPages: 1,
+        },
+      });
+    }
 
     const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);

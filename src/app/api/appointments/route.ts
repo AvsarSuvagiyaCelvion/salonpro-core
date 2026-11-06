@@ -2,11 +2,34 @@ import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { DEMO_APPOINTMENTS } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const body = await request.json().catch(() => ({}));
+      return NextResponse.json({
+        success: true,
+        message: 'Appointment scheduled (Demo Simulation)',
+        appointment: { ...DEMO_APPOINTMENTS[0], ...body, id: `appt-demo-${Date.now()}` },
+      });
+    }
+
+    // Static Demo Appointments
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        appointments: DEMO_APPOINTMENTS,
+        pagination: {
+          page: 1,
+          pageSize: 50,
+          totalRecords: DEMO_APPOINTMENTS.length,
+          totalPages: 1,
+        },
+      });
+    }
 
     const salonId = auth.session.salonId;
     const { searchParams } = new URL(request.url);
@@ -81,6 +104,15 @@ export async function POST(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const body = await request.json().catch(() => ({}));
+      return NextResponse.json({
+        success: true,
+        message: 'Appointment scheduled (Demo Simulation)',
+        appointment: { ...DEMO_APPOINTMENTS[0], ...body, id: `appt-demo-${Date.now()}` },
+      });
+    }
 
     const salonId = auth.session.salonId;
     const body = await request.json();

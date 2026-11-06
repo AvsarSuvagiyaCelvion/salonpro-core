@@ -8,6 +8,40 @@ export async function GET(request: Request) {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
 
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        waiting: [
+          {
+            id: 'wait-demo-1',
+            created_at: new Date(Date.now() - 600000).toISOString(),
+            customer_id: 'cust-2',
+            customer_name: 'Ritu Sharma',
+            customer_mobile: '9825100002',
+          },
+        ],
+        sessions: [
+          {
+            id: 'sess-demo-1',
+            started_at: new Date(Date.now() - 1800000).toISOString(),
+            status: 'active',
+            customer_id: 'cust-1',
+            customer_name: 'Diya Joshi',
+            customer_mobile: '9825100001',
+            items: [
+              {
+                id: 'item-demo-1',
+                kind: 'service',
+                name: 'Signature Haircut & Styling',
+                unit_price: 650,
+                qty: 1,
+                staff_name: 'Priya Patel',
+              },
+            ],
+          },
+        ],
+      });
+    }
+
     const salonId = auth.session.salonId;
 
     // 1. Waiting customers

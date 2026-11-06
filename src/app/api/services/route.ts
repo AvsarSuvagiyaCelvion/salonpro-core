@@ -3,11 +3,16 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant, requireRole } from '@/lib/api-auth';
 import { checkLimit } from '@/lib/plan';
+import { DEMO_SERVICES } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({ services: DEMO_SERVICES });
+    }
 
     const salonId = auth.session.salonId;
     const res = await query(
@@ -31,6 +36,23 @@ export async function POST(request: Request) {
 
     const roleErr = requireRole(auth.session, ['owner']);
     if (roleErr) return roleErr;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const body = await request.json().catch(() => ({}));
+      return NextResponse.json({
+        service: {
+          id: `srv-demo-${Date.now()}`,
+          salon_id: auth.session.salonId,
+          name: body.name || 'Demo Service',
+          category: body.category || 'General',
+          description: body.description || '',
+          duration_min: Number(body.duration_min) || 30,
+          price: Number(body.price) || 500,
+          online_enabled: body.online_enabled ?? true,
+        },
+        message: 'Service added successfully (Demo Mode)',
+      });
+    }
 
     const salonId = auth.session.salonId;
 

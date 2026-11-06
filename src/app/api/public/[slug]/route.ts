@@ -3,6 +3,13 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getSalonPlan } from '@/lib/plan';
 import { getSalonHolidays } from '@/lib/holidays';
+import {
+  DEMO_SALON,
+  DEMO_SERVICES,
+  DEMO_STAFF,
+  DEMO_PHOTOS,
+  DEMO_REVIEWS,
+} from '@/lib/demo-data';
 
 export async function GET(
   request: Request,
@@ -10,6 +17,43 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
+
+    // Static Demo Showcase Handler (Zero Database Dependency)
+    if (slug.toLowerCase().trim() === 'dixa-beauty-salon') {
+      return NextResponse.json({
+        salon: DEMO_SALON,
+        services: DEMO_SERVICES,
+        staff: DEMO_STAFF.map((s) => ({ id: s.id, name: s.name, role_title: s.role_title })),
+        staffServices: [
+          { staff_id: 'stf-1', service_id: 'srv-1' },
+          { staff_id: 'stf-1', service_id: 'srv-5' },
+          { staff_id: 'stf-2', service_id: 'srv-2' },
+          { staff_id: 'stf-2', service_id: 'srv-6' },
+          { staff_id: 'stf-3', service_id: 'srv-3' },
+          { staff_id: 'stf-3', service_id: 'srv-4' },
+        ],
+        holidays: [],
+        photos: DEMO_PHOTOS,
+        reviewsSummary: {
+          average: 4.9,
+          count: 28,
+          enabled: true,
+        },
+        reviews: DEMO_REVIEWS.map((r) => ({
+          id: r.id,
+          rating: r.rating,
+          comment: r.comment,
+          owner_reply: r.owner_reply,
+          owner_replied_at: r.owner_replied_at,
+          created_at: r.created_at,
+          service_name: r.service_name,
+          customer_name:
+            r.customer_name.split(' ')[0] +
+            ' ' +
+            (r.customer_name.split(' ')[1] ? r.customer_name.split(' ')[1][0] + '.' : ''),
+        })),
+      });
+    }
 
     // Fetch salon
     const salonRes = await query(

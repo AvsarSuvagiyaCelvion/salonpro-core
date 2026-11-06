@@ -11,6 +11,15 @@ export async function PATCH(
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
 
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const { id } = await params;
+      const body = await request.json().catch(() => ({}));
+      return NextResponse.json({
+        appointment: { id, status: body.status || 'done' },
+        message: `Appointment marked as ${body.status || 'done'} (Demo Simulation)`,
+      });
+    }
+
     const salonId = auth.session.salonId;
     const { id } = await params;
     const body = await request.json();
@@ -60,6 +69,15 @@ export async function DELETE(
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const { id } = await params;
+      const body = await request.json().catch(() => ({}));
+      return NextResponse.json({
+        appointment: { id, status: body.status || 'done' },
+        message: `Appointment marked as ${body.status || 'done'} (Demo Simulation)`,
+      });
+    }
 
     const salonId = auth.session.salonId;
     const { id } = await params;

@@ -1,6 +1,6 @@
 # Owner & Staff Panel (ERP) Documentation
 
-> **Last verified:** 2026-11-06 (Staff vs Owner role restrictions, masked commissions, and settings guards verified)  
+> **Last verified:** 2026-11-06 (Complete DB cleanup & static in-code demo owner ERP verified)  
 > **Status:** Verified against source code
 
 ---

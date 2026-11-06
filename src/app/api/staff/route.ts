@@ -3,11 +3,16 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant, requireRole } from '@/lib/api-auth';
 import { checkLimit } from '@/lib/plan';
+import { DEMO_STAFF } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
   try {
     const auth = await requireTenant(request);
     if (auth.error) return auth.error;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      return NextResponse.json({ staff: DEMO_STAFF, canViewCommission: true });
+    }
 
     const salonId = auth.session.salonId;
     const staffRes = await query(
@@ -80,6 +85,23 @@ export async function POST(request: Request) {
 
     const roleErr = requireRole(auth.session, ['owner']);
     if (roleErr) return roleErr;
+
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const body = await request.json().catch(() => ({}));
+      return NextResponse.json({
+        staff: {
+          id: `stf-demo-${Date.now()}`,
+          name: body.name || 'Demo Stylist',
+          role_title: body.role_title || 'Stylist',
+          service_commission_pct: Number(body.service_commission_pct) || 10,
+          product_commission_pct: Number(body.product_commission_pct) || 5,
+          active: body.active ?? true,
+          show_online: body.show_online ?? true,
+          services: [],
+        },
+        message: 'Staff member added (Demo Mode)',
+      });
+    }
 
     const salonId = auth.session.salonId;
 

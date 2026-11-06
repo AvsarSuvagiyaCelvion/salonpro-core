@@ -1,6 +1,6 @@
 # Customer Panel Documentation
 
-> **Last verified:** 2026-11-06 (Universal client authentication & PIN workflow verified)  
+> **Last verified:** 2026-11-06 (Complete DB cleanup & static in-code demo booking verified)  
 > **Status:** Verified against source code
 
 ---

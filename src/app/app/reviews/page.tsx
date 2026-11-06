@@ -643,9 +643,9 @@ export default function OwnerReviewsPage() {
 
       {/* ================= MODAL: ADD / EDIT OWNER REPLY ================= */}
       {replyModalReview && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center animate-fade-in">
+          <div className="relative bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl max-w-lg w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#E5E7EB] dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center font-bold">
                   <MessageSquare className="w-4 h-4" />
@@ -662,11 +662,13 @@ export default function OwnerReviewsPage() {
               <button
                 type="button"
                 onClick={() => setReplyModalReview(null)}
-                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer p-1"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
+
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 touch-scroll">
 
             {/* Client Comment Preview */}
             {replyModalReview.comment && (
@@ -712,6 +714,7 @@ export default function OwnerReviewsPage() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

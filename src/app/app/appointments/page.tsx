@@ -1376,33 +1376,34 @@ export default function AppointmentsPage() {
 
       {/* ================= MODAL: NEW APPOINTMENT ================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#141926] rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xl max-w-lg w-full p-6 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xl max-w-lg w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#E5E7EB] dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
               <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
                 <CalendarIcon className="w-4 h-4 text-[#D4A77F]" />
                 <span>Book New Salon Appointment</span>
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-neutral-400 hover:text-[#1F2937] dark:hover:text-white cursor-pointer"
+                className="text-neutral-400 hover:text-[#1F2937] dark:hover:text-white cursor-pointer p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Collision Error Alert */}
-            {overlapError && (
-              <div className="mt-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-xs text-amber-950 dark:text-amber-200 font-medium flex items-start gap-2.5">
-                <ShieldAlert className="w-4 h-4 text-amber-900 dark:text-amber-300 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-amber-900 dark:text-amber-300">Stylist Collision Conflict:</p>
-                  <p className="mt-0.5">{overlapError}</p>
+            <div className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 touch-scroll">
+              {/* Collision Error Alert */}
+              {overlapError && (
+                <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-xs text-amber-950 dark:text-amber-200 font-medium flex items-start gap-2.5">
+                  <ShieldAlert className="w-4 h-4 text-amber-900 dark:text-amber-300 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-amber-900 dark:text-amber-300">Stylist Collision Conflict:</p>
+                    <p className="mt-0.5">{overlapError}</p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <form onSubmit={handleCreateAppointment} className="mt-4 space-y-4">
+              <form onSubmit={handleCreateAppointment} className="space-y-4">
               {/* Customer Selector / Toggle */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -1568,6 +1569,7 @@ export default function AppointmentsPage() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

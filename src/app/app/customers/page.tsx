@@ -459,10 +459,10 @@ export default function CustomersPage() {
 
       {/* ================= MODAL: CUSTOMER BILLS & SERVICES HISTORY ================= */}
       {selectedCustomerForBills && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-2xl w-full p-6 animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-2xl w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
             {/* Modal Header */}
-            <div className="flex items-start justify-between pb-3 border-b border-neutral-100">
+            <div className="flex items-start justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center font-bold text-sm">
                   <Receipt className="w-5 h-5" />
@@ -471,7 +471,7 @@ export default function CustomersPage() {
                   <h2 className="text-base font-bold text-[#1F2937] dark:text-white">
                     Bill History: {selectedCustomerForBills.name}
                   </h2>
-                  <p className="text-xs text-neutral-500 flex flex-wrap items-center gap-1.5 mt-0.5">
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 flex flex-wrap items-center gap-1.5 mt-0.5">
                     <Phone className="w-3 h-3" />
                     <span>+91 {selectedCustomerForBills.mobile}</span>
                     {selectedCustomerForBills.email && (
@@ -497,14 +497,14 @@ export default function CustomersPage() {
               </div>
               <button
                 onClick={() => setSelectedCustomerForBills(null)}
-                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Invoices List */}
-            <div className="flex-1 overflow-y-auto py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 touch-scroll">
               {loadingBills ? (
                 <div className="p-8 text-center text-neutral-400 text-sm">
                   Loading invoices and services for {selectedCustomerForBills.name}...
@@ -607,14 +607,14 @@ export default function CustomersPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between">
-              <span className="text-xs text-neutral-500">
+            <div className="p-4 sm:p-5 border-t border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-between shrink-0 bg-white dark:bg-[#141926]">
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">
                 Showing {customerInvoices.length} invoice(s) for this client
               </span>
               <button
                 type="button"
                 onClick={() => setSelectedCustomerForBills(null)}
-                className="px-4 py-2 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold bg-neutral-100 dark:bg-[#1C2230] hover:bg-neutral-200 dark:hover:bg-[#252C3D] text-neutral-700 dark:text-neutral-200 rounded-xl cursor-pointer transition-colors"
               >
                 Close
               </button>
@@ -625,22 +625,22 @@ export default function CustomersPage() {
 
       {/* ================= MODAL: ADD / EDIT CUSTOMER ================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
-              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-md w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
+              <h2 className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
                 <Users className="w-4 h-4 text-[#D4A77F]" />
                 <span>{editingCustomer ? 'Edit Client Profile' : 'Register New Client'}</span>
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+            <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 touch-scroll">
               <div>
                 <label className="block text-xs font-semibold text-neutral-700 mb-1">
                   Client Full Name *
@@ -741,10 +741,10 @@ export default function CustomersPage() {
       )}
       {/* ================= MODAL 3: BULK WHATSAPP BROADCAST ================= */}
       {isBroadcastModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-neutral-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-lg w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
             {/* Modal Header */}
-            <div className="bg-[#075e54] text-white p-4 flex items-center justify-between">
+            <div className="bg-[#075e54] text-white p-4 flex items-center justify-between shrink-0 shadow-xs">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-2xl bg-emerald-700/80 flex items-center justify-center text-base shadow-xs">
                   📢
@@ -765,7 +765,7 @@ export default function CustomersPage() {
               </button>
             </div>
 
-            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4 text-xs touch-scroll">
               {broadcastSentCount !== null ? (
                 <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
                   <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center text-xl font-bold">

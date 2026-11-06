@@ -897,10 +897,9 @@ export default function StaffPage() {
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* TAB 1: WEEKLY SHIFTS */}
-            {scheduleTab === 'shifts' && (
+              {/* TAB 1: WEEKLY SHIFTS */}
+              {scheduleTab === 'shifts' && (
               <div className="pt-1 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-xl bg-neutral-50 dark:bg-[#10141E] border border-neutral-200/70 dark:border-[#2A2F3A] text-xs">
                   <div className="text-neutral-600 dark:text-neutral-300">
@@ -1147,6 +1146,7 @@ export default function StaffPage() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
       )}

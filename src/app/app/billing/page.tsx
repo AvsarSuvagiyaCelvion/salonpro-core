@@ -471,22 +471,22 @@ export default function BillingPage() {
 
       {/* ================= PAYMENT MODAL ================= */}
       {paymentModalInvoice && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-md w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
+              <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-emerald-600" />
                 <span>Process Payment ({paymentModalInvoice.number})</span>
               </h2>
               <button
                 onClick={() => setPaymentModalInvoice(null)}
-                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleProcessPayment} className="space-y-4 pt-4">
+            <form onSubmit={handleProcessPayment} className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 touch-scroll">
               <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-200 text-xs space-y-1">
                 <div className="flex justify-between text-neutral-600">
                   <span>Client:</span>
@@ -591,10 +591,10 @@ export default function BillingPage() {
 
       {/* ================= WHATSAPP PREVIEW MODAL ================= */}
       {whatsappInvoice && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#e5ddd5] rounded-2xl border border-neutral-300 shadow-2xl max-w-sm w-full overflow-hidden animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-[#e5ddd5] dark:bg-[#0B141A] rounded-2xl border border-neutral-300 dark:border-[#222E35] shadow-2xl max-w-sm w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
             {/* WhatsApp Header */}
-            <div className="bg-[#075e54] text-white p-3.5 flex items-center justify-between shadow-xs">
+            <div className="bg-[#075e54] text-white p-3.5 flex items-center justify-between shrink-0 shadow-xs">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-emerald-700 flex items-center justify-center text-xs font-bold ring-1 ring-white/30">
                   SP
@@ -615,7 +615,7 @@ export default function BillingPage() {
             </div>
 
             {/* Chat Body */}
-            <div className="p-4 space-y-3">
+            <div className="p-3 sm:p-4 space-y-3 overflow-y-auto flex-1 touch-scroll">
               <div className="bg-white rounded-xl p-3.5 shadow-xs text-xs space-y-2 border border-neutral-200/50">
                 <p className="font-bold text-[#075e54] text-sm">
                   ✨ Salon Bill Receipt
@@ -713,23 +713,23 @@ export default function BillingPage() {
       )}
       {/* ================= MODAL: FULL BILL RECEIPT ================= */}
       {viewInvoice && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-md w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-              <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
+              <span className="text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
                 Official Bill Receipt
               </span>
               <button
                 onClick={() => setViewInvoice(null)}
-                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Printable Receipt Body */}
-            <div className="py-4 space-y-4 flex-1 overflow-y-auto">
+            <div className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto touch-scroll">
               {/* Salon Brand Header */}
               <div className="text-center pb-3 border-b border-dashed border-neutral-200">
                 <h2 className="text-xl font-black text-[#1F2937] dark:text-white tracking-tight">

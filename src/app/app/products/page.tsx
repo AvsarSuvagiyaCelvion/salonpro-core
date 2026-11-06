@@ -723,11 +723,11 @@ export default function ProductsPage() {
 
       {/* ================= MODAL: QUICK RETAIL SELL POS ================= */}
       {isSellModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100 mb-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="relative bg-white dark:bg-[#141926] rounded-3xl max-w-lg w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-[#2A2F3A]">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
                   <ShoppingCart className="w-4 h-4" />
                 </div>
                 <div>
@@ -738,12 +738,13 @@ export default function ProductsPage() {
               <button
                 type="button"
                 onClick={() => setIsSellModalOpen(false)}
-                className="p-1 rounded-xl text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100"
+                className="p-1 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#1C2230]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1 touch-scroll">
             {saleSuccessInfo ? (
               <div className="text-center py-4 space-y-4 animate-scale-in">
                 <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
@@ -992,28 +993,29 @@ export default function ProductsPage() {
                 </div>
               </form>
             )}
+            </div>
           </div>
         </div>
       )}
 
       {/* ================= MODAL: ADD / EDIT PRODUCT ================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-neutral-200 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100 mb-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="relative bg-white dark:bg-[#141926] rounded-3xl max-w-lg w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-[#2A2F3A]">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
               <h3 className="font-black text-base text-[#1F2937] dark:text-white">
                 {editingProduct ? 'Edit Retail Product' : 'Add New Retail Product'}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-xl text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100"
+                className="p-1 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-[#1C2230]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitProduct} className="space-y-4">
+            <form onSubmit={handleSubmitProduct} className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 touch-scroll">
               <div>
                 <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
                   Product Name <span className="text-[#D4A77F]">*</span>

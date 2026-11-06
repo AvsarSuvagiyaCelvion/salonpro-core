@@ -491,6 +491,10 @@ export default function CustomerPortalPage() {
       return;
     }
 
+    const lastSalon = typeof window !== 'undefined' ? localStorage.getItem('salonpro_last_salon') : null;
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const salonSlugParam = urlParams?.get('salon') || urlParams?.get('slug') || lastSalon || undefined;
+
     try {
       const res = await fetch('/api/customer/auth', {
         method: 'POST',
@@ -502,11 +506,16 @@ export default function CustomerPortalPage() {
           email: authEmail,
           pin: authPin,
           confirmPin: authMode === 'signup' ? authConfirmPin : undefined,
+          salonSlug: salonSlugParam,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Authentication failed');
+
+      if (data.customer?.salon_slug && typeof window !== 'undefined') {
+        localStorage.setItem('salonpro_last_salon', data.customer.salon_slug);
+      }
 
       setLoggedIn(true);
       setCustomer(data.customer);

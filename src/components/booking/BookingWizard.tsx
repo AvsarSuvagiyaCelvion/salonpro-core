@@ -161,6 +161,9 @@ export default function BookingWizard({ slug }: { slug: string }) {
         }
         const data = await res.json();
         setSalon(data.salon);
+        if (slug && typeof window !== 'undefined') {
+          try { localStorage.setItem('salonpro_last_salon', slug); } catch {}
+        }
         setPhotos(data.photos || []);
         const fetchedServices = data.services || [];
         setServices(fetchedServices);

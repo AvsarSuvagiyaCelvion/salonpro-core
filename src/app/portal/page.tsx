@@ -954,7 +954,7 @@ export default function CustomerPortalPage() {
                 <div className="space-y-2.5">
                   {pastAppts.map((appt) => {
                     const existingReview = reviewsMap[appt.id];
-                    const isCompleted = appt.status === 'completed';
+                    const isCompleted = appt.status === 'completed' || appt.status === 'done';
                     const apptTime = new Date(appt.ends_at || appt.starts_at).getTime();
                     const isWithin30Days = Date.now() - apptTime <= 30 * 24 * 60 * 60 * 1000;
                     const canReview = isCompleted && !existingReview && isWithin30Days;
@@ -997,7 +997,7 @@ export default function CustomerPortalPage() {
                                 className={`text-[10px] font-bold capitalize ${
                                   appt.status === 'cancelled'
                                     ? 'text-rose-600 dark:text-rose-400'
-                                    : appt.status === 'completed'
+                                    : appt.status === 'completed' || appt.status === 'done'
                                     ? 'text-emerald-600 dark:text-emerald-400'
                                     : 'text-[#6B7280] dark:text-[#A0A8B8]'
                                 }`}
@@ -1006,6 +1006,8 @@ export default function CustomerPortalPage() {
                                   ? appt.cancelled_by === 'customer'
                                     ? 'Cancelled (by you)'
                                     : 'Cancelled'
+                                  : appt.status === 'done'
+                                  ? 'Completed'
                                   : appt.status}
                               </span>
                             </div>

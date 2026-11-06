@@ -67,8 +67,11 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const body = await request.json().catch(() => ({}));
-    const { name, email, address, avatar_url } = body;
+    const rawBody = await request.json().catch(() => ({}));
+    if (rawBody === null || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
+      return NextResponse.json({ error: 'Request body must be a valid JSON object.' }, { status: 400 });
+    }
+    const { name, email, address, avatar_url } = rawBody;
 
     // 1. Validate Name (if provided: 2-60 chars)
     const hasName = name !== undefined;

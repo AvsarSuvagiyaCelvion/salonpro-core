@@ -37,12 +37,17 @@ export async function PATCH(
     }
 
     const { id: appointmentId } = await params;
-    if (!appointmentId) {
-      return NextResponse.json({ error: 'Appointment ID is required' }, { status: 400 });
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!appointmentId || !UUID_REGEX.test(appointmentId)) {
+      return NextResponse.json({ error: 'Invalid appointment ID format.' }, { status: 400 });
     }
 
-    const body = await request.json().catch(() => ({}));
-    const { action } = body;
+    const rawBody = await request.json().catch(() => ({}));
+    if (rawBody === null || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
+      return NextResponse.json({ error: 'Request body must be a valid JSON object.' }, { status: 400 });
+    }
+    const body = rawBody;
+    const { action } = rawBody;
 
     if (!action || !['cancel', 'reschedule'].includes(action)) {
       return NextResponse.json(

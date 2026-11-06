@@ -174,9 +174,17 @@ async function handleUpdateSettings(request: Request) {
     }
 
     let parsedCancelPolicyHours: number | null = null;
-    if (cancel_policy_hours !== undefined && cancel_policy_hours !== null && cancel_policy_hours !== '') {
-      const cancelHoursInt = parseInt(cancel_policy_hours, 10);
-      if (isNaN(cancelHoursInt) || cancelHoursInt < 0 || cancelHoursInt > 72) {
+    if (cancel_policy_hours !== undefined) {
+      if (cancel_policy_hours === null || cancel_policy_hours === '') {
+        return NextResponse.json(
+          { error: 'Customers can cancel/reschedule up to 0 to 72 hours before.' },
+          { status: 400 }
+        );
+      }
+      const cancelHoursInt = typeof cancel_policy_hours === 'number'
+        ? cancel_policy_hours
+        : parseInt(String(cancel_policy_hours), 10);
+      if (isNaN(cancelHoursInt) || !Number.isInteger(cancelHoursInt) || cancelHoursInt < 0 || cancelHoursInt > 72) {
         return NextResponse.json(
           { error: 'Customers can cancel/reschedule up to 0 to 72 hours before.' },
           { status: 400 }

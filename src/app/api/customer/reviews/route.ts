@@ -68,21 +68,25 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json().catch(() => ({}));
-    const { appointment_id, rating, comment } = body;
+    const rawBody = await request.json().catch(() => ({}));
+    if (rawBody === null || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
+      return NextResponse.json({ error: 'Request body must be a valid JSON object.' }, { status: 400 });
+    }
+    const { appointment_id, rating, comment } = rawBody;
 
-    if (!appointment_id) {
-      return NextResponse.json({ error: 'Appointment ID is required.' }, { status: 400 });
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!appointment_id || !UUID_REGEX.test(String(appointment_id))) {
+      return NextResponse.json({ error: 'Invalid appointment ID format.' }, { status: 400 });
     }
 
-    // Validate rating: integer 1..5
-    const numRating = Number(rating);
-    if (!Number.isInteger(numRating) || numRating < 1 || numRating > 5) {
+    // Validate rating: strictly integer 1..5 (not string, not float, not null)
+    if (typeof rating !== 'number' || !Number.isInteger(rating) || rating < 1 || rating > 5) {
       return NextResponse.json(
         { error: 'Rating must be an integer between 1 and 5 stars.' },
         { status: 400 }
       );
     }
+    const numRating = rating;
 
     // Validate comment: optional text <= 500 chars
     let cleanComment: string | null = null;
@@ -118,8 +122,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Appointment not found.' }, { status: 404 });
     }
 
-    // Must be completed
-    if (appt.status !== 'completed') {
+    // Must be completed (in SalonPro DB, completed status is 'done' or 'completed')
+    if (appt.status !== 'done' && appt.status !== 'completed') {
       return NextResponse.json(
         { error: 'Reviews can only be submitted for completed appointments.' },
         { status: 400 }

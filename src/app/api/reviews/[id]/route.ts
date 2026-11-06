@@ -15,8 +15,9 @@ export async function PATCH(
     const salonId = auth.session.salonId;
     const { id } = await props.params;
 
-    if (!id) {
-      return NextResponse.json({ error: 'Review ID is required.' }, { status: 400 });
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!id || !UUID_REGEX.test(id)) {
+      return NextResponse.json({ error: 'Invalid review ID format.' }, { status: 400 });
     }
 
     // Rate-limit owner review replies/status changes: 30 per 15 minutes
@@ -29,8 +30,11 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json().catch(() => ({}));
-    const { owner_reply, status } = body;
+    const rawBody = await request.json().catch(() => ({}));
+    if (rawBody === null || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
+      return NextResponse.json({ error: 'Request body must be a valid JSON object.' }, { status: 400 });
+    }
+    const { owner_reply, status } = rawBody;
 
     const hasReply = owner_reply !== undefined;
     let finalReply: string | null = null;

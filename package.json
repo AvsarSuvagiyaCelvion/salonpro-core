@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:setup": "node scripts/setup-db.js"
+    "db:setup": "node scripts/setup-db.js",
+    "qa:api": "node --no-warnings tests/qa/runner.ts",
+    "qa:api:feature": "node --no-warnings tests/qa/runner.ts",
+    "qa:ui": "node --no-warnings tests/qa/runner.ts --ui-only",
+    "qa:all": "node --no-warnings tests/qa/runner.ts --with-ui"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

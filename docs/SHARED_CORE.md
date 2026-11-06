@@ -205,3 +205,21 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts` an
 | `017_customer_profile_columns.sql` | Adds nullable `email text`, `address text`, and `avatar_url text` columns to `customers` table with `ADD COLUMN IF NOT EXISTS`. |
 | `018_reviews.sql` | Creates `reviews` table (`id`, `salon_id`, `customer_id`, `appointment_id` UNIQUE, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at`) with RLS and compound indexes; configures `reviews` plan flag in `subscription_plans`. |
 
+---
+
+## 13. Automated QA Test Suite (`tests/qa/`)
+
+SalonPro includes a comprehensive automated QA test suite running against an isolated test PostgreSQL database:
+
+### Commands
+- `npm run qa:api`: Boots test server on port 3100, seeds `TEST_` fixtures, executes all 29 API integration tests (< 1 min), and generates `tests/qa/report.md`.
+- `npm run qa:api:feature -- <1|2|3|4>`: Executes a single feature subset (`1`: Cancel/Reschedule, `2`: Image/Gallery, `3`: Profile/PIN, `4`: Reviews).
+- `npm run qa:ui`: Runs Playwright UI smoke suite (8 smoke tests covering desktop & 375px mobile).
+- `npm run qa:all`: Executes both API suite and UI smoke suite sequentially.
+
+### Safety Guard
+- Pre-flight check in `tests/qa/config.ts` prevents running tests if `DATABASE_URL` matches `.env.local` or does not contain `test`.
+- Automatically backs up `.env.local` during test runs so Next.js connects exclusively to `DATABASE_URL` from `.env.test`.
+- Test fixtures use the `TEST_` prefix and are cleaned up before and after each test run.
+
+

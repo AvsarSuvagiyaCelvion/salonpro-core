@@ -44,8 +44,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json().catch(() => ({}));
-    const { currentPin, newPin, confirmPin } = body;
+    const rawBody = await request.json().catch(() => ({}));
+    if (rawBody === null || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
+      return NextResponse.json({ error: 'Request body must be a valid JSON object.' }, { status: 400 });
+    }
+    const { currentPin, newPin, confirmPin } = rawBody;
 
     const cleanCurrentPin = currentPin !== undefined && currentPin !== null ? String(currentPin).trim() : '';
     const cleanNewPin = newPin !== undefined && newPin !== null ? String(newPin).trim() : '';

@@ -1,6 +1,6 @@
 # Owner & Staff Panel (ERP) Documentation
 
-> **Last verified:** 2026-11-06 (Responsive image uploader, dark mode settings contrast, and customer portal header verified)  
+> **Last verified:** 2026-11-06 (Mobile modal scrolling on Services/Staff/Live tabs, staff leaves high-contrast date styling, and live studio floor light/dark mode color matching)  
 > **Status:** Verified against source code
 
 ---
@@ -20,13 +20,13 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/register-salon` | `src/app/register-salon/page.tsx` | Alias for `/register`. | Onboarding form |
 | `/app` | `src/app/app/page.tsx` | Default tenant root route; automatically redirects to `/app/dashboard`. | Next.js redirect |
 | `/app/dashboard` | `src/app/app/dashboard/page.tsx` | Executive summary: daily sales, appointment count, live queue count, monthly revenue, and recent appointments. | `AreaTrendChart`, `StatsCounter` |
-| `/app/live` | `src/app/app/live/page.tsx` | Live floor queue: manages walk-in waiting list, moves clients to "In Chair" sessions, adds services/products, and checks out to POS. | Live Kanban columns |
+| `/app/live` | `src/app/app/live/page.tsx` | Live floor queue: manages walk-in waiting list, moves clients to "In Chair" sessions, adds services/products, and checks out to POS. Fully responsive mobile scroll modals and theme-matched dark/light styling. | Live Kanban columns, Waitlist modal, Service/Product modal, POS Checkout modal |
 | `/app/appointments` | `src/app/app/appointments/page.tsx` | Calendar & schedule management: Multi-Stylist Lanes view, 7-Day Matrix view, and Card list view. Manages status (In Chair, Done, Cancelled). Automatically greys out off/leave periods and non-shift hours with "Leave"/"Off" labels and prevents booking walk-ins into blocked intervals. | `SkeletonTable` |
 | `/app/billing` | `src/app/app/billing/page.tsx` | POS Billing & Checkout: invoice generation, discount calculation, payment modes (Cash, UPI, Card), and GST calculation. | POS register form |
 | `/app/customers` | `src/app/app/customers/page.tsx` | Client directory (CRM): search, contact details, total visits, lifetime spend, notes, and VIP status. | Customer list & modal |
-| `/app/services` | `src/app/app/services/page.tsx` | Service catalog: service items, category classification, duration, pricing, and online booking visibility toggle. | Service table & modal |
+| `/app/services` | `src/app/app/services/page.tsx` | Service catalog: service items, category classification, duration, pricing, and online booking visibility toggle. Includes mobile scrollable Add/Edit Service modal with pinned header/footer and full dark mode support. | Service table & modal |
 | `/app/products` | `src/app/app/products/page.tsx` | Retail inventory: product tracking, stock count, cost price, selling price, and low stock threshold alerts. | Product table & modal |
-| `/app/staff` | `src/app/app/staff/page.tsx` | Staff roster & schedules: stylist profiles, roles, commissions, assigned services, duty status, weekly shifts editor (7 days, start/end hours, working/off, copy salon hours), planned leave manager, and non-destructive appointment conflict warning viewer. | Staff table, Add/Edit modal, Shifts & Leaves modal |
+| `/app/staff` | `src/app/app/staff/page.tsx` | Staff roster & schedules: stylist profiles, roles, commissions, assigned services, duty status, weekly shifts editor (7 days, start/end hours, working/off, copy salon hours), planned leave manager with high-contrast date display, and mobile viewport responsive scrollable modal dialogs. | Staff table, Add/Edit modal, Shifts & Leaves modal |
 | `/app/memberships` | `src/app/app/memberships/page.tsx` | VIP membership & package management: discount rules, validity periods, and client assignment. | Membership cards & assignment modal |
 | `/app/reports` | `src/app/app/reports/page.tsx` | Analytics and export: revenue breakdowns, staff commission statements, and CSV/PDF export. | `ReportExportModal`, `BarComparisonChart`, `DonutDistributionChart`, `HourlyRushChart` |
 | `/app/reviews` | `src/app/app/reviews/page.tsx` | Reviews & ratings hub: aggregate rating, 5-star distribution, stylist rating leaderboard, client reviews feed, owner reply drawer/modal, and visibility toggle (`visible`/`hidden`). Gated by `reviews` plan flag (Pro/Premium). | Reviews dashboard, Star rating bars, Reply modal |

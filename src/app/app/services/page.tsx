@@ -235,7 +235,7 @@ export default function ServicesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search service by name or description..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-neutral-200 bg-white text-xs text-neutral-800 focus:outline-none focus:border-[#D4A77F]"
+            className="w-full pl-9 pr-3 py-2 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] bg-white dark:bg-[#141926] text-xs text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:border-[#D4A77F]"
           />
         </div>
 
@@ -244,10 +244,10 @@ export default function ServicesPage() {
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 categoryFilter === cat
-                  ? 'bg-[#10141F] text-white shadow-xs'
-                  : 'bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50'
+                  ? 'bg-[#10141F] dark:bg-[#D4A77F] text-white dark:text-[#080B12] shadow-xs'
+                  : 'bg-white dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
               }`}
             >
               {cat}
@@ -257,19 +257,19 @@ export default function ServicesPage() {
       </div>
 
       {/* Services Table Card */}
-      <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-4">
             <SkeletonTable rows={5} columns={5} />
           </div>
         ) : filteredServices.length === 0 ? (
-          <div className="p-12 text-center text-neutral-400 text-sm">
+          <div className="p-12 text-center text-neutral-400 dark:text-neutral-500 text-sm">
             No services found matching your criteria.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50/70 border-b border-neutral-200/80 text-neutral-400 font-semibold uppercase tracking-wider">
+              <thead className="bg-neutral-50/70 dark:bg-[#10141E] border-b border-neutral-200/80 dark:border-[#2A2F3A] text-neutral-400 font-semibold uppercase tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Service Details</th>
                   <th className="py-3 px-4">Category</th>
@@ -279,31 +279,31 @@ export default function ServicesPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-neutral-100 dark:divide-[#2A2F3A]">
                 {filteredServices.map((service) => (
-                  <tr key={service.id} className="hover:bg-[#D4A77F]/10 transition-colors">
+                  <tr key={service.id} className="hover:bg-neutral-50/60 dark:hover:bg-[#1C2230] transition-colors">
                     <td className="py-3 px-4 max-w-xs">
                       <div className="font-bold text-sm text-[#1F2937] dark:text-white">
                         {service.name}
                       </div>
                       {service.description && (
-                        <p className="text-[11px] text-neutral-500 line-clamp-1 mt-0.5">
+                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 line-clamp-1 mt-0.5">
                           {service.description}
                         </p>
                       )}
                     </td>
                     <td className="py-3 px-4">
-                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-neutral-100 text-neutral-700">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-neutral-100 dark:bg-[#1C2230] text-neutral-700 dark:text-neutral-200 border border-neutral-200/60 dark:border-[#2A2F3A]">
                         {service.category}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-neutral-600">
+                    <td className="py-3 px-4 text-neutral-600 dark:text-neutral-300">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 text-neutral-400" />
                         <span>{service.duration_min} mins</span>
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-bold text-neutral-900 text-sm">
+                    <td className="py-3 px-4 font-bold text-neutral-900 dark:text-white text-sm">
                       ₹{Number(service.price).toLocaleString('en-IN')}
                     </td>
                     <td className="py-3 px-4 text-center">
@@ -311,8 +311,8 @@ export default function ServicesPage() {
                         onClick={() => handleToggleOnline(service.id, service.online_enabled)}
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
                           service.online_enabled
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-neutral-100 text-neutral-500 border border-neutral-200'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                            : 'bg-neutral-100 dark:bg-[#1C2230] text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-[#2A2F3A]'
                         }`}
                       >
                         <span
@@ -333,7 +333,7 @@ export default function ServicesPage() {
                       </button>
                       <button
                         onClick={() => handleDelete(service.id)}
-                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
                         title="Delete service"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -347,26 +347,29 @@ export default function ServicesPage() {
         )}
       </div>
 
-      {/* Add / Edit Service Modal */}
+      {/* Add / Edit Service Modal - Scrollable on mobile with sticky header & footer */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
-              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-md w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
+              <h2 className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
                 <Scissors className="w-4 h-4 text-[#D4A77F]" />
                 <span>{editingService ? 'Edit Service' : 'Add New Service'}</span>
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+            {/* Modal Scrollable Body */}
+            <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 touch-scroll">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                   Service Name *
                 </label>
                 <input
@@ -375,19 +378,19 @@ export default function ServicesPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Balayage Hair Color"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F] outline-none"
+                  className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F] outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                     Category *
                   </label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none bg-white"
+                    className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white focus:border-[#D4A77F] outline-none"
                   >
                     <option value="Hair">Hair</option>
                     <option value="Skin">Skin</option>
@@ -400,7 +403,7 @@ export default function ServicesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                     Duration (Minutes) *
                   </label>
                   <input
@@ -410,13 +413,13 @@ export default function ServicesPage() {
                     step="1"
                     value={formDuration}
                     onChange={(e) => setFormDuration(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                    className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white focus:border-[#D4A77F] outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                   Price (₹) *
                 </label>
                 <input
@@ -427,12 +430,12 @@ export default function ServicesPage() {
                   value={formPrice}
                   onChange={(e) => setFormPrice(e.target.value)}
                   placeholder="e.g. 499, 999 or 1099"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                  className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                   Description
                 </label>
                 <textarea
@@ -440,7 +443,7 @@ export default function ServicesPage() {
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Short description of the procedure..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                  className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none resize-none"
                 />
               </div>
 
@@ -452,23 +455,24 @@ export default function ServicesPage() {
                   onChange={(e) => setFormOnline(e.target.checked)}
                   className="rounded text-[#D4A77F] focus:ring-[#D4A77F] cursor-pointer"
                 />
-                <label htmlFor="online_toggle" className="text-xs text-neutral-700 cursor-pointer select-none">
+                <label htmlFor="online_toggle" className="text-xs font-medium text-neutral-800 dark:text-neutral-200 cursor-pointer select-none">
                   Enable for public online appointment booking
                 </label>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100">
+              {/* Modal Actions Footer */}
+              <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100 dark:border-[#2A2F3A]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 rounded-xl cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C2230] rounded-xl cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
                 >
                   {saving ? 'Saving...' : editingService ? 'Update Service' : 'Add Service'}
                 </button>

@@ -462,19 +462,19 @@ export default function StaffPage() {
       )}
 
       {/* Staff Table */}
-      <div className="bg-white rounded-2xl border border-neutral-200/80 shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-4">
             <SkeletonTable rows={4} columns={7} />
           </div>
         ) : staffList.length === 0 ? (
-          <div className="p-12 text-center text-neutral-400 text-sm">
+          <div className="p-12 text-center text-neutral-400 dark:text-neutral-500 text-sm">
             No staff members found. Click "Add Staff Member" to add your first stylist.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50/70 border-b border-neutral-200/80 text-neutral-400 font-semibold uppercase tracking-wider">
+              <thead className="bg-neutral-50/70 dark:bg-[#10141E] border-b border-neutral-200/80 dark:border-[#2A2F3A] text-neutral-400 font-semibold uppercase tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Staff Member</th>
                   <th className="py-3 px-4">Role</th>
@@ -487,9 +487,9 @@ export default function StaffPage() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-neutral-100 dark:divide-[#2A2F3A]">
                 {staffList.map((staff) => (
-                  <tr key={staff.id} className="hover:bg-[#D4A77F]/10 transition-colors">
+                  <tr key={staff.id} className="hover:bg-neutral-50/60 dark:hover:bg-[#1C2230] transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#1F2937] to-[#D4A77F] text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
@@ -505,17 +505,17 @@ export default function StaffPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 font-medium text-neutral-700">
+                    <td className="py-3.5 px-4 font-medium text-neutral-700 dark:text-neutral-300">
                       {staff.role_title}
                     </td>
                     <td className="py-3.5 px-4">
                       {canViewCommission ? (
                         <div className="text-[11px] space-y-0.5">
-                          <div className="text-neutral-700">
+                          <div className="text-neutral-700 dark:text-neutral-300">
                             Services: <span className="font-bold text-[#D4A77F]">{staff.service_commission_pct}%</span>
                           </div>
-                          <div className="text-neutral-500">
-                            Products: <span className="font-bold text-emerald-700">{staff.product_commission_pct}%</span>
+                          <div className="text-neutral-500 dark:text-neutral-400">
+                            Products: <span className="font-bold text-emerald-700 dark:text-emerald-400">{staff.product_commission_pct}%</span>
                           </div>
                         </div>
                       ) : (
@@ -523,7 +523,7 @@ export default function StaffPage() {
                       )}
                     </td>
                     <td className="py-3.5 px-4">
-                      <strong className="text-sm font-black text-neutral-900 block">
+                      <strong className="text-sm font-black text-neutral-900 dark:text-white block">
                         {staff.products_sold_count || 0} units
                       </strong>
                       <span className="text-[11px] text-neutral-400">
@@ -533,7 +533,7 @@ export default function StaffPage() {
                     <td className="py-3.5 px-4">
                       {canViewCommission ? (
                         <>
-                          <strong className="text-sm font-black text-emerald-700 block">
+                          <strong className="text-sm font-black text-emerald-700 dark:text-emerald-400 block">
                             ₹{Number(staff.total_commission_earned || 0).toLocaleString('en-IN')}
                           </strong>
                           <span className="text-[10px] text-neutral-400">
@@ -552,7 +552,7 @@ export default function StaffPage() {
                           staff.services.map((s) => (
                             <span
                               key={s.id}
-                              className="px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-700 text-[10px] font-medium"
+                              className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-[#1C2230] text-neutral-700 dark:text-neutral-300 border border-neutral-200/60 dark:border-[#2A2F3A] text-[10px] font-medium"
                             >
                               {s.name}
                             </span>
@@ -566,8 +566,8 @@ export default function StaffPage() {
                         onClick={() => handleToggleStatus(staff.id, 'active', staff.active)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
                           staff.active
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                            : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                         }`}
                         title="Click to toggle Working / On Leave"
                       >
@@ -581,8 +581,8 @@ export default function StaffPage() {
                         onClick={() => handleToggleStatus(staff.id, 'show_online', staff.show_online)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
                           staff.show_online
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'bg-neutral-100 text-neutral-500 border border-neutral-200'
+                            ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                            : 'bg-neutral-100 dark:bg-[#1C2230] text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-[#2A2F3A]'
                         }`}
                         title="Click to toggle Online Booking visibility"
                       >
@@ -607,7 +607,7 @@ export default function StaffPage() {
                       </button>
                       <button
                         onClick={() => handleDelete(staff.id)}
-                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
                         title="Delete staff"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -623,24 +623,25 @@ export default function StaffPage() {
 
       {/* Add / Edit Staff Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-lg w-full p-6 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
-              <h2 className="text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-lg w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
+              <h2 className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
                 <UserCheck className="w-4 h-4 text-[#D4A77F]" />
                 <span>{editingStaff ? 'Edit Staff Member' : 'Add New Staff Member'}</span>
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+            <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 touch-scroll">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                   Full Name *
                 </label>
                 <input
@@ -649,12 +650,12 @@ export default function StaffPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Pooja Dave"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                  className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                   Role Title *
                 </label>
                 <input
@@ -663,14 +664,14 @@ export default function StaffPage() {
                   value={formRole}
                   onChange={(e) => setFormRole(e.target.value)}
                   placeholder="e.g. Senior Hair Colorist"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                  className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
               {canViewCommission && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                    <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                       Service Commission (%)
                     </label>
                     <input
@@ -680,12 +681,12 @@ export default function StaffPage() {
                       step="0.5"
                       value={formServiceComm}
                       onChange={(e) => setFormServiceComm(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                      className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white focus:border-[#D4A77F] outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                    <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                       Product Commission (%)
                     </label>
                     <input
@@ -695,7 +696,7 @@ export default function StaffPage() {
                       step="0.5"
                       value={formProductComm}
                       onChange={(e) => setFormProductComm(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                      className="w-full px-3 py-2 text-xs font-medium rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white focus:border-[#D4A77F] outline-none"
                     />
                   </div>
                 </div>
@@ -703,14 +704,14 @@ export default function StaffPage() {
 
               {/* Services Multi-Select */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-2">
+                <label className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 mb-2">
                   Services Performed by this Staff Member:
                 </label>
-                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2.5 rounded-xl border border-neutral-200 bg-neutral-50/50">
+                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2.5 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#10141E]">
                   {allServices.map((srv) => (
                     <label
                       key={srv.id}
-                      className="flex items-center gap-2 text-xs text-neutral-700 cursor-pointer p-1 rounded-lg hover:bg-white select-none"
+                      className="flex items-center gap-2 text-xs text-neutral-800 dark:text-neutral-200 cursor-pointer p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#1C2230] select-none"
                     >
                       <input
                         type="checkbox"
@@ -718,14 +719,14 @@ export default function StaffPage() {
                         onChange={() => toggleServiceSelection(srv.id)}
                         className="rounded text-[#D4A77F] focus:ring-[#D4A77F]"
                       />
-                      <span className="truncate">{srv.name}</span>
+                      <span className="truncate font-medium">{srv.name}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               {/* Status toggles */}
-              <div className="space-y-2 pt-1 border-t border-neutral-100">
+              <div className="space-y-2 pt-1 border-t border-neutral-100 dark:border-[#2A2F3A]">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -734,7 +735,7 @@ export default function StaffPage() {
                     onChange={(e) => setFormActive(e.target.checked)}
                     className="rounded text-[#D4A77F] focus:ring-[#D4A77F] cursor-pointer"
                   />
-                  <label htmlFor="staff_active_toggle" className="text-xs text-neutral-700 cursor-pointer select-none">
+                  <label htmlFor="staff_active_toggle" className="text-xs font-medium text-neutral-800 dark:text-neutral-200 cursor-pointer select-none">
                     Currently Working (Uncheck if on long leave)
                   </label>
                 </div>
@@ -747,24 +748,24 @@ export default function StaffPage() {
                     onChange={(e) => setFormShowOnline(e.target.checked)}
                     className="rounded text-[#D4A77F] focus:ring-[#D4A77F] cursor-pointer"
                   />
-                  <label htmlFor="staff_online_toggle" className="text-xs text-neutral-700 cursor-pointer select-none">
+                  <label htmlFor="staff_online_toggle" className="text-xs font-medium text-neutral-800 dark:text-neutral-200 cursor-pointer select-none">
                     Show on online client booking page
                   </label>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100">
+              <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100 dark:border-[#2A2F3A]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 rounded-xl cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C2230] rounded-xl cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
                 >
                   {saving ? 'Saving...' : editingStaff ? 'Update Staff' : 'Add Staff Member'}
                 </button>
@@ -776,67 +777,70 @@ export default function StaffPage() {
 
       {/* Shifts & Leaves Management Modal */}
       {isScheduleModalOpen && scheduleStaff && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-2xl w-full p-4 sm:p-6 animate-in zoom-in-95 max-h-[92vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-start justify-between pb-3 sm:pb-4 border-b border-neutral-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center font-bold shrink-0">
-                  <Calendar className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-2xl w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[92vh] overflow-hidden animate-in zoom-in-95">
+            {/* Pinned Modal Header & Tabs */}
+            <div className="p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926] space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center font-bold shrink-0">
+                    <Calendar className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-white">
+                      Shifts &amp; Leaves — {scheduleStaff.name}
+                    </h2>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      {scheduleStaff.role_title || 'Stylist'} · Configure weekly working shifts and scheduled leaves
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-bold text-[#1F2937]">
-                    Shifts &amp; Leaves — {scheduleStaff.name}
-                  </h2>
-                  <p className="text-xs text-neutral-500">
-                    {scheduleStaff.role_title || 'Stylist'} · Configure weekly working shifts and scheduled leaves
-                  </p>
-                </div>
+                <button
+                  onClick={() => setIsScheduleModalOpen(false)}
+                  className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                onClick={() => setIsScheduleModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-700 cursor-pointer p-1"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              {/* Modal Tabs */}
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScheduleTab('shifts');
+                    setScheduleMsg(null);
+                  }}
+                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    scheduleTab === 'shifts'
+                      ? 'bg-[#D4A77F] text-[#080B12] shadow-sm'
+                      : 'bg-neutral-100 dark:bg-[#1C2230] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/70 dark:hover:bg-[#252C3D]'
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Weekly Shifts (7 Days)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScheduleTab('leaves');
+                    setScheduleMsg(null);
+                  }}
+                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    scheduleTab === 'leaves'
+                      ? 'bg-[#D4A77F] text-[#080B12] shadow-sm'
+                      : 'bg-neutral-100 dark:bg-[#1C2230] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/70 dark:hover:bg-[#252C3D]'
+                  }`}
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Staff Leaves ({leavesList.length})</span>
+                </button>
+              </div>
             </div>
 
-            {/* Modal Tabs */}
-            <div className="flex items-center gap-2 pt-4 pb-2 border-b border-neutral-100">
-              <button
-                type="button"
-                onClick={() => {
-                  setScheduleTab('shifts');
-                  setScheduleMsg(null);
-                }}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  scheduleTab === 'shifts'
-                    ? 'bg-[#D4A77F] text-[#080B12] shadow-sm'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200/70'
-                }`}
-              >
-                <Clock className="w-3.5 h-3.5" />
-                <span>Weekly Shifts (7 Days)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setScheduleTab('leaves');
-                  setScheduleMsg(null);
-                }}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  scheduleTab === 'leaves'
-                    ? 'bg-[#D4A77F] text-[#080B12] shadow-sm'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200/70'
-                }`}
-              >
-                <Calendar className="w-3.5 h-3.5" />
-                <span>Staff Leaves ({leavesList.length})</span>
-              </button>
-            </div>
-
-            {/* Notification / Conflict Banner */}
-            <div className="space-y-3 pt-3">
+            {/* Scrollable Modal Content */}
+            <div className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 touch-scroll">
               {scheduleMsg && (
                 <div
                   className={`p-3 rounded-xl border flex items-center justify-between text-xs font-medium ${
@@ -897,10 +901,10 @@ export default function StaffPage() {
 
             {/* TAB 1: WEEKLY SHIFTS */}
             {scheduleTab === 'shifts' && (
-              <div className="pt-3 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 text-xs">
-                  <div className="text-neutral-600">
-                    <span className="font-semibold text-neutral-800">Salon Operating Hours:</span>{' '}
+              <div className="pt-1 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-xl bg-neutral-50 dark:bg-[#10141E] border border-neutral-200/70 dark:border-[#2A2F3A] text-xs">
+                  <div className="text-neutral-600 dark:text-neutral-300">
+                    <span className="font-semibold text-neutral-800 dark:text-white">Salon Operating Hours:</span>{' '}
                     {salonHours ? (
                       <span className="font-bold text-[#D4A77F]">
                         {salonHours.open_time.slice(0, 5)} - {salonHours.close_time.slice(0, 5)}
@@ -908,14 +912,14 @@ export default function StaffPage() {
                     ) : (
                       'Loading...'
                     )}
-                    <span className="text-[11px] text-neutral-400 block mt-0.5">
+                    <span className="text-[11px] text-neutral-400 dark:text-neutral-500 block mt-0.5">
                       Shifts must be scheduled within salon operating hours.
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={handleCopySalonHours}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-neutral-300 text-neutral-700 font-semibold hover:bg-neutral-100 text-xs cursor-pointer shadow-2xs self-start sm:self-auto"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-[#1C2230] border border-neutral-300 dark:border-[#2A2F3A] text-neutral-800 dark:text-neutral-200 font-semibold hover:bg-neutral-100 dark:hover:bg-[#252C3D] text-xs cursor-pointer shadow-2xs self-start sm:self-auto transition-colors"
                   >
                     <Copy className="w-3.5 h-3.5 text-[#D4A77F]" />
                     <span>Copy Salon Hours</span>
@@ -931,12 +935,12 @@ export default function StaffPage() {
                         key={sh.weekday}
                         className={`p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
                           sh.is_off
-                            ? 'bg-neutral-50/80 border-neutral-200 text-neutral-400'
-                            : 'bg-white border-neutral-200/90 text-neutral-800'
+                            ? 'bg-neutral-50/80 dark:bg-[#10141E] border-neutral-200 dark:border-[#222838] text-neutral-500'
+                            : 'bg-white dark:bg-[#1C2230] border-neutral-200/90 dark:border-[#2A2F3A] text-neutral-900 dark:text-white'
                         }`}
                       >
                         <div className="flex items-center justify-between sm:justify-start gap-4 min-w-[130px]">
-                          <span className="font-bold text-xs text-neutral-900">
+                          <span className="font-bold text-xs text-neutral-900 dark:text-white">
                             {WEEKDAY_NAMES[sh.weekday]}
                           </span>
                           <button
@@ -944,8 +948,8 @@ export default function StaffPage() {
                             onClick={() => handleShiftChange(sh.weekday, 'is_off', !sh.is_off)}
                             className={`px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer transition-all ${
                               sh.is_off
-                                ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                ? 'bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                                : 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                             }`}
                           >
                             {sh.is_off ? 'Day Off' : 'Working'}
@@ -954,7 +958,7 @@ export default function StaffPage() {
 
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-1.5 text-xs">
-                            <span className="text-[11px] text-neutral-500 font-medium">Start:</span>
+                            <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">Start:</span>
                             <input
                               type="time"
                               disabled={sh.is_off}
@@ -962,14 +966,14 @@ export default function StaffPage() {
                               onChange={(e) =>
                                 handleShiftChange(sh.weekday, 'start_time', e.target.value)
                               }
-                              className="px-2 py-1 rounded-lg border border-neutral-300 text-xs outline-none focus:border-[#D4A77F] disabled:opacity-40 disabled:bg-neutral-100"
+                              className="px-2.5 py-1.5 rounded-lg border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#141926] text-neutral-900 dark:text-white font-bold text-xs outline-none focus:border-[#D4A77F] disabled:opacity-50 disabled:bg-neutral-100 dark:disabled:bg-neutral-800 disabled:text-neutral-400 shadow-2xs"
                             />
                           </div>
 
-                          <span className="text-neutral-400 text-xs">to</span>
+                          <span className="text-neutral-400 text-xs font-semibold">to</span>
 
                           <div className="flex items-center gap-1.5 text-xs">
-                            <span className="text-[11px] text-neutral-500 font-medium">End:</span>
+                            <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">End:</span>
                             <input
                               type="time"
                               disabled={sh.is_off}
@@ -977,7 +981,7 @@ export default function StaffPage() {
                               onChange={(e) =>
                                 handleShiftChange(sh.weekday, 'end_time', e.target.value)
                               }
-                              className="px-2 py-1 rounded-lg border border-neutral-300 text-xs outline-none focus:border-[#D4A77F] disabled:opacity-40 disabled:bg-neutral-100"
+                              className="px-2.5 py-1.5 rounded-lg border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#141926] text-neutral-900 dark:text-white font-bold text-xs outline-none focus:border-[#D4A77F] disabled:opacity-50 disabled:bg-neutral-100 dark:disabled:bg-neutral-800 disabled:text-neutral-400 shadow-2xs"
                             />
                           </div>
                         </div>
@@ -986,11 +990,11 @@ export default function StaffPage() {
                   </div>
                 )}
 
-                <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
+                <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100 dark:border-[#2A2F3A]">
                   <button
                     type="button"
                     onClick={() => setIsScheduleModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 rounded-xl cursor-pointer"
+                    className="px-4 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C2230] rounded-xl cursor-pointer transition-colors"
                   >
                     Close
                   </button>
@@ -998,7 +1002,7 @@ export default function StaffPage() {
                     type="button"
                     disabled={shiftsSaving || shiftsLoading}
                     onClick={handleSaveShifts}
-                    className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
                   >
                     {shiftsSaving ? 'Saving Shifts...' : 'Save Weekly Shifts'}
                   </button>
@@ -1008,20 +1012,20 @@ export default function StaffPage() {
 
             {/* TAB 2: STAFF LEAVES */}
             {scheduleTab === 'leaves' && (
-              <div className="pt-3 space-y-5">
+              <div className="pt-1 space-y-5">
                 {/* Add Leave Form */}
                 <form
                   onSubmit={handleAddLeave}
-                  className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-3"
+                  className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#10141E] border border-neutral-200/80 dark:border-[#2A2F3A] space-y-3"
                 >
-                  <h3 className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold text-neutral-800 dark:text-white flex items-center gap-1.5">
                     <Plus className="w-3.5 h-3.5 text-[#D4A77F]" />
                     <span>Add New Leave / Time Off</span>
                   </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] font-semibold text-neutral-600 mb-1">
+                      <label className="block text-[11px] font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                         From Date *
                       </label>
                       <input
@@ -1029,11 +1033,11 @@ export default function StaffPage() {
                         required
                         value={leaveFrom}
                         onChange={(e) => setLeaveFrom(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-neutral-300 outline-none focus:border-[#D4A77F]"
+                        className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white outline-none focus:border-[#D4A77F] shadow-2xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-neutral-600 mb-1">
+                      <label className="block text-[11px] font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                         To Date *
                       </label>
                       <input
@@ -1041,11 +1045,11 @@ export default function StaffPage() {
                         required
                         value={leaveTo}
                         onChange={(e) => setLeaveTo(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-neutral-300 outline-none focus:border-[#D4A77F]"
+                        className="w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white outline-none focus:border-[#D4A77F] shadow-2xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-neutral-600 mb-1">
+                      <label className="block text-[11px] font-bold text-neutral-800 dark:text-neutral-200 mb-1">
                         Reason (Max 120 chars)
                       </label>
                       <input
@@ -1054,7 +1058,7 @@ export default function StaffPage() {
                         placeholder="e.g. Vacation / Personal"
                         value={leaveReason}
                         onChange={(e) => setLeaveReason(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-neutral-300 outline-none focus:border-[#D4A77F]"
+                        className="w-full px-2.5 py-1.5 text-xs font-medium rounded-lg border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none focus:border-[#D4A77F] shadow-2xs"
                       />
                     </div>
                   </div>
@@ -1063,7 +1067,7 @@ export default function StaffPage() {
                     <button
                       type="submit"
                       disabled={leaveAdding}
-                      className="px-4 py-1.5 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-lg shadow-sm cursor-pointer disabled:opacity-50"
+                      className="px-4 py-1.5 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-lg shadow-sm cursor-pointer disabled:opacity-50 transition-all"
                     >
                       {leaveAdding ? 'Recording Leave...' : '+ Record Leave'}
                     </button>
@@ -1072,15 +1076,15 @@ export default function StaffPage() {
 
                 {/* Leaves List */}
                 <div>
-                  <h3 className="text-xs font-bold text-neutral-800 mb-2">Recorded Leaves</h3>
+                  <h3 className="text-xs font-bold text-neutral-800 dark:text-white mb-2">Recorded Leaves</h3>
                   {leavesLoading ? (
                     <div className="py-6 text-center text-xs text-neutral-400">Loading leaves...</div>
                   ) : leavesList.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-neutral-400 bg-neutral-50 rounded-xl border border-neutral-200/60">
+                    <div className="p-6 text-center text-xs text-neutral-400 dark:text-neutral-500 bg-neutral-50 dark:bg-[#10141E] rounded-xl border border-neutral-200/60 dark:border-[#2A2F3A]">
                       No leaves recorded for this stylist.
                     </div>
                   ) : (
-                    <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <div className="space-y-2 max-h-60 overflow-y-auto pr-1 touch-scroll">
                       {leavesList.map((leave) => {
                         const todayStr = new Date().toISOString().slice(0, 10);
                         const isPast = leave.to_date < todayStr;
@@ -1089,26 +1093,30 @@ export default function StaffPage() {
                             key={leave.id}
                             className={`p-3 rounded-xl border flex items-center justify-between gap-3 ${
                               isPast
-                                ? 'bg-neutral-50/60 border-neutral-200 text-neutral-400 opacity-60'
-                                : 'bg-white border-neutral-200 text-neutral-800'
+                                ? 'bg-neutral-100/70 dark:bg-[#10141E] border-neutral-300 dark:border-[#222838]'
+                                : 'bg-white dark:bg-[#1C2230] border-neutral-200/90 dark:border-[#2A2F3A]'
                             }`}
                           >
-                            <div className="space-y-0.5">
+                            <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-xs text-neutral-900 tabular-nums">
+                                <span className={`font-extrabold text-xs tabular-nums ${
+                                  isPast
+                                    ? 'text-neutral-700 dark:text-neutral-400'
+                                    : 'text-neutral-900 dark:text-white'
+                                }`}>
                                   {leave.from_date} to {leave.to_date}
                                 </span>
                                 {isPast ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-500">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300">
                                     Past Leave
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-300/60 dark:border-amber-800">
                                     Upcoming
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-neutral-500">
+                              <p className="text-[11px] font-medium text-neutral-600 dark:text-neutral-400">
                                 {leave.reason || 'No specific reason given'}
                               </p>
                             </div>
@@ -1116,7 +1124,7 @@ export default function StaffPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteLeave(leave.id)}
-                              className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                              className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
                               title="Delete leave"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1128,13 +1136,13 @@ export default function StaffPage() {
                   )}
                 </div>
 
-                <div className="flex justify-end pt-3 border-t border-neutral-100">
+                <div className="flex justify-end pt-3 border-t border-neutral-100 dark:border-[#2A2F3A]">
                   <button
                     type="button"
                     onClick={() => setIsScheduleModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 rounded-xl cursor-pointer"
+                    className="px-4 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C2230] rounded-xl cursor-pointer transition-colors"
                   >
-                    Done
+                    Close
                   </button>
                 </div>
               </div>

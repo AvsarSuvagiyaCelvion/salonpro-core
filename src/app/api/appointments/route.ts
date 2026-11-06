@@ -2,6 +2,7 @@ import { serverError } from '@/lib/http';
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { getStaffWorkingWindow, timeToMinutes } from '@/lib/availability';
 import { DEMO_APPOINTMENTS } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
@@ -188,9 +189,40 @@ export async function POST(request: Request) {
     if (staffRes.rows.length === 0) {
       return NextResponse.json({ error: 'Staff member not found in this salon' }, { status: 404 });
     }
+    const staffName = staffRes.rows[0].name;
+
+    // Verify staff working window (shift & leave)
+    const staffWindow = await getStaffWorkingWindow(staff_id, date.trim(), { salonId });
+    if (!staffWindow.isWorking) {
+      let msg = `${staffName} is not available on this date.`;
+      if (staffWindow.reason === 'staff_leave') {
+        msg = `${staffName} is on leave on this date${staffWindow.leaveReason ? ` (${staffWindow.leaveReason})` : ''}.`;
+      } else if (staffWindow.reason === 'staff_shift_off') {
+        msg = `${staffName} is marked off on this day.`;
+      } else if (staffWindow.reason === 'salon_closed_weekday') {
+        msg = 'The salon is closed on this day of the week.';
+      } else if (staffWindow.reason === 'salon_holiday') {
+        msg = `The salon is closed on this date (${staffWindow.holidayTitle || 'Holiday'}).`;
+      }
+      return NextResponse.json({ error: msg }, { status: 400 });
+    }
 
     // Construct timestamps in Indian Standard Time (IST, UTC+05:30) so time doesn't shift by 5.5 hours on UTC servers
     const cleanStartTime = start_time.trim().length === 5 ? `${start_time.trim()}:00` : start_time.trim();
+    const apptStartM = timeToMinutes(cleanStartTime.slice(0, 5));
+    const apptEndM = apptStartM + durationMin;
+    const shiftStartM = timeToMinutes(staffWindow.start!);
+    const shiftEndM = timeToMinutes(staffWindow.end!);
+
+    if (apptStartM < shiftStartM || apptEndM > shiftEndM) {
+      return NextResponse.json(
+        {
+          error: `${staffName}'s working shift on this day is ${staffWindow.start} - ${staffWindow.end}. The requested appointment (${cleanStartTime.slice(0, 5)}) falls outside their shift hours.`,
+        },
+        { status: 400 }
+      );
+    }
+
     const startsAt = new Date(`${date.trim()}T${cleanStartTime}+05:30`);
     const endsAt = new Date(startsAt.getTime() + durationMin * 60000);
 

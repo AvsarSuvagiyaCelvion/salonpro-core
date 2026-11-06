@@ -269,7 +269,9 @@ export default function BookingWizard({ slug }: { slug: string }) {
           }
         } else if (serverSlots.length === 0) {
           setAvailableSlots([]);
-          if (isToday) {
+          if (selectedStaffId && selectedStaffId !== 'anyone') {
+            setSlotNotice('No available slots for this specialist on this date. Please choose another specialist or date.');
+          } else if (isToday) {
             setSlotNotice('The shop is closed for today. Please book an appointment for another date.');
             // Auto-select next available open date (e.g. Tomorrow)
             const nextOpen = availableDates.find((d) => d.dateStr > todayISTStr && !d.isClosed);

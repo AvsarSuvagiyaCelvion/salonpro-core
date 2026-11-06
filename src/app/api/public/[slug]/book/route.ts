@@ -5,6 +5,7 @@ import { getSalonPlan } from '@/lib/plan';
 import { normalizeMobile } from '@/lib/phone';
 import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp } from '@/lib/rate-limit';
 import { checkDateHoliday } from '@/lib/holidays';
+import { getStaffWorkingWindow, timeToMinutes } from '@/lib/availability';
 import bcrypt from 'bcryptjs';
 
 export async function POST(
@@ -256,8 +257,35 @@ export async function POST(
           { status: 400 }
         );
       }
+
+      // Check stylist working window (shifts & leaves)
+      const staffWindow = await getStaffWorkingWindow(finalStaffId, String(date).trim(), {
+        salonId: salon.id,
+        salon,
+      });
+
+      if (!staffWindow.isWorking) {
+        let msg = 'Selected stylist is not available on this date.';
+        if (staffWindow.reason === 'staff_leave') {
+          msg = `Selected stylist is on leave on this date${staffWindow.leaveReason ? ` (${staffWindow.leaveReason})` : ''}.`;
+        } else if (staffWindow.reason === 'staff_shift_off') {
+          msg = 'Selected stylist is off on this day.';
+        }
+        return NextResponse.json({ error: msg }, { status: 400 });
+      }
+
+      const shiftStartM = timeToMinutes(staffWindow.start!);
+      const shiftEndM = timeToMinutes(staffWindow.end!);
+      if (slotStartM < shiftStartM || slotEndM > shiftEndM) {
+        return NextResponse.json(
+          {
+            error: `The requested time (${cleanT.slice(0, 5)}) is outside the stylist's shift hours (${staffWindow.start} - ${staffWindow.end}).`,
+          },
+          { status: 400 }
+        );
+      }
     } else {
-      // Find an active eligible staff member free at this slot
+      // Find an active eligible staff member free at this slot whose shift covers this time
       const candidateStaff = await query(
         `SELECT s.id, s.name 
          FROM staff s
@@ -272,11 +300,28 @@ export async function POST(
                AND a.status IN ('scheduled', 'arrived')
                AND tstzrange(a.starts_at, a.ends_at) && tstzrange($3::timestamptz, $4::timestamptz)
            )
-         LIMIT 1`,
+         ORDER BY s.name ASC`,
         [salon.id, service.id, startsAt.toISOString(), endsAt.toISOString()]
       );
 
-      if (candidateStaff.rows.length === 0) {
+      let chosenStaff: any = null;
+      for (const cand of candidateStaff.rows) {
+        const candWin = await getStaffWorkingWindow(cand.id, String(date).trim(), {
+          salonId: salon.id,
+          salon,
+        });
+
+        if (candWin.isWorking && candWin.start && candWin.end) {
+          const shiftStartM = timeToMinutes(candWin.start);
+          const shiftEndM = timeToMinutes(candWin.end);
+          if (slotStartM >= shiftStartM && slotEndM <= shiftEndM) {
+            chosenStaff = cand;
+            break;
+          }
+        }
+      }
+
+      if (!chosenStaff) {
         return NextResponse.json(
           {
             isOverlap: true,
@@ -286,7 +331,7 @@ export async function POST(
         );
       }
 
-      finalStaffId = candidateStaff.rows[0].id;
+      finalStaffId = chosenStaff.id;
     }
 
     // Wrong-PIN rate limiting check for this (salon, mobile)

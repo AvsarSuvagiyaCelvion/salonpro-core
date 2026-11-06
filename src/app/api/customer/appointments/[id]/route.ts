@@ -4,6 +4,7 @@ import pool, { query } from '@/lib/db';
 import { CUSTOMER_COOKIE_NAME, verifyCustomerSessionToken } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { checkDateHoliday } from '@/lib/holidays';
+import { getStaffWorkingWindow, timeToMinutes } from '@/lib/availability';
 import { serverError } from '@/lib/http';
 
 export async function PATCH(
@@ -279,6 +280,27 @@ export async function PATCH(
           );
         }
         finalStaffId = requestedStaffId;
+
+        // Verify stylist working window (shifts & leaves)
+        const staffWin = await getStaffWorkingWindow(finalStaffId, date, { salonId: appt.salon_id });
+        if (!staffWin.isWorking) {
+          let msg = 'Selected stylist is not available on this date.';
+          if (staffWin.reason === 'staff_leave') {
+            msg = `Selected stylist is on leave on this date${staffWin.leaveReason ? ` (${staffWin.leaveReason})` : ''}.`;
+          } else if (staffWin.reason === 'staff_shift_off') {
+            msg = 'Selected stylist is off on this day.';
+          }
+          return NextResponse.json({ error: msg }, { status: 400 });
+        }
+
+        const shiftStartM = timeToMinutes(staffWin.start!);
+        const shiftEndM = timeToMinutes(staffWin.end!);
+        if (startTotalMins < shiftStartM || endTotalMins > shiftEndM) {
+          return NextResponse.json(
+            { error: `Selected time is outside the stylist's shift hours (${staffWin.start} - ${staffWin.end}).` },
+            { status: 400 }
+          );
+        }
       } else if (requestedStaffId === 'anyone') {
         const candidateStaff = await query(
           `SELECT s.id, s.name
@@ -295,11 +317,24 @@ export async function PATCH(
                  AND a.status IN ('scheduled', 'arrived')
                  AND tstzrange(a.starts_at, a.ends_at) && tstzrange($4::timestamptz, $5::timestamptz)
              )
-           LIMIT 1`,
+           ORDER BY s.name ASC`,
           [appt.salon_id, appt.service_id, appt.id, newStartsAt.toISOString(), newEndsAt.toISOString()]
         );
 
-        if (candidateStaff.rows.length === 0) {
+        let chosenCandidate: any = null;
+        for (const cand of candidateStaff.rows) {
+          const candWin = await getStaffWorkingWindow(cand.id, date, { salonId: appt.salon_id });
+          if (candWin.isWorking && candWin.start && candWin.end) {
+            const shiftStartM = timeToMinutes(candWin.start);
+            const shiftEndM = timeToMinutes(candWin.end);
+            if (startTotalMins >= shiftStartM && endTotalMins <= shiftEndM) {
+              chosenCandidate = cand;
+              break;
+            }
+          }
+        }
+
+        if (!chosenCandidate) {
           return NextResponse.json(
             {
               isOverlap: true,
@@ -308,9 +343,30 @@ export async function PATCH(
             { status: 409 }
           );
         }
-        finalStaffId = candidateStaff.rows[0].id;
+        finalStaffId = chosenCandidate.id;
       } else {
         finalStaffId = appt.staff_id;
+
+        // Verify current stylist working window
+        const staffWin = await getStaffWorkingWindow(finalStaffId, date, { salonId: appt.salon_id });
+        if (!staffWin.isWorking) {
+          let msg = 'Your stylist is not available on this date.';
+          if (staffWin.reason === 'staff_leave') {
+            msg = `Your stylist is on leave on this date${staffWin.leaveReason ? ` (${staffWin.leaveReason})` : ''}.`;
+          } else if (staffWin.reason === 'staff_shift_off') {
+            msg = 'Your stylist is off on this day.';
+          }
+          return NextResponse.json({ error: msg }, { status: 400 });
+        }
+
+        const shiftStartM = timeToMinutes(staffWin.start!);
+        const shiftEndM = timeToMinutes(staffWin.end!);
+        if (startTotalMins < shiftStartM || endTotalMins > shiftEndM) {
+          return NextResponse.json(
+            { error: `Selected time is outside the stylist's shift hours (${staffWin.start} - ${staffWin.end}).` },
+            { status: 400 }
+          );
+        }
       }
 
       // ATOMIC TRANSACTION WITH POSTGRES ADVISORY LOCK

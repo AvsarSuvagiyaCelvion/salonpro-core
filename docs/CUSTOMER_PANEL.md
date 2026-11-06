@@ -1,6 +1,6 @@
 # Customer Panel Documentation
 
-> **Last verified:** 2026-11-06 (Complete DB cleanup & static in-code demo booking verified)  
+> **Last verified:** 2026-11-06 (Individual Staff Weekly Shifts & Staff Leaves verified)  
 > **Status:** Verified against source code
 
 ---
@@ -66,6 +66,8 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `payments` | `invoice_id`, `amount`, `payment_method` | Read | `001_initial_schema.sql` |
 | `customer_plans` | `customer_id`, `plan_id`, `kind`, `starts_on`, `expires_on` | Read | `001_initial_schema.sql` |
 | `reviews` | `id`, `salon_id`, `customer_id`, `appointment_id`, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at` | Read / Write | `018_reviews.sql` |
+| `staff_shifts` | `id`, `staff_id`, `salon_id`, `weekday`, `start_time`, `end_time`, `is_off` | Read | `019_staff_shifts_and_leaves.sql` |
+| `staff_leaves` | `id`, `staff_id`, `salon_id`, `from_date`, `to_date` | Read | `019_staff_shifts_and_leaves.sql` |
 
 ---
 
@@ -75,11 +77,12 @@ The Customer Panel enables salon clients to discover salon services, select styl
 1. **Visit salon link**: Client loads `/<slug>` or `/book/<slug>`. `BookingWizard.tsx` calls `GET /api/public/[slug]` to load brand logo, gallery photos (`salon_photos`), services, active staff, and operating schedule.
 2. **Step 1 - Ambience Gallery & Pick Service**: User browses responsive lazy-loaded salon gallery photos, selects category and service. Duration and price are recorded.
 3. **Step 2 - Pick Stylist**: User selects specific stylist or "Anyone / First Available".
-4. **Step 3 - Pick Date & Slot**: Selecting a date calls `GET /api/public/[slug]/slots?service_id=...&date=...&staff_id=...`. `src/lib/slots.ts` calculates available time slots considering operating hours, buffers, advance rules, existing appointments, and holidays.
+4. **Step 3 - Pick Date & Slot**: Selecting a date calls `GET /api/public/[slug]/slots?service_id=...&date=...&staff_id=...`. `src/lib/slots.ts` calculates available time slots considering operating hours, buffers, advance rules, existing appointments, holidays, and individual staff shifts and planned leaves via `src/lib/availability.ts`. If a specific stylist is off or on leave, 0 slots are returned and the UI displays an intuitive notice.
 5. **Step 4 - Details & PIN**: Client inputs 10-digit mobile, name, and 4-digit PIN.
 6. **Step 5 - Atomic Reservation**: Submit calls `POST /api/public/[slug]/book`. The backend:
    - Verifies rate limits and rate limits on wrong PINs.
    - Handles Demo salon (`dixa-beauty-salon` simulates success).
+   - Validates stylist working window via `getStaffWorkingWindow` (for "anyone", filters down to stylists on duty during requested interval).
    - Opens transaction in `src/app/api/public/[slug]/book/route.ts` with `pg_advisory_xact_lock(hashtext('salonId:staffId'))`.
    - Re-checks slot availability with `tstzrange` conflict check.
    - Inserts or verifies customer PIN using `bcrypt`.
@@ -103,11 +106,11 @@ The Customer Panel enables salon clients to discover salon services, select styl
 
 ### Flow 3: Customer Self-Service Reschedule
 1. **Open Reschedule Modal**: From `/portal`, customer clicks "Reschedule". Checks `rescheduled_count < 2`.
-2. **Slot Selection**: User picks a new date. UI fetches available slots via `GET /api/public/[slug]/slots`.
+2. **Slot Selection**: User picks a new date. UI fetches available slots via `GET /api/public/[slug]/slots`. Slots strictly reflect stylist weekly shifts and leaves.
 3. **Submit Reschedule**: User selects slot and clicks "Confirm Reschedule". UI calls `PATCH /api/customer/appointments/[id]` with `{ action: 'reschedule', date, time, staff_id }`.
 4. **Backend Concurrency Guard**:
    - Enforces max 2 reschedules (`rescheduled_count < 2`).
-   - Validates date, time, operating hours, advance rules, and holidays.
+   - Validates date, time, operating hours, advance rules, holidays, and stylist shift/leave working window (`getStaffWorkingWindow`).
    - Acquires PostgreSQL advisory transaction lock on `salon_id:staff_id`.
    - Verifies slot conflict excluding the current appointment (`a.id != $id`).
    - If slot was taken concurrently, returns HTTP `409` (`{ isOverlap: true }`). UI prompts user to choose another slot.
@@ -155,6 +158,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 ## 8. Shared Dependencies
 - `src/lib/auth.ts`: `CUSTOMER_COOKIE_NAME`, `verifyCustomerSessionToken`, `createCustomerSessionToken`.
 - `src/lib/slots.ts`: `getAvailableSlots` shared between booking wizard and portal reschedule modal.
+- `src/lib/availability.ts`: `getStaffWorkingWindow`, `getStaffWorkingWindowsForDate`.
 - `src/lib/rate-limit.ts`: Throttling booking submissions, customer PIN attempts, and profile edits.
 - `src/lib/storage.ts`: Storage path validation and Supabase Storage client for customer avatar uploads.
 - `src/lib/holidays.ts`: `checkDateHoliday` to disable closed holiday slots.

@@ -1,5 +1,6 @@
 import { query } from './db';
 import { checkDateHoliday } from './holidays';
+import { getStaffWorkingWindowsForDate } from './availability';
 
 export interface AvailableSlot {
   time: string; // "10:00"
@@ -206,9 +207,28 @@ export async function getAvailableSlots(params: {
     };
   }
 
-  const staffIds = eligibleStaff.map((s) => s.id);
+  // 5. Check staff working windows (shifts + leaves) for this date
+  const staffWindows = await getStaffWorkingWindowsForDate(salon.id, date, eligibleStaff);
 
-  // 5. Fetch existing appointments for eligible staff on this date (in IST)
+  // Filter to staff who are actively working on this date
+  const workingEligibleStaff = eligibleStaff.filter((st) => {
+    const win = staffWindows.get(st.id);
+    return win && win.isWorking;
+  });
+
+  if (workingEligibleStaff.length === 0) {
+    return {
+      salon,
+      service,
+      date,
+      isClosedDay: false,
+      slots: [],
+    };
+  }
+
+  const staffIds = workingEligibleStaff.map((s) => s.id);
+
+  // 6. Fetch existing appointments for working eligible staff on this date (in IST)
   const dayStart = `${date}T00:00:00+05:30`;
   const dayEnd = `${date}T23:59:59+05:30`;
 
@@ -225,7 +245,7 @@ export async function getAvailableSlots(params: {
 
   const existingAppts = apptRes.rows;
 
-  // 6. Generate candidate slots inside salon open/close hours
+  // 7. Generate candidate slots inside salon open/close hours
   const openMins = timeToMinutes(salon.open_time);
   const closeMins = timeToMinutes(salon.close_time);
   const slotStep = salon.slot_minutes || 30;
@@ -258,10 +278,21 @@ export async function getAvailableSlots(params: {
     const candidateStartMs = candidateStart.getTime();
     const candidateEndWithBufferMs = candidateEnd.getTime() + bufferMins * 60000;
 
-    // Find first free eligible staff for this slot
+    // Find first free eligible staff for this slot who is working during this specific time window
     let freeStaff: any = null;
 
-    for (const staff of eligibleStaff) {
+    for (const staff of workingEligibleStaff) {
+      const win = staffWindows.get(staff.id);
+      if (!win || !win.isWorking || !win.start || !win.end) continue;
+
+      const shiftStartM = timeToMinutes(win.start);
+      const shiftEndM = timeToMinutes(win.end);
+
+      // Appointment must not start before shift start or end after shift end
+      if (m < shiftStartM || m + durationMins > shiftEndM) {
+        continue;
+      }
+
       const staffAppts = existingAppts.filter((a) => a.staff_id === staff.id);
 
       const hasConflict = staffAppts.some((a) => {

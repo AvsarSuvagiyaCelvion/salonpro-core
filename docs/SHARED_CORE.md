@@ -1,6 +1,6 @@
 # Shared Core Architecture & Infrastructure
 
-> **Last verified:** 2026-11-06 (Complete DB cleanup & 100% static in-code demo architecture verified)  
+> **Last verified:** 2026-11-06 (Individual Staff Weekly Shifts & Staff Leaves verified)  
 > **Status:** Verified against source code
 
 ---
@@ -142,14 +142,19 @@ In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re
 ---
 
 ## 9. Slot Generation & Overlap Serialization
-Slot availability and collision prevention are governed by `src/lib/slots.ts` and atomic transactional locking:
+Slot availability and collision prevention are governed by `src/lib/slots.ts`, `src/lib/availability.ts`, and atomic transactional locking:
 1. **Candidate Slot Generation**: Iterates from `open_time` to `close_time` with step `slot_minutes` (e.g. 30 min) and buffer `buffer_minutes` (e.g. 10 min).
-2. **Filters**:
+2. **Filters & Staff Availability (`getStaffWorkingWindow`)**:
    - Skips past slots in current IST time.
    - Skips slots within `min_advance_hours`.
    - Skips days outside `max_advance_days`.
    - Skips closed days from `working_days`.
    - Skips dates registered in `salon_holidays`.
+   - **Individual Staff Shifts & Leaves (`src/lib/availability.ts`)**:
+     - Evaluates `getStaffWorkingWindow(staffId, date)` for each candidate stylist.
+     - Stylists on recorded leaves (`staff_leaves`) or marked off (`staff_shifts.is_off`) produce 0 slots.
+     - Slots are constrained strictly within stylist shift start and end hours (`staff_shifts.start_time` - `staff_shifts.end_time`).
+     - A stylist with no custom shifts falls back seamlessly to salon hours and working days.
 3. **Advisory Transaction Lock**:
    ```sql
    SELECT pg_advisory_xact_lock(hashtext('salonId:staffId'));
@@ -221,6 +226,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts` an
 | `016_salon_photos.sql` | Creates `salon_photos` table (`id`, `salon_id`, `url`, `storage_path`, `sort_order`, `created_at`) with RLS and foreign key cascade for gallery photo uploads. |
 | `017_customer_profile_columns.sql` | Adds nullable `email text`, `address text`, and `avatar_url text` columns to `customers` table with `ADD COLUMN IF NOT EXISTS`. |
 | `018_reviews.sql` | Creates `reviews` table (`id`, `salon_id`, `customer_id`, `appointment_id` UNIQUE, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at`) with RLS and compound indexes; configures `reviews` plan flag in `subscription_plans`. |
+| `019_staff_shifts_and_leaves.sql` | Creates `staff_shifts` table (`id`, `staff_id`, `salon_id`, `weekday` 0-6, `start_time`, `end_time`, `is_off`, `UNIQUE(staff_id, weekday)`) and `staff_leaves` table (`id`, `staff_id`, `salon_id`, `from_date`, `to_date`, `reason`) with RLS, foreign keys ON DELETE CASCADE, and indexes. |
 
 ---
 

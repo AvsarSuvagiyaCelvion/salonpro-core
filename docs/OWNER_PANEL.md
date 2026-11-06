@@ -1,6 +1,6 @@
 # Owner & Staff Panel (ERP) Documentation
 
-> **Last verified:** 2026-11-06 (Complete DB cleanup & static in-code demo owner ERP verified)  
+> **Last verified:** 2026-11-06 (Individual Staff Weekly Shifts & Staff Leaves verified)  
 > **Status:** Verified against source code
 
 ---
@@ -21,12 +21,12 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/app` | `src/app/app/page.tsx` | Default tenant root route; automatically redirects to `/app/dashboard`. | Next.js redirect |
 | `/app/dashboard` | `src/app/app/dashboard/page.tsx` | Executive summary: daily sales, appointment count, live queue count, monthly revenue, and recent appointments. | `AreaTrendChart`, `StatsCounter` |
 | `/app/live` | `src/app/app/live/page.tsx` | Live floor queue: manages walk-in waiting list, moves clients to "In Chair" sessions, adds services/products, and checks out to POS. | Live Kanban columns |
-| `/app/appointments` | `src/app/app/appointments/page.tsx` | Calendar & schedule management: Multi-Stylist Lanes view, 7-Day Matrix view, and Card list view. Manages status (In Chair, Done, Cancelled). | `SkeletonTable` |
+| `/app/appointments` | `src/app/app/appointments/page.tsx` | Calendar & schedule management: Multi-Stylist Lanes view, 7-Day Matrix view, and Card list view. Manages status (In Chair, Done, Cancelled). Automatically greys out off/leave periods and non-shift hours with "Leave"/"Off" labels and prevents booking walk-ins into blocked intervals. | `SkeletonTable` |
 | `/app/billing` | `src/app/app/billing/page.tsx` | POS Billing & Checkout: invoice generation, discount calculation, payment modes (Cash, UPI, Card), and GST calculation. | POS register form |
 | `/app/customers` | `src/app/app/customers/page.tsx` | Client directory (CRM): search, contact details, total visits, lifetime spend, notes, and VIP status. | Customer list & modal |
 | `/app/services` | `src/app/app/services/page.tsx` | Service catalog: service items, category classification, duration, pricing, and online booking visibility toggle. | Service table & modal |
 | `/app/products` | `src/app/app/products/page.tsx` | Retail inventory: product tracking, stock count, cost price, selling price, and low stock threshold alerts. | Product table & modal |
-| `/app/staff` | `src/app/app/staff/page.tsx` | Staff roster: stylist profiles, roles, service commission %, product commission %, and online scheduling status. | Staff table & modal |
+| `/app/staff` | `src/app/app/staff/page.tsx` | Staff roster & schedules: stylist profiles, roles, commissions, assigned services, duty status, weekly shifts editor (7 days, start/end hours, working/off, copy salon hours), planned leave manager, and non-destructive appointment conflict warning viewer. | Staff table, Add/Edit modal, Shifts & Leaves modal |
 | `/app/memberships` | `src/app/app/memberships/page.tsx` | VIP membership & package management: discount rules, validity periods, and client assignment. | Membership cards & assignment modal |
 | `/app/reports` | `src/app/app/reports/page.tsx` | Analytics and export: revenue breakdowns, staff commission statements, and CSV/PDF export. | `ReportExportModal`, `BarComparisonChart`, `DonutDistributionChart`, `HourlyRushChart` |
 | `/app/reviews` | `src/app/app/reviews/page.tsx` | Reviews & ratings hub: aggregate rating, 5-star distribution, stylist rating leaderboard, client reviews feed, owner reply drawer/modal, and visibility toggle (`visible`/`hidden`). Gated by `reviews` plan flag (Pro/Premium). | Reviews dashboard, Star rating bars, Reply modal |
@@ -68,6 +68,9 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/api/products/sell` | `POST` | `src/app/api/products/sell/route.ts` | `salonpro_session` | Direct POS sale for retail products without service session. |
 | `/api/staff` | `GET`, `POST` | `src/app/api/staff/route.ts` | `salonpro_session` | Lists staff or creates new stylist profile. Enforces plan staff limits. |
 | `/api/staff/[id]` | `PATCH`, `DELETE` | `src/app/api/staff/[id]/route.ts` | `salonpro_session` | Updates stylist roles, commission percentages, or deletes staff. |
+| `/api/staff/[id]/shifts` | `GET`, `PUT` | `src/app/api/staff/[id]/shifts/route.ts` | `salonpro_session` (Role: `owner`) | `GET` fetches 7-day weekly shifts for a stylist (falls back to salon hours if not set) and salon operating window. `PUT` updates weekly shifts (0=Sunday to 6=Saturday), validates shifts lie within salon operating hours, and returns a non-destructive warning list of existing appointments conflicting with shortened shifts / off days. Rate-limited to 30 requests / 15 min. |
+| `/api/staff/[id]/leaves` | `GET`, `POST`, `DELETE` | `src/app/api/staff/[id]/leaves/route.ts` | `salonpro_session` (Role: `owner`) | `GET` lists planned leaves for a stylist. `POST` adds leave (`from_date`, `to_date`, `reason` max 120 chars) and returns existing scheduled appointment conflicts as non-destructive warnings. `DELETE` removes a planned leave by `leaveId`. Rate-limited to 30 requests / 15 min. |
+| `/api/staff/availability` | `GET` | `src/app/api/staff/availability/route.ts` | `salonpro_session` | Returns consolidated daily or date-range working windows (`isWorking`, `start`, `end`, reason) for all active salon staff, combining salon working days, salon holidays, staff shifts, and staff leaves. |
 | `/api/memberships` | `GET`, `POST` | `src/app/api/memberships/route.ts` | `salonpro_session` (Feature: `memberships`) | Lists or creates VIP membership plans. Gated by plan feature. |
 | `/api/memberships/assign` | `POST` | `src/app/api/memberships/assign/route.ts` | `salonpro_session` (Feature: `memberships`) | Assigns VIP plan to customer. |
 | `/api/reports` | `GET` | `src/app/api/reports/route.ts` | `salonpro_session` | Aggregates daily/monthly revenue, staff commission reports, and cash summary. |
@@ -123,6 +126,8 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `salon_holidays` | `id`, `salon_id`, `title`, `start_date`, `end_date`, `note` | Read / Write | `014_salon_holidays.sql` |
 | `subscription_payments` | `id`, `salon_id`, `razorpay_order_id`, `razorpay_payment_id`, `amount`, `status` | Read / Write | `011_subscription_payments.sql` |
 | `reviews` | `id`, `salon_id`, `customer_id`, `appointment_id`, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at` | Read / Write | `018_reviews.sql` |
+| `staff_shifts` | `id`, `staff_id`, `salon_id`, `weekday`, `start_time`, `end_time`, `is_off`, `created_at` | Read / Write | `019_staff_shifts_and_leaves.sql` |
+| `staff_leaves` | `id`, `staff_id`, `salon_id`, `from_date`, `to_date`, `reason`, `created_at` | Read / Write | `019_staff_shifts_and_leaves.sql` |
 
 ---
 
@@ -163,6 +168,22 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 4. **Reply to Feedback**: Owner clicks "Reply" or "Edit Reply" on any review card. Modal opens allowing an official response up to 300 characters. Submitting calls `PATCH /api/reviews/[id]` with `{ owner_reply }`.
 5. **Visibility Moderation**: Owner can toggle "Hide" / "Unhide" for any review. Hidden reviews are immediately excluded from public booking pages and the salon's public average rating. Calls `PATCH /api/reviews/[id]` with `{ status: 'hidden' | 'visible' }`.
 
+### Flow 5: Staff Weekly Shifts & Leave Management
+1. **Open Schedule Editor**: From `/app/staff`, owner clicks the calendar/clock icon "Manage Shifts & Leaves" next to any staff member.
+2. **Edit Weekly Shifts**:
+   - 7-day schedule (Sunday to Saturday) with toggle for Working / Off, start time, and end time.
+   - "Copy salon hours" button quickly presets start and end times to the salon's default opening and closing hours.
+   - Server validates shifts lie strictly within salon open/close hours.
+   - On save (`PUT /api/staff/[id]/shifts`), upserts into `staff_shifts`.
+   - Returns a non-destructive warning list of existing booked appointments that conflict with shortened shifts or newly marked off days (appointments are never auto-cancelled).
+3. **Manage Planned Leaves**:
+   - Owner switches to "Staff Leaves" tab to add dates (`from_date`, `to_date`, `reason` max 120 chars).
+   - Past leaves are displayed greyed out; upcoming leaves can be removed (`DELETE /api/staff/[id]/leaves`).
+   - Adding a leave (`POST /api/staff/[id]/leaves`) checks for existing booked appointments during that period and surfaces them as a warning banner.
+4. **Calendar & Walk-in Integration**:
+   - In `/app/appointments`, Multi-Stylist Lanes greys out stylists who are on leave or off, showing "🌴 Leave" or "⛔ Off" indicators.
+   - Walk-in appointments booked via ERP check `getStaffWorkingWindow` and block scheduling when a stylist is off, on leave, or outside shift hours.
+
 ---
 
 ## 7. Business Rules and Edge Cases
@@ -184,6 +205,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 ## 8. Shared Dependencies
 - `src/lib/api-auth.ts`: `requireTenant`, `requireRole`, `invalidateUserAuthCache`.
 - `src/lib/auth.ts`: `COOKIE_NAME` (`salonpro_session`), `verifySessionToken`.
+- `src/lib/availability.ts`: `getStaffWorkingWindow`, `getStaffWorkingWindowsForDate`, `findConflictingAppointmentsForShifts`, `findConflictingAppointmentsForLeave`.
 - `src/lib/plan.ts`: `getSalonPlan`, `requireFeature`, `requireLimit`.
 - `src/proxy.ts`: Directs authenticated owners hitting `/login` or `/` to `/app`.
 
@@ -193,6 +215,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 - **Owner Cancellation**: When an owner cancels an appointment via ERP, `cancelled_by` is set to `'owner'`. The customer sees this as cancelled in `/portal`.
 - **Operating Hours Update**: Modifying `open_time`, `buffer_minutes`, or `cancel_policy_hours` immediately alters the slots rendered to clients on `/[slug]` and cancellation eligibility in `/portal`.
 - **Service/Staff Visibility**: Toggling `online_enabled = false` or `show_online = false` immediately hides that service/staff from public booking.
+- **Staff Shifts & Leaves**: Updating a stylist's weekly shift or adding planned leave immediately removes unavailable slots from public online booking (`/[slug]`) and customer reschedule (`/portal`), and greys out their lane in owner calendar (`/app/appointments`).
 
 ---
 
@@ -206,6 +229,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 - **Dashboard metrics calculation**: `src/app/api/dashboard/stats/route.ts`
 - **POS completion & checkout logic**: `src/app/api/live/sessions/[id]/complete/route.ts`
 - **Owner appointments & calendar**: `src/app/app/appointments/page.tsx`
+- **Staff shifts, leaves & availability helper**: `src/lib/availability.ts` & `src/app/app/staff/page.tsx`
 - **Owner settings & timings**: `src/app/app/settings/page.tsx` & `src/app/api/settings/route.ts`
 - **Commission calculations**: `src/app/api/reports/route.ts`
 

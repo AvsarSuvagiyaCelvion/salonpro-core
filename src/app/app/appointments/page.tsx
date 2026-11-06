@@ -105,6 +105,22 @@ export default function AppointmentsPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [overlapError, setOverlapError] = useState<string | null>(null);
 
+  // Staff Availability (Shifts & Leaves)
+  const [staffAvailability, setStaffAvailability] = useState<
+    Record<
+      string,
+      {
+        isWorking: boolean;
+        start: string | null;
+        end: string | null;
+        reason: string;
+        leaveReason?: string | null;
+        holidayTitle?: string | null;
+      }
+    >
+  >({});
+  const [weekAvailability, setWeekAvailability] = useState<Record<string, Record<string, any>>>({});
+
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -269,6 +285,36 @@ export default function AppointmentsPage() {
           setTotalRecords(data.pagination.total);
         }
       }
+
+      // Fetch staff availability for current view
+      if (viewMode === 'lanes') {
+        const targetDate = calendarDate || now.toISOString().slice(0, 10);
+        try {
+          const availRes = await fetch(`/api/staff/availability?date=${targetDate}`);
+          if (availRes.ok) {
+            const availData = await availRes.json();
+            setStaffAvailability(availData.availability || {});
+          }
+        } catch {}
+      } else if (viewMode === 'week') {
+        const targetDate = calendarDate || now.toISOString().slice(0, 10);
+        const curD = new Date(targetDate + 'T00:00:00');
+        const day = curD.getDay();
+        const diffToMon = day === 0 ? -6 : 1 - day;
+        const mon = new Date(curD);
+        mon.setDate(curD.getDate() + diffToMon);
+        const sun = new Date(mon);
+        sun.setDate(mon.getDate() + 6);
+        const monStr = mon.toLocaleDateString('en-CA');
+        const sunStr = sun.toLocaleDateString('en-CA');
+        try {
+          const availRes = await fetch(`/api/staff/availability?startDate=${monStr}&endDate=${sunStr}`);
+          if (availRes.ok) {
+            const availData = await availRes.json();
+            setWeekAvailability(availData.availability || {});
+          }
+        } catch {}
+      }
     } catch {
       setMessage({ type: 'error', text: 'Failed to load appointments' });
     } finally {
@@ -340,11 +386,8 @@ export default function AppointmentsPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.isOverlap) {
-          setOverlapError(data.error);
-          return;
-        }
-        throw new Error(data.error || 'Failed to book appointment');
+        setOverlapError(data.error || 'Failed to book appointment');
+        return;
       }
 
       await fetchAppointments();
@@ -731,6 +774,11 @@ export default function AppointmentsPage() {
                         <div className="text-[10px] text-[#6B7280] dark:text-[#A0A8B8] truncate">
                           {staff.role_title || 'Stylist'}
                         </div>
+                        {staffAvailability[staff.id] && !staffAvailability[staff.id].isWorking && (
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 mt-0.5">
+                            {staffAvailability[staff.id].reason === 'staff_leave' ? '🌴 On Leave' : '⛔ Off Today'}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -774,23 +822,54 @@ export default function AppointmentsPage() {
                         return matchesStaff && apptDate.getHours() === hour;
                       });
 
+                      const avail = staffAvailability[staff.id];
+                      const isNotWorkingDay = avail && !avail.isWorking;
+                      const isLeave = isNotWorkingDay && avail.reason === 'staff_leave';
+                      const isShiftOff = isNotWorkingDay && avail.reason === 'staff_shift_off';
+                      const isOutsideShift = (() => {
+                        if (!avail || !avail.isWorking || !avail.start || !avail.end) return false;
+                        const startH = parseInt(avail.start.slice(0, 2), 10);
+                        const endH = parseInt(avail.end.slice(0, 2), 10);
+                        return hour < startH || hour >= endH;
+                      })();
+
                       return (
                         <div
                           key={staff.id}
                           className="p-2 sm:p-2.5 border-b border-[#E5E7EB] dark:border-[#2A2F3A] min-h-[96px] bg-white dark:bg-[#141926] hover:bg-[#F9FAFB]/60 dark:hover:bg-[#1C2230]/40 transition-colors flex flex-col justify-center relative group"
                         >
                           {cellAppts.length === 0 ? (
-                            /* Empty Slot: Clickable to Book with this Stylist */
-                            <button
-                              type="button"
-                              onClick={() => openCreateModal(`${hour.toString().padStart(2, '0')}:00`, calendarDate, staff.id)}
-                              className="w-full h-full min-h-[64px] border border-dashed border-[#E5E7EB] dark:border-[#2A2F3A] hover:border-[#D4A77F] dark:hover:border-[#D4A77F] rounded-xl flex items-center justify-center gap-1.5 text-[11px] font-medium text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#D4A77F] hover:bg-[#D4A77F]/5 transition-all cursor-pointer group/btn"
-                            >
-                              <Plus className="w-3.5 h-3.5 text-[#6B7280] dark:text-[#A0A8B8] group-hover/btn:text-[#D4A77F] group-hover/btn:scale-110 transition-transform" />
-                              <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                Book {staff.name.split(' ')[0]}
-                              </span>
-                            </button>
+                            isNotWorkingDay ? (
+                              <div className="w-full h-full min-h-[64px] rounded-xl bg-neutral-100/70 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center p-2 text-center select-none">
+                                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+                                  {isLeave ? '🌴 Leave' : isShiftOff ? '⛔ Off' : 'Closed'}
+                                </span>
+                                <span className="text-[9px] text-neutral-400 dark:text-neutral-500 mt-0.5 truncate max-w-[120px]">
+                                  {avail?.leaveReason || (isShiftOff ? 'Day Off' : 'Not Working')}
+                                </span>
+                              </div>
+                            ) : isOutsideShift ? (
+                              <div className="w-full h-full min-h-[64px] rounded-xl bg-neutral-50/80 dark:bg-neutral-900/40 border border-dashed border-neutral-200/80 dark:border-neutral-800 flex flex-col items-center justify-center p-2 text-center select-none">
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold text-neutral-400 dark:text-neutral-500">
+                                  Off Shift
+                                </span>
+                                <span className="text-[9px] text-neutral-400 dark:text-neutral-500 font-variant-numeric tabular-nums mt-0.5">
+                                  Shift: {avail?.start} - {avail?.end}
+                                </span>
+                              </div>
+                            ) : (
+                              /* Empty Slot: Clickable to Book with this Stylist */
+                              <button
+                                type="button"
+                                onClick={() => openCreateModal(`${hour.toString().padStart(2, '0')}:00`, calendarDate, staff.id)}
+                                className="w-full h-full min-h-[64px] border border-dashed border-[#E5E7EB] dark:border-[#2A2F3A] hover:border-[#D4A77F] dark:hover:border-[#D4A77F] rounded-xl flex items-center justify-center gap-1.5 text-[11px] font-medium text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#D4A77F] hover:bg-[#D4A77F]/5 transition-all cursor-pointer group/btn"
+                              >
+                                <Plus className="w-3.5 h-3.5 text-[#6B7280] dark:text-[#A0A8B8] group-hover/btn:text-[#D4A77F] group-hover/btn:scale-110 transition-transform" />
+                                <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Book {staff.name.split(' ')[0]}
+                                </span>
+                              </button>
+                            )
                           ) : (
                             /* Scheduled Appointment Cards */
                             <div className="space-y-2">
@@ -970,9 +1049,11 @@ export default function AppointmentsPage() {
                   return a.starts_at.slice(0, 10) === d.dateStr;
                 });
                 const dayRev = dayAppts.reduce((sum, a) => sum + (a.status !== 'cancelled' ? Number(a.service_price || 0) : 0), 0);
+                const stylistAvail = selectedStylistFilter !== 'all' ? weekAvailability[d.dateStr]?.[selectedStylistFilter] : null;
+                const isStylistNotWorking = stylistAvail && !stylistAvail.isWorking;
 
                 return (
-                  <div key={d.dateStr} className="flex flex-col min-h-[460px]">
+                  <div key={d.dateStr} className={`flex flex-col min-h-[460px] ${isStylistNotWorking ? 'bg-neutral-50/50 dark:bg-neutral-900/30' : ''}`}>
                     {/* Day Column Header */}
                     <div
                       className={`p-3 text-center border-b border-[#E5E7EB] dark:border-[#2A2F3A] transition-colors ${
@@ -993,25 +1074,46 @@ export default function AppointmentsPage() {
                         {d.formatted}
                       </div>
 
-                      <div className="mt-1 flex items-center justify-center gap-1 text-[10px]">
-                        <span className="font-bold text-[#D4A77F]">{dayAppts.length} appts</span>
-                        <span className="text-neutral-400">·</span>
-                        <span className="font-variant-numeric tabular-nums font-semibold text-[#1F2937] dark:text-white">₹{dayRev.toLocaleString('en-IN')}</span>
-                      </div>
+                      {isStylistNotWorking ? (
+                        <div className="mt-1">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+                            {stylistAvail?.reason === 'staff_leave' ? '🌴 Leave' : '⛔ Off'}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="mt-1 flex items-center justify-center gap-1 text-[10px]">
+                          <span className="font-bold text-[#D4A77F]">{dayAppts.length} appts</span>
+                          <span className="text-neutral-400">·</span>
+                          <span className="font-variant-numeric tabular-nums font-semibold text-[#1F2937] dark:text-white">₹{dayRev.toLocaleString('en-IN')}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Day Appointments List */}
                     <div className="p-2 space-y-2 flex-1 overflow-y-auto max-h-[500px]">
                       {dayAppts.length === 0 ? (
                         <div className="h-full min-h-[120px] flex flex-col items-center justify-center text-center p-3 text-[11px] text-[#9CA3AF]">
-                          <span>No bookings</span>
-                          <button
-                            type="button"
-                            onClick={() => openCreateModal('11:00', d.dateStr)}
-                            className="mt-2 px-2 py-1 rounded-lg border border-dashed border-[#D4A77F]/40 hover:border-[#D4A77F] text-[#D4A77F] text-[10px] font-semibold cursor-pointer"
-                          >
-                            + Book Slot
-                          </button>
+                          {isStylistNotWorking ? (
+                            <>
+                              <span className="font-semibold text-neutral-500 dark:text-neutral-400">
+                                {stylistAvail?.reason === 'staff_leave' ? '🌴 Stylist on Leave' : '⛔ Stylist Day Off'}
+                              </span>
+                              <span className="text-[10px] text-neutral-400 mt-0.5">
+                                {stylistAvail?.leaveReason || 'Not taking appointments'}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span>No bookings</span>
+                              <button
+                                type="button"
+                                onClick={() => openCreateModal('11:00', d.dateStr)}
+                                className="mt-2 px-2 py-1 rounded-lg border border-dashed border-[#D4A77F]/40 hover:border-[#D4A77F] text-[#D4A77F] text-[10px] font-semibold cursor-pointer"
+                              >
+                                + Book Slot
+                              </button>
+                            </>
+                          )}
                         </div>
                       ) : (
                         dayAppts.map((appt) => {

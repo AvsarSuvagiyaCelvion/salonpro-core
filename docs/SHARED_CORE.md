@@ -1,6 +1,6 @@
 # Shared Core Architecture & Infrastructure
 
-> **Last verified:** 2026-11-06  
+> **Last verified:** 2026-11-06 (Full access control, exception handling, and error response audit)  
 > **Status:** Verified against source code
 
 ---
@@ -48,6 +48,22 @@ The proxy middleware intercepts every incoming HTTP request and performs:
 
 ### Role Re-verification
 In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re-queries `users.role` from PostgreSQL (with a 10-second in-memory cache `userAuthCache`) to immediately enforce role downgrades or account deactivations.
+
+### Error Handling & RFC HTTP Responses (`src/lib/http.ts`, `src/app/error.tsx`, `src/app/not-found.tsx`)
+- **Centralized API Error Handler (`serverError`)**:
+  - Safely inspects Postgres error codes and JavaScript exceptions:
+    - `22P02`: Invalid UUID or numeric input syntax -> returns HTTP 400 `{ error: 'Invalid identifier or parameter format.', code: 'INVALID_INPUT' }`.
+    - `22007` / `22008`: Invalid date or time format -> returns HTTP 400 `{ error: 'Invalid date or time value.', code: 'INVALID_DATETIME' }`.
+    - `SyntaxError`: Malformed JSON request bodies -> returns HTTP 400 `{ error: 'Malformed JSON or invalid request payload.', code: 'BAD_REQUEST' }`.
+    - `23505`: Unique constraint collisions -> returns HTTP 409 `{ error: 'A conflicting record already exists.', code: 'CONFLICT' }`.
+    - `23503`: Foreign key constraint failures -> returns HTTP 400 `{ error: 'Referenced record was not found or is invalid.', code: 'FOREIGN_KEY_VIOLATION' }`.
+    - `23514`: Check constraint violations -> returns HTTP 400 `{ error: 'Provided data violates validation rules.', code: 'CHECK_VIOLATION' }`.
+    - Unhandled internal errors -> logs to server console and returns sanitized HTTP 500.
+- **Client & Server Runtime Error Boundary (`src/app/error.tsx`)**:
+  - React 19 / Next.js client component error boundary. Catches rendering and client-side exceptions gracefully across all routes.
+  - Displays branded error card with error reference digest, "Try Again" (`reset()`), "Return Home", and customer support phone/email links.
+- **Branded Not Found Screen (`src/app/not-found.tsx`)**:
+  - Full-screen dark/light themed 404 handler with quick navigation to Home, Customer Portal, or Salon Owner Login, responsive from 320px upwards.
 
 ---
 

@@ -115,6 +115,11 @@ export async function POST(request: Request) {
           const defaultSalonRes = await query('SELECT id FROM salons WHERE is_active = true ORDER BY created_at ASC LIMIT 1');
           if (defaultSalonRes.rows.length > 0) {
             salonId = defaultSalonRes.rows[0].id;
+          } else {
+            const fallbackSalonRes = await query('SELECT id FROM salons ORDER BY created_at ASC LIMIT 1');
+            if (fallbackSalonRes.rows.length > 0) {
+              salonId = fallbackSalonRes.rows[0].id;
+            }
           }
         }
       }
@@ -132,19 +137,74 @@ export async function POST(request: Request) {
 
       const cleanName = name ? String(name).trim() : '';
       if (!cleanName) {
-        return NextResponse.json({ error: 'Full name is required to sign up.' }, { status: 400 });
+        return NextResponse.json({ error: 'Full name is required to sign up or set PIN.' }, { status: 400 });
       }
 
-      // Check if customer already exists for THIS (salon_id, mobile)
+      // Check if customer already exists for THIS mobile (at requested salon or globally)
       const existing = await query(
-        `SELECT id, name, mobile, email, pin FROM customers WHERE salon_id = $1 AND mobile = $2 LIMIT 1`,
-        [salonId, cleanMobile]
+        `SELECT id, name, mobile, email, pin, salon_id 
+         FROM customers 
+         WHERE mobile = $1 
+         ORDER BY (CASE WHEN salon_id = $2::uuid THEN 0 ELSE 1 END), created_at ASC 
+         LIMIT 1`,
+        [cleanMobile, salonId]
       );
 
       if (existing.rows.length > 0) {
+        const existingCust = existing.rows[0];
+        // If the existing customer has no PIN set yet, allow them to set their PIN right now!
+        if (!existingCust.pin) {
+          const hashedPin = await bcrypt.hash(cleanPin, 10);
+          const updated = await query(
+            `UPDATE customers
+             SET pin = $1,
+                 name = CASE WHEN $2::text <> '' THEN $2::text ELSE name END,
+                 email = CASE WHEN $3::text IS NOT NULL AND $3::text <> '' THEN $3::text ELSE email END,
+                 last_login_at = NOW()
+             WHERE id = $4
+             RETURNING id, name, mobile, email, salon_id`,
+            [hashedPin, cleanName, email ? String(email).trim() : null, existingCust.id]
+          );
+          const customer = updated.rows[0];
+          await resetRateLimit(ipRateLimitKey);
+
+          const sRes = await query(`SELECT slug as salon_slug, name as salon_name FROM salons WHERE id = $1 LIMIT 1`, [customer.salon_id]);
+          const sInfo = sRes.rows[0] || {};
+
+          const token = await createCustomerSessionToken({
+            customerId: customer.id,
+            mobile: customer.mobile,
+            name: customer.name,
+            salonId: customer.salon_id,
+          });
+
+          const response = NextResponse.json({
+            success: true,
+            customer: {
+              ...customer,
+              salon_slug: sInfo.salon_slug,
+              salon_name: sInfo.salon_name,
+            },
+            message: 'Your 4-digit PIN has been set successfully! Welcome to your customer portal.',
+          });
+
+          response.cookies.set({
+            name: CUSTOMER_COOKIE_NAME,
+            value: token,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 30 * 24 * 60 * 60, // 30 days
+          });
+
+          return response;
+        }
+
+        // Customer already has an active PIN
         return NextResponse.json(
           {
-            error: 'An account with this mobile number already exists at this salon. Please sign in with your PIN.',
+            error: 'An account with this mobile number already exists. Please sign in using the "Sign In" tab with your 4-digit PIN.',
             code: 'ACCOUNT_EXISTS',
             requiresLogin: true,
           },
@@ -167,6 +227,9 @@ export async function POST(request: Request) {
       // Reset IP rate limit on successful signup
       await resetRateLimit(ipRateLimitKey);
 
+      const sRes = await query(`SELECT slug as salon_slug, name as salon_name FROM salons WHERE id = $1 LIMIT 1`, [customer.salon_id]);
+      const sInfo = sRes.rows[0] || {};
+
       // Create session cookie
       const token = await createCustomerSessionToken({
         customerId: customer.id,
@@ -177,8 +240,12 @@ export async function POST(request: Request) {
 
       const response = NextResponse.json({
         success: true,
-        customer,
-        message: 'Account created successfully!',
+        customer: {
+          ...customer,
+          salon_slug: sInfo.salon_slug,
+          salon_name: sInfo.salon_name,
+        },
+        message: 'Account created successfully! Welcome to your customer portal.',
       });
 
       response.cookies.set({
@@ -193,33 +260,20 @@ export async function POST(request: Request) {
 
       return response;
     } else if (action === 'login') {
-      // Find customer candidates by mobile
-      let custRes;
-      if (salonId) {
-        custRes = await query(
-          `SELECT c.id, c.salon_id, c.name, c.mobile, c.email, c.pin, s.slug as salon_slug, s.name as salon_name
-           FROM customers c
-           JOIN salons s ON c.salon_id = s.id
-           WHERE c.salon_id = $1 AND c.mobile = $2
-           LIMIT 1`,
-          [salonId, cleanMobile]
-        );
-      } else {
-        // Portal login without explicit salonId: find customer by mobile across salons
-        custRes = await query(
-          `SELECT c.id, c.salon_id, c.name, c.mobile, c.email, c.pin, s.slug as salon_slug, s.name as salon_name
-           FROM customers c
-           JOIN salons s ON c.salon_id = s.id
-           WHERE c.mobile = $1
-           ORDER BY c.last_login_at DESC NULLS LAST, c.created_at DESC`,
-          [cleanMobile]
-        );
-      }
+      // Find customer candidates by mobile, prioritizing requested salonId if specified
+      const custRes = await query(
+        `SELECT c.id, c.salon_id, c.name, c.mobile, c.email, c.pin, s.slug as salon_slug, s.name as salon_name
+         FROM customers c
+         JOIN salons s ON c.salon_id = s.id
+         WHERE c.mobile = $1
+         ORDER BY (CASE WHEN c.salon_id = $2::uuid THEN 0 ELSE 1 END), c.last_login_at DESC NULLS LAST, c.created_at DESC`,
+        [cleanMobile, salonId]
+      );
 
       if (custRes.rows.length === 0) {
         await recordFailedAttempt(ipRateLimitKey, 20, 900);
         return NextResponse.json(
-          { error: 'No customer account found with this mobile. Please click "New Account" below or book an appointment.' },
+          { error: 'No customer account found with this mobile number. Please click "New Account / Set PIN" to register.' },
           { status: 404 }
         );
       }
@@ -263,13 +317,14 @@ export async function POST(request: Request) {
       }
 
       if (!customer) {
-        if (hadUnsetPin && custRes.rows.length === 1) {
+        if (hadUnsetPin) {
           await recordFailedAttempt(ipRateLimitKey, 20, 900);
           return NextResponse.json(
             {
               code: 'PIN_NOT_SET',
-              error: 'Please set your PIN using the "New Account / Reset PIN" tab to access your portal.',
-              message: 'Please set your PIN using the "New Account / Reset PIN" tab to access your portal.',
+              canSetPin: true,
+              error: 'Your mobile is registered, but your 4-digit PIN is not set yet. Please click "New Account / Set PIN" to create your PIN.',
+              message: 'Your mobile is registered, but your 4-digit PIN is not set yet. Please click "New Account / Set PIN" to create your PIN.',
             },
             { status: 403 }
           );

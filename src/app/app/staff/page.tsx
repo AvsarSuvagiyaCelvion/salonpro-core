@@ -43,6 +43,7 @@ export default function StaffPage() {
   const [staffList, setStaffList] = useState<StaffMember[]>([]);
   const [allServices, setAllServices] = useState<ServiceOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canViewCommission, setCanViewCommission] = useState(true);
 
   // Modal & Edit states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,7 +74,12 @@ export default function StaffPage() {
       const staffData = await staffRes.json();
       const servicesData = await servicesRes.json();
 
-      if (staffRes.ok) setStaffList(staffData.staff || []);
+      if (staffRes.ok) {
+        setStaffList(staffData.staff || []);
+        if (staffData.canViewCommission !== undefined) {
+          setCanViewCommission(Boolean(staffData.canViewCommission));
+        }
+      }
       if (servicesRes.ok) setAllServices(servicesData.services || []);
     } catch {
       setMessage({ type: 'error', text: 'Failed to load staff list' });
@@ -292,14 +298,18 @@ export default function StaffPage() {
                       {staff.role_title}
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="text-[11px] space-y-0.5">
-                        <div className="text-neutral-700">
-                          Services: <span className="font-bold text-[#D4A77F]">{staff.service_commission_pct}%</span>
+                      {canViewCommission ? (
+                        <div className="text-[11px] space-y-0.5">
+                          <div className="text-neutral-700">
+                            Services: <span className="font-bold text-[#D4A77F]">{staff.service_commission_pct}%</span>
+                          </div>
+                          <div className="text-neutral-500">
+                            Products: <span className="font-bold text-emerald-700">{staff.product_commission_pct}%</span>
+                          </div>
                         </div>
-                        <div className="text-neutral-500">
-                          Products: <span className="font-bold text-emerald-700">{staff.product_commission_pct}%</span>
-                        </div>
-                      </div>
+                      ) : (
+                        <span className="text-[11px] text-neutral-400 italic">Owner Only</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4">
                       <strong className="text-sm font-black text-neutral-900 block">
@@ -310,12 +320,18 @@ export default function StaffPage() {
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
-                      <strong className="text-sm font-black text-emerald-700 block">
-                        ₹{Number(staff.total_commission_earned || 0).toLocaleString('en-IN')}
-                      </strong>
-                      <span className="text-[10px] text-neutral-400">
-                        ₹{Number(staff.product_commission_earned || 0).toFixed(0)} retail + ₹{Number(staff.service_commission_earned || 0).toFixed(0)} svc
-                      </span>
+                      {canViewCommission ? (
+                        <>
+                          <strong className="text-sm font-black text-emerald-700 block">
+                            ₹{Number(staff.total_commission_earned || 0).toLocaleString('en-IN')}
+                          </strong>
+                          <span className="text-[10px] text-neutral-400">
+                            ₹{Number(staff.product_commission_earned || 0).toFixed(0)} retail + ₹{Number(staff.service_commission_earned || 0).toFixed(0)} svc
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-[11px] text-neutral-400 italic">Owner Only</span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 max-w-xs">
                       <div className="flex flex-wrap gap-1">
@@ -433,37 +449,39 @@ export default function StaffPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    Service Commission (%)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.5"
-                    value={formServiceComm}
-                    onChange={(e) => setFormServiceComm(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
-                  />
-                </div>
+              {canViewCommission && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                      Service Commission (%)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={formServiceComm}
+                      onChange={(e) => setFormServiceComm(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                    Product Commission (%)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.5"
-                    value={formProductComm}
-                    onChange={(e) => setFormProductComm(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
-                  />
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                      Product Commission (%)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={formProductComm}
+                      onChange={(e) => setFormProductComm(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Services Multi-Select */}
               <div>

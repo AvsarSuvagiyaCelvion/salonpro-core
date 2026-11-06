@@ -42,6 +42,7 @@ export default function SettingsPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [userRole, setUserRole] = useState<'owner' | 'staff'>('owner');
 
   // Form fields
   const [salonId, setSalonId] = useState('');
@@ -164,6 +165,7 @@ export default function SettingsPage() {
         if (!res.ok) throw new Error();
         const data = await res.json();
         const s = data.salon;
+        if (data.user?.role) setUserRole(data.user.role);
 
         if (s) {
           setSalonId(s.id);
@@ -364,13 +366,25 @@ export default function SettingsPage() {
         <button
           type="button"
           onClick={handleSaveSettings}
-          disabled={saving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95 self-start sm:self-auto"
+          disabled={saving || userRole === 'staff'}
+          title={userRole === 'staff' ? 'Only salon owners can modify settings' : 'Save Settings'}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-white text-xs font-bold shadow-md transition-all active:scale-95 self-start sm:self-auto cursor-pointer disabled:cursor-not-allowed"
         >
           <Save className="w-4 h-4" />
-          <span>{saving ? 'Saving Changes...' : 'Save Settings'}</span>
+          <span>{saving ? 'Saving Changes...' : userRole === 'staff' ? 'Owner Only' : 'Save Settings'}</span>
         </button>
       </div>
+
+      {/* Staff View Only Notice */}
+      {userRole === 'staff' && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs sm:text-sm flex items-center gap-3 font-medium">
+          <Shield className="w-5 h-5 text-amber-600 shrink-0" />
+          <div>
+            <p className="font-bold text-amber-800 dark:text-amber-200">Staff Member View (Read-Only)</p>
+            <p className="text-[11px] text-amber-700 dark:text-amber-300">You are viewing salon settings with operational staff access. Salon profile details, hours, and cancellation policies can only be saved by the salon owner.</p>
+          </div>
+        </div>
+      )}
 
       {/* Notifications */}
       {saveSuccess && (

@@ -1,6 +1,6 @@
 # Owner & Staff Panel (ERP) Documentation
 
-> **Last verified:** 2026-11-06  
+> **Last verified:** 2026-11-06 (Staff vs Owner role restrictions, masked commissions, and settings guards verified)  
 > **Status:** Verified against source code
 
 ---
@@ -30,7 +30,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/app/memberships` | `src/app/app/memberships/page.tsx` | VIP membership & package management: discount rules, validity periods, and client assignment. | Membership cards & assignment modal |
 | `/app/reports` | `src/app/app/reports/page.tsx` | Analytics and export: revenue breakdowns, staff commission statements, and CSV/PDF export. | `ReportExportModal`, `BarComparisonChart`, `DonutDistributionChart`, `HourlyRushChart` |
 | `/app/reviews` | `src/app/app/reviews/page.tsx` | Reviews & ratings hub: aggregate rating, 5-star distribution, stylist rating leaderboard, client reviews feed, owner reply drawer/modal, and visibility toggle (`visible`/`hidden`). Gated by `reviews` plan flag (Pro/Premium). | Reviews dashboard, Star rating bars, Reply modal |
-| `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, and holiday closures. | Settings tab panels |
+| `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, and holiday closures. Gated with owner role validation; displays a read-only informational banner and disables save actions when accessed by operational staff. | Settings tab panels |
 | `/app/subscription` | `src/app/app/subscription/page.tsx` | Plan management: current subscription tier, trial status, feature matrix, and Razorpay upgrade/renewal. | Plan cards & Razorpay checkout |
 | `/app/benefits` | `src/app/app/benefits/page.tsx` | Plan comparison matrix showing feature gates between Basic, Pro, and Premium. | Feature comparison table |
 

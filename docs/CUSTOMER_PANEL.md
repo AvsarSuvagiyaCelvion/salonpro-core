@@ -1,6 +1,6 @@
 # Customer Panel Documentation
 
-> **Last verified:** 2026-11-06  
+> **Last verified:** 2026-11-06 (Universal client authentication & PIN workflow verified)  
 > **Status:** Verified against source code
 
 ---
@@ -31,7 +31,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `/api/public/[slug]` | `GET` | `src/app/api/public/[slug]/route.ts` | None (Public) | Fetches salon details, brand logo, gallery photos (`salon_photos`), service list, active staff, and working days for the booking wizard. |
 | `/api/public/[slug]/slots` | `GET` | `src/app/api/public/[slug]/slots/route.ts` | None (Public) | Computes real-time available time slots for a given date, service, and optional staff member. |
 | `/api/public/[slug]/book` | `POST` | `src/app/api/public/[slug]/book/route.ts` | None (Public with rate limit & PIN) | Validates customer PIN, checks concurrency via PostgreSQL advisory locks, and books appointment atomically. |
-| `/api/customer/auth` | `GET`, `POST` | `src/app/api/customer/auth/route.ts` | Cookie for `GET`; None for `POST` | Checks customer session or signs in / registers a new customer using 10-digit mobile & 4-digit PIN. Supports direct `/portal` mobile+PIN authentication (resolves customer's registered salon automatically) as well as tenant-scoped auth. Sets `salonpro_customer_session`. |
+| `/api/customer/auth` | `GET`, `POST` | `src/app/api/customer/auth/route.ts` | Cookie for `GET`; None for `POST` | Checks customer session or signs in / registers a new customer using 10-digit mobile & 4-digit PIN. Supports unified cross-salon mobile login (with priority matching for requested salon), automatic PIN creation for existing walk-in / staff-created clients with unset PIN (`canSetPin`), smart mode toggle on existing accounts (`requiresLogin`), and fallback to active salon on direct `/portal` signups. Sets `salonpro_customer_session`. |
 | `/api/customer/logout` | `POST` | `src/app/api/customer/logout/route.ts` | `salonpro_customer_session` | Clears the `salonpro_customer_session` HTTP-only cookie. |
 | `/api/customer/records` | `GET`, `PATCH` | `src/app/api/customer/records/route.ts` | `salonpro_customer_session` | Fetches customer profile, upcoming/past appointments, invoices, active VIP plans, and cancellation policy hours. |
 | `/api/customer/appointments/[id]` | `PATCH` | `src/app/api/customer/appointments/[id]/route.ts` | `salonpro_customer_session` | Handles customer self-service `cancel` or `reschedule` within the salon's cancellation window. Prevents duplicate booking via advisory lock. |

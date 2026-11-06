@@ -511,7 +511,19 @@ export default function CustomerPortalPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Authentication failed');
+      if (!res.ok) {
+        if (data.requiresLogin) {
+          setAuthMode('login');
+          setAuthError(data.error || 'Account already exists. Please enter your 4-digit PIN to sign in.');
+          return;
+        }
+        if (data.canSetPin) {
+          setAuthMode('signup');
+          setAuthError(data.error || 'Please set your 4-digit PIN to access your portal.');
+          return;
+        }
+        throw new Error(data.error || 'Authentication failed');
+      }
 
       if (data.customer?.salon_slug && typeof window !== 'undefined') {
         localStorage.setItem('salonpro_last_salon', data.customer.salon_slug);
@@ -600,7 +612,7 @@ export default function CustomerPortalPage() {
                   : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
               }`}
             >
-              New Account / Reset PIN
+              New Account / Set PIN
             </button>
           </div>
 

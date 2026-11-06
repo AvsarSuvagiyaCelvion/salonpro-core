@@ -20,6 +20,7 @@ import {
   MapPin,
   KeyRound,
   ShieldCheck,
+  Star,
 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 import ImageUploader from '@/components/ui/ImageUploader';
@@ -145,6 +146,14 @@ export default function CustomerPortalPage() {
   const [rescheduling, setRescheduling] = useState(false);
   const [rescheduleError, setRescheduleError] = useState<string | null>(null);
   const [portalMessage, setPortalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Customer Reviews State
+  const [reviewsMap, setReviewsMap] = useState<Record<string, any>>({});
+  const [reviewModalAppt, setReviewModalAppt] = useState<Appointment | null>(null);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState<string>('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
 
   function canModifyAppointment(startsAtStr: string, policyHours: number = 2): boolean {
     const startsAt = new Date(startsAtStr).getTime();
@@ -279,8 +288,66 @@ export default function CustomerPortalPage() {
       setPastAppts(data.pastAppointments || []);
       setInvoices(data.invoices || []);
       setPlans(data.plans || []);
+
+      // Fetch customer's submitted reviews
+      try {
+        const revRes = await fetch('/api/customer/reviews');
+        if (revRes.ok) {
+          const revData = await revRes.json();
+          const rMap: Record<string, any> = {};
+          (revData.reviews || []).forEach((r: any) => {
+            rMap[r.appointment_id] = r;
+          });
+          setReviewsMap(rMap);
+        }
+      } catch {}
     } catch (err) {
       console.error('Failed to load records:', err);
+    }
+  }
+
+  function handleOpenReviewModal(appt: Appointment) {
+    setReviewModalAppt(appt);
+    setReviewRating(5);
+    setReviewComment('');
+    setReviewError(null);
+  }
+
+  async function handleSubmitReview(e: React.FormEvent) {
+    e.preventDefault();
+    if (!reviewModalAppt) return;
+    setSubmittingReview(true);
+    setReviewError(null);
+
+    try {
+      const res = await fetch('/api/customer/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appointment_id: reviewModalAppt.id,
+          rating: reviewRating,
+          comment: reviewComment.trim() || null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to submit review');
+      }
+
+      // Update reviewsMap locally
+      setReviewsMap((prev) => ({
+        ...prev,
+        [reviewModalAppt.id]: data.review,
+      }));
+
+      setReviewModalAppt(null);
+      setPortalMessage({ type: 'success', text: 'Thank you! Your review has been submitted.' });
+      setTimeout(() => setPortalMessage(null), 5000);
+    } catch (err: any) {
+      setReviewError(err.message || 'Error submitting review');
+    } finally {
+      setSubmittingReview(false);
     }
   }
 
@@ -885,54 +952,123 @@ export default function CustomerPortalPage() {
                   Past Visits History
                 </h2>
                 <div className="space-y-2.5">
-                  {pastAppts.map((appt) => (
-                    <div
-                      key={appt.id}
-                      className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl p-4 flex justify-between items-center text-xs shadow-2xs"
-                    >
-                      <div>
-                        <div className="font-semibold text-[#1F2937] dark:text-white">{appt.service_name}</div>
-                        <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
-                          {new Date(appt.starts_at).toLocaleDateString('en-IN', {
-                            timeZone: 'Asia/Kolkata',
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}{' '}
-                          ·{' '}
-                          {new Date(appt.starts_at).toLocaleTimeString('en-IN', {
-                            timeZone: 'Asia/Kolkata',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}{' '}
-                          with {appt.staff_name}
+                  {pastAppts.map((appt) => {
+                    const existingReview = reviewsMap[appt.id];
+                    const isCompleted = appt.status === 'completed';
+                    const apptTime = new Date(appt.ends_at || appt.starts_at).getTime();
+                    const isWithin30Days = Date.now() - apptTime <= 30 * 24 * 60 * 60 * 1000;
+                    const canReview = isCompleted && !existingReview && isWithin30Days;
+
+                    return (
+                      <div
+                        key={appt.id}
+                        className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl p-4 text-xs shadow-2xs space-y-3"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div>
+                            <div className="font-semibold text-[#1F2937] dark:text-white">{appt.service_name}</div>
+                            <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
+                              {new Date(appt.starts_at).toLocaleDateString('en-IN', {
+                                timeZone: 'Asia/Kolkata',
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}{' '}
+                              ·{' '}
+                              {new Date(appt.starts_at).toLocaleTimeString('en-IN', {
+                                timeZone: 'Asia/Kolkata',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}{' '}
+                              with {appt.staff_name}
+                            </div>
+                          </div>
+                          <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1">
+                            <div className="font-bold text-[#1F2937] dark:text-white">
+                              ₹{Number(appt.service_price).toLocaleString('en-IN')}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {appt.rescheduled_count && appt.rescheduled_count > 0 ? (
+                                <span className="text-[9px] px-1 py-0.2 rounded bg-[#D4A77F]/20 text-[#B8905F] dark:text-[#D4A77F]">
+                                  Rescheduled
+                                </span>
+                              ) : null}
+                              <span
+                                className={`text-[10px] font-bold capitalize ${
+                                  appt.status === 'cancelled'
+                                    ? 'text-rose-600 dark:text-rose-400'
+                                    : appt.status === 'completed'
+                                    ? 'text-emerald-600 dark:text-emerald-400'
+                                    : 'text-[#6B7280] dark:text-[#A0A8B8]'
+                                }`}
+                              >
+                                {appt.status === 'cancelled'
+                                  ? appt.cancelled_by === 'customer'
+                                    ? 'Cancelled (by you)'
+                                    : 'Cancelled'
+                                  : appt.status}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-[#1F2937] dark:text-white">₹{Number(appt.service_price).toLocaleString('en-IN')}</div>
-                        <div className="flex items-center justify-end gap-1 mt-0.5">
-                          {appt.rescheduled_count && appt.rescheduled_count > 0 ? (
-                            <span className="text-[9px] px-1 py-0.2 rounded bg-[#D4A77F]/20 text-[#B8905F] dark:text-[#D4A77F]">
-                              Rescheduled
+
+                        {/* Submitted Review (Read-only) */}
+                        {existingReview && (
+                          <div className="pt-2.5 border-t border-neutral-100 dark:border-neutral-800 text-[11px] space-y-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <div className="flex items-center text-amber-400 text-xs">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                  <span
+                                    key={i}
+                                    className={
+                                      i < existingReview.rating
+                                        ? 'text-amber-400'
+                                        : 'text-neutral-300 dark:text-neutral-700'
+                                    }
+                                  >
+                                    ★
+                                  </span>
+                                ))}
+                              </div>
+                              <span className="font-bold text-neutral-700 dark:text-neutral-200">
+                                Your rating ({existingReview.rating}/5)
+                              </span>
+                            </div>
+
+                            {existingReview.comment && (
+                              <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed italic">
+                                &ldquo;{existingReview.comment}&rdquo;
+                              </p>
+                            )}
+
+                            {existingReview.owner_reply && (
+                              <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#10141F] border-l-2 border-[#D4A77F] text-[10px] text-neutral-600 dark:text-neutral-300 mt-1 space-y-0.5">
+                                <span className="font-bold text-[#D4A77F] block">Salon response:</span>
+                                <p>{existingReview.owner_reply}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Review Call to Action */}
+                        {canReview && (
+                          <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
+                            <span className="text-[10px] text-neutral-400">
+                              Completed visit · Share your feedback
                             </span>
-                          ) : null}
-                          <span
-                            className={`text-[10px] font-bold capitalize ${
-                              appt.status === 'cancelled'
-                                ? 'text-rose-600 dark:text-rose-400'
-                                : 'text-[#6B7280] dark:text-[#A0A8B8]'
-                            }`}
-                          >
-                            {appt.status === 'cancelled'
-                              ? appt.cancelled_by === 'customer'
-                                ? 'Cancelled (by you)'
-                                : 'Cancelled'
-                              : appt.status}
-                          </span>
-                        </div>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenReviewModal(appt)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-bold transition-all cursor-pointer shadow-2xs active:scale-95"
+                            >
+                              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                              <span>Rate this visit</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -1501,6 +1637,114 @@ export default function CustomerPortalPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL: SUBMIT VISIT REVIEW ================= */}
+      {reviewModalAppt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl max-w-sm w-full p-5 sm:p-6 shadow-2xl space-y-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center font-bold">
+                  <Star className="w-4 h-4 fill-amber-400" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-white">Rate Your Visit</h3>
+                  <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] truncate max-w-[200px]">
+                    {reviewModalAppt.service_name} · {reviewModalAppt.staff_name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReviewModalAppt(null)}
+                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Error Banner */}
+            {reviewError && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{reviewError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitReview} className="space-y-4">
+              {/* Star Rating Selector (Fits cleanly on 1 line at 320px) */}
+              <div className="text-center py-1">
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-2">
+                  How was your experience?
+                </label>
+                <div className="flex items-center justify-center gap-2 sm:gap-3 py-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      className="p-1 rounded-lg transition-transform hover:scale-125 active:scale-95 cursor-pointer focus:outline-none"
+                    >
+                      <Star
+                        className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
+                          star <= reviewRating
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-neutral-300 dark:text-neutral-700 hover:text-amber-200'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-1">
+                  {reviewRating === 5 && '★★★★★ Excellent'}
+                  {reviewRating === 4 && '★★★★☆ Very Good'}
+                  {reviewRating === 3 && '★★★☆☆ Average'}
+                  {reviewRating === 2 && '★★☆☆☆ Below Average'}
+                  {reviewRating === 1 && '★☆☆☆☆ Poor'}
+                </div>
+              </div>
+
+              {/* Optional Comment */}
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                  Your Feedback (Optional)
+                </label>
+                <textarea
+                  rows={3}
+                  maxLength={500}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share details of your visit, the stylist's service, or styling tips..."
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-3.5 py-2.5 text-xs text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                />
+                <div className="flex justify-end text-[10px] text-neutral-400 mt-0.5">
+                  {reviewComment.length}/500
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E7EB] dark:border-[#2A2F3A]">
+                <button
+                  type="button"
+                  disabled={submittingReview}
+                  onClick={() => setReviewModalAppt(null)}
+                  className="px-4 py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="px-5 py-2 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-extrabold shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                >
+                  {submittingReview ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

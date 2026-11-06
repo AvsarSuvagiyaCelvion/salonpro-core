@@ -28,6 +28,7 @@ import {
   ShieldCheck,
   Zap,
   Lock,
+  Star,
 } from 'lucide-react';
 
 interface NavItem {
@@ -44,6 +45,7 @@ const navItems: NavItem[] = [
   { name: 'Appointments', href: '/app/appointments', icon: Calendar },
   { name: 'Billing and payments', href: '/app/billing', icon: Receipt },
   { name: 'Customers', href: '/app/customers', icon: Users },
+  { name: 'Reviews', href: '/app/reviews', icon: Star, requiredFlag: 'reviews', requiredPlanName: 'Pro' },
   { name: 'Staff', href: '/app/staff', icon: UserCheck },
   { name: 'Services', href: '/app/services', icon: Scissors },
   { name: 'Products', href: '/app/products', icon: Package },

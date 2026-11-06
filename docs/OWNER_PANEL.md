@@ -29,6 +29,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/app/staff` | `src/app/app/staff/page.tsx` | Staff roster: stylist profiles, roles, service commission %, product commission %, and online scheduling status. | Staff table & modal |
 | `/app/memberships` | `src/app/app/memberships/page.tsx` | VIP membership & package management: discount rules, validity periods, and client assignment. | Membership cards & assignment modal |
 | `/app/reports` | `src/app/app/reports/page.tsx` | Analytics and export: revenue breakdowns, staff commission statements, and CSV/PDF export. | `ReportExportModal`, `BarComparisonChart`, `DonutDistributionChart`, `HourlyRushChart` |
+| `/app/reviews` | `src/app/app/reviews/page.tsx` | Reviews & ratings hub: aggregate rating, 5-star distribution, stylist rating leaderboard, client reviews feed, owner reply drawer/modal, and visibility toggle (`visible`/`hidden`). Gated by `reviews` plan flag (Pro/Premium). | Reviews dashboard, Star rating bars, Reply modal |
 | `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, and holiday closures. | Settings tab panels |
 | `/app/subscription` | `src/app/app/subscription/page.tsx` | Plan management: current subscription tier, trial status, feature matrix, and Razorpay upgrade/renewal. | Plan cards & Razorpay checkout |
 | `/app/benefits` | `src/app/app/benefits/page.tsx` | Plan comparison matrix showing feature gates between Basic, Pro, and Premium. | Feature comparison table |
@@ -70,6 +71,8 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/api/memberships` | `GET`, `POST` | `src/app/api/memberships/route.ts` | `salonpro_session` (Feature: `memberships`) | Lists or creates VIP membership plans. Gated by plan feature. |
 | `/api/memberships/assign` | `POST` | `src/app/api/memberships/assign/route.ts` | `salonpro_session` (Feature: `memberships`) | Assigns VIP plan to customer. |
 | `/api/reports` | `GET` | `src/app/api/reports/route.ts` | `salonpro_session` | Aggregates daily/monthly revenue, staff commission reports, and cash summary. |
+| `/api/reviews` | `GET` | `src/app/api/reviews/route.ts` | `salonpro_session` (Feature: `reviews`) | Lists paginated reviews for the salon with status (`all`/`visible`/`hidden`), star (1-5), and staff filters. Computes overall average, total count, 5-to-1 star distribution breakdown, and staff average ratings. Returns `planAllowed`. |
+| `/api/reviews/[id]` | `PATCH` | `src/app/api/reviews/[id]/route.ts` | `salonpro_session` (Feature: `reviews`) | Adds or updates an owner reply (max 300 chars, records `owner_replied_at`) or toggles status (`visible`/`hidden`). Scoped to salon owner/staff; rate-limited to 30 requests / 15 min. |
 | `/api/export` | `GET` | `src/app/api/export/route.ts` | `salonpro_session` (Feature: `export`) | Exports clients, invoices, appointments, or products as CSV/PDF. Gated by plan. |
 | `/api/settings` | `GET`, `PUT`, `PATCH` | `src/app/api/settings/route.ts` | `salonpro_session` (Role: `owner`) | Reads and saves salon operating rules, buffer gap, advance notice, cancellation policy, and branding. |
 | `/api/settings/photos` | `GET`, `POST`, `DELETE` | `src/app/api/settings/photos/route.ts` | `salonpro_session` (Role: `owner`) | Fetches, adds, or deletes salon gallery photos. Enforces `MAX_GALLERY_PHOTOS = 5`. |
@@ -119,6 +122,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `payments` | `id`, `invoice_id`, `amount`, `payment_method`, `created_at` | Read / Write | `001_initial_schema.sql` |
 | `salon_holidays` | `id`, `salon_id`, `title`, `start_date`, `end_date`, `note` | Read / Write | `014_salon_holidays.sql` |
 | `subscription_payments` | `id`, `salon_id`, `razorpay_order_id`, `razorpay_payment_id`, `amount`, `status` | Read / Write | `011_subscription_payments.sql` |
+| `reviews` | `id`, `salon_id`, `customer_id`, `appointment_id`, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at` | Read / Write | `018_reviews.sql` |
 
 ---
 
@@ -152,6 +156,13 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 4. **Save**: Click "Save Settings" -> `PUT /api/settings` validates values (cancellation hours strictly 0-72, logo path strictly in salon's own storage or existing external URL) and updates `salons` table.
 5. **Temporary Closures**: Owner navigates to "Holidays & Closures" tab to block festival dates or renovation days (`POST /api/holidays`).
 
+### Flow 4: Owner Review Moderation & Reply Management
+1. **Open Reviews**: Owner navigates to `/app/reviews`. If on Basic plan, an upgrade banner prompting upgrade to Pro/Premium is displayed.
+2. **View Analytics**: Dashboard displays average rating score (e.g. 4.8 / 5.0), total count, 5-to-1 star distribution bars, and staff-wise performance averages.
+3. **Filter Reviews**: Owner filters by visibility status (`all`, `visible`, `hidden`), star rating (1 to 5), or stylist.
+4. **Reply to Feedback**: Owner clicks "Reply" or "Edit Reply" on any review card. Modal opens allowing an official response up to 300 characters. Submitting calls `PATCH /api/reviews/[id]` with `{ owner_reply }`.
+5. **Visibility Moderation**: Owner can toggle "Hide" / "Unhide" for any review. Hidden reviews are immediately excluded from public booking pages and the salon's public average rating. Calls `PATCH /api/reviews/[id]` with `{ status: 'hidden' | 'visible' }`.
+
 ---
 
 ## 7. Business Rules and Edge Cases
@@ -161,9 +172,9 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
   - `staff`: Blocked from viewing financial reports, changing salon settings, or modifying subscriptions (`requireRole(session, ['owner'])` returns 403).
 - **Subscription Gates**:
   - Gated by `src/lib/plan.ts`.
-  - Basic: Max 3 staff, max 30 services, no logo upload, no custom domain, no export.
-  - Pro: Max 10 staff, max 100 services, logo upload enabled, commission reports, memberships, export enabled.
-  - Premium: Unlimited staff/services, custom domains.
+  - Basic: Max 3 staff, max 30 services, no logo upload, no custom domain, no export, no reviews management/showcase.
+  - Pro: Max 10 staff, max 100 services, logo upload enabled, commission reports, memberships, export enabled, reviews management and public ratings showcase enabled.
+  - Premium: Unlimited staff/services, custom domains, all features enabled.
   - Expired subscriptions return HTTP 402, redirecting owner to `/app/subscription`.
 - **Demo Salon**: The demo salon `dixa-beauty-salon` allows instant one-click login via `/api/demo/owner-login` without entering a password.
 - **Appointments Table Schema**: The `appointments` table has **no** `updated_at` column. Do not write to it.

@@ -82,6 +82,78 @@ export async function GET(
       [salon.id]
     );
 
+    // Fetch review ratings & latest 5 visible reviews (if plan allows reviews)
+    const planAllowsReviews = planCheck.plan?.flags.reviews ?? false;
+    let reviewsSummary = { average: 0, count: 0, enabled: false };
+    let latestReviews: any[] = [];
+
+    if (planAllowsReviews) {
+      const summaryRes = await query(
+        `SELECT
+           COUNT(*)::int as count,
+           COALESCE(ROUND(AVG(rating)::numeric, 1), 0)::float as average
+         FROM reviews
+         WHERE salon_id = $1::uuid AND status = 'visible'`,
+        [salon.id]
+      );
+
+      const sRow = summaryRes.rows[0];
+      const count = Number(sRow?.count) || 0;
+      const average = Number(sRow?.average) || 0;
+
+      reviewsSummary = {
+        average,
+        count,
+        enabled: true,
+      };
+
+      if (count > 0) {
+        const reviewsRes = await query(
+          `SELECT
+             r.id,
+             r.rating,
+             r.comment,
+             r.owner_reply,
+             r.owner_replied_at,
+             r.created_at,
+             c.name as customer_raw_name,
+             srv.name as service_name
+           FROM reviews r
+           JOIN customers c ON r.customer_id = c.id
+           JOIN appointments a ON r.appointment_id = a.id
+           LEFT JOIN services srv ON a.service_id = srv.id
+           WHERE r.salon_id = $1::uuid AND r.status = 'visible'
+           ORDER BY r.created_at DESC
+           LIMIT 5`,
+          [salon.id]
+        );
+
+        latestReviews = reviewsRes.rows.map((r) => {
+          // Privacy protection: Return only "First name + last initial", never phone or full name
+          let displayName = 'Client';
+          if (r.customer_raw_name) {
+            const parts = r.customer_raw_name.trim().split(/\s+/);
+            if (parts.length === 1) {
+              displayName = parts[0];
+            } else {
+              displayName = `${parts[0]} ${parts[parts.length - 1].charAt(0).toUpperCase()}.`;
+            }
+          }
+
+          return {
+            id: r.id,
+            rating: r.rating,
+            comment: r.comment,
+            owner_reply: r.owner_reply,
+            owner_replied_at: r.owner_replied_at,
+            created_at: r.created_at,
+            service_name: r.service_name,
+            customer_name: displayName,
+          };
+        });
+      }
+    }
+
     return NextResponse.json({
       salon,
       services: servicesRes.rows,
@@ -89,6 +161,8 @@ export async function GET(
       staffServices: mappingRes.rows,
       holidays,
       photos: photosRes.rows,
+      reviewsSummary,
+      reviews: latestReviews,
     });
   } catch (error: any) {
     return serverError(error, 'src/app/api/public/[slug]/route.ts');

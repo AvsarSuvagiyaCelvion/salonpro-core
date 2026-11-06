@@ -74,6 +74,8 @@ In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re
   - Customer appointment self-service actions: Max 30 requests per minute per customer.
   - Customer profile updates: Max 20 requests per 15 minutes per customer.
   - Customer PIN change attempts: Max 5 incorrect attempts per customer + IP per 15 minutes with temporary lockout.
+  - Customer review submission: Max 10 requests per 15 minutes per customer.
+  - Owner review replies and status updates: Max 30 updates per 15 minutes per salon.
 
 ---
 
@@ -82,8 +84,8 @@ In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re
 | Plan Slug | Plan Name | Staff Limit | Service Limit | WhatsApp msgs/mo | Key Feature Flags Enabled |
 |---|---|---|---|---|---|
 | `basic` | Basic Plan | 3 staff | 30 services | 0 | Public booking, POS checkout |
-| `pro` | Pro Studio | 10 staff | 100 services | 200 | `logo_upload`, `commission_report`, `memberships`, `calendar_view`, `customer_cancel`, `export`, `coupons` |
-| `premium` | Enterprise / Luxury | Unlimited (0) | Unlimited (0) | 1,000+ | All Pro features + `custom_domain`, `priority_support` |
+| `pro` | Pro Studio | 10 staff | 100 services | 200 | `logo_upload`, `commission_report`, `memberships`, `calendar_view`, `customer_cancel`, `export`, `coupons`, `reviews` |
+| `premium` | Enterprise / Luxury | Unlimited (0) | Unlimited (0) | 1,000+ | All Pro features + `reviews`, `custom_domain`, `priority_support` |
 
 - **Trial Period**: Every newly registered salon automatically receives a 14-day Pro trial (`trial_ends_at = NOW() + 14 days`).
 - **Caching**: Plan context is cached for 30 seconds (`planCache`). Calling `invalidateSalonPlanCache(salonId)` purges it when settings or subscriptions change.
@@ -201,4 +203,5 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts` an
 | `015_customer_cancel_reschedule.sql` | Adds `cancel_policy_hours` to `salons` (default 2); adds `cancelled_by`, `cancelled_at`, and `rescheduled_count` to `appointments`. |
 | `016_salon_photos.sql` | Creates `salon_photos` table (`id`, `salon_id`, `url`, `storage_path`, `sort_order`, `created_at`) with RLS and foreign key cascade for gallery photo uploads. |
 | `017_customer_profile_columns.sql` | Adds nullable `email text`, `address text`, and `avatar_url text` columns to `customers` table with `ADD COLUMN IF NOT EXISTS`. |
+| `018_reviews.sql` | Creates `reviews` table (`id`, `salon_id`, `customer_id`, `appointment_id` UNIQUE, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at`) with RLS and compound indexes; configures `reviews` plan flag in `subscription_plans`. |
 

@@ -15,6 +15,7 @@ export interface PlanFlags {
   customer_cancel: boolean;
   export: boolean;
   coupons: boolean;
+  reviews: boolean;
   loyalty: boolean;
   custom_domain: boolean;
   multi_branch: boolean;
@@ -55,6 +56,7 @@ const DEFAULT_PRO_FLAGS: PlanFlags = {
   customer_cancel: true,
   export: true,
   coupons: true,
+  reviews: true,
   loyalty: false,
   custom_domain: false,
   multi_branch: false,
@@ -75,6 +77,7 @@ const DEFAULT_BASIC_FLAGS: PlanFlags = {
   customer_cancel: false,
   export: false,
   coupons: false,
+  reviews: false,
   loyalty: false,
   custom_domain: false,
   multi_branch: false,

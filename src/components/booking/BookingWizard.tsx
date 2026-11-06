@@ -48,6 +48,23 @@ interface Photo {
   sort_order: number;
 }
 
+interface PublicReview {
+  id: string;
+  rating: number;
+  comment: string | null;
+  owner_reply: string | null;
+  owner_replied_at: string | null;
+  created_at: string;
+  service_name: string | null;
+  customer_name: string;
+}
+
+interface ReviewsSummary {
+  average: number;
+  count: number;
+  enabled: boolean;
+}
+
 export default function BookingWizard({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
   const [salon, setSalon] = useState<Salon | null>(null);
@@ -57,6 +74,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [services, setServices] = useState<Service[]>([]);
   const [staffList, setStaffList] = useState<Staff[]>([]);
   const [staffServices, setStaffServices] = useState<{ staff_id: string; service_id: string }[]>([]);
+  const [reviewsSummary, setReviewsSummary] = useState<ReviewsSummary>({ average: 0, count: 0, enabled: false });
+  const [latestReviews, setLatestReviews] = useState<PublicReview[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Wizard state with route/refresh persistence
@@ -148,6 +167,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
         setStaffList(data.staff || []);
         setStaffServices(data.staffServices || []);
         setHolidays(data.holidays || []);
+        if (data.reviewsSummary) {
+          setReviewsSummary(data.reviewsSummary);
+        }
+        if (data.reviews) {
+          setLatestReviews(data.reviews);
+        }
 
         // Restore selectedService from sessionStorage or default to first service
         if (typeof window !== 'undefined') {
@@ -585,6 +610,18 @@ export default function BookingWizard({ slug }: { slug: string }) {
             )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">{salon.name}</h1>
+          {reviewsSummary.enabled && reviewsSummary.count > 0 && (
+            <div className="flex items-center justify-center gap-1.5 mt-1.5">
+              <div className="flex items-center text-amber-400 text-xs sm:text-sm">
+                <span>★</span>
+                <span className="font-extrabold text-white ml-1">{reviewsSummary.average.toFixed(1)}</span>
+              </div>
+              <span className="text-neutral-500 text-xs">·</span>
+              <span className="text-neutral-300 text-xs font-semibold">
+                ({reviewsSummary.count} {reviewsSummary.count === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
+          )}
           <p className="text-xs sm:text-sm text-neutral-400 mt-1 flex items-center justify-center gap-2">
             <span>✨ Premium Beauty & Hair Studio</span>
             <span>·</span>
@@ -740,6 +777,70 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 );
               })}
             </div>
+
+            {/* Recent Client Reviews Section */}
+            {reviewsSummary.enabled && latestReviews.length > 0 && (
+              <div className="mt-8 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <span className="text-amber-400">★</span>
+                    <span>Client Experiences ({reviewsSummary.count})</span>
+                  </h3>
+                  <span className="text-xs text-neutral-400 font-medium">
+                    Average: <strong className="text-white">{reviewsSummary.average.toFixed(1)} / 5</strong>
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {latestReviews.map((rev) => (
+                    <div
+                      key={rev.id}
+                      className="p-4 rounded-2xl bg-[#141926]/70 border border-[#2A2F3A] space-y-2 text-xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white">{rev.customer_name}</span>
+                          {rev.service_name && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700">
+                              {rev.service_name}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center text-amber-400 text-xs">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span key={i} className={i < rev.rating ? 'text-amber-400' : 'text-neutral-700'}>
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {rev.comment && (
+                        <p className="text-neutral-300 leading-relaxed text-xs italic">
+                          &ldquo;{rev.comment}&rdquo;
+                        </p>
+                      )}
+
+                      {rev.owner_reply && (
+                        <div className="p-2.5 rounded-xl bg-[#1C2230] border-l-2 border-[#D4A77F] text-[11px] text-neutral-300 mt-2 space-y-0.5">
+                          <span className="font-bold text-[#D4A77F] block">Response from {salon.name}:</span>
+                          <p>{rev.owner_reply}</p>
+                        </div>
+                      )}
+
+                      <div className="text-[10px] text-neutral-500 text-right">
+                        {new Date(rev.created_at).toLocaleDateString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Floating Next Button */}
             <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#080B12]/90 backdrop-blur-md border-t border-[#2A2F3A] z-10 flex justify-center">

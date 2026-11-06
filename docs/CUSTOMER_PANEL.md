@@ -14,9 +14,9 @@ The Customer Panel enables salon clients to discover salon services, select styl
 
 | Route | File Path | What It Does | Key Components Used |
 |---|---|---|---|
-| `/[slug]` | `src/app/[slug]/page.tsx` | Primary public showcase & booking wizard for a salon identified by unique slug. | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
+| `/[slug]` | `src/app/[slug]/page.tsx` | Primary public showcase & booking wizard for a salon identified by unique slug. Displays salon average rating stars & count, and recent customer reviews with owner replies (when `reviews` plan flag is active). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
 | `/book/[slug]` | `src/app/book/[slug]/page.tsx` | Alias for public booking wizard (supports direct `/book/<slug>` links). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
-| `/portal` | `src/app/portal/page.tsx` | Customer portal: authenticated client dashboard showing upcoming visits, past visits, invoices, VIP plans, profile editor, PIN change, and self-service cancel/reschedule. Supports `?tab=profile` query param. Also renders customer login/signup when unauthenticated. | `CustomerPortalPage`, `ThemeToggle`, `ImageUploader`, `PrintReceiptButton` |
+| `/portal` | `src/app/portal/page.tsx` | Customer portal: authenticated client dashboard showing upcoming visits, past visits, invoices, VIP plans, profile editor, PIN change, self-service cancel/reschedule, and "Rate this visit" modal for completed appointments within 30 days. Supports `?tab=profile` query param. Also renders customer login/signup when unauthenticated. | `CustomerPortalPage`, `ThemeToggle`, `ImageUploader`, `PrintReceiptButton` |
 | `/my-account` | `src/app/my-account/page.tsx` | Alias route re-exporting `/portal`. | `CustomerPortalPage` |
 | `/customer/login` | `src/app/customer/login/page.tsx` | Alias route re-exporting `/portal` (renders in login mode). | `CustomerPortalPage` |
 | `/customer/signup` | `src/app/customer/signup/page.tsx` | Alias route re-exporting `/portal` (renders in signup mode). | `CustomerPortalPage` |
@@ -37,6 +37,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `/api/customer/appointments/[id]` | `PATCH` | `src/app/api/customer/appointments/[id]/route.ts` | `salonpro_customer_session` | Handles customer self-service `cancel` or `reschedule` within the salon's cancellation window. Prevents duplicate booking via advisory lock. |
 | `/api/customer/profile` | `GET`, `PATCH` | `src/app/api/customer/profile/route.ts` | `salonpro_customer_session` | `GET` returns logged-in client profile. `PATCH` updates name (2-60 chars), email, address (max 250), and avatar_url (strictly within customer's own folder in `salon-media` bucket). Phone is read-only. Rate-limited to 20 updates / 15 min. |
 | `/api/customer/profile/pin` | `POST` | `src/app/api/customer/profile/pin/route.ts` | `salonpro_customer_session` | Updates customer 4-digit PIN. Requires current PIN, new 4-digit PIN (must differ), and confirm PIN. Verifies current PIN via bcryptjs and hashes new PIN. Protected by strict brute-force rate limit (5 attempts / 15 min per customer + IP). |
+| `/api/customer/reviews` | `GET`, `POST` | `src/app/api/customer/reviews/route.ts` | `salonpro_customer_session` | `GET` lists all reviews submitted by the authenticated customer. `POST` submits review for a completed appointment within 30 days (1-5 stars, optional comment max 500 chars). Rate-limited to 10 submissions / 15 min. Simulates success for demo salon `dixa-beauty-salon`. |
 
 ---
 
@@ -64,6 +65,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `invoices` | `id`, `salon_id`, `customer_id`, `number`, `receipt_token`, `subtotal`, `tax_amount`, `total` | Read | `001_initial_schema.sql`, `007_invoices_tax_and_tenant_indexes.sql`, `010_backfill_invoice_receipt_tokens.sql` |
 | `payments` | `invoice_id`, `amount`, `payment_method` | Read | `001_initial_schema.sql` |
 | `customer_plans` | `customer_id`, `plan_id`, `kind`, `starts_on`, `expires_on` | Read | `001_initial_schema.sql` |
+| `reviews` | `id`, `salon_id`, `customer_id`, `appointment_id`, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at` | Read / Write | `018_reviews.sql` |
 
 ---
 
@@ -117,6 +119,20 @@ The Customer Panel enables salon clients to discover salon services, select styl
 3. **Submit Profile Update**: Calls `PATCH /api/customer/profile`. Backend validates name length (2-60 chars), email regex, address length (max 250), and verifies `avatar_url` points strictly to the customer's own storage directory (`customers/{customerId}/...`). Updates DB, re-issues session cookie if name changed, and updates portal header avatar and name.
 4. **Change 4-Digit Security PIN**: User inputs Current PIN, New 4-digit PIN, and Confirm PIN. Calls `POST /api/customer/profile/pin`. Backend checks brute-force rate limit (5 attempts / 15 min), verifies current PIN using `bcryptjs`, hashes new PIN, and updates database.
 
+### Flow 5: Customer Post-Visit Review Submission
+1. **Trigger Review Modal**: From `/portal` under "Past Visits History", client locates a completed appointment completed within the past 30 days without an existing review. Clicks "Rate this visit".
+2. **Modal Input**: Selects 1 to 5 stars (responsive single-row on 320px screens) and optionally types feedback (max 500 characters).
+3. **Submit Review**: Clicks "Submit Review". UI calls `POST /api/customer/reviews`.
+4. **Backend Processing**:
+   - Authenticates customer session token.
+   - Enforces rate limit (`cust_review_submit:<customerId>`, 10 / 15 min).
+   - Validates appointment belongs to logged-in customer and is in `completed` status.
+   - Enforces recency check: `a.ends_at >= NOW() - INTERVAL '30 days'`.
+   - Derives `staff_id` and `salon_id` from the appointment record.
+   - Handles demo salon `dixa-beauty-salon` with simulated success.
+   - Inserts record into `reviews` table (`status = 'visible'`). Unique constraint on `appointment_id` prevents duplicates.
+5. **UI Update**: Modal closes, review is saved to local state, and the visit card now shows the customer's star rating, comment, and any future salon response read-only.
+
 ---
 
 ## 7. Business Rules and Edge Cases
@@ -127,7 +143,8 @@ The Customer Panel enables salon clients to discover salon services, select styl
 - **Customer Phone Immutability**: Customer mobile number is the primary identity token and cannot be edited via portal profile updates.
 - **Customer Storage Isolation**: Avatars can only be stored under `customers/{customerId}/...` in bucket `salon-media`. External URLs or data URIs are rejected with HTTP 400.
 - **Brute Force Defense**: PIN updates lock after 5 consecutive failed attempts for 15 minutes.
-- **Demo Salon (`dixa-beauty-salon`)**: Simulates public bookings, cancellations, and reschedules without writing persistent records to the database.
+- **Demo Salon (`dixa-beauty-salon`)**: Simulates public bookings, cancellations, reschedules, and review submissions without writing persistent records to the database.
+- **Review Submission Window & Privacy**: Reviews can only be submitted for `completed` visits within 30 days of appointment completion. Rating is an integer 1-5; comment is optional up to 500 characters. Public listing displays only "First name + last initial" (e.g. "Rahul S.") to protect customer privacy; phone numbers and full surnames are never exposed over public endpoints.
 - **Honeypot Bot Protection**: `POST /api/public/[slug]/book` contains hidden field `hp`. If populated by spam bots, silently returns mock success.
 - **Anti-IDOR on Receipts (`/b/[number]`)**:
   - Unauthenticated access is allowed **only** when requested via the 64-character unguessable `receipt_token`.

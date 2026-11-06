@@ -65,6 +65,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     slug: string;
     open_time?: string;
     close_time?: string;
+    logo_url?: string | null;
   } | null>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -446,8 +447,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </button>
 
           <Link href="/app" className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] text-[#D4A77F] flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[#D4A77F]" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] text-[#D4A77F] flex items-center justify-center font-bold text-base sm:text-lg shadow-sm shrink-0 overflow-hidden">
+              {salon?.logo_url ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={salon.logo_url} alt={salon.name} className="w-full h-full object-cover" />
+              ) : (
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[#D4A77F]" />
+              )}
             </div>
             <div className="min-w-0">
               <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate max-w-[140px] sm:max-w-xs">
@@ -501,8 +507,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {/* Drawer Header */}
               <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] text-[#D4A77F] flex items-center justify-center font-bold text-lg shadow-sm">
-                    <Sparkles className="w-5 h-5 text-[#D4A77F]" />
+                  <div className="w-9 h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] text-[#D4A77F] flex items-center justify-center font-bold text-lg shadow-sm overflow-hidden shrink-0">
+                    {salon?.logo_url ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={salon.logo_url} alt={salon.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Sparkles className="w-5 h-5 text-[#D4A77F]" />
+                    )}
                   </div>
                   <div className="min-w-0">
                     <span className="font-extrabold text-sm text-[#1F2937] dark:text-[#FFFFFF] block leading-tight truncate">

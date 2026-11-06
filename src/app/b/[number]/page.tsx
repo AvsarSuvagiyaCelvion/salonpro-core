@@ -40,7 +40,7 @@ export default async function PublicBillPage({
   // Query invoice by unguessable receipt_token or sequential invoice number
   const invRes = await query(
     `SELECT i.*, 
-            s.name as salon_name, s.address as salon_address, s.phone as salon_phone,
+            s.name as salon_name, s.address as salon_address, s.phone as salon_phone, s.logo_url as salon_logo_url,
             c.name as customer_name, c.mobile as customer_mobile
      FROM invoices i
      JOIN salons s ON i.salon_id = s.id
@@ -136,8 +136,13 @@ export default async function PublicBillPage({
         
         {/* Top Header Brand Banner */}
         <div className="bg-neutral-900 text-white p-6 sm:p-8 text-center relative">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#D4A77F]/20 text-[#D4A77F] font-bold text-2xl mb-3 border border-[#D4A77F]/30">
-            {invoice.salon_name?.charAt(0) || 'G'}
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#D4A77F]/20 text-[#D4A77F] font-bold text-2xl mb-3 border border-[#D4A77F]/30 overflow-hidden">
+            {invoice.salon_logo_url ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={invoice.salon_logo_url} alt={invoice.salon_name} className="w-full h-full object-cover" />
+            ) : (
+              invoice.salon_name?.charAt(0) || 'G'
+            )}
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">{invoice.salon_name}</h1>
           <p className="text-xs text-neutral-400 mt-1 max-w-xs mx-auto">

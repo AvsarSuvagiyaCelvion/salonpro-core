@@ -9,7 +9,7 @@ export interface ImageUploaderProps {
   onChange: (url: string | null, storagePath?: string | null) => void;
   onRemove?: () => void;
   type?: 'logo' | 'gallery' | 'avatar';
-  mode?: 'default' | 'avatar';
+  mode?: 'default' | 'avatar' | 'logo';
   label?: string;
   helperText?: string;
   className?: string;
@@ -27,7 +27,9 @@ export default function ImageUploader({
   className = '',
   disabled = false,
 }: ImageUploaderProps) {
-  const isAvatar = mode === 'avatar';
+  const isLogo = type === 'logo' || mode === 'logo';
+  const isAvatar = mode === 'avatar' && !isLogo;
+  const isCompactBox = isAvatar || isLogo;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [uploading, setUploading] = useState(false);
@@ -215,10 +217,28 @@ export default function ImageUploader({
 
   const displaySrc = localPreview || value;
 
+  const containerShape = isAvatar
+    ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full'
+    : isLogo
+    ? 'w-32 h-32 sm:w-36 sm:h-36 rounded-2xl'
+    : 'w-full max-w-sm h-28 sm:h-32 rounded-2xl';
+
+  const previewShape = isAvatar
+    ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full'
+    : isLogo
+    ? 'w-32 h-32 sm:w-36 sm:h-36 rounded-2xl'
+    : 'w-48 sm:w-56 h-32 rounded-2xl';
+
+  const uploadPromptTitle = isLogo
+    ? 'Upload Logo'
+    : isAvatar
+    ? 'Upload Photo'
+    : 'Click to upload image';
+
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-2 w-full max-w-full ${className}`}>
       {label && (
-        <label className={`block text-xs font-bold text-neutral-700 dark:text-neutral-300 ${isAvatar ? 'text-center' : ''}`}>
+        <label className={`block text-xs font-bold text-neutral-700 dark:text-neutral-300 ${isCompactBox ? 'text-center' : ''}`}>
           {label}
         </label>
       )}
@@ -234,11 +254,9 @@ export default function ImageUploader({
 
       {displaySrc ? (
         /* Preview with Replace / Remove controls */
-        <div className={`relative group ${isAvatar ? 'flex flex-col items-center justify-center mx-auto' : 'inline-block'}`}>
+        <div className={`relative group ${isCompactBox ? 'flex flex-col items-center justify-center mx-auto' : 'inline-block'}`}>
           <div
-            className={`relative overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 ${
-              isAvatar ? 'w-24 h-24 rounded-full' : 'w-48 h-32 rounded-2xl'
-            }`}
+            className={`relative overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 shadow-xs ${previewShape}`}
           >
             {!imageError ? (
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -246,7 +264,7 @@ export default function ImageUploader({
                 src={displaySrc}
                 alt=""
                 onError={() => setImageError(true)}
-                className="w-full h-full object-cover"
+                className={`w-full h-full ${isLogo ? 'object-contain p-2' : 'object-cover'}`}
                 loading="lazy"
               />
             ) : (
@@ -276,7 +294,7 @@ export default function ImageUploader({
               <button
                 type="button"
                 onClick={handleRemove}
-                className="px-2.5 py-1 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-[11px] font-semibold hover:bg-rose-100 transition-all cursor-pointer"
+                className="px-2.5 py-1 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-[11px] font-semibold hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all cursor-pointer"
               >
                 Remove
               </button>
@@ -285,28 +303,28 @@ export default function ImageUploader({
         </div>
       ) : (
         /* Empty Upload Dropzone */
-        <div className={isAvatar ? 'flex flex-col items-center justify-center' : ''}>
+        <div className={isCompactBox ? 'flex flex-col items-center justify-center' : ''}>
           <div
             onClick={() => {
               if (!disabled && !uploading) fileInputRef.current?.click();
             }}
-            className={`border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-[#D4A77F] dark:hover:border-[#D4A77F] bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all cursor-pointer flex flex-col items-center justify-center p-4 text-center ${
-              isAvatar ? 'w-24 h-24 rounded-full' : 'w-full max-w-sm h-32 rounded-2xl'
-            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-[#D4A77F] dark:hover:border-[#D4A77F] bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all cursor-pointer flex flex-col items-center justify-center p-3 text-center ${containerShape} ${
+              disabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             {uploading ? (
               <div className="flex flex-col items-center">
                 <RefreshCw className="w-5 h-5 text-[#D4A77F] animate-spin" />
-                <span className="text-[11px] text-neutral-500 mt-2 font-medium">{progressText || 'Processing...'}</span>
+                <span className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-2 font-medium">{progressText || 'Processing...'}</span>
               </div>
             ) : (
               <div className="flex flex-col items-center">
-                <Upload className="w-5 h-5 text-neutral-400 group-hover:text-[#D4A77F]" />
-                <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mt-1.5">
-                  {isAvatar ? 'Upload Avatar' : 'Click to upload image'}
+                <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400 dark:text-neutral-500 group-hover:text-[#D4A77F]" />
+                <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 mt-1 sm:mt-1.5">
+                  {uploadPromptTitle}
                 </span>
-                <span className="text-[10px] text-neutral-400 mt-0.5">
-                  JPG, PNG, WebP (max 5MB)
+                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                  JPG, PNG, WebP {isAvatar ? '' : '(max 5MB)'}
                 </span>
               </div>
             )}
@@ -315,15 +333,15 @@ export default function ImageUploader({
       )}
 
       {helperText && !errorMessage && (
-        <p className={`text-[10px] text-neutral-400 ${isAvatar ? 'text-center max-w-xs mx-auto' : ''}`}>
+        <p className={`text-[10px] sm:text-[11px] text-neutral-500 dark:text-neutral-400 ${isCompactBox ? 'text-center max-w-xs mx-auto' : ''}`}>
           {helperText}
         </p>
       )}
 
       {errorMessage && (
-        <div className={`p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-1.5 ${isAvatar ? 'max-w-xs mx-auto text-center justify-center' : ''}`}>
-          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-          <span>{errorMessage}</span>
+        <div className={`p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 ${isCompactBox ? 'max-w-md mx-auto text-left' : ''}`}>
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+          <span className="leading-snug">{errorMessage}</span>
         </div>
       )}
     </div>

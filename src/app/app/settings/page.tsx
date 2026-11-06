@@ -357,7 +357,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
             Salon Settings
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
             Configure salon profile, working hours, and public booking portal
           </p>
         </div>
@@ -388,21 +388,21 @@ export default function SettingsPage() {
 
       {/* Notifications */}
       {saveSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-2 font-medium animate-fadeIn">
-          <Check className="w-4 h-4 text-emerald-600" />
+        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm flex items-center gap-2 font-medium animate-fadeIn">
+          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Settings saved successfully! Changes take effect immediately on public booking.</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center gap-2 font-medium">
-          <AlertCircle className="w-4 h-4 text-rose-600" />
+        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs sm:text-sm flex items-center gap-2 font-medium">
+          <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {/* Section Navigation Tabs */}
-      <div className="flex gap-2 border-b border-neutral-200 pb-2 overflow-x-auto">
+      <div className="flex gap-2 border-b border-neutral-200 dark:border-[#2A2F3A] pb-2 overflow-x-auto no-scrollbar">
         {[
           { id: 'salon', label: 'Salon Details', icon: Store },
           { id: 'booking', label: 'Booking & Timings', icon: Calendar },
@@ -414,10 +414,10 @@ export default function SettingsPage() {
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 isActive
                   ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm'
-                  : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200'
+                  : 'bg-white dark:bg-[#141926] text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white border border-neutral-200 dark:border-[#2A2F3A]'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -430,10 +430,10 @@ export default function SettingsPage() {
       <form onSubmit={handleSaveSettings} className="space-y-6">
         {/* ================= SECTION 1: SALON DETAILS ================= */}
         {activeSection === 'salon' && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-6">
+          <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-6 transition-colors duration-200">
             <div>
               <h2 className="text-base font-bold text-[#1F2937] dark:text-white">Salon Information</h2>
-              <p className="text-xs text-neutral-400 mt-0.5">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                 Public information shown to clients on digital invoices and booking
               </p>
             </div>
@@ -441,7 +441,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* Salon Name */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Salon Name <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
@@ -449,23 +449,23 @@ export default function SettingsPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                   placeholder="e.g. Glow Studio"
                 />
               </div>
 
               {/* Address */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Salon Address / Location
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 absolute left-3.5 top-3 text-neutral-400" />
+                  <MapPin className="w-4 h-4 absolute left-3.5 top-3 text-neutral-400 dark:text-neutral-500" />
                   <input
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                     placeholder="e.g. 101, Titanium Square, Thaltej, Ahmedabad"
                   />
                 </div>
@@ -473,16 +473,16 @@ export default function SettingsPage() {
 
               {/* Phone */}
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Contact Phone / WhatsApp
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 absolute left-3.5 top-3 text-neutral-400" />
+                  <Phone className="w-4 h-4 absolute left-3.5 top-3 text-neutral-400 dark:text-neutral-500" />
                   <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 text-sm font-mono focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                     placeholder="+91 98250 12345"
                   />
                 </div>
@@ -490,45 +490,45 @@ export default function SettingsPage() {
 
               {/* Unique Slug */}
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Booking Slug (Unique URL Path)
                 </label>
                 <input
                   type="text"
                   disabled
                   value={slug}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 bg-neutral-50 text-neutral-500 font-mono text-sm cursor-not-allowed"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-[#10141F]/60 text-neutral-500 dark:text-neutral-400 font-mono text-sm cursor-not-allowed"
                 />
-                <span className="text-[10px] text-neutral-400 mt-1 block">
+                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1 block">
                   Slug is uniquely assigned to your salon studio.
                 </span>
               </div>
 
               {/* Logo Upload Section */}
-              <div className="pt-4 border-t border-neutral-100 sm:col-span-2">
+              <div className="pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] sm:col-span-2">
                 <ImageUploader
-                  mode="avatar"
+                  mode="logo"
                   type="logo"
                   value={logoUrl}
                   onChange={(newUrl) => setLogoUrl(newUrl)}
                   onRemove={() => setLogoUrl(null)}
                   label="Salon Logo (Optional)"
-                  helperText="Square image recommended (up to 400px, WebP/JPEG, max 60KB). Displayed on receipts, invoices, and booking pages."
+                  helperText="Square or horizontal image recommended (WebP/JPEG, max 60KB). Displayed on receipts, invoices, and booking pages."
                 />
               </div>
 
               {/* Salon Photos Gallery Section */}
-              <div className="pt-6 border-t border-neutral-100 sm:col-span-2 space-y-4">
+              <div className="pt-6 border-t border-neutral-100 dark:border-[#2A2F3A] sm:col-span-2 space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
                       <Images className="w-4 h-4 text-[#D4A77F]" />
                       <span>Salon Photos Gallery</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 font-mono font-normal">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-[#10141F] text-neutral-600 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 font-mono font-normal">
                         {galleryPhotos.length} / {MAX_GALLERY_PHOTOS}
                       </span>
                     </h3>
-                    <p className="text-xs text-neutral-400 mt-0.5">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                       Showcase your salon ambience, workstations, and equipment to clients (Max {MAX_GALLERY_PHOTOS} photos).
                     </p>
                   </div>
@@ -536,11 +536,11 @@ export default function SettingsPage() {
 
                 {/* Photos Grid */}
                 {galleryPhotos.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3">
                     {galleryPhotos.map((photo, idx) => (
                       <div
                         key={photo.id || idx}
-                        className="group relative aspect-4/3 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 shadow-xs"
+                        className="group relative aspect-4/3 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 shadow-xs"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -553,7 +553,7 @@ export default function SettingsPage() {
                           <button
                             type="button"
                             onClick={() => handleDeleteGalleryPhoto(photo.id, photo.storage_path)}
-                            className="p-1.5 rounded-xl bg-rose-600 text-white hover:bg-rose-700 shadow-md transition-all"
+                            className="p-1.5 rounded-xl bg-rose-600 text-white hover:bg-rose-700 shadow-md transition-all cursor-pointer"
                             title="Delete photo"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -569,7 +569,7 @@ export default function SettingsPage() {
 
                 {/* Add Photo / Upload Box */}
                 {galleryPhotos.length < MAX_GALLERY_PHOTOS ? (
-                  <div className="bg-neutral-50/70 dark:bg-neutral-900/40 p-4 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700">
+                  <div className="bg-neutral-50/70 dark:bg-[#10141F]/60 p-3.5 sm:p-4 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700">
                     <ImageUploader
                       mode="default"
                       type="gallery"
@@ -594,15 +594,15 @@ export default function SettingsPage() {
 
         {/* ================= SECTION 2: BOOKING & TIMINGS ================= */}
         {activeSection === 'booking' && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-6">
+          <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-6 transition-colors duration-200">
             {/* Public Link Box */}
-            <div className="bg-neutral-50 p-4 sm:p-5 rounded-2xl border border-neutral-200/80">
+            <div className="bg-neutral-50 dark:bg-[#10141F] p-4 sm:p-5 rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A]">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+                  <span className="text-[10px] uppercase font-bold text-neutral-400 dark:text-neutral-500 tracking-wider">
                     Your Public Booking URL
                   </span>
-                  <div className="text-sm font-mono font-bold text-neutral-800 mt-0.5 break-all">
+                  <div className="text-sm font-mono font-bold text-neutral-800 dark:text-neutral-100 mt-0.5 break-all">
                     {publicLink}
                   </div>
                 </div>
@@ -611,7 +611,7 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={handleCopyLink}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-neutral-200 text-neutral-700 text-xs font-semibold shadow-xs hover:bg-neutral-50 transition-all"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-neutral-700 dark:text-neutral-200 text-xs font-semibold shadow-xs hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all cursor-pointer"
                   >
                     {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedLink ? 'Copied!' : 'Copy Link'}</span>
@@ -629,10 +629,10 @@ export default function SettingsPage() {
               </div>
 
               {/* Enable / Disable Online Booking Switch */}
-              <div className="mt-4 pt-4 border-t border-neutral-200/60 flex items-center justify-between">
+              <div className="mt-4 pt-4 border-t border-neutral-200/60 dark:border-[#2A2F3A] flex items-center justify-between">
                 <div>
                   <span className="font-bold text-xs text-[#1F2937] dark:text-white">Accept Online Client Bookings</span>
-                  <p className="text-[11px] text-neutral-500">
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                     When disabled, the public page displays &quot;Booking is closed&quot;
                   </p>
                 </div>
@@ -644,7 +644,7 @@ export default function SettingsPage() {
                     onChange={(e) => setBookingEnabled(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                  <div className="w-11 h-6 bg-neutral-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 dark:after:border-neutral-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                 </label>
               </div>
             </div>
@@ -654,26 +654,26 @@ export default function SettingsPage() {
               <h3 className="text-sm font-bold text-[#1F2937] dark:text-white mb-3">Operating Hours</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                     Opening Time (Daily start)
                   </label>
                   <input
                     type="time"
                     value={openTime}
                     onChange={(e) => setOpenTime(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-sm font-mono focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                     Closing Time (Daily end)
                   </label>
                   <input
                     type="time"
                     value={closeTime}
                     onChange={(e) => setCloseTime(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm font-mono focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-sm font-mono focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
               </div>
@@ -681,7 +681,7 @@ export default function SettingsPage() {
 
             {/* Working Days */}
             <div>
-              <label className="block text-xs font-bold text-neutral-700 mb-2">
+              <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-2">
                 Salon Working Days
               </label>
               <div className="flex flex-wrap gap-2">
@@ -692,10 +692,10 @@ export default function SettingsPage() {
                       key={d.day}
                       type="button"
                       onClick={() => toggleWorkingDay(d.day)}
-                      className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
+                      className={`px-3.5 sm:px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
                         isOpen
                           ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm'
-                          : 'bg-neutral-100 text-neutral-400 hover:bg-neutral-200'
+                          : 'bg-neutral-100 dark:bg-[#10141F] text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-transparent dark:border-[#2A2F3A]'
                       }`}
                     >
                       {d.label} {isOpen ? '✓' : ''}
@@ -703,21 +703,21 @@ export default function SettingsPage() {
                   );
                 })}
               </div>
-              <p className="text-[10px] text-neutral-400 mt-1.5">
+              <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1.5">
                 Slots on unchecked days will be marked &quot;Closed&quot; on public booking
               </p>
             </div>
 
             {/* Slot & Buffer Settings */}
-            <div className="pt-4 border-t border-neutral-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Slot Interval Step (Minutes)
                 </label>
                 <select
                   value={slotMinutes}
                   onChange={(e) => setSlotMinutes(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-sm focus:outline-none focus:border-[#D4A77F]"
                 >
                   <option value={15}>15 minutes</option>
                   <option value={20}>20 minutes</option>
@@ -728,13 +728,13 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Buffer Gap Between Appointments (Minutes)
                 </label>
                 <select
                   value={bufferMinutes}
                   onChange={(e) => setBufferMinutes(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-sm focus:outline-none focus:border-[#D4A77F]"
                 >
                   <option value={0}>No buffer (0 mins)</option>
                   <option value={5}>5 minutes</option>
@@ -745,7 +745,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Minimum Advance Notice (Hours)
                 </label>
                 <input
@@ -754,12 +754,12 @@ export default function SettingsPage() {
                   max={48}
                   value={minAdvanceHours}
                   onChange={(e) => setMinAdvanceHours(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-sm focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Maximum Advance Booking (Days)
                 </label>
                 <input
@@ -768,12 +768,12 @@ export default function SettingsPage() {
                   max={60}
                   value={maxAdvanceDays}
                   onChange={(e) => setMaxAdvanceDays(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-sm focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
                   Customers can cancel/reschedule up to ___ hours before
                 </label>
                 <div className="relative">
@@ -783,21 +783,21 @@ export default function SettingsPage() {
                     max={72}
                     value={cancelPolicyHours}
                     onChange={(e) => setCancelPolicyHours(Number(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-200 text-sm focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-sm focus:outline-none focus:border-[#D4A77F]"
                   />
-                  <span className="absolute right-4 top-2.5 text-xs text-neutral-400 font-medium">hours</span>
+                  <span className="absolute right-4 top-2.5 text-xs text-neutral-400 dark:text-neutral-500 font-medium">hours</span>
                 </div>
-                <p className="text-[10px] text-neutral-400 mt-1">
+                <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">
                   0 = until start. Maximum 72 hours.
                 </p>
               </div>
             </div>
 
             {/* WhatsApp Reminders toggle */}
-            <div className="pt-4 border-t border-neutral-100 flex items-center justify-between">
+            <div className="pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-between">
               <div>
                 <span className="font-bold text-xs text-[#1F2937] dark:text-white">Send WhatsApp Booking Reminders</span>
-                <p className="text-[11px] text-neutral-500">
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                   Sends scheduled reminder message to customer 2 hours prior to visit
                 </p>
               </div>
@@ -809,7 +809,7 @@ export default function SettingsPage() {
                   onChange={(e) => setSendReminders(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
+                <div className="w-11 h-6 bg-neutral-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 dark:after:border-neutral-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
               </label>
             </div>
           </div>
@@ -823,21 +823,21 @@ export default function SettingsPage() {
               <div
                 className={`p-4 rounded-2xl border text-xs sm:text-sm flex items-center gap-2 font-medium ${
                   holidayMessage.type === 'success'
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                    : 'bg-rose-50 border-rose-200 text-rose-800'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
                 }`}
               >
                 {holidayMessage.type === 'success' ? (
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 ) : (
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                 )}
                 <span>{holidayMessage.text}</span>
               </div>
             )}
 
             {/* Schedule New Holiday Card */}
-            <div className="bg-white dark:bg-[#141926] p-6 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-5">
+            <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-5">
               <div>
                 <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
                   <Palmtree className="w-5 h-5 text-[#D4A77F]" />
@@ -976,7 +976,7 @@ export default function SettingsPage() {
             </div>
 
             {/* List of Scheduled Holidays */}
-            <div className="bg-white dark:bg-[#141926] p-6 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-4">
+            <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-[#1F2937] dark:text-white">
@@ -1083,9 +1083,9 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-white font-extrabold text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center gap-2"
+              className="w-full sm:w-auto justify-center px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-[#080B12] font-black text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
             >
-              <Save className="w-4 h-4" />
+              <Save className="w-4 h-4 text-[#080B12]" />
               <span>{saving ? 'Saving Settings...' : 'Save All Settings'}</span>
             </button>
           </div>

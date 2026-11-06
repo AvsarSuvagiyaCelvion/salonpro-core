@@ -1,6 +1,6 @@
 # Customer Panel Documentation
 
-> **Last verified:** 2026-11-06 (Individual Staff Weekly Shifts & Staff Leaves verified)  
+> **Last verified:** 2026-11-06 (Customer portal sticky top navigation header and responsive avatar uploader verified)  
 > **Status:** Verified against source code
 
 ---
@@ -16,7 +16,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 |---|---|---|---|
 | `/[slug]` | `src/app/[slug]/page.tsx` | Primary public showcase & booking wizard for a salon identified by unique slug. Displays salon average rating stars & count, and recent customer reviews with owner replies (when `reviews` plan flag is active). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
 | `/book/[slug]` | `src/app/book/[slug]/page.tsx` | Alias for public booking wizard (supports direct `/book/<slug>` links). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
-| `/portal` | `src/app/portal/page.tsx` | Customer portal: authenticated client dashboard showing upcoming visits, past visits, invoices, VIP plans, profile editor, PIN change, self-service cancel/reschedule, and "Rate this visit" modal for completed appointments within 30 days. Supports `?tab=profile` query param. Also renders customer login/signup when unauthenticated. | `CustomerPortalPage`, `ThemeToggle`, `ImageUploader`, `PrintReceiptButton` |
+| `/portal` | `src/app/portal/page.tsx` | Customer portal: features a sticky branded top navigation header with salon identity, Home/Book links, and integrated ThemeToggle. Authenticated client dashboard showing upcoming visits, past visits, invoices, VIP plans, profile editor, PIN change, self-service cancel/reschedule, and "Rate this visit" modal for completed appointments within 30 days. Also cleanly renders customer login/signup with header when unauthenticated. | `CustomerPortalPage`, `ThemeToggle`, `ImageUploader`, `PrintReceiptButton` |
 | `/my-account` | `src/app/my-account/page.tsx` | Alias route re-exporting `/portal`. | `CustomerPortalPage` |
 | `/customer/login` | `src/app/customer/login/page.tsx` | Alias route re-exporting `/portal` (renders in login mode). | `CustomerPortalPage` |
 | `/customer/signup` | `src/app/customer/signup/page.tsx` | Alias route re-exporting `/portal` (renders in signup mode). | `CustomerPortalPage` |

@@ -131,6 +131,7 @@ export default function CustomerPortalPage() {
   const [authConfirmPin, setAuthConfirmPin] = useState('');
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [lastSalonSlug, setLastSalonSlug] = useState<string | null>(null);
 
   // Cancel & Reschedule Modals State
   const [cancelModalAppt, setCancelModalAppt] = useState<Appointment | null>(null);
@@ -363,6 +364,8 @@ export default function CustomerPortalPage() {
       ) {
         setActiveTab(tabParam);
       }
+      const slug = params.get('salon') || params.get('slug') || localStorage.getItem('salonpro_last_salon');
+      if (slug) setLastSalonSlug(slug);
     }
 
     checkSession();
@@ -564,164 +567,204 @@ export default function CustomerPortalPage() {
   // ================= NOT LOGGED IN: LOGIN / SIGNUP VIEW =================
   if (!loggedIn) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex flex-col justify-center items-center p-4 selection:bg-[#D4A77F] selection:text-[#080B12] transition-colors duration-300">
-        <div className="fixed top-4 right-4 z-50">
-          <ThemeToggle />
-        </div>
-
-        <div className="max-w-md w-full bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 sm:p-8 shadow-xl">
-          <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#D4A77F] text-[#080B12] flex items-center justify-center mx-auto mb-3 shadow-lg">
-              <Sparkles className="w-7 h-7" />
-            </div>
-            <h1 className="text-2xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF]">Client Portal</h1>
-            <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1">
-              {authMode === 'login'
-                ? 'Sign in to view your appointments, receipts and benefits'
-                : 'Create your customer account to track your visits'}
-            </p>
+      <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex flex-col selection:bg-[#D4A77F] selection:text-[#080B12] transition-colors duration-300">
+        {/* Sticky Top Portal Navigation Header */}
+        <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-2xs transition-colors duration-250">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <Link
+              href={lastSalonSlug ? `/${lastSalonSlug}` : '/'}
+              className="flex items-center gap-2 group min-w-0"
+            >
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-sm shrink-0 group-hover:rotate-12 transition-transform duration-300">
+                ✂
+              </div>
+              <div className="min-w-0">
+                <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate">
+                  Salon<span className="text-[#D4A77F]">Pro</span>
+                </span>
+                <span className="text-[10px] text-[#D4A77F] font-bold block -mt-0.5 truncate">
+                  Client Portal
+                </span>
+              </div>
+            </Link>
           </div>
 
-          {/* Mode Switcher */}
-          <div className="grid grid-cols-2 p-1 bg-[#F3F4F6] dark:bg-[#10141F] rounded-2xl mb-5 border border-[#E5E7EB] dark:border-[#2A2F3A]">
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode('login');
-                setAuthError(null);
-                setAuthConfirmPin('');
-              }}
-              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                authMode === 'login'
-                  ? 'bg-[#D4A77F] text-[#080B12] shadow-sm font-bold'
-                  : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode('signup');
-                setAuthError(null);
-                setAuthConfirmPin('');
-              }}
-              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                authMode === 'signup'
-                  ? 'bg-[#D4A77F] text-[#080B12] shadow-sm font-bold'
-                  : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
-              }`}
-            >
-              New Account / Set PIN
-            </button>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {lastSalonSlug ? (
+              <Link
+                href={`/${lastSalonSlug}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">Book Slot</span>
+              </Link>
+            ) : (
+              <Link
+                href="/"
+                className="text-xs text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#D4A77F] transition-colors font-medium px-2 py-1"
+              >
+                Home
+              </Link>
+            )}
+            <ThemeToggle />
           </div>
+        </header>
 
-          {authError && (
-            <div className="mb-4 p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-2xl text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{authError}</span>
+        <main className="flex-1 flex flex-col justify-center items-center p-4 sm:p-6 w-full max-w-full">
+          <div className="max-w-md w-full bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 sm:p-8 shadow-xl">
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#D4A77F] text-[#080B12] flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <Sparkles className="w-7 h-7" />
+              </div>
+              <h1 className="text-2xl font-extrabold text-[#1F2937] dark:text-[#FFFFFF]">Client Portal</h1>
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1">
+                {authMode === 'login'
+                  ? 'Sign in to view your appointments, receipts and benefits'
+                  : 'Create your customer account to track your visits'}
+              </p>
             </div>
-          )}
 
-          <form onSubmit={handleAuthSubmit} className="space-y-4">
-            {authMode === 'signup' && (
-              <div>
-                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
-                  Full Name <span className="text-[#D4A77F]">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Diya Joshi"
-                  value={authName}
-                  onChange={(e) => setAuthName(e.target.value)}
-                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                />
+            {/* Mode Switcher */}
+            <div className="grid grid-cols-2 p-1 bg-[#F3F4F6] dark:bg-[#10141F] rounded-2xl mb-5 border border-[#E5E7EB] dark:border-[#2A2F3A]">
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('login');
+                  setAuthError(null);
+                  setAuthConfirmPin('');
+                }}
+                className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  authMode === 'login'
+                    ? 'bg-[#D4A77F] text-[#080B12] shadow-sm font-bold'
+                    : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('signup');
+                  setAuthError(null);
+                  setAuthConfirmPin('');
+                }}
+                className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  authMode === 'signup'
+                    ? 'bg-[#D4A77F] text-[#080B12] shadow-sm font-bold'
+                    : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
+                }`}
+              >
+                New Account / Set PIN
+              </button>
+            </div>
+
+            {authError && (
+              <div className="mb-4 p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-2xl text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{authError}</span>
               </div>
             )}
 
-            <div>
-              <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
-                Mobile Number <span className="text-[#D4A77F]">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-3 text-sm text-[#9CA3AF] dark:text-[#747D8D] font-mono">+91</span>
-                <input
-                  type="tel"
-                  required
-                  placeholder="9898023456"
-                  value={authMobile}
-                  onChange={(e) => setAuthMobile(e.target.value)}
-                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-14 pr-4 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                />
-              </div>
-            </div>
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              {authMode === 'signup' && (
+                <div>
+                  <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
+                    Full Name <span className="text-[#D4A77F]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Diya Joshi"
+                    value={authName}
+                    onChange={(e) => setAuthName(e.target.value)}
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                  />
+                </div>
+              )}
 
-            {authMode === 'signup' && (
               <div>
                 <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
-                  Email Address (Optional)
+                  Mobile Number <span className="text-[#D4A77F]">*</span>
                 </label>
-                <input
-                  type="email"
-                  placeholder="diya.j@example.com"
-                  value={authEmail}
-                  onChange={(e) => setAuthEmail(e.target.value)}
-                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                />
+                <div className="relative">
+                  <span className="absolute left-4 top-3 text-sm text-[#9CA3AF] dark:text-[#747D8D] font-mono">+91</span>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="9898023456"
+                    value={authMobile}
+                    onChange={(e) => setAuthMobile(e.target.value)}
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-14 pr-4 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                  />
+                </div>
               </div>
-            )}
 
-            <div>
-              <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
-                4-Digit PIN / Password <span className="text-[#D4A77F]">*</span>
-              </label>
-              <input
-                type="password"
-                maxLength={6}
-                required
-                placeholder="Enter 4-digit PIN"
-                value={authPin}
-                onChange={(e) => setAuthPin(e.target.value)}
-                className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-              />
-            </div>
+              {authMode === 'signup' && (
+                <div>
+                  <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
+                    Email Address (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="diya.j@example.com"
+                    value={authEmail}
+                    onChange={(e) => setAuthEmail(e.target.value)}
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                  />
+                </div>
+              )}
 
-            {authMode === 'signup' && (
               <div>
                 <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
-                  Confirm 4-Digit PIN <span className="text-[#D4A77F]">*</span>
+                  4-Digit PIN / Password <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
                   type="password"
                   maxLength={6}
                   required
-                  placeholder="Re-enter 4-digit PIN"
-                  value={authConfirmPin}
-                  onChange={(e) => setAuthConfirmPin(e.target.value)}
+                  placeholder="Enter 4-digit PIN"
+                  value={authPin}
+                  onChange={(e) => setAuthPin(e.target.value)}
                   className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={authSubmitting}
-              className="w-full py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-extrabold text-sm shadow-md shadow-[#D4A77F]/20 transition-all active:scale-98 disabled:opacity-50 mt-2 cursor-pointer"
-            >
-              {authSubmitting ? 'Verifying...' : authMode === 'login' ? 'Sign In to Portal' : 'Create Customer Account'}
-            </button>
-          </form>
+              {authMode === 'signup' && (
+                <div>
+                  <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
+                    Confirm 4-Digit PIN <span className="text-[#D4A77F]">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    maxLength={6}
+                    required
+                    placeholder="Re-enter 4-digit PIN"
+                    value={authConfirmPin}
+                    onChange={(e) => setAuthConfirmPin(e.target.value)}
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                  />
+                </div>
+              )}
 
-          <div className="mt-6 pt-5 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-center">
-            <Link
-              href="/"
-              className="text-xs text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#D4A77F] transition-colors inline-flex items-center gap-1"
-            >
-              <span>← Back to Home</span>
-            </Link>
+              <button
+                type="submit"
+                disabled={authSubmitting}
+                className="w-full py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-extrabold text-sm shadow-md shadow-[#D4A77F]/20 transition-all active:scale-98 disabled:opacity-50 mt-2 cursor-pointer"
+              >
+                {authSubmitting ? 'Verifying...' : authMode === 'login' ? 'Sign In to Portal' : 'Create Customer Account'}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-5 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-center">
+              <Link
+                href={lastSalonSlug ? `/${lastSalonSlug}` : '/'}
+                className="text-xs text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#D4A77F] transition-colors inline-flex items-center gap-1"
+              >
+                <span>← Back to {lastSalonSlug ? 'Salon Booking' : 'Home'}</span>
+              </Link>
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -731,7 +774,53 @@ export default function CustomerPortalPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex flex-col font-sans pb-24 transition-colors duration-300">
-      {/* Top Banner Header */}
+      {/* Sticky Top Portal Navigation Header */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-2xs transition-colors duration-250">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <Link
+            href={salon?.slug ? `/${salon.slug}` : lastSalonSlug ? `/${lastSalonSlug}` : '/'}
+            className="flex items-center gap-2 group min-w-0"
+          >
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-sm shrink-0 group-hover:rotate-12 transition-transform duration-300">
+              ✂
+            </div>
+            <div className="min-w-0">
+              <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate max-w-[140px] xs:max-w-xs sm:max-w-md">
+                {salon?.name || 'SalonPro'}
+              </span>
+              <span className="text-[10px] text-[#D4A77F] font-bold block -mt-0.5 truncate">
+                Customer Portal
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {salon?.slug && (
+            <Link
+              href={`/${salon.slug}`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span className="hidden xs:inline">Book Visit</span>
+            </Link>
+          )}
+
+          <ThemeToggle />
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Sign out of customer portal"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F3F4F6] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 text-[#6B7280] dark:text-[#A0A8B8] text-xs font-semibold transition-all cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sign out</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Top Profile Banner */}
       <div className="bg-white dark:bg-[#10141F] border-b border-[#E5E7EB] dark:border-[#2A2F3A] px-4 py-6 shadow-xs">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
@@ -763,8 +852,6 @@ export default function CustomerPortalPage() {
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <ThemeToggle />
-
             {salon?.slug && (
               <Link
                 href={`/${salon.slug}`}
@@ -787,7 +874,7 @@ export default function CustomerPortalPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-6">
+      <div className="max-w-4xl w-full mx-auto p-3 xs:p-4 sm:p-6 space-y-6">
         {/* Navigation Tabs */}
         <div className="flex gap-2 border-b border-[#E5E7EB] dark:border-[#2A2F3A] pb-2 overflow-x-auto touch-scroll no-scrollbar">
           {[

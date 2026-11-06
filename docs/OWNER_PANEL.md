@@ -1,6 +1,6 @@
 # Owner & Staff Panel (ERP) Documentation
 
-> **Last verified:** 2026-11-06 (Individual Staff Weekly Shifts & Staff Leaves verified)  
+> **Last verified:** 2026-11-06 (Responsive image uploader, dark mode settings contrast, and customer portal header verified)  
 > **Status:** Verified against source code
 
 ---
@@ -101,7 +101,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `DonutDistributionChart` | `src/components/charts/DonutDistributionChart.tsx` | Visual distribution chart for payment modes (Cash, UPI, Card). |
 | `HourlyRushChart` | `src/components/charts/HourlyRushChart.tsx` | Peak hours hourly rush histogram for salon footfall. |
 | `BrandLoader` | `src/components/ui/BrandLoader.tsx` | Branded spinner for full-screen loading transitions. |
-| `ImageUploader` | `src/components/ui/ImageUploader.tsx` | Client-side image upload and preview component with canvas compression (target <=200KB for gallery, <=60KB square crop for logo/avatar). |
+| `ImageUploader` | `src/components/ui/ImageUploader.tsx` | Client-side image upload and preview component with canvas compression (target <=200KB for gallery, <=60KB square crop for logo/avatar). Fully responsive from 320px with dedicated `mode="logo"`, `mode="avatar"`, and `mode="default"` styles. |
 
 ---
 

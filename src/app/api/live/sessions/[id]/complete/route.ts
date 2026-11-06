@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import pool from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
 import { sendWhatsAppInvoiceReceipt } from '@/lib/whatsapp';
+import { getSalonInvoicePrefix, formatInvoiceNumber } from '@/lib/invoice-helper';
 
 export async function POST(
   request: Request,
@@ -65,7 +66,8 @@ export async function POST(
     const sessRes = await client.query(
       `SELECT s.id, s.salon_id, s.customer_id, s.status,
               c.name as customer_name, c.mobile as customer_mobile,
-              sal.name as salon_name, sal.phone as salon_phone
+              sal.name as salon_name, sal.slug as salon_slug, sal.phone as salon_phone,
+              sal.invoice_prefix as salon_invoice_prefix
        FROM sessions s
        JOIN customers c ON s.customer_id = c.id
        JOIN salons sal ON s.salon_id = sal.id
@@ -170,11 +172,16 @@ export async function POST(
       `UPDATE salons 
        SET invoice_counter = COALESCE(invoice_counter, 0) + 1 
        WHERE id = $1 
-       RETURNING invoice_counter`,
+       RETURNING invoice_counter, name, slug, invoice_prefix`,
       [salonId]
     );
     const invSeq = Number(counterRes.rows[0].invoice_counter);
-    const invNumber = `INV-${currentYear}-${invSeq.toString().padStart(4, '0')}`;
+    const prefix = getSalonInvoicePrefix({
+      invoice_prefix: counterRes.rows[0].invoice_prefix ?? session.salon_invoice_prefix,
+      slug: counterRes.rows[0].slug ?? session.salon_slug,
+      name: counterRes.rows[0].name ?? session.salon_name,
+    });
+    const invNumber = formatInvoiceNumber(prefix, currentYear, invSeq);
     const receiptToken = crypto.randomBytes(16).toString('hex');
 
     // 6. Create invoice with tax breakdown and unguessable token

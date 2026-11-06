@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import pool, { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
+import { getSalonInvoicePrefix, formatInvoiceNumber } from '@/lib/invoice-helper';
 
 // 1. GET Recent Retail Product Sales History
 export async function GET(request: Request) {
@@ -243,11 +244,16 @@ export async function POST(request: Request) {
       `UPDATE salons 
        SET invoice_counter = COALESCE(invoice_counter, 0) + 1 
        WHERE id = $1 
-       RETURNING invoice_counter`,
+       RETURNING invoice_counter, name, slug, invoice_prefix`,
       [salonId]
     );
     const invSeq = Number(counterRes.rows[0].invoice_counter);
-    const invoiceNumber = `INV-${currentYear}-${invSeq.toString().padStart(4, '0')}`;
+    const prefix = getSalonInvoicePrefix({
+      invoice_prefix: counterRes.rows[0].invoice_prefix,
+      slug: counterRes.rows[0].slug,
+      name: counterRes.rows[0].name,
+    });
+    const invoiceNumber = formatInvoiceNumber(prefix, currentYear, invSeq);
     const receiptToken = crypto.randomBytes(16).toString('hex');
 
     // 8. Create Invoice

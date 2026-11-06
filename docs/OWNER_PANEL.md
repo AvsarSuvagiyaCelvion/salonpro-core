@@ -1,6 +1,6 @@
 # Owner & Staff Panel (ERP) Documentation
 
-> **Last verified:** 2026-11-06 (Mobile modal scrolling on Services/Staff/Live tabs, staff leaves high-contrast date styling, and live studio floor light/dark mode color matching)  
+> **Last verified:** 2026-11-06 (Salon-branded invoice prefix management & sequential numbering verified)  
 > **Status:** Verified against source code
 
 ---
@@ -30,7 +30,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/app/memberships` | `src/app/app/memberships/page.tsx` | VIP membership & package management: discount rules, validity periods, and client assignment. | Membership cards & assignment modal |
 | `/app/reports` | `src/app/app/reports/page.tsx` | Analytics and export: revenue breakdowns, staff commission statements, and CSV/PDF export. | `ReportExportModal`, `BarComparisonChart`, `DonutDistributionChart`, `HourlyRushChart` |
 | `/app/reviews` | `src/app/app/reviews/page.tsx` | Reviews & ratings hub: aggregate rating, 5-star distribution, stylist rating leaderboard, client reviews feed, owner reply drawer/modal, and visibility toggle (`visible`/`hidden`). Gated by `reviews` plan flag (Pro/Premium). | Reviews dashboard, Star rating bars, Reply modal |
-| `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, and holiday closures. Gated with owner role validation; displays a read-only informational banner and disables save actions when accessed by operational staff. | Settings tab panels |
+| `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, custom invoice prefix management with live format preview, and holiday closures. Gated with owner role validation; displays a read-only informational banner and disables save actions when accessed by operational staff. | Settings tab panels |
 | `/app/subscription` | `src/app/app/subscription/page.tsx` | Plan management: current subscription tier, trial status, feature matrix, and Razorpay upgrade/renewal. | Plan cards & Razorpay checkout |
 | `/app/benefits` | `src/app/app/benefits/page.tsx` | Plan comparison matrix showing feature gates between Basic, Pro, and Premium. | Feature comparison table |
 
@@ -110,7 +110,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | Table | Key Columns Touched | Read/Write | Migration File |
 |---|---|---|---|
 | `users` | `id`, `salon_id`, `email`, `password_hash`, `role`, `is_active` | Read / Write | `006_users_and_tenant_auth.sql` |
-| `salons` | `id`, `name`, `slug`, `brand_color`, `logo_url`, `open_time`, `close_time`, `working_days`, `slot_minutes`, `buffer_minutes`, `min_advance_hours`, `max_advance_days`, `cancel_policy_hours`, `invoice_counter`, `plan`, `trial_ends_at`, `subscription_status` | Read / Write | `001_initial_schema.sql`, `003_add_settings_columns.sql`, `008_plans_limits.sql`, `009_auth_rate_limits_and_invoice_counter.sql`, `015_customer_cancel_reschedule.sql` |
+| `salons` | `id`, `name`, `slug`, `brand_color`, `logo_url`, `open_time`, `close_time`, `working_days`, `slot_minutes`, `buffer_minutes`, `min_advance_hours`, `max_advance_days`, `cancel_policy_hours`, `invoice_counter`, `invoice_prefix`, `plan`, `trial_ends_at`, `subscription_status` | Read / Write | `001_initial_schema.sql`, `003_add_settings_columns.sql`, `008_plans_limits.sql`, `009_auth_rate_limits_and_invoice_counter.sql`, `015_customer_cancel_reschedule.sql`, `020_add_salon_invoice_prefix.sql` |
 | `salon_photos` | `id`, `salon_id`, `url`, `storage_path`, `sort_order`, `created_at` | Read / Write | `016_salon_photos.sql` |
 | `staff` | `id`, `salon_id`, `name`, `role_title`, `service_commission_pct`, `product_commission_pct`, `active`, `show_online` | Read / Write | `001_initial_schema.sql` |
 | `services` | `id`, `salon_id`, `name`, `category`, `duration_min`, `price`, `online_enabled` | Read / Write | `001_initial_schema.sql` |

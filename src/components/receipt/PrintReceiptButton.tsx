@@ -316,8 +316,13 @@ export default function PrintReceiptButton({
       );
       doc.text('Powered by SalonPro ERP Cloud', pageWidth / 2, 284, { align: 'center' });
 
-      // Direct Browser File Download
-      doc.save(`Invoice-${invoice.number.replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`);
+      // Direct Browser File Download: Name with salon name and invoice number instead of generic "Invoice-INV-..."
+      const cleanSalonName = (salon.name || 'Salon')
+        .trim()
+        .replace(/[^a-zA-Z0-9_-]/g, '_')
+        .replace(/_+/g, '_');
+      const cleanInvoiceNum = (invoice.number || 'Receipt').replace(/[^a-zA-Z0-9_-]/g, '_');
+      doc.save(`${cleanSalonName}-${cleanInvoiceNum}.pdf`);
 
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 3000);

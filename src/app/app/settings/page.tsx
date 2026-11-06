@@ -22,6 +22,7 @@ import {
   Plus,
   Palmtree,
   Images,
+  Receipt,
 } from 'lucide-react';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { MAX_GALLERY_PHOTOS } from '@/lib/storage';
@@ -66,9 +67,10 @@ export default function SettingsPage() {
   const [maxAdvanceDays, setMaxAdvanceDays] = useState(14);
   const [cancelPolicyHours, setCancelPolicyHours] = useState(2);
   const [sendReminders, setSendReminders] = useState(true);
+  const [invoicePrefix, setInvoicePrefix] = useState('');
 
   // Active section tab
-  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'holidays'>('salon');
+  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'invoicing' | 'holidays'>('salon');
 
   // Holidays & Closures state
   const [holidaysList, setHolidaysList] = useState<any[]>([]);
@@ -185,6 +187,7 @@ export default function SettingsPage() {
           setMaxAdvanceDays(s.max_advance_days || 14);
           setCancelPolicyHours(s.cancel_policy_hours !== undefined && s.cancel_policy_hours !== null ? Number(s.cancel_policy_hours) : 2);
           setSendReminders(s.send_reminders ?? true);
+          setInvoicePrefix(s.invoice_prefix || '');
 
           if (typeof window !== 'undefined') {
             try {
@@ -300,6 +303,7 @@ export default function SettingsPage() {
         max_advance_days: Number(maxAdvanceDays),
         cancel_policy_hours: Number(cancelPolicyHours),
         send_reminders: sendReminders,
+        invoice_prefix: invoicePrefix.trim().toUpperCase() || null,
       };
 
       const res = await fetch('/api/settings', {
@@ -317,6 +321,7 @@ export default function SettingsPage() {
         if (data.salon.open_time) setOpenTime(data.salon.open_time.slice(0, 5));
         if (data.salon.close_time) setCloseTime(data.salon.close_time.slice(0, 5));
         if (data.salon.name) setName(data.salon.name);
+        if (data.salon.invoice_prefix !== undefined) setInvoicePrefix(data.salon.invoice_prefix || '');
       }
 
       // Notify layout and other components of updated timing & settings
@@ -406,6 +411,7 @@ export default function SettingsPage() {
         {[
           { id: 'salon', label: 'Salon Details', icon: Store },
           { id: 'booking', label: 'Booking & Timings', icon: Calendar },
+          { id: 'invoicing', label: 'Invoice & Receipts', icon: Receipt },
           { id: 'holidays', label: 'Holidays & Closures', icon: Palmtree },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -811,6 +817,101 @@ export default function SettingsPage() {
                 />
                 <div className="w-11 h-6 bg-neutral-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 dark:after:border-neutral-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
               </label>
+            </div>
+          </div>
+        )}
+
+        {/* ================= SECTION: INVOICE & RECEIPTS BRANDING ================= */}
+        {activeSection === 'invoicing' && (
+          <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-6 transition-colors duration-200">
+            <div>
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-[#D4A77F]" />
+                <span>Invoice Numbering & Branding</span>
+              </h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                Customize your salon-branded invoice number format for POS bills and digital PDF receipts.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {/* Custom Invoice Prefix */}
+              <div className="sm:col-span-1">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
+                  Custom Invoice Prefix
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    maxLength={10}
+                    placeholder={
+                      slug
+                        ? slug.split('-')[0]?.toUpperCase() || 'SALON'
+                        : name
+                        ? name.trim().split(/\s+/)[0]?.toUpperCase() || 'SALON'
+                        : 'SALON'
+                    }
+                    value={invoicePrefix}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+                      setInvoicePrefix(val);
+                    }}
+                    disabled={userRole === 'staff'}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#1C2230] text-neutral-900 dark:text-white font-mono uppercase font-bold text-sm focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F] outline-none transition-all placeholder:text-neutral-400 dark:placeholder:text-neutral-500 disabled:opacity-60"
+                  />
+                </div>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1.5 leading-relaxed">
+                  2 to 10 uppercase letters, numbers, or hyphens (e.g. <span className="font-semibold text-neutral-700 dark:text-neutral-200">PALAK</span>, <span className="font-semibold text-neutral-700 dark:text-neutral-200">DIXA</span>, <span className="font-semibold text-neutral-700 dark:text-neutral-200">GLAM</span>). If left blank, it automatically defaults to your salon name.
+                </p>
+              </div>
+
+              {/* Live Preview Card */}
+              <div className="sm:col-span-1">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5">
+                  Live Preview on Invoices & Receipts
+                </label>
+                <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-[#2A2F3A] space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-neutral-500 dark:text-neutral-400">Generated Invoice Format:</span>
+                    <span className="font-mono font-black text-sm text-[#D4A77F] px-2.5 py-0.5 rounded-lg bg-[#D4A77F]/10 border border-[#D4A77F]/30">
+                      {invoicePrefix.trim()
+                        ? `${invoicePrefix.trim()}-${new Date().getFullYear()}-0001`
+                        : `${
+                            slug
+                              ? slug.split('-')[0]?.toUpperCase() || 'SALON'
+                              : name
+                              ? name.trim().split(/\s+/)[0]?.toUpperCase() || 'SALON'
+                              : 'SALON'
+                          }-${new Date().getFullYear()}-0001`}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-neutral-200/60 dark:border-[#2A2F3A]">
+                    <span className="text-neutral-500 dark:text-neutral-400">Downloaded PDF Filename:</span>
+                    <span className="font-mono text-[11px] text-neutral-700 dark:text-neutral-300 truncate max-w-[200px]" title={`${(name || 'Salon').trim().replace(/[^a-zA-Z0-9_-]/g, '_')}-${invoicePrefix.trim() || (slug ? slug.split('-')[0]?.toUpperCase() : 'SALON')}-${new Date().getFullYear()}-0001.pdf`}>
+                      {`${(name || 'Salon').trim().replace(/[^a-zA-Z0-9_-]/g, '_')}-${
+                        invoicePrefix.trim()
+                          ? invoicePrefix.trim()
+                          : slug
+                          ? slug.split('-')[0]?.toUpperCase() || 'SALON'
+                          : 'SALON'
+                      }-${new Date().getFullYear()}-0001.pdf`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Information Callout */}
+            <div className="p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/20 text-xs space-y-1.5 text-neutral-700 dark:text-neutral-300">
+              <div className="font-bold text-[#1F2937] dark:text-white flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
+                <span>How SalonPro formats your receipts:</span>
+              </div>
+              <ul className="list-disc pl-5 space-y-1 text-neutral-600 dark:text-neutral-400 text-[11px]">
+                <li>Every invoice sequence starts sequentially per salon and includes the current calendar year.</li>
+                <li>Digital WhatsApp bills, PDF receipts, and client portal receipts will proudly display your customized salon prefix.</li>
+                <li>Changing your prefix affects only new invoices and will never modify or break previous bills.</li>
+              </ul>
             </div>
           </div>
         )}

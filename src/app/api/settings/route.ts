@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       `SELECT id, name, slug, address, phone, brand_color, logo_url, custom_domain, custom_domain_verified,
               booking_enabled, open_time, close_time, slot_minutes, buffer_minutes,
               working_days, min_advance_hours, max_advance_days, send_reminders,
-              cancel_policy_hours,
+              cancel_policy_hours, invoice_prefix,
               trial_ends_at, subscription_status, subscription_ends_at, subscription_plan_id
        FROM salons
        WHERE id = $1
@@ -105,6 +105,7 @@ async function handleUpdateSettings(request: Request) {
       max_advance_days,
       send_reminders,
       cancel_policy_hours,
+      invoice_prefix,
     } = body;
 
     // 5.3 Validations on settings updates
@@ -215,6 +216,24 @@ async function handleUpdateSettings(request: Request) {
       parsedCancelPolicyHours = cancelHoursInt;
     }
 
+    let parsedInvoicePrefix: string | null = null;
+    let hasInvoicePrefixUpdate = false;
+    if (invoice_prefix !== undefined) {
+      hasInvoicePrefixUpdate = true;
+      if (invoice_prefix !== null && String(invoice_prefix).trim() !== '') {
+        const cleanPrefix = String(invoice_prefix).trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+        if (cleanPrefix.length < 2 || cleanPrefix.length > 10) {
+          return NextResponse.json(
+            { error: 'Invoice prefix must be between 2 and 10 characters (letters, numbers, hyphens).' },
+            { status: 400 }
+          );
+        }
+        parsedInvoicePrefix = cleanPrefix;
+      } else {
+        parsedInvoicePrefix = null; // Reset to default/null so it falls back to salon name
+      }
+    }
+
     // Feature gating: logo_upload (only enforce if user is actively changing/uploading a new logo)
     if (logo_url !== undefined && logo_url) {
       const curSalon = await query('SELECT logo_url FROM salons WHERE id = $1', [salonId]);
@@ -282,8 +301,9 @@ async function handleUpdateSettings(request: Request) {
            max_advance_days = COALESCE($13, max_advance_days),
            send_reminders = COALESCE($14, send_reminders),
            custom_domain = COALESCE($15, custom_domain),
-           cancel_policy_hours = COALESCE($16::integer, cancel_policy_hours)
-       WHERE id = $17::uuid
+           cancel_policy_hours = COALESCE($16::integer, cancel_policy_hours),
+           invoice_prefix = CASE WHEN $17::boolean THEN $18::text ELSE invoice_prefix END
+       WHERE id = $19::uuid
        RETURNING *`,
       [
         name,
@@ -302,6 +322,8 @@ async function handleUpdateSettings(request: Request) {
         send_reminders,
         custom_domain,
         parsedCancelPolicyHours,
+        hasInvoicePrefixUpdate,
+        parsedInvoicePrefix,
         salonId,
       ]
     );

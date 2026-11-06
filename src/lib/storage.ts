@@ -147,11 +147,9 @@ export async function uploadToStorage(
   const cleanPath = storagePath.replace(/^\/+/, '');
 
   if (!serviceKey) {
-    console.warn('Notice: SUPABASE_SERVICE_ROLE_KEY is not configured. Simulating storage upload.');
     return {
-      success: true,
-      publicUrl: getStoragePublicUrl(cleanPath),
-      storagePath: cleanPath,
+      success: false,
+      error: 'Supabase Storage is not configured. Please add SUPABASE_SERVICE_ROLE_KEY to your Vercel / server environment variables.',
     };
   }
 

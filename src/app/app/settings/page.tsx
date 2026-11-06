@@ -224,7 +224,7 @@ export default function SettingsPage() {
         setGalleryPhotos((prev) => [...prev, data.photo]);
       }
     } catch (err: any) {
-      alert(err.message || 'Error adding photo to gallery');
+      setErrorMessage(err.message || 'Error adding photo to gallery');
     }
   }
 
@@ -242,7 +242,7 @@ export default function SettingsPage() {
       }
       setGalleryPhotos((prev) => prev.filter((p) => p.id !== id));
     } catch (err: any) {
-      alert(err.message || 'Error deleting photo');
+      setErrorMessage(err.message || 'Error deleting photo');
     }
   }
 
@@ -348,7 +348,7 @@ export default function SettingsPage() {
   const publicLink = typeof window !== 'undefined' ? `${window.location.origin}/${slug}` : `/${slug}`;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-20">
+    <div className="max-w-4xl mx-auto space-y-6 pb-36 sm:pb-24">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>

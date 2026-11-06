@@ -52,6 +52,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
   const [salon, setSalon] = useState<Salon | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [logoError, setLogoError] = useState(false);
+  const [brokenPhotoIds, setBrokenPhotoIds] = useState<Record<string, boolean>>({});
   const [services, setServices] = useState<Service[]>([]);
   const [staffList, setStaffList] = useState<Staff[]>([]);
   const [staffServices, setStaffServices] = useState<{ staff_id: string; service_id: string }[]>([]);
@@ -570,9 +572,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
             className="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center font-bold text-3xl shadow-xl border border-white/20 mb-3 overflow-hidden"
             style={{ backgroundColor: brandColor, color: '#ffffff' }}
           >
-            {salon.logo_url ? (
+            {salon.logo_url && !logoError ? (
               /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={salon.logo_url} alt={salon.name} className="w-full h-full object-cover" />
+              <img
+                src={salon.logo_url}
+                alt={salon.name}
+                onError={() => setLogoError(true)}
+                className="w-full h-full object-cover"
+              />
             ) : (
               salon.name.charAt(0)
             )}
@@ -626,31 +633,36 @@ export default function BookingWizard({ slug }: { slug: string }) {
         {currentStep === 1 && (
           <div>
             {/* Salon Gallery */}
-            {photos && photos.length > 0 && (
+            {photos.filter((p) => !brokenPhotoIds[p.id]).length > 0 && (
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2.5">
                   <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
                     Salon Gallery
                   </h3>
                   <span className="text-[11px] text-neutral-500 font-medium">
-                    {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+                    {photos.filter((p) => !brokenPhotoIds[p.id]).length} {photos.filter((p) => !brokenPhotoIds[p.id]).length === 1 ? 'photo' : 'photos'}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
-                  {photos.map((photo, idx) => (
-                    <div
-                      key={photo.id || idx}
-                      className="group aspect-4/3 rounded-2xl overflow-hidden border border-[#2A2F3A] bg-[#141926] relative shadow-sm"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={photo.url}
-                        alt={`${salon.name} photo ${idx + 1}`}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  ))}
+                  {photos
+                    .filter((p) => !brokenPhotoIds[p.id])
+                    .map((photo, idx) => (
+                      <div
+                        key={photo.id || idx}
+                        className="group aspect-4/3 rounded-2xl overflow-hidden border border-[#2A2F3A] bg-[#141926] relative shadow-sm"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.url}
+                          alt={`${salon.name} photo ${idx + 1}`}
+                          loading="lazy"
+                          onError={() => {
+                            setBrokenPhotoIds((prev) => ({ ...prev, [photo.id]: true }));
+                          }}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      </div>
+                    ))}
                 </div>
               </div>
             )}

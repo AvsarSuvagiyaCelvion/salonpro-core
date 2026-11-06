@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, RefreshCw, AlertCircle } from 'lucide-react';
 import { MAX_CLIENT_FILE_SIZE } from '@/lib/storage';
 
@@ -34,6 +34,8 @@ export default function ImageUploader({
   const [progressText, setProgressText] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [currentStoragePath, setCurrentStoragePath] = useState<string | null>(null);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   /**
    * Compresses an image in browser using canvas
@@ -152,6 +154,11 @@ export default function ImageUploader({
       setUploading(true);
       setProgressText('Compressing...');
 
+      // Immediate local preview so user sees the image right away
+      const localUrl = URL.createObjectURL(file);
+      setLocalPreview(localUrl);
+      setImageError(false);
+
       const compressedBlob = await compressImage(file);
       setProgressText(`Uploading (${Math.round(compressedBlob.size / 1024)}KB)...`);
 
@@ -169,6 +176,7 @@ export default function ImageUploader({
 
       const data = await res.json();
       if (!res.ok) {
+        setLocalPreview(null);
         throw new Error(data.error || 'Failed to upload image.');
       }
 
@@ -198,15 +206,19 @@ export default function ImageUploader({
     }
 
     setCurrentStoragePath(null);
+    setLocalPreview(null);
+    setImageError(false);
     onChange(null, null);
     if (onRemove) onRemove();
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
+  const displaySrc = localPreview || value;
+
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
+        <label className={`block text-xs font-bold text-neutral-700 dark:text-neutral-300 ${isAvatar ? 'text-center' : ''}`}>
           {label}
         </label>
       )}
@@ -220,21 +232,29 @@ export default function ImageUploader({
         className="hidden"
       />
 
-      {value ? (
+      {displaySrc ? (
         /* Preview with Replace / Remove controls */
-        <div className="relative group inline-block">
+        <div className={`relative group ${isAvatar ? 'flex flex-col items-center justify-center mx-auto' : 'inline-block'}`}>
           <div
             className={`relative overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 ${
               isAvatar ? 'w-24 h-24 rounded-full' : 'w-48 h-32 rounded-2xl'
             }`}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={value}
-              alt="Uploaded media preview"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
+            {!imageError ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={displaySrc}
+                alt=""
+                onError={() => setImageError(true)}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center bg-neutral-100 dark:bg-neutral-800 text-neutral-400">
+                <Upload className="w-5 h-5 mb-1 opacity-50 text-neutral-400" />
+                <span className="text-[10px] leading-tight font-medium">Image unavailable</span>
+              </div>
+            )}
 
             {uploading && (
               <div className="absolute inset-0 bg-black/60 backdrop-blur-2xs flex flex-col items-center justify-center p-2 text-center text-white">
@@ -245,7 +265,7 @@ export default function ImageUploader({
           </div>
 
           {!disabled && !uploading && (
-            <div className="flex items-center gap-1.5 mt-2">
+            <div className="flex items-center justify-center gap-1.5 mt-2">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -265,39 +285,43 @@ export default function ImageUploader({
         </div>
       ) : (
         /* Empty Upload Dropzone */
-        <div
-          onClick={() => {
-            if (!disabled && !uploading) fileInputRef.current?.click();
-          }}
-          className={`border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-[#D4A77F] dark:hover:border-[#D4A77F] bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all cursor-pointer flex flex-col items-center justify-center p-4 text-center ${
-            isAvatar ? 'w-24 h-24 rounded-full' : 'w-full max-w-sm h-32 rounded-2xl'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          {uploading ? (
-            <div className="flex flex-col items-center">
-              <RefreshCw className="w-5 h-5 text-[#D4A77F] animate-spin" />
-              <span className="text-[11px] text-neutral-500 mt-2 font-medium">{progressText || 'Processing...'}</span>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <Upload className="w-5 h-5 text-neutral-400 group-hover:text-[#D4A77F]" />
-              <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mt-1.5">
-                {isAvatar ? 'Upload Avatar' : 'Click to upload image'}
-              </span>
-              <span className="text-[10px] text-neutral-400 mt-0.5">
-                JPG, PNG, WebP (max 5MB)
-              </span>
-            </div>
-          )}
+        <div className={isAvatar ? 'flex flex-col items-center justify-center' : ''}>
+          <div
+            onClick={() => {
+              if (!disabled && !uploading) fileInputRef.current?.click();
+            }}
+            className={`border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-[#D4A77F] dark:hover:border-[#D4A77F] bg-neutral-50/50 dark:bg-neutral-900/50 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all cursor-pointer flex flex-col items-center justify-center p-4 text-center ${
+              isAvatar ? 'w-24 h-24 rounded-full' : 'w-full max-w-sm h-32 rounded-2xl'
+            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {uploading ? (
+              <div className="flex flex-col items-center">
+                <RefreshCw className="w-5 h-5 text-[#D4A77F] animate-spin" />
+                <span className="text-[11px] text-neutral-500 mt-2 font-medium">{progressText || 'Processing...'}</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <Upload className="w-5 h-5 text-neutral-400 group-hover:text-[#D4A77F]" />
+                <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 mt-1.5">
+                  {isAvatar ? 'Upload Avatar' : 'Click to upload image'}
+                </span>
+                <span className="text-[10px] text-neutral-400 mt-0.5">
+                  JPG, PNG, WebP (max 5MB)
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {helperText && !errorMessage && (
-        <p className="text-[10px] text-neutral-400">{helperText}</p>
+        <p className={`text-[10px] text-neutral-400 ${isAvatar ? 'text-center max-w-xs mx-auto' : ''}`}>
+          {helperText}
+        </p>
       )}
 
       {errorMessage && (
-        <div className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-1.5">
+        <div className={`p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-1.5 ${isAvatar ? 'max-w-xs mx-auto text-center justify-center' : ''}`}>
           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           <span>{errorMessage}</span>
         </div>

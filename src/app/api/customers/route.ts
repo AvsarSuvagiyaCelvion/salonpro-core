@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const offset = (page - 1) * pageSize;
 
     let sql = `
-      SELECT c.id, c.salon_id, c.name, c.mobile, c.email, c.note, c.birthday, c.created_at,
+      SELECT c.id, c.salon_id, c.name, c.mobile, c.email, c.address, c.avatar_url, c.note, c.birthday, c.created_at,
              COUNT(DISTINCT i.id)::int as visits,
              COALESCE(SUM(i.total), 0)::numeric(10,2) as total_spent,
              COUNT(*) OVER() as full_count

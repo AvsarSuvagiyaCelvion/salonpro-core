@@ -15,14 +15,22 @@ import {
   ShieldAlert,
   X,
   Check,
+  User,
+  Lock,
+  MapPin,
+  KeyRound,
+  ShieldCheck,
 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 interface Customer {
   id: string;
   name: string;
   mobile: string;
   email: string | null;
+  address?: string | null;
+  avatar_url?: string | null;
 }
 
 interface Salon {
@@ -87,7 +95,31 @@ export default function CustomerPortalPage() {
   const [pastAppts, setPastAppts] = useState<Appointment[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [activeTab, setActiveTab] = useState<'appointments' | 'bills' | 'memberships'>('appointments');
+  const [activeTab, setActiveTab] = useState<'appointments' | 'bills' | 'memberships' | 'profile'>('appointments');
+
+  // Profile form state
+  const [profileName, setProfileName] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [profileAddress, setProfileAddress] = useState('');
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileSuccessMsg, setProfileSuccessMsg] = useState<string | null>(null);
+  const [profileErrorMsg, setProfileErrorMsg] = useState<string | null>(null);
+
+  // PIN change form state
+  const [currentPin, setCurrentPin] = useState('');
+  const [newPin, setNewPin] = useState('');
+  const [confirmPin, setConfirmPin] = useState('');
+  const [changingPin, setChangingPin] = useState(false);
+  const [pinSuccessMsg, setPinSuccessMsg] = useState<string | null>(null);
+  const [pinErrorMsg, setPinErrorMsg] = useState<string | null>(null);
+
+  function syncProfile(cust: Customer) {
+    setProfileName(cust.name || '');
+    setProfileEmail(cust.email || '');
+    setProfileAddress(cust.address || '');
+    setProfileAvatarUrl(cust.avatar_url || null);
+  }
 
   // Auth form state (when not logged in)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
@@ -221,6 +253,7 @@ export default function CustomerPortalPage() {
       if (data.loggedIn && data.customer) {
         setLoggedIn(true);
         setCustomer(data.customer);
+        syncProfile(data.customer);
         await loadCustomerRecords();
       } else {
         setLoggedIn(false);
@@ -238,6 +271,9 @@ export default function CustomerPortalPage() {
       if (!res.ok) throw new Error();
       const data = await res.json();
       setCustomer(data.customer);
+      if (data.customer) {
+        syncProfile(data.customer);
+      }
       setSalon(data.salon);
       setUpcomingAppts(data.upcomingAppointments || []);
       setPastAppts(data.pastAppointments || []);
@@ -252,7 +288,12 @@ export default function CustomerPortalPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
-      if (tabParam === 'bills' || tabParam === 'memberships' || tabParam === 'appointments') {
+      if (
+        tabParam === 'bills' ||
+        tabParam === 'memberships' ||
+        tabParam === 'appointments' ||
+        tabParam === 'profile'
+      ) {
         setActiveTab(tabParam);
       }
     }
@@ -260,12 +301,115 @@ export default function CustomerPortalPage() {
     checkSession();
   }, []);
 
-  function handleSwitchTab(tab: 'appointments' | 'bills' | 'memberships') {
+  function handleSwitchTab(tab: 'appointments' | 'bills' | 'memberships' | 'profile') {
     setActiveTab(tab);
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.set('tab', tab);
       window.history.replaceState(null, '', url.toString());
+    }
+  }
+
+  async function handleSaveProfile(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingProfile(true);
+    setProfileSuccessMsg(null);
+    setProfileErrorMsg(null);
+
+    const cleanName = profileName.trim();
+    if (cleanName.length < 2 || cleanName.length > 60) {
+      setProfileErrorMsg('Full name must be between 2 and 60 characters.');
+      setSavingProfile(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/customer/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: cleanName,
+          email: profileEmail.trim() || null,
+          address: profileAddress.trim() || null,
+          avatar_url: profileAvatarUrl || null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update profile.');
+      }
+
+      setCustomer(data.customer);
+      syncProfile(data.customer);
+      setProfileSuccessMsg('Your profile has been saved successfully!');
+      setTimeout(() => setProfileSuccessMsg(null), 4000);
+    } catch (err: any) {
+      setProfileErrorMsg(err.message || 'Error saving profile.');
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
+  async function handleChangePin(e: React.FormEvent) {
+    e.preventDefault();
+    setChangingPin(true);
+    setPinSuccessMsg(null);
+    setPinErrorMsg(null);
+
+    const cleanCurr = currentPin.trim();
+    const cleanNew = newPin.trim();
+    const cleanConf = confirmPin.trim();
+
+    if (!cleanCurr) {
+      setPinErrorMsg('Please enter your current PIN.');
+      setChangingPin(false);
+      return;
+    }
+
+    if (!/^\d{4}$/.test(cleanNew)) {
+      setPinErrorMsg('New PIN must be exactly 4 digits (0-9).');
+      setChangingPin(false);
+      return;
+    }
+
+    if (cleanNew === cleanCurr) {
+      setPinErrorMsg('New PIN must be different from your current PIN.');
+      setChangingPin(false);
+      return;
+    }
+
+    if (cleanNew !== cleanConf) {
+      setPinErrorMsg('New PIN and Confirm PIN do not match.');
+      setChangingPin(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/customer/profile/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPin: cleanCurr,
+          newPin: cleanNew,
+          confirmPin: cleanConf,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update PIN.');
+      }
+
+      setPinSuccessMsg('Your 4-digit PIN has been changed successfully!');
+      setCurrentPin('');
+      setNewPin('');
+      setConfirmPin('');
+      setTimeout(() => setPinSuccessMsg(null), 4000);
+    } catch (err: any) {
+      setPinErrorMsg(err.message || 'Error updating PIN.');
+    } finally {
+      setChangingPin(false);
     }
   }
 
@@ -299,6 +443,9 @@ export default function CustomerPortalPage() {
 
       setLoggedIn(true);
       setCustomer(data.customer);
+      if (data.customer) {
+        syncProfile(data.customer);
+      }
       await loadCustomerRecords();
     } catch (err: any) {
       setAuthError(err.message);
@@ -501,10 +648,18 @@ export default function CustomerPortalPage() {
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div
-              style={{ backgroundColor: brandColor }}
-              className="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-[#080B12] text-2xl shadow-md border border-white/10"
+              style={{ backgroundColor: customer?.avatar_url ? 'transparent' : brandColor }}
+              className="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-[#080B12] text-2xl shadow-md border border-white/10 overflow-hidden shrink-0"
             >
-              {customer?.name.charAt(0) || 'C'}
+              {customer?.avatar_url ? (
+                <img
+                  src={customer.avatar_url}
+                  alt={customer.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                customer?.name?.charAt(0) || 'C'
+              )}
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -551,6 +706,7 @@ export default function CustomerPortalPage() {
             { id: 'appointments', label: `My Appointments (${upcomingAppts.length})`, icon: Calendar },
             { id: 'bills', label: `Bills & Receipts (${invoices.length})`, icon: Receipt },
             { id: 'memberships', label: `VIP Memberships (${plans.length})`, icon: Award },
+            { id: 'profile', label: `Profile & Security`, icon: User },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -934,6 +1090,226 @@ export default function CustomerPortalPage() {
             )}
           </div>
         )}
+
+        {/* ================= TAB 4: PROFILE & SECURITY ================= */}
+        {activeTab === 'profile' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Profile Update Feedback */}
+            {profileSuccessMsg && (
+              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm flex items-center gap-2 font-medium">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{profileSuccessMsg}</span>
+              </div>
+            )}
+            {profileErrorMsg && (
+              <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs sm:text-sm flex items-center gap-2 font-medium">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{profileErrorMsg}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card 1: Personal Details */}
+              <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
+                  <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm text-[#1F2937] dark:text-white">Personal Profile</h3>
+                    <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
+                      Keep your contact and address details up to date
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSaveProfile} className="space-y-4">
+                  {/* Avatar Uploader */}
+                  <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A]">
+                    <ImageUploader
+                      value={profileAvatarUrl}
+                      onChange={(url) => setProfileAvatarUrl(url)}
+                      onRemove={() => setProfileAvatarUrl(null)}
+                      type="avatar"
+                      mode="avatar"
+                      label="Profile Picture"
+                      helperText="Square photo recommended. Max 400x400px, WebP/JPEG, <=60 KB."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                      Full Name <span className="text-[#D4A77F]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={profileName}
+                      onChange={(e) => setProfileName(e.target.value)}
+                      placeholder="e.g. Diya Joshi"
+                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5 flex items-center justify-between">
+                      <span>Registered Mobile</span>
+                      <span className="text-[10px] text-neutral-400 font-normal flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Read-only ID
+                      </span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-2.5 text-xs text-[#9CA3AF] dark:text-[#747D8D] font-mono">+91</span>
+                      <input
+                        type="tel"
+                        disabled
+                        value={customer?.mobile || ''}
+                        className="w-full bg-neutral-100 dark:bg-neutral-900 border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-12 pr-4 py-2.5 text-xs font-mono text-[#6B7280] dark:text-[#A0A8B8] cursor-not-allowed select-none"
+                      />
+                    </div>
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      Your phone number is linked to your salon visits and cannot be altered.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                      Email Address (Optional)
+                    </label>
+                    <input
+                      type="email"
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      placeholder="e.g. diya.j@example.com"
+                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                      Delivery / Home Address (Optional)
+                    </label>
+                    <textarea
+                      rows={2}
+                      maxLength={250}
+                      value={profileAddress}
+                      onChange={(e) => setProfileAddress(e.target.value)}
+                      placeholder="e.g. 402, Shivalik Heights, CG Road, Ahmedabad"
+                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                    />
+                    <div className="flex justify-end text-[10px] text-neutral-400 mt-0.5">
+                      {profileAddress.length}/250 characters
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={savingProfile}
+                    className="w-full py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-extrabold text-xs shadow-md shadow-[#D4A77F]/20 transition-all active:scale-98 disabled:opacity-50 cursor-pointer"
+                  >
+                    {savingProfile ? 'Saving Changes...' : 'Save Profile Details'}
+                  </button>
+                </form>
+              </div>
+
+              {/* Card 2: Security & PIN Change */}
+              <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <KeyRound className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm text-[#1F2937] dark:text-white">Security & 4-Digit PIN</h3>
+                    <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
+                      Change your security passcode for accessing your portal
+                    </p>
+                  </div>
+                </div>
+
+                {pinSuccessMsg && (
+                  <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2 font-medium">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{pinSuccessMsg}</span>
+                  </div>
+                )}
+
+                {pinErrorMsg && (
+                  <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2 font-medium">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{pinErrorMsg}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleChangePin} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                      Current 4-Digit PIN <span className="text-[#D4A77F]">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      maxLength={4}
+                      required
+                      value={currentPin}
+                      onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, ''))}
+                      placeholder="••••"
+                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                      New 4-Digit PIN <span className="text-[#D4A77F]">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      maxLength={4}
+                      required
+                      value={newPin}
+                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
+                      placeholder="••••"
+                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                    />
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      Must be 4 numbers (0-9) and different from current PIN.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
+                      Confirm New 4-Digit PIN <span className="text-[#D4A77F]">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      maxLength={4}
+                      required
+                      value={confirmPin}
+                      onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
+                      placeholder="••••"
+                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={changingPin || !currentPin || !newPin || !confirmPin}
+                      className="w-full py-3 rounded-2xl bg-neutral-900 dark:bg-neutral-100 hover:bg-neutral-800 dark:hover:bg-white text-white dark:text-neutral-900 font-extrabold text-xs shadow-md transition-all active:scale-98 disabled:opacity-50 cursor-pointer"
+                    >
+                      {changingPin ? 'Updating PIN...' : 'Update Security PIN'}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 text-[11px] text-amber-800 dark:text-amber-300">
+                  <div className="font-bold mb-0.5 flex items-center gap-1">
+                    <Lock className="w-3 h-3" /> Security Lock Protection
+                  </div>
+                  5 consecutive failed PIN attempts will lock PIN changes for 15 minutes to protect your account.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ================= CANCEL CONFIRMATION MODAL ================= */}
@@ -1162,6 +1538,17 @@ export default function CustomerPortalPage() {
         >
           <Award className="w-4 h-4" />
           <span className="text-[10px]">VIP</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSwitchTab('profile')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'profile' ? 'text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
+          }`}
+        >
+          <User className="w-4 h-4" />
+          <span className="text-[10px]">Profile</span>
         </button>
 
         {salon?.slug && (

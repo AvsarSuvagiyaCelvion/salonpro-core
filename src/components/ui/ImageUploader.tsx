@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Upload, RefreshCw, AlertCircle } from 'lucide-react';
 import { MAX_CLIENT_FILE_SIZE } from '@/lib/storage';
 

@@ -16,7 +16,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 |---|---|---|---|
 | `/[slug]` | `src/app/[slug]/page.tsx` | Primary public showcase & booking wizard for a salon identified by unique slug. | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
 | `/book/[slug]` | `src/app/book/[slug]/page.tsx` | Alias for public booking wizard (supports direct `/book/<slug>` links). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
-| `/portal` | `src/app/portal/page.tsx` | Customer portal: authenticated client dashboard showing upcoming visits, past visits, invoices, VIP plans, and self-service cancel/reschedule. Also renders customer login/signup when unauthenticated. | `CustomerPortalPage`, `ThemeToggle`, `PrintReceiptButton` |
+| `/portal` | `src/app/portal/page.tsx` | Customer portal: authenticated client dashboard showing upcoming visits, past visits, invoices, VIP plans, profile editor, PIN change, and self-service cancel/reschedule. Supports `?tab=profile` query param. Also renders customer login/signup when unauthenticated. | `CustomerPortalPage`, `ThemeToggle`, `ImageUploader`, `PrintReceiptButton` |
 | `/my-account` | `src/app/my-account/page.tsx` | Alias route re-exporting `/portal`. | `CustomerPortalPage` |
 | `/customer/login` | `src/app/customer/login/page.tsx` | Alias route re-exporting `/portal` (renders in login mode). | `CustomerPortalPage` |
 | `/customer/signup` | `src/app/customer/signup/page.tsx` | Alias route re-exporting `/portal` (renders in signup mode). | `CustomerPortalPage` |
@@ -35,6 +35,8 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `/api/customer/logout` | `POST` | `src/app/api/customer/logout/route.ts` | `salonpro_customer_session` | Clears the `salonpro_customer_session` HTTP-only cookie. |
 | `/api/customer/records` | `GET`, `PATCH` | `src/app/api/customer/records/route.ts` | `salonpro_customer_session` | Fetches customer profile, upcoming/past appointments, invoices, active VIP plans, and cancellation policy hours. |
 | `/api/customer/appointments/[id]` | `PATCH` | `src/app/api/customer/appointments/[id]/route.ts` | `salonpro_customer_session` | Handles customer self-service `cancel` or `reschedule` within the salon's cancellation window. Prevents duplicate booking via advisory lock. |
+| `/api/customer/profile` | `GET`, `PATCH` | `src/app/api/customer/profile/route.ts` | `salonpro_customer_session` | `GET` returns logged-in client profile. `PATCH` updates name (2-60 chars), email, address (max 250), and avatar_url (strictly within customer's own folder in `salon-media` bucket). Phone is read-only. Rate-limited to 20 updates / 15 min. |
+| `/api/customer/profile/pin` | `POST` | `src/app/api/customer/profile/pin/route.ts` | `salonpro_customer_session` | Updates customer 4-digit PIN. Requires current PIN, new 4-digit PIN (must differ), and confirm PIN. Verifies current PIN via bcryptjs and hashes new PIN. Protected by strict brute-force rate limit (5 attempts / 15 min per customer + IP). |
 
 ---
 
@@ -57,7 +59,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `staff` | `id`, `salon_id`, `name`, `role_title`, `active`, `show_online` | Read | `001_initial_schema.sql` |
 | `staff_services` | `staff_id`, `service_id` | Read | `001_initial_schema.sql` |
 | `salon_holidays` | `salon_id`, `start_date`, `end_date`, `title` | Read | `014_salon_holidays.sql` |
-| `customers` | `id`, `salon_id`, `name`, `mobile`, `email`, `pin`, `last_login_at` | Read / Write | `001_initial_schema.sql`, `004_add_customer_auth.sql`, `012_dedupe_and_unique_customers.sql` |
+| `customers` | `id`, `salon_id`, `name`, `mobile`, `email`, `address`, `avatar_url`, `pin`, `last_login_at` | Read / Write | `001_initial_schema.sql`, `004_add_customer_auth.sql`, `012_dedupe_and_unique_customers.sql`, `017_customer_profile_columns.sql` |
 | `appointments` | `id`, `salon_id`, `customer_id`, `staff_id`, `service_id`, `starts_at`, `ends_at`, `status`, `source`, `cancelled_by`, `cancelled_at`, `rescheduled_count` | Read / Write | `001_initial_schema.sql`, `015_customer_cancel_reschedule.sql` |
 | `invoices` | `id`, `salon_id`, `customer_id`, `number`, `receipt_token`, `subtotal`, `tax_amount`, `total` | Read | `001_initial_schema.sql`, `007_invoices_tax_and_tenant_indexes.sql`, `010_backfill_invoice_receipt_tokens.sql` |
 | `payments` | `invoice_id`, `amount`, `payment_method` | Read | `001_initial_schema.sql` |
@@ -109,6 +111,12 @@ The Customer Panel enables salon clients to discover salon services, select styl
    - If slot was taken concurrently, returns HTTP `409` (`{ isOverlap: true }`). UI prompts user to choose another slot.
    - On success: updates `starts_at`, `ends_at`, `staff_id`, `rescheduled_count = rescheduled_count + 1`.
 
+### Flow 4: Customer Profile Edit & Security PIN Change
+1. **Access Profile**: Logged-in customer visits `/portal?tab=profile` or clicks "Profile & Security" tab.
+2. **Edit Profile Details**: User updates Name, Email, Address, or uploads avatar photo via `ImageUploader` (square crop <=60 KB). Phone remains read-only.
+3. **Submit Profile Update**: Calls `PATCH /api/customer/profile`. Backend validates name length (2-60 chars), email regex, address length (max 250), and verifies `avatar_url` points strictly to the customer's own storage directory (`customers/{customerId}/...`). Updates DB, re-issues session cookie if name changed, and updates portal header avatar and name.
+4. **Change 4-Digit Security PIN**: User inputs Current PIN, New 4-digit PIN, and Confirm PIN. Calls `POST /api/customer/profile/pin`. Backend checks brute-force rate limit (5 attempts / 15 min), verifies current PIN using `bcryptjs`, hashes new PIN, and updates database.
+
 ---
 
 ## 7. Business Rules and Edge Cases
@@ -116,6 +124,9 @@ The Customer Panel enables salon clients to discover salon services, select styl
 - **Advisory Lock Concurrency**: Serialized using PostgreSQL `pg_advisory_xact_lock(hashtext(lockKey))` to eliminate race conditions between simultaneous bookings.
 - **Cancellation Cutoff**: Governed by `salons.cancel_policy_hours` (default 2 hours, customizable 0-72 hours). If cutoff has passed, requests return HTTP 400 instructing the client to call the salon directly.
 - **Reschedule Limit**: Max 2 reschedules per appointment. On the 3rd attempt, returns HTTP 400.
+- **Customer Phone Immutability**: Customer mobile number is the primary identity token and cannot be edited via portal profile updates.
+- **Customer Storage Isolation**: Avatars can only be stored under `customers/{customerId}/...` in bucket `salon-media`. External URLs or data URIs are rejected with HTTP 400.
+- **Brute Force Defense**: PIN updates lock after 5 consecutive failed attempts for 15 minutes.
 - **Demo Salon (`dixa-beauty-salon`)**: Simulates public bookings, cancellations, and reschedules without writing persistent records to the database.
 - **Honeypot Bot Protection**: `POST /api/public/[slug]/book` contains hidden field `hp`. If populated by spam bots, silently returns mock success.
 - **Anti-IDOR on Receipts (`/b/[number]`)**:
@@ -127,7 +138,8 @@ The Customer Panel enables salon clients to discover salon services, select styl
 ## 8. Shared Dependencies
 - `src/lib/auth.ts`: `CUSTOMER_COOKIE_NAME`, `verifyCustomerSessionToken`, `createCustomerSessionToken`.
 - `src/lib/slots.ts`: `getAvailableSlots` shared between booking wizard and portal reschedule modal.
-- `src/lib/rate-limit.ts`: Throttling booking submissions and customer PIN attempts.
+- `src/lib/rate-limit.ts`: Throttling booking submissions, customer PIN attempts, and profile edits.
+- `src/lib/storage.ts`: Storage path validation and Supabase Storage client for customer avatar uploads.
 - `src/lib/holidays.ts`: `checkDateHoliday` to disable closed holiday slots.
 - `src/proxy.ts`: Subdomain rewrite from `tenant.salonpro.in/` to `/[slug]`.
 
@@ -137,12 +149,12 @@ The Customer Panel enables salon clients to discover salon services, select styl
 - **Online Booking**: Immediately appears in the Owner ERP live board (`/app/live`) and appointments calendar (`/app/appointments`).
 - **Customer Cancellation**: Flags appointment as `status = 'cancelled'` and `cancelled_by = 'customer'`. Displays with "Cancelled by customer" pill in Owner appointments view.
 - **Customer Reschedule**: Updates `starts_at` and `ends_at` on the appointment, frees the old slot, and reflects immediately across owner schedules.
+- **Customer Profile & Avatar**: Updated email, address, and avatar are immediately visible to owners in `/app/customers` (client table, bill modal, and detail views).
 
 ---
 
 ## 10. Known Gaps / TODO / UNVERIFIED Items
 - Direct automated customer SMS / WhatsApp reminders currently require manual click or external webhook integrations; no background cron worker is currently running in this deployment.
-- Customer account profile editing (changing name/phone) is currently UNVERIFIED / not exposed in the customer portal.
 
 ---
 

@@ -25,6 +25,7 @@ import {
   Send,
   MessageSquare,
   Wallet,
+  MapPin,
 } from 'lucide-react';
 
 interface Customer {
@@ -32,6 +33,8 @@ interface Customer {
   name: string;
   mobile: string;
   email: string | null;
+  address?: string | null;
+  avatar_url?: string | null;
   note: string | null;
   birthday: string | null;
   visits: number;
@@ -331,8 +334,12 @@ export default function CustomersPage() {
                   <tr key={c.id} className="hover:bg-[#D4A77F]/10 transition-colors">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center font-bold text-xs">
-                          {c.name.slice(0, 1)}
+                        <div className="w-8 h-8 rounded-full bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center font-bold text-xs overflow-hidden shrink-0 border border-neutral-200/50">
+                          {c.avatar_url ? (
+                            <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
+                          ) : (
+                            c.name.slice(0, 1)
+                          )}
                         </div>
                         <div>
                           <div className="font-bold text-sm text-[#1F2937] dark:text-white">
@@ -354,6 +361,12 @@ export default function CustomersPage() {
                           <div className="flex items-center gap-1.5 text-neutral-500 text-[11px]">
                             <Mail className="w-3 h-3 text-neutral-400" />
                             <span>{c.email}</span>
+                          </div>
+                        )}
+                        {c.address && (
+                          <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] truncate max-w-[200px]" title={c.address}>
+                            <MapPin className="w-3 h-3 text-neutral-400 shrink-0" />
+                            <span className="truncate">{c.address}</span>
                           </div>
                         )}
                       </div>
@@ -458,9 +471,25 @@ export default function CustomersPage() {
                   <h2 className="text-base font-bold text-[#1F2937] dark:text-white">
                     Bill History: {selectedCustomerForBills.name}
                   </h2>
-                  <p className="text-xs text-neutral-500 flex items-center gap-1.5 mt-0.5">
+                  <p className="text-xs text-neutral-500 flex flex-wrap items-center gap-1.5 mt-0.5">
                     <Phone className="w-3 h-3" />
                     <span>+91 {selectedCustomerForBills.mobile}</span>
+                    {selectedCustomerForBills.email && (
+                      <>
+                        <span>•</span>
+                        <Mail className="w-3 h-3" />
+                        <span>{selectedCustomerForBills.email}</span>
+                      </>
+                    )}
+                    {selectedCustomerForBills.address && (
+                      <>
+                        <span>•</span>
+                        <MapPin className="w-3 h-3 text-neutral-400" />
+                        <span className="truncate max-w-[200px]" title={selectedCustomerForBills.address}>
+                          {selectedCustomerForBills.address}
+                        </span>
+                      </>
+                    )}
                     <span>•</span>
                     <span>Total Spent: <strong>₹{selectedCustomerForBills.total_spent}</strong></span>
                   </p>
@@ -677,6 +706,18 @@ export default function CustomersPage() {
                   className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none"
                 />
               </div>
+
+              {editingCustomer?.address && (
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-500 mb-1 flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-neutral-400" />
+                    <span>Client Address (Set by client in customer portal)</span>
+                  </label>
+                  <div className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-600">
+                    {editingCustomer.address}
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100">
                 <button

@@ -110,7 +110,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `services` | `id`, `salon_id`, `name`, `category`, `duration_min`, `price`, `online_enabled` | Read / Write | `001_initial_schema.sql` |
 | `staff_services` | `staff_id`, `service_id` | Read / Write | `001_initial_schema.sql` |
 | `products` | `id`, `salon_id`, `name`, `brand`, `sku`, `price`, `cost_price`, `stock`, `min_stock`, `active` | Read / Write | `001_initial_schema.sql` |
-| `customers` | `id`, `salon_id`, `name`, `mobile`, `email`, `note`, `pin` | Read / Write | `001_initial_schema.sql`, `012_dedupe_and_unique_customers.sql` |
+| `customers` | `id`, `salon_id`, `name`, `mobile`, `email`, `address`, `avatar_url`, `note`, `birthday`, `pin` | Read / Write | `001_initial_schema.sql`, `012_dedupe_and_unique_customers.sql`, `017_customer_profile_columns.sql` |
 | `appointments` | `id`, `salon_id`, `customer_id`, `staff_id`, `service_id`, `starts_at`, `ends_at`, `status`, `source`, `cancelled_by`, `cancelled_at`, `rescheduled_count` | Read / Write | `001_initial_schema.sql`, `015_customer_cancel_reschedule.sql` |
 | `waiting` | `id`, `salon_id`, `customer_id`, `created_at` | Read / Write | `001_initial_schema.sql` |
 | `sessions` | `id`, `salon_id`, `customer_id`, `status`, `started_at` | Read / Write | `001_initial_schema.sql` |

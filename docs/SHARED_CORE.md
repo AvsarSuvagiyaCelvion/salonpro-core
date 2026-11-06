@@ -72,6 +72,8 @@ In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re
   - Customer booking PIN attempts: Max 5 incorrect PIN attempts per (salon, mobile) per 15 minutes.
   - Admin login: Max 10 attempts per IP per 15 minutes.
   - Customer appointment self-service actions: Max 30 requests per minute per customer.
+  - Customer profile updates: Max 20 requests per 15 minutes per customer.
+  - Customer PIN change attempts: Max 5 incorrect attempts per customer + IP per 15 minutes with temporary lockout.
 
 ---
 
@@ -198,4 +200,5 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts` an
 | `014_salon_holidays.sql` | Creates `salon_holidays` table for scheduled temporary salon closures. |
 | `015_customer_cancel_reschedule.sql` | Adds `cancel_policy_hours` to `salons` (default 2); adds `cancelled_by`, `cancelled_at`, and `rescheduled_count` to `appointments`. |
 | `016_salon_photos.sql` | Creates `salon_photos` table (`id`, `salon_id`, `url`, `storage_path`, `sort_order`, `created_at`) with RLS and foreign key cascade for gallery photo uploads. |
+| `017_customer_profile_columns.sql` | Adds nullable `email text`, `address text`, and `avatar_url text` columns to `customers` table with `ADD COLUMN IF NOT EXISTS`. |
 

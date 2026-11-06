@@ -22,7 +22,7 @@ export async function GET() {
 
     // 1. Customer details
     const custRes = await query(
-      `SELECT id, salon_id, name, mobile, email, created_at FROM customers WHERE id = $1 LIMIT 1`,
+      `SELECT id, salon_id, name, mobile, email, address, avatar_url, created_at FROM customers WHERE id = $1 LIMIT 1`,
       [customerId]
     );
 

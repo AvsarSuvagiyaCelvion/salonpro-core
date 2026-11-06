@@ -1,6 +1,6 @@
 # Customer Panel Documentation
 
-> **Last verified:** 2026-11-06 (Customer portal sticky top navigation header and responsive avatar uploader verified)  
+> **Last verified:** 2026-11-06 (Public booking wizard state persistence for service, specialist, and date across page reloads verified)  
 > **Status:** Verified against source code
 
 ---
@@ -74,10 +74,10 @@ The Customer Panel enables salon clients to discover salon services, select styl
 ## 6. Main User Flows
 
 ### Flow 1: Public Online Booking
-1. **Visit salon link**: Client loads `/<slug>` or `/book/<slug>`. `BookingWizard.tsx` calls `GET /api/public/[slug]` to load brand logo, gallery photos (`salon_photos`), services, active staff, and operating schedule.
+1. **Visit salon link**: Client loads `/<slug>` or `/book/<slug>`. `BookingWizard.tsx` calls `GET /api/public/[slug]` to load brand logo, gallery photos (`salon_photos`), services, active staff, and operating schedule. Selected service, specialist, and date are preserved in `sessionStorage` and synced with URL query params (`?step=...&service=...&staff=...&date=...`) so that page refreshes on Step 3 or Step 4 maintain exact client choices without resetting staff back to "anyone".
 2. **Step 1 - Ambience Gallery & Pick Service**: User browses responsive lazy-loaded salon gallery photos, selects category and service. Duration and price are recorded.
-3. **Step 2 - Pick Stylist**: User selects specific stylist or "Anyone / First Available".
-4. **Step 3 - Pick Date & Slot**: Selecting a date calls `GET /api/public/[slug]/slots?service_id=...&date=...&staff_id=...`. `src/lib/slots.ts` calculates available time slots considering operating hours, buffers, advance rules, existing appointments, holidays, and individual staff shifts and planned leaves via `src/lib/availability.ts`. If a specific stylist is off or on leave, 0 slots are returned and the UI displays an intuitive notice.
+3. **Step 2 - Pick Stylist**: User selects specific stylist or "Anyone / First Available". Persisted in storage and query params via `handleSelectStaff`.
+4. **Step 3 - Pick Date & Slot**: Selecting a date calls `GET /api/public/[slug]/slots?service_id=...&date=...&staff_id=...`. `src/lib/slots.ts` calculates available time slots considering operating hours, buffers, advance rules, existing appointments, holidays, and individual staff shifts and planned leaves via `src/lib/availability.ts`. If a specific stylist is off or on leave, 0 slots are returned and the UI displays an intuitive notice. Date selection is persisted across reloads via `handleSelectDate`.
 5. **Step 4 - Details & PIN**: Client inputs 10-digit mobile, name, and 4-digit PIN.
 6. **Step 5 - Atomic Reservation**: Submit calls `POST /api/public/[slug]/book`. The backend:
    - Verifies rate limits and rate limits on wrong PINs.
@@ -88,7 +88,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
    - Inserts or verifies customer PIN using `bcrypt`.
    - Inserts appointment with `source = 'online'`, `status = 'scheduled'`.
    - Sets HTTP-only cookie `salonpro_customer_session`.
-   - Returns appointment confirmation + prefilled WhatsApp link.
+   - Returns appointment confirmation + prefilled WhatsApp link. Cleans up stored booking session keys.
 
 ### Flow 2: Customer Self-Service Cancellation
 1. **View Appointments**: Logged-in customer visits `/portal`. Client calls `GET /api/customer/records`.

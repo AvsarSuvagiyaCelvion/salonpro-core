@@ -106,11 +106,25 @@ export default function BookingWizard({ slug }: { slug: string }) {
     }
   }, []);
 
-  function updateStep(newStep: number) {
+  function updateStep(newStep: number, overrides?: { serviceId?: string; staffId?: string; date?: string }) {
     setCurrentStep(newStep);
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.set('step', newStep.toString());
+      const svcId = overrides?.serviceId || selectedService?.id;
+      if (svcId) {
+        url.searchParams.set('service', svcId);
+      }
+      const stId = overrides?.staffId !== undefined ? overrides.staffId : selectedStaffId;
+      if (stId && stId !== 'anyone') {
+        url.searchParams.set('staff', stId);
+      } else {
+        url.searchParams.delete('staff');
+      }
+      const dt = overrides?.date || selectedDate;
+      if (dt) {
+        url.searchParams.set('date', dt);
+      }
       window.history.replaceState(null, '', url.toString());
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
@@ -177,15 +191,23 @@ export default function BookingWizard({ slug }: { slug: string }) {
           setLatestReviews(data.reviews);
         }
 
-        // Restore selectedService from sessionStorage or default to first service
+        // Restore selectedService & selectedStaffId from URL/sessionStorage or default
         if (typeof window !== 'undefined') {
           try {
-            const storedSvcId = sessionStorage.getItem(`salonpro_${slug}_svc_id`);
+            const urlParams = new URLSearchParams(window.location.search);
+            const storedSvcId = urlParams.get('service') || sessionStorage.getItem(`salonpro_${slug}_svc_id`);
             const matched = fetchedServices.find((s: Service) => s.id === storedSvcId);
             if (matched) {
               setSelectedService(matched);
             } else if (fetchedServices.length > 0) {
               setSelectedService(fetchedServices[0]);
+            }
+
+            const storedStaffId = urlParams.get('staff') || sessionStorage.getItem(`salonpro_${slug}_staff_id`);
+            if (storedStaffId) {
+              if (storedStaffId === 'anyone' || (data.staff || []).some((st: Staff) => st.id === storedStaffId)) {
+                setSelectedStaffId(storedStaffId);
+              }
             }
           } catch {}
         }
@@ -228,12 +250,31 @@ export default function BookingWizard({ slug }: { slug: string }) {
     }
 
     setAvailableDates(dates);
-    // Default select first open date
-    const firstOpen = dates.find((d) => !d.isClosed);
-    if (firstOpen) {
-      setSelectedDate(firstOpen.dateStr);
+    
+    // Restore selected date from URL/sessionStorage or default select first open date
+    let initialDate = '';
+    if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const savedDate = urlParams.get('date') || sessionStorage.getItem(`salonpro_${slug}_date`);
+        if (savedDate) {
+          const matchedDate = dates.find((d) => d.dateStr === savedDate && !d.isClosed);
+          if (matchedDate) {
+            initialDate = matchedDate.dateStr;
+          }
+        }
+      } catch {}
     }
-  }, [salon, holidays]);
+    if (!initialDate) {
+      const firstOpen = dates.find((d) => !d.isClosed);
+      if (firstOpen) {
+        initialDate = firstOpen.dateStr;
+      }
+    }
+    if (initialDate) {
+      setSelectedDate(initialDate);
+    }
+  }, [salon, holidays, slug]);
 
   // 3. Fetch Slots when Service, Staff, or Date changes
   useEffect(() => {
@@ -277,6 +318,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
             const nextOpen = availableDates.find((d) => d.dateStr > todayISTStr && !d.isClosed);
             if (nextOpen && nextOpen.dateStr !== selectedDate) {
               setSelectedDate(nextOpen.dateStr);
+              if (typeof window !== 'undefined') {
+                try {
+                  sessionStorage.setItem(`salonpro_${slug}_date`, nextOpen.dateStr);
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('date', nextOpen.dateStr);
+                  window.history.replaceState(null, '', url.toString());
+                } catch {}
+              }
             }
           } else {
             setSlotNotice('No free slots available for this date. Please try another specialist or date.');
@@ -448,6 +497,38 @@ export default function BookingWizard({ slug }: { slug: string }) {
     if (typeof window !== 'undefined') {
       try {
         sessionStorage.setItem(`salonpro_${slug}_svc_id`, svc.id);
+        const url = new URL(window.location.href);
+        url.searchParams.set('service', svc.id);
+        window.history.replaceState(null, '', url.toString());
+      } catch {}
+    }
+  }
+
+  function handleSelectStaff(staffId: string) {
+    setSelectedStaffId(staffId);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem(`salonpro_${slug}_staff_id`, staffId);
+        const url = new URL(window.location.href);
+        if (staffId && staffId !== 'anyone') {
+          url.searchParams.set('staff', staffId);
+        } else {
+          url.searchParams.delete('staff');
+        }
+        window.history.replaceState(null, '', url.toString());
+      } catch {}
+    }
+  }
+
+  function handleSelectDate(dateStr: string) {
+    setSelectedDate(dateStr);
+    setSelectedSlot(null);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem(`salonpro_${slug}_date`, dateStr);
+        const url = new URL(window.location.href);
+        url.searchParams.set('date', dateStr);
+        window.history.replaceState(null, '', url.toString());
       } catch {}
     }
   }
@@ -532,6 +613,18 @@ export default function BookingWizard({ slug }: { slug: string }) {
       }
 
       setConfirmedBooking(data);
+      if (typeof window !== 'undefined') {
+        try {
+          sessionStorage.removeItem(`salonpro_${slug}_svc_id`);
+          sessionStorage.removeItem(`salonpro_${slug}_staff_id`);
+          sessionStorage.removeItem(`salonpro_${slug}_date`);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('service');
+          url.searchParams.delete('staff');
+          url.searchParams.delete('date');
+          window.history.replaceState(null, '', url.toString());
+        } catch {}
+      }
       updateStep(5); // Confirmation screen
     } catch (err: any) {
       setSubmitError(err.message || 'Error occurred while saving booking');
@@ -894,7 +987,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             <div className="space-y-3 pb-36 sm:pb-44 max-h-[65vh] sm:max-h-[70vh] overflow-y-auto pr-1 touch-scroll scrollbar-thin">
               {/* Anyone Option */}
               <div
-                onClick={() => setSelectedStaffId('anyone')}
+                onClick={() => handleSelectStaff('anyone')}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                   selectedStaffId === 'anyone'
                     ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
@@ -925,7 +1018,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 return (
                   <div
                     key={st.id}
-                    onClick={() => setSelectedStaffId(st.id)}
+                    onClick={() => handleSelectStaff(st.id)}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
                         ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
@@ -1024,10 +1117,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     <button
                       key={d.dateStr}
                       disabled={d.isClosed}
-                      onClick={() => {
-                        setSelectedDate(d.dateStr);
-                        setSelectedSlot(null);
-                      }}
+                      onClick={() => handleSelectDate(d.dateStr)}
                       className={`flex flex-col items-center justify-center shrink-0 min-w-[84px] sm:min-w-[92px] px-2.5 py-3 rounded-2xl border transition-all cursor-pointer ${
                         d.isClosed
                           ? 'opacity-30 cursor-not-allowed bg-[#141926]/40 border-[#2A2F3A]'
@@ -1088,8 +1178,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       onClick={() => {
                         const next = availableDates.find((d) => d.dateStr > selectedDate && !d.isClosed);
                         if (next) {
-                          setSelectedDate(next.dateStr);
-                          setSelectedSlot(null);
+                          handleSelectDate(next.dateStr);
                         }
                       }}
                       className="mt-4 px-5 py-2.5 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"

@@ -43,6 +43,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     loadAdmin();
   }, [pathname]);
 
+  useEffect(() => {
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
+
   // If on admin login page, render without admin layout shell
   if (pathname === '/admin/login') {
     return <>{children}</>;
@@ -60,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         localStorage.clear();
         sessionStorage.clear();
       } catch {}
-      window.location.href = '/admin/login';
+      window.location.replace('/admin/login');
     }
   }
 

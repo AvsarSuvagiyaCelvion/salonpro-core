@@ -123,10 +123,10 @@ export default function LandingPageClient() {
 
               <a
                 href="/api/demo/owner-login"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-500 font-sans font-semibold text-[15px] tracking-normal border border-amber-500/30 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-400 font-sans font-semibold text-[15px] tracking-normal border border-amber-500/30 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
                 <span>🖥️ Owner ERP Demo</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400">1-Click</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300">1-Click</span>
               </a>
 
               <Link
@@ -277,7 +277,7 @@ export default function LandingPageClient() {
               {/* Feature 2: Live Studio Kanban */}
               <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center mb-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center mb-4 shadow-2xs">
                     <Scissors className="w-5 h-5" />
                   </div>
                   <h4 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Live Studio Kanban</h4>
@@ -285,7 +285,7 @@ export default function LandingPageClient() {
                     Track walk-in waiting queues, currently seated chairs, and completed sessions ready for POS billing.
                   </p>
                   <div className="mt-4 p-3 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[11px] space-y-1">
-                    <div className="font-bold text-[#D4A77F]">⚡ Dynamic Visual Queuing:</div>
+                    <div className="font-bold text-[#8C5E2E] dark:text-[#D4A77F]">⚡ Dynamic Visual Queuing:</div>
                     <p className="text-[#6B7280] dark:text-[#A0A8B8] text-[10px]">Staff drag-and-drop client cards as they move from waiting lounge to chair.</p>
                   </div>
                 </div>
@@ -294,7 +294,7 @@ export default function LandingPageClient() {
               {/* Feature 3: POS Billing + Animated Line-by-Line GST Invoice Demo */}
               <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#10B981] flex items-center justify-center mb-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-emerald-700 dark:text-emerald-400 flex items-center justify-center mb-4 shadow-2xs">
                     <Receipt className="w-5 h-5" />
                   </div>
                   <h4 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">POS Billing with GST</h4>
@@ -310,7 +310,7 @@ export default function LandingPageClient() {
               {/* Feature 4: Staff Commission Automation */}
               <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center mb-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center mb-4 shadow-2xs">
                     <Users className="w-5 h-5" />
                   </div>
                   <h4 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Staff Commission Automation</h4>
@@ -318,7 +318,7 @@ export default function LandingPageClient() {
                     Set separate commission percentages for services and retail products. Export transparent payroll reports.
                   </p>
                   <div className="mt-4 p-3 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[11px] space-y-1">
-                    <div className="font-bold text-[#D4A77F]">📊 Stylist Breakdown:</div>
+                    <div className="font-bold text-[#8C5E2E] dark:text-[#D4A77F]">📊 Stylist Breakdown:</div>
                     <p className="text-[#6B7280] dark:text-[#A0A8B8] text-[10px]">Real-time commission calculation per service cut and product sale.</p>
                   </div>
                 </div>
@@ -327,7 +327,7 @@ export default function LandingPageClient() {
               {/* Feature 5: VIP Memberships */}
               <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center mb-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center mb-4 shadow-2xs">
                     <Award className="w-5 h-5" />
                   </div>
                   <h4 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">VIP Memberships & Discounts</h4>
@@ -335,7 +335,7 @@ export default function LandingPageClient() {
                     Sell Gold or Platinum annual memberships. Member discounts are automatically pre-filled during billing checkout.
                   </p>
                   <div className="mt-4 p-3 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[11px] space-y-1">
-                    <div className="font-bold text-[#D4A77F]">⭐ Recurring Loyalty:</div>
+                    <div className="font-bold text-[#8C5E2E] dark:text-[#D4A77F]">⭐ Recurring Loyalty:</div>
                     <p className="text-[#6B7280] dark:text-[#A0A8B8] text-[10px]">Higher customer retention with automated VIP member tiers.</p>
                   </div>
                 </div>
@@ -344,7 +344,7 @@ export default function LandingPageClient() {
               {/* Feature 6: Daily Cash & Sales Reports */}
               <TiltCard className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
                 <div>
-                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#10B981] flex items-center justify-center mb-4 shadow-2xs">
+                  <div className="w-10 h-10 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-emerald-700 dark:text-emerald-400 flex items-center justify-center mb-4 shadow-2xs">
                     <TrendingUp className="w-5 h-5" />
                   </div>
                   <h4 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Daily Cash & Sales Reports</h4>

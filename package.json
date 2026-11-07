@@ -12,7 +12,11 @@
     "qa:api": "node --no-warnings tests/qa/runner.ts",
     "qa:api:feature": "node --no-warnings tests/qa/runner.ts",
     "qa:ui": "node --no-warnings tests/qa/runner.ts --ui-only",
-    "qa:all": "node --no-warnings tests/qa/runner.ts --with-ui"
+    "qa:all": "node --no-warnings tests/qa/runner.ts --with-ui",
+    "qa:visual": "node --no-warnings tests/visual/runner.ts",
+    "qa:visual:mobile": "node --no-warnings tests/visual/runner.ts --mobile",
+    "qa:visual:tablet": "node --no-warnings tests/visual/runner.ts --tablet",
+    "qa:visual:desktop": "node --no-warnings tests/visual/runner.ts --desktop"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

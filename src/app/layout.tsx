@@ -55,7 +55,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full font-sans antialiased bg-white text-[#1F2937] dark:bg-[#080B12] dark:text-[#FFFFFF] transition-colors duration-200">
         {children}
-        <Analytics />
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   );

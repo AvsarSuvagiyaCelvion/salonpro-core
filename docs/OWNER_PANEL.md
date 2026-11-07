@@ -19,7 +19,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/register` | `src/app/register/page.tsx` | Tenant onboarding page: registers new salon, creates owner credentials, and provisions 14-day Pro trial. | Onboarding form |
 | `/register-salon` | `src/app/register-salon/page.tsx` | Alias for `/register`. | Onboarding form |
 | `/app` | `src/app/app/page.tsx` | Default tenant root route; automatically redirects to `/app/dashboard`. | Next.js redirect |
-| `/app/dashboard` | `src/app/app/dashboard/page.tsx` | Executive summary: daily sales, appointment count, live queue count, monthly revenue, and recent appointments. | `AreaTrendChart`, `StatsCounter` |
+| `/app/dashboard` | `src/app/app/dashboard/page.tsx` | Executive summary: daily sales, appointment count, live queue count, monthly revenue, and recent appointments. | `DonutDistributionChart`, `BarComparisonChart`, `HourlyRushChart` |
 | `/app/live` | `src/app/app/live/page.tsx` | Live floor queue: manages walk-in waiting list, moves clients to "In Chair" sessions, adds services/products, and checks out to POS. Fully responsive mobile scroll modals and theme-matched dark/light styling. | Live Kanban columns, Waitlist modal, Service/Product modal, POS Checkout modal |
 | `/app/appointments` | `src/app/app/appointments/page.tsx` | Calendar & schedule management: Multi-Stylist Lanes view, 7-Day Matrix view, and Card list view. Manages status (In Chair, Done, Cancelled). Automatically greys out off/leave periods and non-shift hours with "Leave"/"Off" labels and prevents booking walk-ins into blocked intervals. | `SkeletonTable` |
 | `/app/billing` | `src/app/app/billing/page.tsx` | POS Billing & Checkout: invoice generation, discount calculation, payment modes (Cash, UPI, Card), and GST calculation. | POS register form |
@@ -199,6 +199,11 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
   - Expired subscriptions return HTTP 402, redirecting owner to `/app/subscription`.
 - **Demo Salon**: The demo salon `dixa-beauty-salon` allows instant one-click login via `/api/demo/owner-login` without entering a password.
 - **Appointments Table Schema**: The `appointments` table has **no** `updated_at` column. Do not write to it.
+- **Navigation Architecture (Mobile)**: Mobile navigation uses the responsive slide-out drawer exclusively (accessible from the top header hamburger menu). The mobile bottom dock navigation bar was retired to reclaim 96px vertical viewport real estate and avoid UI clipping.
+- **Cache Security & Back-Forward Cache (bfcache)**:
+  - Middleware (`src/proxy.ts`) enforces `Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate`, `Pragma: no-cache`, and `Expires: 0` for all `/app/*` and `/admin/*` routes.
+  - Logout API (`/api/logout`, `/api/admin/logout`) sets immediate cookie expiration (`expires: new Date(0)`) and cache-busting headers.
+  - App and Admin layouts listen for `pageshow` with `event.persisted` to force an immediate `window.location.reload()` when restored from bfcache, and execute `window.location.replace('/login')` on logout. This completely prevents stale authenticated dashboard views from appearing when tapping browser Back.
 
 ---
 

@@ -679,8 +679,8 @@ export default function AdminSalonsPage() {
                       }}
                       className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
                         broadcastType === 'payment'
-                          ? 'bg-amber-50 border-amber-500 text-amber-950'
-                          : 'bg-slate-50 border-slate-200 text-[#6B7280] dark:text-[#A0A8B8]'
+                          ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200'
+                          : 'bg-slate-50 dark:bg-[#1C2230] border-slate-200 dark:border-[#2A2F3A] text-[#6B7280] dark:text-[#A0A8B8]'
                       }`}
                     >
                       💰 Renewal
@@ -696,8 +696,8 @@ export default function AdminSalonsPage() {
                       }}
                       className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
                         broadcastType === 'update'
-                          ? 'bg-amber-50 border-amber-500 text-amber-950'
-                          : 'bg-slate-50 border-slate-200 text-[#6B7280] dark:text-[#A0A8B8]'
+                          ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200'
+                          : 'bg-slate-50 dark:bg-[#1C2230] border-slate-200 dark:border-[#2A2F3A] text-[#6B7280] dark:text-[#A0A8B8]'
                       }`}
                     >
                       🚀 New Feature
@@ -713,8 +713,8 @@ export default function AdminSalonsPage() {
                       }}
                       className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
                         broadcastType === 'notice'
-                          ? 'bg-amber-50 border-amber-500 text-amber-950'
-                          : 'bg-slate-50 border-slate-200 text-[#6B7280] dark:text-[#A0A8B8]'
+                          ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200'
+                          : 'bg-slate-50 dark:bg-[#1C2230] border-slate-200 dark:border-[#2A2F3A] text-[#6B7280] dark:text-[#A0A8B8]'
                       }`}
                     >
                       ⚙️ Maintenance

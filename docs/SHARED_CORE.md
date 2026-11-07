@@ -1,6 +1,6 @@
 # Shared Core Architecture & Infrastructure
 
-> **Last verified:** 2026-11-06 (Salon-branded invoice prefix management & sequential numbering verified)  
+> **Last verified:** 2026-11-07 (Multi-viewport WCAG 2.1 AA theme contrast & binary favicon verified)  
 > **Status:** Verified against source code
 
 ---

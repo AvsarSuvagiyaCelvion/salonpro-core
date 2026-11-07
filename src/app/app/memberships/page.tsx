@@ -349,14 +349,14 @@ export default function MembershipsPage() {
                       <Gift className="w-3.5 h-3.5 text-purple-500" />
                       Products Discount:
                     </span>
-                    <span className="font-extrabold text-purple-700 text-sm">
+                    <span className="font-extrabold text-purple-700 dark:text-purple-300 text-sm">
                       {plan.products_discount_pct}% OFF
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between">
+              <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-between">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block">Subscription Fee</span>
                   <span className="text-xl font-black text-[#1F2937] dark:text-white">
@@ -769,7 +769,7 @@ export default function MembershipsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-purple-700 mb-1">
+                    <label className="block text-xs font-bold text-purple-700 dark:text-purple-300 mb-1">
                       Products Discount %
                     </label>
                     <input
@@ -778,13 +778,13 @@ export default function MembershipsPage() {
                       max={100}
                       value={formProdDiscount}
                       onChange={(e) => setFormProdDiscount(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-purple-200 text-sm font-bold text-purple-700 focus:outline-none"
+                      className="w-full px-3 py-2 rounded-xl border border-purple-200 dark:border-purple-800 bg-white dark:bg-[#10141F] text-sm font-bold text-purple-700 dark:text-purple-300 focus:outline-none"
                     />
                   </div>
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100">
+              <div className="flex justify-end gap-2 pt-4 border-t border-neutral-100 dark:border-[#2A2F3A]">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}

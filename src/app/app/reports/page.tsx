@@ -493,7 +493,7 @@ export default function ReportsPage() {
                         </td>
 
                         <td className="py-4 px-6 text-right">
-                          <span className="font-extrabold text-sm text-[#D4A77F] bg-[#D4A77F]/10 px-2.5 py-1 rounded-xl border border-[#D4A77F]/30">
+                          <span className="font-extrabold text-sm text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/10 px-2.5 py-1 rounded-xl border border-[#D4A77F]/30">
                             ₹{st.calculatedCommission.toLocaleString('en-IN')}
                           </span>
                         </td>

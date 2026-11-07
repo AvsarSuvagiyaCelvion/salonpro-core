@@ -357,7 +357,7 @@ export default function AdminOverviewPage() {
                       <a
                         href={`/${s.slug}`}
                         target="_blank"
-                        className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#1F2937] dark:text-[#FFFFFF] text-[11px] font-semibold transition-all border border-slate-200"
+                        className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1C2230] hover:bg-slate-200 dark:hover:bg-[#252D3D] text-[#1F2937] dark:text-[#FFFFFF] text-[11px] font-semibold transition-all border border-slate-200 dark:border-[#2A2F3A]"
                         title="View Customer Booking Page"
                       >
                         Public Page ↗
@@ -365,7 +365,7 @@ export default function AdminOverviewPage() {
                       <a
                         href="/app"
                         target="_blank"
-                        className="px-2.5 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-[11px] font-bold transition-all"
+                        className="px-2.5 py-1.5 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/50 text-[11px] font-bold transition-all"
                         title="Manage as Salon Owner"
                       >
                         Owner ERP ➔

@@ -22,7 +22,6 @@ import {
   PieChart,
   Zap,
 } from 'lucide-react';
-import AreaTrendChart from '@/components/charts/AreaTrendChart';
 import DonutDistributionChart, { SliceData } from '@/components/charts/DonutDistributionChart';
 import BarComparisonChart, { BarItem } from '@/components/charts/BarComparisonChart';
 import HourlyRushChart from '@/components/charts/HourlyRushChart';
@@ -71,7 +70,6 @@ export default function DashboardPage() {
     open: '09:00',
     close: '21:00',
   });
-  const [hoveredPoint, setHoveredPoint] = useState<ChartPoint | null>(null);
 
   useEffect(() => {
     async function loadSalon() {
@@ -119,10 +117,6 @@ export default function DashboardPage() {
     }
     loadStats();
   }, [period]);
-
-  const maxChartAmount = data?.chartData
-    ? Math.max(...data.chartData.map((d) => d.amount), 1000)
-    : 1000;
 
   return (
     <div className="space-y-6 pb-12 text-[#1F2937] dark:text-[#FFFFFF] transition-colors duration-300">
@@ -331,39 +325,6 @@ export default function DashboardPage() {
             <span className="truncate">Available for booking</span>
           </div>
         </div>
-      </div>
-
-      {/* Daily Revenue Chart Section */}
-      <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#D4A77F] animate-ping" />
-              <h2 className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-[#FFFFFF]">Revenue Trajectory & Daily Performance</h2>
-            </div>
-            <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Smooth trendline of verified client billing in this period</p>
-          </div>
-          <div className="text-xs font-mono font-bold text-[#1F2937] dark:text-[#FFFFFF] bg-[#F3F4F6] dark:bg-[#1C2230] px-3 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] w-fit">
-            Peak Day: ₹{maxChartAmount.toLocaleString('en-IN')}
-          </div>
-        </div>
-
-        {/* Interactive SVG Area Chart */}
-        {loading ? (
-          <div className="h-52 w-full bg-[#F8F9FA] dark:bg-[#080B12] rounded-2xl animate-pulse flex items-center justify-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
-            Loading chart analytics...
-          </div>
-        ) : !data?.chartData || data.chartData.length === 0 ? (
-          <div className="h-52 w-full flex items-center justify-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
-            No transaction records found for this period
-          </div>
-        ) : (
-          <AreaTrendChart
-            data={data.chartData.map((d) => ({ label: d.label, value: d.amount }))}
-            color="#D4A77F"
-            height={220}
-          />
-        )}
       </div>
 
       {/* 2x2 Performance Analytics Grid */}

@@ -236,10 +236,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Security Guard: On Page Reload / Refresh, keep session active.
   // On Browser Back / Forward navigation (or mobile swipe back/forward) or bfcache restore, require re-authentication.
-  // Clean up any remaining route effects
   useEffect(() => {
-    // Normal browser back/forward navigation preserves valid sessions
-  }, [pathname]);
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) {
+        // Page was restored from Back-Forward Cache (bfcache).
+        // Force a fresh reload so middleware re-evaluates the authentication cookie.
+        window.location.reload();
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
 
   async function handleActivatePlan(planId: string) {
     setActivatingPlan(true);
@@ -285,8 +294,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         localStorage.clear();
         sessionStorage.clear();
       } catch {}
-      // Perform full browser navigation to login so all cached states & auth tokens are purged
-      window.location.href = '/login';
+      // Replace history entry to login so user cannot traverse back into dashboard
+      window.location.replace('/login');
     }
   }
 
@@ -689,7 +698,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main Content Viewport */}
-        <main className="flex-1 overflow-x-hidden lg:overflow-y-auto p-2.5 xs:p-3.5 sm:p-6 lg:p-8 w-full max-w-full pb-24 md:pb-8 touch-scroll">
+        <main className="flex-1 overflow-x-hidden lg:overflow-y-auto p-2.5 xs:p-3.5 sm:p-6 lg:p-8 w-full max-w-full pb-6 sm:pb-8 touch-scroll">
           <div className="max-w-7xl mx-auto w-full">
             {isExpiredLockout ? (
             <div className="max-w-4xl mx-auto py-8">
@@ -938,38 +947,38 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6 animate-fade-in">
           <div className="fixed inset-0" onClick={() => setPlanPrompt(null)} aria-hidden="true" />
           <div className="min-h-full flex items-center justify-center py-6">
-            <div className="relative z-10 bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 my-auto animate-scale-in">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                <div className="flex items-center gap-2 text-[#D4A77F] font-black text-sm">
+            <div className="relative z-10 bg-white dark:bg-[#141926] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-[#2A2F3A] my-auto animate-scale-in">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#2A2F3A] mb-4">
+                <div className="flex items-center gap-2 text-[#8C5E2E] dark:text-[#D4A77F] font-black text-sm">
                   <AlertTriangle className="w-5 h-5 text-amber-500" />
                   <span>{planPrompt.title}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setPlanPrompt(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1C2230] cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <p className="text-xs sm:text-sm text-slate-600 mb-5 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-[#A0A8B8] mb-5 leading-relaxed">
                 {planPrompt.message}
               </p>
 
               <div className="p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 mb-5 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#D4A77F]">Recommended Plan</span>
+                  <span className="text-[10px] uppercase font-bold text-[#8C5E2E] dark:text-[#D4A77F]">Recommended Plan</span>
                   <div className="text-sm font-extrabold text-[#1F2937] dark:text-white">Upgrade to {planPrompt.requiredPlan || 'Pro'}</div>
                 </div>
-                <span className="text-xs font-black text-[#D4A77F]">₹999/month</span>
+                <span className="text-xs font-black text-[#8C5E2E] dark:text-[#D4A77F]">₹999/month</span>
               </div>
 
               <div className="flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setPlanPrompt(null)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-[#A0A8B8] hover:bg-slate-100 dark:hover:bg-[#1C2230] transition-colors cursor-pointer"
                 >
                   Close
                 </button>
@@ -989,70 +998,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       )}
-
-      {/* Mobile Bottom Dock Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] px-2 py-1.5 flex items-center justify-around shadow-lg">
-        <Link
-          href="/app"
-          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors ${
-            pathname === '/app'
-              ? 'text-[#D4A77F] font-bold'
-              : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
-          }`}
-        >
-          <LayoutDashboard className="w-5 h-5" />
-          <span className="text-[10px]">Overview</span>
-        </Link>
-
-        <Link
-          href="/app/live"
-          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors relative ${
-            pathname.startsWith('/app/live')
-              ? 'text-[#D4A77F] font-bold'
-              : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
-          }`}
-        >
-          <span className="relative">
-            <Radio className="w-5 h-5" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500"></span>
-          </span>
-          <span className="text-[10px]">Live</span>
-        </Link>
-
-        <Link
-          href="/app/billing"
-          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors ${
-            pathname.startsWith('/app/billing')
-              ? 'text-[#D4A77F] font-bold'
-              : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
-          }`}
-        >
-          <Receipt className="w-5 h-5" />
-          <span className="text-[10px]">Billing</span>
-        </Link>
-
-        <Link
-          href="/app/appointments"
-          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors ${
-            pathname.startsWith('/app/appointments')
-              ? 'text-[#D4A77F] font-bold'
-              : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
-          }`}
-        >
-          <Calendar className="w-5 h-5" />
-          <span className="text-[10px]">Bookings</span>
-        </Link>
-
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(true)}
-          className="flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] cursor-pointer"
-        >
-          <Menu className="w-5 h-5" />
-          <span className="text-[10px]">All Menus</span>
-        </button>
-      </div>
     </div>
   );
 }

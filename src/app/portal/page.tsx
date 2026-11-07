@@ -23,6 +23,7 @@ import {
   Star,
 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
+import { showToast } from '@/lib/toast';
 import ImageUploader from '@/components/ui/ImageUploader';
 
 interface Customer {
@@ -147,6 +148,12 @@ export default function CustomerPortalPage() {
   const [rescheduling, setRescheduling] = useState(false);
   const [rescheduleError, setRescheduleError] = useState<string | null>(null);
   const [portalMessage, setPortalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    if (portalMessage?.text) {
+      showToast(portalMessage.text, portalMessage.type);
+    }
+  }, [portalMessage]);
 
   // Customer Reviews State
   const [reviewsMap, setReviewsMap] = useState<Record<string, any>>({});

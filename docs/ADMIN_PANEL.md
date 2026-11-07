@@ -68,7 +68,7 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 ### Flow 1: Super Admin Authentication
 1. **Visit `/admin/login`**: IP rate limiting is checked via `checkRateLimit('admin_auth_ip:<ip>', 10, 900)`.
 2. **Submit Credentials**: Calls `POST /api/admin/auth`.
-   - Checks `platform_admins` table for matching email.
+   - Checks `platform_admins` table for matching email (seeded super admins: `adminsalonpro@gmail.com` and `avsarsuvagiya968@gmail.com` with password `Admin@123`).
    - Compares password using `bcrypt.compare`.
    - If not in table, verifies against fallback environment variables `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
    - On success: signs JWT with `role: 'super_admin'`, sets HTTP-only cookie `salonpro_admin_session` (8-hour expiration).

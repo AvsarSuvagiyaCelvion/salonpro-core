@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Manrope, Playfair_Display, Noto_Sans_Gujarati } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
+import ToastContainer from '@/components/ui/ToastContainer';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -55,6 +56,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full font-sans antialiased bg-white text-[#1F2937] dark:bg-[#080B12] dark:text-[#FFFFFF] transition-colors duration-200">
         {children}
+        <ToastContainer />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

@@ -206,6 +206,9 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
   - App and Admin layouts listen for `pageshow` with `event.persisted` to force an immediate `window.location.reload()` when restored from bfcache, and execute `window.location.replace('/login')` on logout. This completely prevents stale authenticated dashboard views from appearing when tapping browser Back.
 - **Inventory Alert Catalog Integrity**: The dashboard differentiates between zero stock warnings on existing inventory ("All retail product stocks are healthy!") and an empty product catalog ("No retail products found" with CTA to `/app/products`) by checking `totalProducts > 0`.
 - **Appointments Filter Bar & Viewport Responsiveness**: Horizontal filter list (`All Stylists`, `all`, `scheduled`, `arrived`, `done`) enforces `pb-2.5 sm:pb-3` padding so the horizontal scrollbar does not sit tightly flush against action buttons on narrow or mobile viewports.
+- **Stylist Lanes Grid Flexibility**: Stylist Lanes view adjusts `minWidth` dynamically (`100%` when viewing 1 stylist, `minmax(220px, 1fr)` when viewing multiple stylists) with smooth touch-scrolling, ensuring clean presentation on narrow 320px screens without arbitrary empty width blocks.
+- **Universal Floating Toast Alerts**: Action feedback messages across bookings, updates, and cancellations render via a global floating toast notification at bottom-right (`src/components/ui/ToastContainer.tsx`), preventing notifications from being missed when scrolled down.
+- **Customer Directory Focus**: Client roster strictly surfaces full client names prominently, without distracting "Member since" badges or promotional WhatsApp broadcasts.
 
 ---
 

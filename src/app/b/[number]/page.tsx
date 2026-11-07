@@ -133,19 +133,33 @@ export default async function PublicBillPage({
     dueAmount <= 0 ? 'PAID' : totalPaid > 0 ? 'PARTIAL' : 'PENDING';
 
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-[#080B12] py-6 sm:py-12 px-4 flex flex-col justify-start items-center print:bg-white print:p-0 transition-colors duration-200">
-      {/* Top Navigation Row */}
-      <div className="w-full max-w-lg flex items-center justify-between gap-2 mb-4 px-1 print:hidden">
-        <Link
-          href="/portal"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] hover:underline"
-        >
-          ← Back to Customer Portal
+    <div className="min-h-screen bg-neutral-100 dark:bg-[#080B12] flex flex-col justify-start items-center print:bg-white print:p-0 transition-colors duration-200">
+      {/* Universal Sticky Top Header for Receipt Page */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-2xs print:hidden mb-6 sm:mb-8">
+        <Link href="/portal" className="flex items-center gap-2 group min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xs text-[#D4A77F] shrink-0">
+            ✂
+          </div>
+          <div className="min-w-0">
+            <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-white tracking-tight block leading-tight truncate">
+              Salon<span className="text-[#8C5E2E] dark:text-[#D4A77F]">Pro</span>
+            </span>
+            <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
+              Verified Digital Receipt
+            </span>
+          </div>
         </Link>
-        <div className="scale-90 origin-right">
+
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <ThemeToggle />
+          <Link
+            href="/portal"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap"
+          >
+            <span>My Bookings ➔</span>
+          </Link>
         </div>
-      </div>
+      </header>
 
       <div id="invoice-receipt-card" className="w-full max-w-lg bg-white dark:bg-[#141926] rounded-3xl shadow-xl border border-neutral-200 dark:border-[#2A2F3A] overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none">
         

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import { showToast } from '@/lib/toast';
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -173,6 +174,12 @@ export default function AppointmentsPage() {
       fetchAppointments(1);
     }
   }, [calendarDate, statusFilter, dateRangeFilter, viewMode]);
+
+  useEffect(() => {
+    if (message?.text) {
+      showToast(message.text, message.type);
+    }
+  }, [message]);
 
   function handlePrevDay() {
     if (!calendarDate) return;
@@ -736,15 +743,18 @@ export default function AppointmentsPage() {
           </div>
 
           {/* Stylist Grid with Sticky Columns */}
-          <div className="overflow-x-auto scrollbar-thin">
+          <div className="overflow-x-auto scrollbar-thin touch-scroll w-full">
             <div
-              className="min-w-[760px] grid divide-x divide-[#E5E7EB] dark:divide-[#2A2F3A]"
+              className="w-full grid divide-x divide-[#E5E7EB] dark:divide-[#2A2F3A]"
               style={{
-                gridTemplateColumns: `80px repeat(${filteredStaff.length}, minmax(240px, 1fr))`,
+                minWidth: filteredStaff.length > 1 ? `${Math.max(560, 70 + filteredStaff.length * 220)}px` : '100%',
+                gridTemplateColumns: filteredStaff.length > 1
+                  ? `70px repeat(${filteredStaff.length}, minmax(220px, 1fr))`
+                  : '70px minmax(0, 1fr)',
               }}
             >
               {/* Header: Stylist Column Tiles */}
-              <div className="sticky top-0 z-20 bg-[#F9FAFB] dark:bg-[#10141F] p-3 text-center border-b border-[#E5E7EB] dark:border-[#2A2F3A] text-[11px] font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider flex items-center justify-center">
+              <div className="sticky top-0 z-20 bg-[#F9FAFB] dark:bg-[#10141F] p-2.5 sm:p-3 text-center border-b border-[#E5E7EB] dark:border-[#2A2F3A] text-[10px] sm:text-[11px] font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider flex items-center justify-center">
                 Time
               </div>
 
@@ -1042,7 +1052,7 @@ export default function AppointmentsPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-thin touch-scroll w-full">
             <div className="min-w-[840px] grid grid-cols-7 divide-x divide-[#E5E7EB] dark:divide-[#2A2F3A]">
               {weekDays.map((d) => {
                 const dayAppts = appointments.filter((a) => {

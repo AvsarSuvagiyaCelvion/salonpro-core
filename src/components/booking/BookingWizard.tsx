@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '@/components/landing/ThemeToggle';
+import { showToast } from '@/lib/toast';
 
 interface Service {
   id: string;
@@ -614,6 +615,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
       }
 
       setConfirmedBooking(data);
+      showToast('Appointment booked successfully! Confirmation receipt dispatched.', 'success');
       if (typeof window !== 'undefined') {
         try {
           sessionStorage.removeItem(`salonpro_${slug}_svc_id`);
@@ -659,6 +661,47 @@ export default function BookingWizard({ slug }: { slug: string }) {
         </div>
       )}
 
+      {/* Universal Sticky Top Header for Public Salon Page */}
+      <header className="sticky top-0 z-40 w-full bg-[#10141F]/95 backdrop-blur-md border-b border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-2xs transition-colors duration-250">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center font-bold text-sm text-[#D4A77F] overflow-hidden shrink-0">
+            {salon?.logo_url && !logoError ? (
+              <img src={salon.logo_url} alt={salon.name} className="w-full h-full object-cover" />
+            ) : (
+              <span>✂</span>
+            )}
+          </div>
+          <div className="min-w-0">
+            <span className="font-extrabold text-sm sm:text-base text-white tracking-tight block leading-tight truncate">
+              {salon?.name || 'Salon Workspace'}
+            </span>
+            <span className="text-[10px] text-[#D4A77F] font-bold block -mt-0.5 truncate">
+              Online Booking &amp; Client Suite
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <ThemeToggle />
+          <Link
+            href="/portal"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm shrink-0 whitespace-nowrap"
+            title="Customer Appointments Portal"
+          >
+            <span>👤</span>
+            <span className="hidden sm:inline">{activeCustomer ? activeCustomer.name.split(' ')[0] : 'My Bookings'}</span>
+          </Link>
+          <Link
+            href="/salon-owner"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold transition-all shadow-sm shrink-0 whitespace-nowrap"
+            title="Salon Owner & Staff ERP Login"
+          >
+            <span>🔐</span>
+            <span className="hidden sm:inline">Staff Login</span>
+          </Link>
+        </div>
+      </header>
+
       {/* Top Salon Hero Banner */}
       <div 
         className="relative overflow-hidden border-b border-[#2A2F3A] pb-6"
@@ -666,34 +709,6 @@ export default function BookingWizard({ slug }: { slug: string }) {
           background: `radial-gradient(ellipse at top, ${brandColor}40 0%, #0a0a0a 75%)`,
         }}
       >
-        {/* Top Staff / Customer Portal Navigation Row */}
-        <div className="flex items-center justify-between gap-2 px-4 pt-3.5 mb-2 relative z-20 max-w-2xl mx-auto">
-          <Link
-            href="/salon-owner"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm"
-            title="Salon Owner & Staff ERP Login"
-          >
-            <span>🔐 Staff Login</span>
-          </Link>
-
-          <div className="scale-90 origin-center shrink-0">
-            <ThemeToggle />
-          </div>
-
-          <Link
-            href="/portal"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm"
-          >
-            {activeCustomer ? (
-              <>
-                <span>👤 {activeCustomer.name.split(' ')[0]}</span>
-                <span className="text-[10px] text-[#D4A77F] font-bold">My Records</span>
-              </>
-            ) : (
-              <span>Client Portal →</span>
-            )}
-          </Link>
-        </div>
 
         <div className="max-w-2xl mx-auto px-4 pt-2 text-center">
           <div 

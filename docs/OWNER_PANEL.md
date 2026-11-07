@@ -44,7 +44,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/api/register` | `POST` | `src/app/api/register/route.ts` | None | Provisions new salon, owner account, default services, and trial period. |
 | `/api/logout` | `POST` | `src/app/api/logout/route.ts` | `salonpro_session` | Clears `salonpro_session` cookie. |
 | `/api/demo/owner-login` | `GET`, `POST` | `src/app/api/demo/owner-login/route.ts` | None (Public Demo) | Logs user into demo salon workspace (`dixa-beauty-salon`) as owner without credentials. |
-| `/api/dashboard/stats` | `GET` | `src/app/api/dashboard/stats/route.ts` | `salonpro_session` | Returns daily and monthly metrics (revenue, appointments, waiting clients). |
+| `/api/dashboard/stats` | `GET` | `src/app/api/dashboard/stats/route.ts` | `salonpro_session` | Returns analytical metrics (revenue, appointments, waiting clients, `totalProducts`, and `lowStockProducts`). |
 | `/api/appointments` | `GET`, `POST` | `src/app/api/appointments/route.ts` | `salonpro_session` | Lists filtered appointments or creates new internal owner booking. |
 | `/api/appointments/[id]` | `PATCH`, `DELETE` | `src/app/api/appointments/[id]/route.ts` | `salonpro_session` | Updates appointment status (`arrived`, `cancelled`, `done`) or removes it. |
 | `/api/appointments/[id]/start-session` | `POST` | `src/app/api/appointments/[id]/start-session/route.ts` | `salonpro_session` | Converts scheduled appointment into an active in-chair beauty session. |
@@ -204,6 +204,8 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
   - Middleware (`src/proxy.ts`) enforces `Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate`, `Pragma: no-cache`, and `Expires: 0` for all `/app/*` and `/admin/*` routes.
   - Logout API (`/api/logout`, `/api/admin/logout`) sets immediate cookie expiration (`expires: new Date(0)`) and cache-busting headers.
   - App and Admin layouts listen for `pageshow` with `event.persisted` to force an immediate `window.location.reload()` when restored from bfcache, and execute `window.location.replace('/login')` on logout. This completely prevents stale authenticated dashboard views from appearing when tapping browser Back.
+- **Inventory Alert Catalog Integrity**: The dashboard differentiates between zero stock warnings on existing inventory ("All retail product stocks are healthy!") and an empty product catalog ("No retail products found" with CTA to `/app/products`) by checking `totalProducts > 0`.
+- **Appointments Filter Bar & Viewport Responsiveness**: Horizontal filter list (`All Stylists`, `all`, `scheduled`, `arrived`, `done`) enforces `pb-2.5 sm:pb-3` padding so the horizontal scrollbar does not sit tightly flush against action buttons on narrow or mobile viewports.
 
 ---
 

@@ -366,9 +366,10 @@ export default function MembershipsPage() {
 
                 <button
                   onClick={() => handleOpenAssign({ id: plan.id, kind: 'membership', price: Number(plan.price) })}
-                  className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition-all"
+                  className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1.5 shrink-0"
                 >
-                  Assign to Client →
+                  <span>Assign to Client</span>
+                  <span aria-hidden="true">&rarr;</span>
                 </button>
               </div>
             </div>
@@ -424,9 +425,10 @@ export default function MembershipsPage() {
 
                 <button
                   onClick={() => handleOpenAssign({ id: pkg.id, kind: 'package', price: Number(pkg.price) })}
-                  className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all"
+                  className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-all whitespace-nowrap inline-flex items-center gap-1.5 shrink-0"
                 >
-                  Assign to Client →
+                  <span>Assign to Client</span>
+                  <span aria-hidden="true">&rarr;</span>
                 </button>
               </div>
             </div>

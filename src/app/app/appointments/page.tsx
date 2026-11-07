@@ -538,7 +538,7 @@ export default function AppointmentsPage() {
       )}
 
       {/* Top Filter & View Mode Controls Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 bg-white dark:bg-[#141926] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-xs">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 bg-white dark:bg-[#141926] rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-xs">
         {/* Left: View Mode Switcher Pills */}
         <div className="flex items-center gap-1 bg-[#F9FAFB] dark:bg-[#10141F] p-1 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] shrink-0">
           <button
@@ -657,13 +657,13 @@ export default function AppointmentsPage() {
         )}
 
         {/* Right: Stylist & Status Filters */}
-        <div className="flex items-center gap-2 overflow-x-auto">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-2.5 pt-1 touch-scroll scrollbar-thin">
           {viewMode === 'lanes' && staffList.length > 1 && (
             <select
               value={selectedStylistFilter}
               onChange={(e) => setSelectedStylistFilter(e.target.value)}
               aria-label="Filter appointments by stylist"
-              className="text-xs font-semibold px-2.5 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] bg-white dark:bg-[#141926] text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
+              className="text-xs font-semibold px-2.5 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] bg-white dark:bg-[#141926] text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F] shrink-0"
             >
               <option value="all">All Stylists ({staffList.length})</option>
               {staffList.map((s) => (
@@ -674,7 +674,7 @@ export default function AppointmentsPage() {
             </select>
           )}
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 shrink-0">
             {(['all', 'scheduled', 'arrived', 'done'] as const).map((st) => (
               <button
                 key={st}

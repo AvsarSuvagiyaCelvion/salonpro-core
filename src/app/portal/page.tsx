@@ -936,9 +936,10 @@ export default function CustomerPortalPage() {
                   {salon?.slug ? (
                     <Link
                       href={`/${salon.slug}`}
-                      className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-md"
+                      className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-md whitespace-nowrap"
                     >
-                      <span>Book Slot Now →</span>
+                      <span>Book Slot Now</span>
+                      <span aria-hidden="true">&rarr;</span>
                     </Link>
                   ) : (
                     <Link

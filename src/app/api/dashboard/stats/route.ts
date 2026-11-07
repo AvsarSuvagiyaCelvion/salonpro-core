@@ -57,7 +57,7 @@ export async function GET(request: Request) {
       startIso = `${pastDateIST}T00:00:00+05:30`;
     }
 
-    // Execute all 10 independent dashboard analytical queries in parallel
+    // Execute all 11 independent dashboard analytical queries in parallel
     const [
       revRes,
       sessRes,
@@ -69,6 +69,7 @@ export async function GET(request: Request) {
       statusRes,
       apptsRes,
       lowStockRes,
+      totalProdRes,
     ] = await Promise.all([
       // 1. Revenue from payments in this period
       query(
@@ -175,12 +176,18 @@ export async function GET(request: Request) {
          ORDER BY stock ASC`,
         [salonId]
       ),
+      // 11. Total retail products count
+      query(
+        `SELECT COUNT(*) as total_products FROM products WHERE salon_id = $1`,
+        [salonId]
+      ),
     ]);
 
     const totalRevenue = Number(revRes.rows[0]?.total_revenue || 0);
     const completedSessions = Number(sessRes.rows[0]?.completed_sessions || 0);
     const totalCustomers = Number(custRes.rows[0]?.total_customers || 0);
     const activeStaff = Number(staffRes.rows[0]?.active_staff || 0);
+    const totalProducts = Number(totalProdRes.rows[0]?.total_products || 0);
 
     // Fill all days in range for smooth chart
     const dailyMap: Record<string, number> = {};
@@ -225,6 +232,7 @@ export async function GET(request: Request) {
       completedSessions,
       totalCustomers,
       activeStaff,
+      totalProducts,
       chartData,
       popularServices: servicesRes.rows,
       topStaff: topStaffRes.rows,

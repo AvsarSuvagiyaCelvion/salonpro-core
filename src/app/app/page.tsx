@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   PieChart,
   Zap,
+  Package,
 } from 'lucide-react';
 import DonutDistributionChart, { SliceData } from '@/components/charts/DonutDistributionChart';
 import BarComparisonChart, { BarItem } from '@/components/charts/BarComparisonChart';
@@ -58,6 +59,7 @@ interface DashboardData {
   paymentStatusCounts: { paid: number; partial: number; pending: number };
   recentAppointments: any[];
   lowStockProducts: any[];
+  totalProducts?: number;
 }
 
 export default function DashboardPage() {
@@ -354,9 +356,10 @@ export default function DashboardPage() {
 
           <Link
             href="/app/services"
-            className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1"
+            className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1.5 whitespace-nowrap"
           >
-            Manage Services Catalog →
+            <span>Manage Services Catalog</span>
+            <span aria-hidden="true">&rarr;</span>
           </Link>
         </div>
 
@@ -394,9 +397,10 @@ export default function DashboardPage() {
 
           <Link
             href="/app/reports"
-            className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1"
+            className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1.5 whitespace-nowrap"
           >
-            Detailed Financial Ledger →
+            <span>Detailed Financial Ledger</span>
+            <span aria-hidden="true">&rarr;</span>
           </Link>
         </div>
 
@@ -520,9 +524,10 @@ export default function DashboardPage() {
 
           <Link
             href="/app/billing"
-            className="mt-6 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1"
+            className="mt-6 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs font-semibold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center justify-center gap-1.5 whitespace-nowrap"
           >
-            Process Billing & Invoices →
+            <span>Process Billing &amp; Invoices</span>
+            <span aria-hidden="true">&rarr;</span>
           </Link>
         </div>
       </div>
@@ -531,16 +536,17 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Upcoming Appointments */}
         <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF]">Upcoming Appointments</h3>
-              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Next scheduled salon visits</p>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="min-w-0">
+              <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] truncate">Upcoming Appointments</h3>
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] truncate">Next scheduled salon visits</p>
             </div>
             <Link
               href="/app/appointments"
-              className="text-xs font-bold text-[#D4A77F] hover:text-[#B8905F] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#D4A77F] hover:text-[#B8905F] hover:underline inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
             >
-              All Appointments →
+              <span>All Appointments</span>
+              <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
 
@@ -548,75 +554,106 @@ export default function DashboardPage() {
             {!data?.recentAppointments || data.recentAppointments.length === 0 ? (
               <div className="text-xs text-[#6B7280] dark:text-[#A0A8B8] py-6 text-center">No scheduled appointments</div>
             ) : (
-              data.recentAppointments.map((appt) => (
-                <div
-                  key={appt.id}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-[#F8F9FA] dark:bg-[#080B12] border border-[#E5E7EB] dark:border-[#2A2F3A]"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center font-bold text-xs text-center leading-tight">
-                      {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF]">{appt.customer_name}</div>
-                      <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
-                        {appt.service_name} · Stylist: {appt.staff_name}
+              data.recentAppointments.map((appt) => {
+                const apptDate = new Date(appt.starts_at);
+                const timeStr = apptDate.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
+                const [timeOnly, periodOnly] = timeStr.includes(' ') ? timeStr.split(' ') : [timeStr, ''];
+
+                return (
+                  <div
+                    key={appt.id}
+                    className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#F8F9FA] dark:bg-[#080B12] border border-[#E5E7EB] dark:border-[#2A2F3A] hover:border-[#D4A77F]/30 transition-colors gap-3"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="min-w-[54px] sm:min-w-[58px] h-12 px-2 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#8C5E2E] dark:text-[#D4A77F] border border-[#E5E7EB] dark:border-[#2A2F3A]/70 shadow-2xs flex flex-col items-center justify-center shrink-0">
+                        <span className="text-xs font-black tracking-tight leading-none text-[#1F2937] dark:text-white">
+                          {timeOnly}
+                        </span>
+                        {periodOnly && (
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-[#8C5E2E] dark:text-[#D4A77F] mt-1 leading-none">
+                            {periodOnly}
+                          </span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] truncate">{appt.customer_name}</div>
+                        <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] truncate mt-0.5">
+                          {appt.service_name} · Stylist: {appt.staff_name}
+                        </div>
                       </div>
                     </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-[10px] uppercase font-bold px-2.5 py-1 rounded-lg bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] border border-[#E5E7EB] dark:border-[#2A2F3A]">
+                        {appt.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-md bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] border border-[#E5E7EB] dark:border-[#2A2F3A]">
-                      {appt.status}
-                    </span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
 
         {/* Low Stock Product Alerts */}
         <div className="bg-white dark:bg-[#141926] p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs">
-          <div className="flex items-center justify-between mb-4">
-            <div>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="min-w-0">
               <h3 className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] flex items-center gap-2">
-                <span>Inventory Alerts</span>
+                <span className="truncate">Inventory Alerts</span>
                 {data?.lowStockProducts && data.lowStockProducts.length > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-ping shrink-0" />
                 )}
               </h3>
-              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Products at or below reorder threshold</p>
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] truncate">Products at or below reorder threshold</p>
             </div>
             <Link
               href="/app/live"
-              className="text-xs font-bold text-[#D4A77F] hover:text-[#B8905F] hover:underline"
+              className="text-xs font-bold text-[#D4A77F] hover:text-[#B8905F] hover:underline inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
             >
-              Open Live Studio →
+              <span>Open Live Studio</span>
+              <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
 
           <div className="space-y-3">
-            {!data?.lowStockProducts || data.lowStockProducts.length === 0 ? (
-              <div className="text-xs text-emerald-700 dark:text-emerald-300 font-medium py-6 text-center bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/40">
+            {loading ? (
+              <div className="text-xs text-[#6B7280] dark:text-[#A0A8B8] py-6 text-center animate-pulse">
+                Loading inventory status...
+              </div>
+            ) : (!data?.totalProducts || data.totalProducts === 0) ? (
+              <div className="text-xs text-[#6B7280] dark:text-[#A0A8B8] font-medium py-6 px-4 text-center bg-[#F8F9FA] dark:bg-[#080B12] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] flex flex-col items-center justify-center gap-2">
+                <Package className="w-5 h-5 text-[#6B7280] dark:text-[#A0A8B8]" />
+                <p className="font-semibold text-[#1F2937] dark:text-white">No retail products found</p>
+                <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">Add products in your inventory catalog to monitor stock levels.</p>
+                <Link
+                  href="/app/products"
+                  className="mt-1 text-xs font-bold text-[#D4A77F] hover:underline inline-flex items-center gap-1.5 whitespace-nowrap"
+                >
+                  <span>Add Retail Products</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </Link>
+              </div>
+            ) : (!data?.lowStockProducts || data.lowStockProducts.length === 0) ? (
+              <div className="text-xs text-emerald-700 dark:text-emerald-300 font-medium py-6 px-4 text-center bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/40">
                 ✓ All retail product stocks are healthy!
               </div>
             ) : (
               data.lowStockProducts.map((p, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/30"
+                  className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#EF4444]/10 border border-[#EF4444]/30 gap-3"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#EF4444]/20 text-[#EF4444] flex items-center justify-center font-bold text-xs">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-10 h-10 rounded-2xl bg-[#EF4444]/20 text-[#EF4444] flex items-center justify-center font-bold text-xs shrink-0">
                       <AlertTriangle className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF]">{p.name}</div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] truncate">{p.name}</div>
                       <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">Retail: ₹{Number(p.price)}</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className="text-xs font-bold text-[#EF4444] bg-white dark:bg-[#141926] border border-[#EF4444]/40 px-2.5 py-1 rounded-xl">
+                  <div className="text-right shrink-0">
+                    <span className="text-xs font-bold text-[#EF4444] bg-white dark:bg-[#141926] border border-[#EF4444]/40 px-2.5 py-1 rounded-xl whitespace-nowrap">
                       {p.stock} left (Min: {p.min_stock})
                     </span>
                   </div>

@@ -11,14 +11,14 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto bg-white dark:bg-[#141926] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A]/80 p-8 sm:p-12 shadow-sm">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D4A77F] hover:underline mb-6">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] hover:underline mb-6">
           ← Back to SalonPro Home
         </Link>
 
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">Privacy Policy</h1>
-        <p className="text-xs text-slate-500 mt-1">Last updated: November 2026</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Last updated: November 2026</p>
 
-        <div className="mt-8 space-y-6 text-xs sm:text-sm text-slate-700 leading-relaxed">
+        <div className="mt-8 space-y-6 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
           <section>
             <h2 className="text-base font-bold text-[#1F2937] dark:text-white mb-2">1. Information We Collect</h2>
             <p>

@@ -104,11 +104,11 @@ export default function AdminAnalyticsPage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Total Billed GMV
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
               ₹
             </div>
           </div>
-          <div className="text-3xl font-black text-emerald-700 font-mono">
+          <div className="text-3xl font-black text-emerald-700 dark:text-emerald-400 font-mono">
             ₹{totalRevenue.toLocaleString('en-IN')}
           </div>
           <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Cumulative invoices generated across all salon tenants</p>
@@ -119,7 +119,7 @@ export default function AdminAnalyticsPage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Completed Collections
             </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
@@ -134,11 +134,11 @@ export default function AdminAnalyticsPage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Appointments Booked
             </span>
-            <div className="w-8 h-8 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-black text-pink-700 font-mono">
+          <div className="text-3xl font-black text-pink-700 dark:text-pink-400 font-mono">
             {totalAppts}
           </div>
           <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Online bookings and in-store walk-in sessions</p>
@@ -155,13 +155,13 @@ export default function AdminAnalyticsPage() {
             </div>
             <p className="text-xs text-[#9CA3AF] dark:text-[#747D8D]">Weekly consolidated transaction volume across all salon tenants</p>
           </div>
-          <div className="text-xs font-mono font-bold text-[#6B7280] dark:text-[#A0A8B8] bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+          <div className="text-xs font-mono font-bold text-[#6B7280] dark:text-[#A0A8B8] bg-slate-50 dark:bg-[#10141F] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-[#2A2F3A]">
             Total GMV: ₹{totalRevenue.toLocaleString('en-IN')}
           </div>
         </div>
 
         {loading ? (
-          <div className="h-52 w-full bg-slate-50 rounded-2xl animate-pulse flex items-center justify-center text-xs text-[#9CA3AF] dark:text-[#747D8D]">
+          <div className="h-52 w-full bg-slate-50 dark:bg-[#10141F] rounded-2xl animate-pulse flex items-center justify-center text-xs text-[#9CA3AF] dark:text-[#747D8D]">
             Loading analytics graph...
           </div>
         ) : (
@@ -199,7 +199,7 @@ export default function AdminAnalyticsPage() {
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-[#6B7280] dark:text-[#A0A8B8] text-center">
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#2A2F3A] text-xs text-[#6B7280] dark:text-[#A0A8B8] text-center">
             Updated in real-time as customer appointments and payments settle
           </div>
         </div>
@@ -222,9 +222,9 @@ export default function AdminAnalyticsPage() {
             )}
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-[#6B7280] dark:text-[#A0A8B8]">
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#2A2F3A] flex items-center justify-between text-xs text-[#6B7280] dark:text-[#A0A8B8]">
             <span>Total Registered Salons: <strong>{salons.length}</strong></span>
-            <span className="text-emerald-700 font-bold">100% Tenant Isolation</span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-bold">100% Tenant Isolation</span>
           </div>
         </div>
       </div>

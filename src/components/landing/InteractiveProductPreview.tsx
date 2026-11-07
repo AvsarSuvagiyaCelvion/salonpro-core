@@ -251,8 +251,8 @@ export default function InteractiveProductPreview() {
                 </div>
 
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2937] dark:text-white bg-white dark:bg-[#141926] px-3 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs self-start sm:self-auto">
-                  <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
-                  <span>Today: 12 Bookings · <strong className="text-[#D4A77F] font-variant-numeric tabular-nums">₹17,000</strong></span>
+                  <Sparkles className="w-3.5 h-3.5 text-[#8C5E2E] dark:text-[#D4A77F]" />
+                  <span>Today: 12 Bookings · <strong className="text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums">₹17,000</strong></span>
                 </div>
               </div>
 
@@ -325,7 +325,7 @@ export default function InteractiveProductPreview() {
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] font-bold text-[#D4A77F] bg-white dark:bg-[#141926] px-2 py-0.5 rounded-full border border-[#E5E7EB] dark:border-[#2A2F3A] font-variant-numeric tabular-nums">
+                        <span className="text-[10px] font-bold text-[#8C5E2E] dark:text-[#D4A77F] bg-white dark:bg-[#141926] px-2 py-0.5 rounded-full border border-[#E5E7EB] dark:border-[#2A2F3A] font-variant-numeric tabular-nums">
                           4 Appts · ₹6,600
                         </span>
                       </div>
@@ -337,7 +337,7 @@ export default function InteractiveProductPreview() {
                           className="p-3 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50/70 dark:bg-amber-950/25 hover:border-amber-400 cursor-pointer transition-all shadow-2xs group"
                         >
                           <div className="flex items-center justify-between text-[11px] pb-1 border-b border-black/5 dark:border-white/5">
-                            <span className="font-bold text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
+                            <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               <span>10:00 - 11:00 AM</span>
                             </span>
@@ -345,12 +345,12 @@ export default function InteractiveProductPreview() {
                               In Chair
                             </span>
                           </div>
-                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#D4A77F] transition-colors">
+                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#8C5E2E] dark:group-hover:text-[#D4A77F] transition-colors">
                             Ananya Iyer
                           </div>
                           <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] flex items-center justify-between mt-0.5">
                             <span className="truncate">Hydra-Gloss Hair Spa</span>
-                            <span className="font-black text-[#D4A77F] font-variant-numeric tabular-nums">₹2,800</span>
+                            <span className="font-black text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums">₹2,800</span>
                           </div>
                         </div>
 
@@ -360,7 +360,7 @@ export default function InteractiveProductPreview() {
                           className="p-3 rounded-xl border border-[#D4A77F]/30 dark:border-[#D4A77F]/30 bg-gradient-to-br from-white to-[#FFFBF7] dark:from-[#141926] dark:to-[#1A2030] hover:border-[#D4A77F] cursor-pointer transition-all shadow-2xs group"
                         >
                           <div className="flex items-center justify-between text-[11px] pb-1 border-b border-black/5 dark:border-white/5">
-                            <span className="font-bold text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
+                            <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               <span>01:00 - 02:30 PM</span>
                             </span>
@@ -368,12 +368,12 @@ export default function InteractiveProductPreview() {
                               Confirmed
                             </span>
                           </div>
-                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#D4A77F] transition-colors">
+                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#8C5E2E] dark:group-hover:text-[#D4A77F] transition-colors">
                             Sneha Desai
                           </div>
                           <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] flex items-center justify-between mt-0.5">
                             <span className="truncate">Keratin Smooth Infusion</span>
-                            <span className="font-black text-[#D4A77F] font-variant-numeric tabular-nums">₹3,800</span>
+                            <span className="font-black text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums">₹3,800</span>
                           </div>
                         </div>
 
@@ -402,7 +402,7 @@ export default function InteractiveProductPreview() {
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] font-bold text-[#D4A77F] bg-white dark:bg-[#141926] px-2 py-0.5 rounded-full border border-[#E5E7EB] dark:border-[#2A2F3A] font-variant-numeric tabular-nums">
+                        <span className="text-[10px] font-bold text-[#8C5E2E] dark:text-[#D4A77F] bg-white dark:bg-[#141926] px-2 py-0.5 rounded-full border border-[#E5E7EB] dark:border-[#2A2F3A] font-variant-numeric tabular-nums">
                           3 Appts · ₹7,700
                         </span>
                       </div>
@@ -414,7 +414,7 @@ export default function InteractiveProductPreview() {
                           className="p-3 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50/70 dark:bg-amber-950/25 hover:border-amber-400 cursor-pointer transition-all shadow-2xs group"
                         >
                           <div className="flex items-center justify-between text-[11px] pb-1 border-b border-black/5 dark:border-white/5">
-                            <span className="font-bold text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
+                            <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               <span>10:30 - 12:30 PM</span>
                             </span>
@@ -422,12 +422,12 @@ export default function InteractiveProductPreview() {
                               In Chair
                             </span>
                           </div>
-                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#D4A77F] transition-colors">
+                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#8C5E2E] dark:group-hover:text-[#D4A77F] transition-colors">
                             Rhea Kapoor
                           </div>
                           <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] flex items-center justify-between mt-0.5">
                             <span className="truncate">Champagne Balayage</span>
-                            <span className="font-black text-[#D4A77F] font-variant-numeric tabular-nums">₹4,500</span>
+                            <span className="font-black text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums">₹4,500</span>
                           </div>
                         </div>
 
@@ -437,7 +437,7 @@ export default function InteractiveProductPreview() {
                           className="p-3 rounded-xl border border-[#D4A77F]/30 dark:border-[#D4A77F]/30 bg-gradient-to-br from-white to-[#FFFBF7] dark:from-[#141926] dark:to-[#1A2030] hover:border-[#D4A77F] cursor-pointer transition-all shadow-2xs group"
                         >
                           <div className="flex items-center justify-between text-[11px] pb-1 border-b border-black/5 dark:border-white/5">
-                            <span className="font-bold text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
+                            <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               <span>02:00 - 03:15 PM</span>
                             </span>
@@ -445,12 +445,12 @@ export default function InteractiveProductPreview() {
                               Confirmed
                             </span>
                           </div>
-                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#D4A77F] transition-colors">
+                          <div className="mt-1.5 font-extrabold text-xs text-[#1F2937] dark:text-white group-hover:text-[#8C5E2E] dark:group-hover:text-[#D4A77F] transition-colors">
                             Pooja Mehta
                           </div>
                           <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] flex items-center justify-between mt-0.5">
                             <span className="truncate">Bridal Radiance Facial</span>
-                            <span className="font-black text-[#D4A77F] font-variant-numeric tabular-nums">₹3,200</span>
+                            <span className="font-black text-[#8C5E2E] dark:text-[#D4A77F] font-variant-numeric tabular-nums">₹3,200</span>
                           </div>
                         </div>
 

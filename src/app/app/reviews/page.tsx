@@ -372,7 +372,7 @@ export default function OwnerReviewsPage() {
                   className="flex items-center justify-between text-xs p-2 rounded-xl bg-neutral-50 dark:bg-[#10141F] border border-neutral-100 dark:border-neutral-800"
                 >
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center font-bold text-[10px]">
+                    <div className="w-6 h-6 rounded-lg bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center font-bold text-[10px]">
                       {st.staffName.charAt(0)}
                     </div>
                     <span className="font-semibold text-[#1F2937] dark:text-white truncate max-w-[120px]">
@@ -471,7 +471,7 @@ export default function OwnerReviewsPage() {
               {/* Header row */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-100 dark:border-neutral-800">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center font-bold text-xs shrink-0">
+                  <div className="w-9 h-9 rounded-2xl bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center font-bold text-xs shrink-0">
                     {getFirstName(rev.customer_name).charAt(0)}
                   </div>
                   <div>
@@ -547,7 +547,7 @@ export default function OwnerReviewsPage() {
               {rev.owner_reply && (
                 <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] space-y-1.5">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-[#D4A77F] flex items-center gap-1">
+                    <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] flex items-center gap-1">
                       <MessageSquare className="w-3.5 h-3.5" />
                       <span>Your Response</span>
                     </span>
@@ -647,7 +647,7 @@ export default function OwnerReviewsPage() {
           <div className="relative bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl max-w-lg w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#E5E7EB] dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center font-bold">
                   <MessageSquare className="w-4 h-4" />
                 </div>
                 <div>

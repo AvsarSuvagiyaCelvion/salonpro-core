@@ -146,7 +146,7 @@ export default function AdminOverviewPage() {
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">Main Admin Dashboard</h1>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30">
               Super Admin
             </span>
           </div>
@@ -173,14 +173,14 @@ export default function AdminOverviewPage() {
         <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 shadow-xs">
           <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider">Total Salons</span>
-            <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center">
               <Building2 className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? '...' : metrics?.totalSalons}
           </div>
-          <div className="text-[11px] text-emerald-600 mt-1 font-semibold flex items-center gap-1">
+          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 font-semibold flex items-center gap-1">
             <span>● 100% active branches</span>
           </div>
         </div>
@@ -395,8 +395,8 @@ export default function AdminOverviewPage() {
               >
                 <div>
                   <div className="flex items-center justify-between text-[10px] text-[#6B7280] dark:text-[#A0A8B8] mb-1.5 font-bold uppercase tracking-wider">
-                    <span className="text-[#D4A77F] font-bold">{a.salon_name}</span>
-                    <span className="text-emerald-700 capitalize bg-emerald-100 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-[#8C5E2E] dark:text-[#D4A77F] font-bold">{a.salon_name}</span>
+                    <span className="text-emerald-700 dark:text-emerald-300 capitalize bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full font-bold">
                       {a.status}
                     </span>
                   </div>
@@ -406,7 +406,7 @@ export default function AdminOverviewPage() {
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
+                <div className="mt-3 pt-3 border-t border-slate-200 dark:border-[#2A2F3A] flex justify-between items-center text-xs">
                   <span className="text-[#6B7280] dark:text-[#A0A8B8] font-mono text-[11px]">
                     {new Date(a.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' })}{' '}
                     at {new Date(a.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}

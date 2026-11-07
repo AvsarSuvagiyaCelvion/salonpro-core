@@ -113,7 +113,7 @@ export default function AdminSecurityPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">Platform Admins & Security</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30">
               Access Control
             </span>
           </div>
@@ -228,7 +228,7 @@ export default function AdminSecurityPage() {
                     {a.email}
                   </td>
                   <td className="py-3.5 px-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30">
                       {a.role}
                     </span>
                   </td>

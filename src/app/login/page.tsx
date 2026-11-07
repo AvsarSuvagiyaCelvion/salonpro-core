@@ -110,9 +110,9 @@ export default function LoginPage() {
               <div className="flex items-start sm:items-center gap-2.5 min-w-0">
                 <span className="text-xl shrink-0 mt-0.5 sm:mt-0">🎁</span>
                 <div>
-                  <p className="text-xs font-bold text-[#D4A77F] flex items-center gap-1.5 flex-wrap">
+                  <p className="text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] flex items-center gap-1.5 flex-wrap">
                     <span>New Salon Owner?</span>
-                    <span className="px-1.5 py-0.2 rounded-full bg-[#D4A77F]/20 text-[#8C5E35] dark:text-[#D4A77F] text-[9px] font-extrabold uppercase">
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#D4A77F]/20 text-[#8C5E2E] dark:text-[#D4A77F] text-[9px] font-extrabold uppercase">
                       7 Days Free
                     </span>
                   </p>
@@ -173,7 +173,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowForgotNotice(!showForgotNotice)}
-                    className="text-xs text-[#D4A77F] hover:underline font-semibold cursor-pointer"
+                    className="text-xs text-[#8C5E2E] dark:text-[#D4A77F] hover:underline font-semibold cursor-pointer"
                   >
                     Forgot Password?
                   </button>
@@ -213,7 +213,7 @@ export default function LoginPage() {
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-bold text-[#D4A77F] underline hover:text-[#B8905F] cursor-pointer inline-flex items-center gap-0.5"
+                        className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] underline hover:text-[#B8905F] cursor-pointer inline-flex items-center gap-0.5"
                       >
                         Platform Support (+91 {supportPhone})
                       </a>{' '}
@@ -265,7 +265,7 @@ export default function LoginPage() {
                 </p>
                 <Link
                   href="/register-salon"
-                  className="block mt-1 font-bold text-[#D4A77F] hover:underline text-xs"
+                  className="block mt-1 font-bold text-[#8C5E2E] dark:text-[#D4A77F] hover:underline text-xs"
                 >
                   Create Account &amp; Start 7-Day Free Trial ➔
                 </Link>

@@ -29,8 +29,8 @@ export default function AdminOwnersPage() {
         <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">Master account directory of all registered salon owners and assigned stylists</p>
       </div>
       {salons.length === 0 && !loading && (
-        <div className="bg-white border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-xs my-8">
-          <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+        <div className="bg-white dark:bg-[#141926] border-2 border-dashed border-slate-200 dark:border-[#2A2F3A] rounded-3xl p-12 text-center max-w-lg mx-auto shadow-xs my-8">
+          <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
             👥
           </div>
           <h3 className="text-lg font-black text-[#1F2937] dark:text-[#FFFFFF]">0 Salon Owners Listed</h3>
@@ -58,7 +58,7 @@ export default function AdminOwnersPage() {
               </div>
               <div>
                 <h3 className="font-extrabold text-base text-[#1F2937] dark:text-[#FFFFFF]">{s.name}</h3>
-                <span className="text-[10px] uppercase font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800/50">
                   Primary Tenant Salon
                 </span>
               </div>
@@ -70,7 +70,7 @@ export default function AdminOwnersPage() {
                   <div className="text-[10px] text-[#9CA3AF] dark:text-[#747D8D] uppercase font-bold">Assigned Owner Email</div>
                   <div className="font-mono text-[#1F2937] dark:text-[#FFFFFF] font-semibold">{s.owner_email || 'Owner account pending'}</div>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800/50">
                   Verified Owner
                 </span>
               </div>
@@ -80,7 +80,7 @@ export default function AdminOwnersPage() {
                   <div className="text-[10px] text-[#9CA3AF] dark:text-[#747D8D] uppercase font-bold">Staff Team Size</div>
                   <div className="text-[#1F2937] dark:text-[#FFFFFF] font-semibold">{s.staff_count} Stylists & Receptionists</div>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-[#6B7280] dark:text-[#A0A8B8] font-bold border border-slate-200">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-[#141926] text-[#6B7280] dark:text-[#A0A8B8] font-bold border border-slate-200 dark:border-[#2A2F3A]">
                   Salon Managed
                 </span>
               </div>

@@ -131,11 +131,11 @@ export default async function PublicBillPage({
     dueAmount <= 0 ? 'PAID' : totalPaid > 0 ? 'PARTIAL' : 'PENDING';
 
   return (
-    <div className="min-h-screen bg-neutral-100 py-6 sm:py-12 px-4 flex justify-center items-start print:bg-white print:p-0">
-      <div id="invoice-receipt-card" className="w-full max-w-lg bg-white rounded-3xl shadow-xl border border-neutral-200 overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none">
+    <div className="min-h-screen bg-neutral-100 dark:bg-[#080B12] py-6 sm:py-12 px-4 flex justify-center items-start print:bg-white print:p-0 transition-colors duration-200">
+      <div id="invoice-receipt-card" className="w-full max-w-lg bg-white dark:bg-[#141926] rounded-3xl shadow-xl border border-neutral-200 dark:border-[#2A2F3A] overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none">
         
         {/* Top Header Brand Banner */}
-        <div className="bg-neutral-900 text-white p-6 sm:p-8 text-center relative">
+        <div className="bg-neutral-900 dark:bg-[#0B0F19] text-white p-6 sm:p-8 text-center relative border-b dark:border-[#2A2F3A]">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#D4A77F]/20 text-[#D4A77F] font-bold text-2xl mb-3 border border-[#D4A77F]/30 overflow-hidden">
             {invoice.salon_logo_url ? (
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -178,14 +178,17 @@ export default async function PublicBillPage({
         </div>
 
         {/* Invoice Metadata bar */}
-        <div className="bg-neutral-50 border-b border-neutral-200 px-6 py-4 flex flex-wrap justify-between items-center text-xs text-neutral-600 gap-2">
+        <div className="bg-neutral-50 dark:bg-[#10141F] border-b border-neutral-200 dark:border-[#2A2F3A] px-6 py-4 flex flex-wrap justify-between items-center text-xs text-neutral-600 dark:text-neutral-300 gap-2">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">Tax Invoice</span>
+            </div>
             <span className="text-neutral-400 block text-[10px] uppercase font-bold tracking-wider">Invoice No</span>
-            <span className="font-mono font-bold text-neutral-800 text-sm">{invoice.number}</span>
+            <span className="font-mono font-bold text-neutral-800 dark:text-white text-sm">{invoice.number}</span>
           </div>
           <div className="text-right">
             <span className="text-neutral-400 block text-[10px] uppercase font-bold tracking-wider">Date & Time</span>
-            <span className="font-medium text-neutral-800">
+            <span className="font-medium text-neutral-800 dark:text-neutral-200">
               {new Date(invoice.created_at).toLocaleDateString('en-IN', {
                 timeZone: 'Asia/Kolkata',
                 day: 'numeric',
@@ -203,14 +206,14 @@ export default async function PublicBillPage({
         </div>
 
         {/* Customer Information */}
-        <div className="p-6 border-b border-neutral-100">
+        <div className="p-6 border-b border-neutral-100 dark:border-[#2A2F3A]">
           <div className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-1">
             Billed To
           </div>
           <div className="flex justify-between items-center">
             <div>
-              <div className="font-bold text-neutral-900 text-base">{invoice.customer_name}</div>
-              <div className="text-xs text-neutral-500 font-mono mt-0.5">{maskMobile(invoice.customer_mobile)}</div>
+              <div className="font-bold text-neutral-900 dark:text-white text-base">{invoice.customer_name}</div>
+              <div className="text-xs text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">{maskMobile(invoice.customer_mobile)}</div>
             </div>
             <div className="text-right text-xs text-neutral-400">
               Verified Client
@@ -228,12 +231,12 @@ export default async function PublicBillPage({
             {items.map((item, idx) => (
               <div key={idx} className="flex justify-between items-start text-sm">
                 <div className="flex-1 pr-3">
-                  <div className="font-medium text-neutral-900">{item.name}</div>
+                  <div className="font-medium text-neutral-900 dark:text-neutral-100">{item.name}</div>
                   <div className="text-xs text-neutral-400 capitalize">
                     {item.kind} {item.qty > 1 ? `× ${item.qty}` : ''}
                   </div>
                 </div>
-                <div className="font-semibold text-neutral-900 text-right">
+                <div className="font-semibold text-neutral-900 dark:text-white text-right">
                   ₹{(Number(item.unit_price) * (item.qty || 1)).toLocaleString('en-IN')}
                 </div>
               </div>
@@ -241,14 +244,14 @@ export default async function PublicBillPage({
           </div>
 
           {/* Pricing Calculation Breakdown */}
-          <div className="mt-6 pt-4 border-t border-dashed border-neutral-200 space-y-2 text-xs">
-            <div className="flex justify-between text-neutral-600">
+          <div className="mt-6 pt-4 border-t border-dashed border-neutral-200 dark:border-[#2A2F3A] space-y-2 text-xs">
+            <div className="flex justify-between text-neutral-600 dark:text-neutral-300">
               <span>Subtotal</span>
               <span>₹{Number(invoice.subtotal).toLocaleString('en-IN')}</span>
             </div>
 
             {Number(invoice.discount_amount) > 0 && (
-              <div className="flex justify-between text-pink-600 font-medium">
+              <div className="flex justify-between text-pink-600 dark:text-pink-400 font-medium">
                 <span>
                   Discount{' '}
                   {invoice.discount_type === 'pct' ? `(${invoice.discount_value}%)` : ''}
@@ -257,7 +260,7 @@ export default async function PublicBillPage({
               </div>
             )}
 
-            <div className="flex justify-between text-neutral-400 pt-1 border-t border-neutral-100">
+            <div className="flex justify-between text-neutral-400 pt-1 border-t border-neutral-100 dark:border-[#2A2F3A]">
               <span>Taxable Value</span>
               <span>₹{taxableSubtotal.toFixed(2)}</span>
             </div>
@@ -272,20 +275,20 @@ export default async function PublicBillPage({
               <span>₹{sgst.toFixed(2)}</span>
             </div>
 
-            <div className="flex justify-between items-baseline pt-3 border-t-2 border-neutral-900 text-neutral-900 font-bold text-lg">
+            <div className="flex justify-between items-baseline pt-3 border-t-2 border-neutral-900 dark:border-neutral-200 text-neutral-900 dark:text-white font-bold text-lg">
               <span>Grand Total</span>
               <span className="text-xl">₹{totalAmount.toLocaleString('en-IN')}</span>
             </div>
           </div>
 
           {/* Payments Section */}
-          <div className="mt-6 pt-4 border-t border-neutral-200">
+          <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-[#2A2F3A]">
             <div className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">
               Payment Summary
             </div>
             
             {payments.length === 0 ? (
-              <div className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-xl border border-amber-200 font-medium">
+              <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800/50 font-medium">
                 No payment recorded yet. Total Due: ₹{totalAmount.toLocaleString('en-IN')}
               </div>
             ) : (
@@ -293,28 +296,28 @@ export default async function PublicBillPage({
                 {payments.map((p, idx) => (
                   <div
                     key={idx}
-                    className="flex justify-between items-center text-xs bg-neutral-50 px-3 py-2 rounded-lg"
+                    className="flex justify-between items-center text-xs bg-neutral-50 dark:bg-[#10141F] px-3 py-2 rounded-lg border border-transparent dark:border-[#2A2F3A]"
                   >
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      <span className="font-semibold uppercase text-neutral-800">{p.method}</span>
+                      <span className="font-semibold uppercase text-neutral-800 dark:text-neutral-200">{p.method}</span>
                       {p.reference && (
                         <span className="text-[10px] text-neutral-400 font-mono">({p.reference})</span>
                       )}
                     </div>
-                    <span className="font-bold text-emerald-600">
+                    <span className="font-bold text-emerald-700 dark:text-emerald-400">
                       ₹{Number(p.amount).toLocaleString('en-IN')}
                     </span>
                   </div>
                 ))}
 
                 <div className="flex justify-between items-center text-xs font-bold pt-2 px-1">
-                  <span className="text-neutral-600">Paid so far</span>
-                  <span className="text-emerald-700">₹{totalPaid.toLocaleString('en-IN')}</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">Paid so far</span>
+                  <span className="text-emerald-700 dark:text-emerald-400">₹{totalPaid.toLocaleString('en-IN')}</span>
                 </div>
 
                 {dueAmount > 0 && (
-                  <div className="flex justify-between items-center text-xs font-bold text-rose-600 px-1">
+                  <div className="flex justify-between items-center text-xs font-bold text-rose-600 dark:text-rose-400 px-1">
                     <span>Balance Due</span>
                     <span>₹{dueAmount.toLocaleString('en-IN')}</span>
                   </div>
@@ -325,11 +328,11 @@ export default async function PublicBillPage({
         </div>
 
         {/* Footer info & Print Button */}
-        <div className="bg-neutral-50 p-6 border-t border-neutral-200 text-center">
-          <p className="text-xs text-neutral-500">
+        <div className="bg-neutral-50 dark:bg-[#10141F] p-6 border-t border-neutral-200 dark:border-[#2A2F3A] text-center">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
             Thank you for pampering yourself with us! ✨
           </p>
-          <p className="text-[10px] text-neutral-400 mt-1">
+          <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">
             Prices are inclusive of all applicable GST. This is a computer generated invoice.
           </p>
 

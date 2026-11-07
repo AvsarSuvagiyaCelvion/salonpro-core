@@ -471,8 +471,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Theme Toggle Button */}
           <ThemeToggle />
 
-          <div className="hidden md:flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#A0A8B8] bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] py-1.5 px-3 rounded-full">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+          <div className="hidden md:flex items-center gap-2 text-xs text-[#374151] dark:text-[#CBD5E1] bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] py-1.5 px-3 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
             <span>
               Studio Open ({salon?.open_time ? salon.open_time.slice(0, 5) : '09:00'} - {salon?.close_time ? salon.close_time.slice(0, 5) : '21:00'})
             </span>
@@ -482,7 +482,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             onClick={handleLogout}
             disabled={loggingOut}
             title="Sign out of ERP"
-            className="flex items-center gap-1.5 text-xs font-semibold text-[#EF4444] hover:bg-[#EF4444]/10 p-2 sm:py-1.5 sm:px-3 rounded-xl transition-colors cursor-pointer border border-[#E5E7EB] dark:border-[#2A2F3A]"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#DC2626] dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 p-2 sm:py-1.5 sm:px-3 rounded-xl transition-colors cursor-pointer border border-[#E5E7EB] dark:border-[#2A2F3A]"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
@@ -519,7 +519,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <span className="font-extrabold text-sm text-[#1F2937] dark:text-[#FFFFFF] block leading-tight truncate">
                       {salon?.name || process.env.NEXT_PUBLIC_DEFAULT_SALON_NAME || 'Pari Beauty Studio - Branch 1'}
                     </span>
-                    <span className="text-[10px] text-[#D4A77F] font-bold bg-[#F3F4F6] dark:bg-[#1C2230] px-1.5 py-0.5 rounded border border-[#E5E7EB] dark:border-[#2A2F3A]">
+                    <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold bg-[#F3F4F6] dark:bg-[#1C2230] px-1.5 py-0.5 rounded border border-[#E5E7EB] dark:border-[#2A2F3A]">
                       Salon Owner ERP
                     </span>
                   </div>
@@ -561,11 +561,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-[#080B12]' : isLocked ? 'text-[#6B7280] dark:text-[#A0A8B8]' : 'text-[#D4A77F]'}`} />
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-[#080B12]' : isLocked ? 'text-[#6B7280] dark:text-[#A0A8B8]' : 'text-[#8C5E2E] dark:text-[#D4A77F]'}`} />
                         <span>{item.name}</span>
                       </div>
                       {isLocked && (
-                        <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#D4A77F]/20 text-[#D4A77F]">
+                        <span className="flex items-center gap-1 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#D4A77F]/20 text-[#8C5E2E] dark:text-[#D4A77F]">
                           <Lock className="w-2.5 h-2.5" />
                           <span>{item.requiredPlanName || 'PRO'}</span>
                         </span>
@@ -581,10 +581,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <a
                     href={`/${salon.slug}`}
                     target="_blank"
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-[#D4A77F] bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all hover:opacity-90"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-[#8C5E2E] dark:text-[#D4A77F] bg-[#F3F4F6] dark:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all hover:opacity-90"
                   >
                     <span className="flex items-center gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
+                      <Sparkles className="w-3.5 h-3.5 text-[#8C5E2E] dark:text-[#D4A77F]" />
                       <span>Client Booking Page</span>
                     </span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -659,11 +659,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#080B12]' : isLocked ? 'text-[#6B7280] dark:text-[#A0A8B8]' : 'text-[#D4A77F]'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#080B12]' : isLocked ? 'text-[#6B7280] dark:text-[#A0A8B8]' : 'text-[#8C5E2E] dark:text-[#D4A77F]'}`} />
                       <span>{item.name}</span>
                     </div>
                     {isLocked && (
-                      <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#D4A77F]/20 text-[#D4A77F]">
+                      <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#D4A77F]/20 text-[#8C5E2E] dark:text-[#D4A77F]">
                         <Lock className="w-2.5 h-2.5" />
                         <span>{item.requiredPlanName || 'PRO'}</span>
                       </span>
@@ -676,12 +676,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
           <div className="p-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F8F9FA] dark:bg-[#10141F] shrink-0">
             <div className="p-2.5 rounded-2xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs">
-              <div className="text-[10px] text-[#6B7280] dark:text-[#A0A8B8] mb-0.5 font-bold uppercase">Signed in as:</div>
+              <div className="text-[10px] text-[#4B5563] dark:text-[#CBD5E1] mb-0.5 font-bold uppercase">Signed in as:</div>
               <div className="text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF] truncate" title={user?.email || 'pari.branch1@gmail.com'}>
                 {user?.email || 'pari.branch1@gmail.com'}
               </div>
-              <div className="text-[10px] text-[#10B981] font-semibold mt-0.5 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+              <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
                 <span className="capitalize">{user?.role || 'Owner'} Account</span>
               </div>
             </div>
@@ -879,10 +879,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <div
                       key={plan.id}
                       onClick={() => setSelectedPlanId(plan.id)}
-                      className={`relative rounded-2xl p-5 border-2 transition-all cursor-pointer bg-white flex flex-col justify-between ${
+                      className={`relative rounded-2xl p-5 border-2 transition-all cursor-pointer bg-white dark:bg-[#141926] flex flex-col justify-between ${
                         isSelected
                           ? 'border-[#D4A77F] ring-4 ring-[#D4A77F]/20 shadow-lg'
-                          : 'border-slate-200 hover:border-slate-300'
+                          : 'border-slate-200 dark:border-[#2A2F3A] hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       {plan.is_popular && (
@@ -892,16 +892,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       )}
 
                       <div>
-                        <h4 className="font-extrabold text-slate-900 text-base mb-1">{plan.name}</h4>
-                        <p className="text-xs text-slate-500 mb-3 min-h-[30px]">{plan.description}</p>
+                        <h4 className="font-extrabold text-slate-900 dark:text-white text-base mb-1">{plan.name}</h4>
+                        <p className="text-xs text-slate-500 dark:text-[#A0A8B8] mb-3 min-h-[30px]">{plan.description}</p>
                         <div className="mb-4">
-                          <span className="text-2xl font-black text-slate-900">₹{Number(plan.price).toLocaleString()}</span>
-                          <span className="text-xs text-slate-500 ml-1">/{plan.billing_interval}</span>
+                          <span className="text-2xl font-black text-slate-900 dark:text-white">₹{Number(plan.price).toLocaleString()}</span>
+                          <span className="text-xs text-slate-500 dark:text-[#A0A8B8] ml-1">/{plan.billing_interval}</span>
                         </div>
-                        <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                        <div className="space-y-1.5 border-t border-slate-100 dark:border-[#2A2F3A] pt-3">
                           {(Array.isArray(plan.features) ? plan.features : []).map((feat: string, i: number) => (
-                            <div key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <div key={i} className="flex items-start gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                               <span>{feat}</span>
                             </div>
                           ))}
@@ -918,7 +918,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         className={`w-full mt-4 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                           isSelected
                             ? 'bg-[#D4A77F] text-[#080B12] hover:bg-[#B8905F] font-bold'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                            : 'bg-slate-100 dark:bg-[#1C2230] text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#2A3445]'
                         }`}
                       >
                         <CreditCard className="w-3.5 h-3.5" />
@@ -991,10 +991,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Mobile Bottom Dock Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] px-3 py-1.5 flex items-center justify-around shadow-lg">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] px-2 py-1.5 flex items-center justify-around shadow-lg">
         <Link
           href="/app"
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition-colors ${
+          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors ${
             pathname === '/app'
               ? 'text-[#D4A77F] font-bold'
               : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
@@ -1006,7 +1006,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         <Link
           href="/app/live"
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition-colors relative ${
+          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors relative ${
             pathname.startsWith('/app/live')
               ? 'text-[#D4A77F] font-bold'
               : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
@@ -1014,15 +1014,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         >
           <span className="relative">
             <Radio className="w-5 h-5" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#10B981] animate-ping"></span>
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#10B981]"></span>
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500"></span>
           </span>
           <span className="text-[10px]">Live</span>
         </Link>
 
         <Link
           href="/app/billing"
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition-colors ${
+          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors ${
             pathname.startsWith('/app/billing')
               ? 'text-[#D4A77F] font-bold'
               : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
@@ -1034,7 +1034,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         <Link
           href="/app/appointments"
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition-colors ${
+          className={`flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl transition-colors ${
             pathname.startsWith('/app/appointments')
               ? 'text-[#D4A77F] font-bold'
               : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF]'
@@ -1047,7 +1047,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(true)}
-          className="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] cursor-pointer"
+          className="flex flex-col items-center justify-center min-h-[44px] min-w-[44px] gap-0.5 py-1 px-2 rounded-xl text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] cursor-pointer"
         >
           <Menu className="w-5 h-5" />
           <span className="text-[10px]">All Menus</span>

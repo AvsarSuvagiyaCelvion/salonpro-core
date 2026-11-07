@@ -364,9 +364,9 @@ export default function ProductsPage() {
 
       {/* KPI Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-3xl bg-white border border-neutral-200/80 shadow-xs">
+        <div className="p-4 rounded-3xl bg-white dark:bg-[#141926] border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
           <div className="flex items-center justify-between text-neutral-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
               Total Products
             </span>
             <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center">
@@ -374,64 +374,64 @@ export default function ProductsPage() {
             </div>
           </div>
           <div className="text-2xl font-black text-[#1F2937] dark:text-white">{products.length}</div>
-          <span className="text-[11px] text-neutral-400 mt-0.5 block">Catalog SKUs</span>
+          <span className="text-[11px] text-neutral-400 dark:text-[#747D8D] mt-0.5 block">Catalog SKUs</span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-neutral-200/80 shadow-xs">
+        <div className="p-4 rounded-3xl bg-white dark:bg-[#141926] border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
           <div className="flex items-center justify-between text-neutral-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
               In-Stock Units
             </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
               <Boxes className="w-4 h-4" />
             </div>
           </div>
           <div className="text-2xl font-black text-[#1F2937] dark:text-white">{totalInventoryUnits}</div>
-          <span className="text-[11px] text-neutral-400 mt-0.5 block">Physical Units</span>
+          <span className="text-[11px] text-neutral-400 dark:text-[#747D8D] mt-0.5 block">Physical Units</span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-neutral-200/80 shadow-xs">
+        <div className="p-4 rounded-3xl bg-white dark:bg-[#141926] border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
           <div className="flex items-center justify-between text-neutral-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
               Low Stock Alerts
             </span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-amber-600">{lowStockCount}</div>
-          <span className="text-[11px] text-amber-600/80 mt-0.5 block font-semibold">
+          <div className="text-2xl font-black text-amber-600 dark:text-amber-400">{lowStockCount}</div>
+          <span className="text-[11px] text-amber-600/80 dark:text-amber-400/80 mt-0.5 block font-semibold">
             {lowStockCount > 0 ? 'Needs reordering' : 'Stock levels optimal'}
           </span>
         </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-neutral-200/80 shadow-xs">
+        <div className="p-4 rounded-3xl bg-white dark:bg-[#141926] border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
           <div className="flex items-center justify-between text-neutral-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
               Retail Revenue
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <ShoppingCart className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-emerald-700">
+          <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400">
             ₹{Number(salesStats?.total_retail_revenue || 0).toLocaleString('en-IN')}
           </div>
-          <span className="text-[11px] text-emerald-600 font-semibold mt-0.5 block">
+          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5 block">
             {salesStats?.total_units_sold || 0} Units Sold via Staff
           </span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-neutral-200 pb-2 overflow-x-auto no-scrollbar touch-scroll">
+      <div className="flex items-center gap-2 border-b border-neutral-200 dark:border-[#2A2F3A] pb-2 overflow-x-auto no-scrollbar touch-scroll">
         <button
           type="button"
           onClick={() => setActiveTab('inventory')}
           className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'inventory'
               ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs'
-              : 'text-neutral-600 hover:bg-neutral-100'
+              : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C2230]'
           }`}
         >
           <Boxes className="w-4 h-4" />
@@ -444,7 +444,7 @@ export default function ProductsPage() {
           className={`py-2 px-4 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap ${
             activeTab === 'sales'
               ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-xs'
-              : 'text-neutral-600 hover:bg-neutral-100'
+              : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C2230]'
           }`}
         >
           <ShoppingCart className="w-4 h-4" />
@@ -464,7 +464,7 @@ export default function ProductsPage() {
                 placeholder="Search products by name, brand, SKU..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-neutral-200 text-xs text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F] transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] text-xs text-[#1F2937] dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:border-[#D4A77F] transition-all"
               />
             </div>
 
@@ -473,8 +473,8 @@ export default function ProductsPage() {
                 onClick={() => setFilter('all')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   filter === 'all'
-                    ? 'bg-neutral-800 text-white'
-                    : 'bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50'
+                    ? 'bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-900'
+                    : 'bg-white dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
                 }`}
               >
                 All Products
@@ -484,7 +484,7 @@ export default function ProductsPage() {
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   filter === 'low_stock'
                     ? 'bg-amber-600 text-white'
-                    : 'bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50'
+                    : 'bg-white dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
                 }`}
               >
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
@@ -494,8 +494,8 @@ export default function ProductsPage() {
                 onClick={() => setFilter('active')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   filter === 'active'
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-white border border-neutral-200 text-neutral-600 hover:bg-neutral-50'
+                    ? 'bg-emerald-700 dark:bg-emerald-600 text-white'
+                    : 'bg-white dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
                 }`}
               >
                 Active Only
@@ -505,15 +505,15 @@ export default function ProductsPage() {
 
           {/* Product Cards Grid */}
           {loading ? (
-            <div className="text-center py-16 bg-white rounded-3xl border border-neutral-200/80">
+            <div className="text-center py-16 bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/80 dark:border-[#2A2F3A]">
               <div className="w-8 h-8 border-3 border-[#D4A77F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-xs font-bold text-neutral-500">Loading salon inventory...</p>
+              <p className="text-xs font-bold text-neutral-500 dark:text-[#A0A8B8]">Loading salon inventory...</p>
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-3xl border border-neutral-200/80">
-              <Package className="w-12 h-12 text-neutral-300 mx-auto mb-3" />
-              <h3 className="text-base font-bold text-neutral-800">No products found</h3>
-              <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
+            <div className="text-center py-16 bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/80 dark:border-[#2A2F3A]">
+              <Package className="w-12 h-12 text-neutral-300 dark:text-neutral-600 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-neutral-800 dark:text-white">No products found</h3>
+              <p className="text-xs text-neutral-500 dark:text-[#A0A8B8] mt-1 max-w-sm mx-auto">
                 {searchQuery || filter !== 'all'
                   ? 'No items matched your current filters.'
                   : 'Start adding salon retail shampoos, oils, waxes, and serums.'}
@@ -524,17 +524,17 @@ export default function ProductsPage() {
               {products.map((p) => (
                 <div
                   key={p.id}
-                  className={`bg-white rounded-3xl p-5 border transition-all hover:shadow-md flex flex-col justify-between ${
+                  className={`bg-white dark:bg-[#141926] rounded-3xl p-5 border transition-all hover:shadow-md flex flex-col justify-between ${
                     p.is_low_stock
-                      ? 'border-amber-300 ring-2 ring-amber-50 shadow-xs'
-                      : 'border-neutral-200/80 shadow-xs'
+                      ? 'border-amber-300 dark:border-amber-700/60 ring-2 ring-amber-50 dark:ring-amber-950/30 shadow-xs'
+                      : 'border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs'
                   }`}
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
                         {p.brand && (
-                          <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider block">
+                          <span className="text-[10px] uppercase font-bold text-neutral-400 dark:text-[#A0A8B8] tracking-wider block">
                             {p.brand}
                           </span>
                         )}
@@ -543,8 +543,8 @@ export default function ProductsPage() {
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${
                           p.is_low_stock
-                            ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                            : 'bg-emerald-50 text-emerald-700'
+                            ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60'
+                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
                         }`}
                       >
                         {p.is_low_stock ? 'Low Stock' : 'In Stock'}
@@ -552,14 +552,14 @@ export default function ProductsPage() {
                     </div>
 
                     {p.sku && (
-                      <span className="text-[10px] text-neutral-400 font-mono block mb-3">
+                      <span className="text-[10px] text-neutral-400 dark:text-[#A0A8B8] font-mono block mb-3">
                         SKU: {p.sku}
                       </span>
                     )}
 
-                    <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs mb-3">
+                    <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-neutral-50 dark:bg-[#10141F] border border-neutral-100 dark:border-[#2A2F3A] text-xs mb-3">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-neutral-400 block">
+                        <span className="text-[10px] uppercase font-bold text-neutral-400 dark:text-[#A0A8B8] block">
                           Retail Price
                         </span>
                         <strong className="text-sm font-black text-[#1F2937] dark:text-white">
@@ -567,12 +567,12 @@ export default function ProductsPage() {
                         </strong>
                       </div>
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-neutral-400 block">
+                        <span className="text-[10px] uppercase font-bold text-neutral-400 dark:text-[#A0A8B8] block">
                           Stock Quantity
                         </span>
                         <strong
                           className={`text-sm font-black ${
-                            p.is_low_stock ? 'text-amber-600' : 'text-emerald-700'
+                            p.is_low_stock ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'
                           }`}
                         >
                           {p.stock} units
@@ -581,21 +581,21 @@ export default function ProductsPage() {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-neutral-100 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-between gap-2">
                     <button
                       type="button"
                       onClick={() => handleOpenSell(p)}
                       disabled={p.stock <= 0}
-                      className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40"
+                      className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40"
                     >
-                      <ShoppingCart className="w-3.5 h-3.5 text-emerald-600" />
+                      <ShoppingCart className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       <span>Sell to Client</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(p)}
-                      className="p-1.5 rounded-xl text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 cursor-pointer"
+                      className="p-1.5 rounded-xl text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-[#1C2230] cursor-pointer"
                       title="Edit product"
                     >
                       <Edit2 className="w-4 h-4" />
@@ -603,7 +603,7 @@ export default function ProductsPage() {
                     <button
                       type="button"
                       onClick={() => handleDeleteProduct(p.id)}
-                      className="p-1.5 rounded-xl text-neutral-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                      className="p-1.5 rounded-xl text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
                       title="Delete product"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -618,13 +618,13 @@ export default function ProductsPage() {
 
       {/* ================= TAB 2: RETAIL SALES & STAFF COMMISSION ================= */}
       {activeTab === 'sales' && (
-        <div className="bg-white rounded-3xl border border-neutral-200/80 shadow-xs overflow-hidden">
-          <div className="p-4 sm:p-5 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="font-extrabold text-base text-[#1F2937] dark:text-white">
                 Retail Sales & Staff Performance Log
               </h3>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-neutral-500 dark:text-[#A0A8B8]">
                 Every product purchased by clients, linked to the recommending staff stylist
               </p>
             </div>
@@ -640,16 +640,16 @@ export default function ProductsPage() {
 
           {sales.length === 0 ? (
             <div className="text-center py-16">
-              <ShoppingCart className="w-12 h-12 text-neutral-300 mx-auto mb-3" />
-              <h4 className="text-sm font-bold text-neutral-800">No retail product sales yet</h4>
-              <p className="text-xs text-neutral-500 mt-1">
+              <ShoppingCart className="w-12 h-12 text-neutral-300 dark:text-neutral-600 mx-auto mb-3" />
+              <h4 className="text-sm font-bold text-neutral-800 dark:text-white">No retail product sales yet</h4>
+              <p className="text-xs text-neutral-500 dark:text-[#A0A8B8] mt-1">
                 Click &quot;Sell Product (Quick POS)&quot; to record your first client sale.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-neutral-600">
-                <thead className="bg-neutral-50 text-[10px] uppercase font-black tracking-wider text-neutral-400 border-b border-neutral-100">
+              <table className="w-full text-left text-xs text-neutral-600 dark:text-neutral-300">
+                <thead className="bg-neutral-50 dark:bg-[#10141F] text-[10px] uppercase font-black tracking-wider text-neutral-500 dark:text-[#A0A8B8] border-b border-neutral-100 dark:border-[#2A2F3A]">
                   <tr>
                     <th className="py-3 px-4">Date & Time</th>
                     <th className="py-3 px-4">Product</th>
@@ -661,10 +661,10 @@ export default function ProductsPage() {
                     <th className="py-3 px-4 text-right">Invoice</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-100 font-medium">
+                <tbody className="divide-y divide-neutral-100 dark:divide-[#2A2F3A] font-medium">
                   {sales.map((sale) => (
-                    <tr key={sale.item_id} className="hover:bg-neutral-50/70 transition-colors">
-                      <td className="py-3 px-4 text-[11px] text-neutral-500 whitespace-nowrap">
+                    <tr key={sale.item_id} className="hover:bg-neutral-50/70 dark:hover:bg-[#1C2230]/60 transition-colors">
+                      <td className="py-3 px-4 text-[11px] text-neutral-500 dark:text-[#A0A8B8] whitespace-nowrap">
                         {new Date(sale.sold_at).toLocaleDateString('en-IN', {
                           timeZone: 'Asia/Kolkata',
                           day: 'numeric',
@@ -676,16 +676,16 @@ export default function ProductsPage() {
                           minute: '2-digit',
                         })}
                       </td>
-                      <td className="py-3 px-4 font-bold text-neutral-900">
+                      <td className="py-3 px-4 font-bold text-neutral-900 dark:text-white">
                         {sale.product_name}
                       </td>
-                      <td className="py-3 px-4 font-mono font-bold text-neutral-800">
+                      <td className="py-3 px-4 font-mono font-bold text-neutral-800 dark:text-neutral-200">
                         x{sale.qty}
                       </td>
                       <td className="py-3 px-4">
-                        <div className="font-semibold text-neutral-900">{sale.customer_name}</div>
+                        <div className="font-semibold text-neutral-900 dark:text-white">{sale.customer_name}</div>
                         {sale.customer_mobile && sale.customer_mobile !== '0000000000' && (
-                          <div className="text-[10px] text-neutral-400 font-mono">
+                          <div className="text-[10px] text-neutral-400 dark:text-[#A0A8B8] font-mono">
                             {sale.customer_mobile}
                           </div>
                         )}
@@ -694,22 +694,22 @@ export default function ProductsPage() {
                         <span className="font-bold text-[#D4A77F] block">
                           {sale.staff_name || 'Counter Sale'}
                         </span>
-                        <span className="text-[10px] text-neutral-400">
+                        <span className="text-[10px] text-neutral-400 dark:text-[#A0A8B8]">
                           {sale.product_commission_pct}% Rate
                         </span>
                       </td>
-                      <td className="py-3 px-4 font-black text-emerald-700">
+                      <td className="py-3 px-4 font-black text-emerald-700 dark:text-emerald-400">
                         ₹{Number(sale.staff_commission_earned || 0).toLocaleString('en-IN')}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-extrabold text-neutral-900 block">
+                        <span className="font-extrabold text-neutral-900 dark:text-white block">
                           ₹{Number(sale.total_price).toLocaleString('en-IN')}
                         </span>
-                        <span className="text-[9px] uppercase px-1.5 py-0.2 rounded-sm bg-neutral-100 text-neutral-600 font-bold">
+                        <span className="text-[9px] uppercase px-1.5 py-0.2 rounded-sm bg-neutral-100 dark:bg-[#1C2230] text-neutral-600 dark:text-neutral-300 font-bold">
                           {sale.payment_method}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right font-mono text-[11px] text-neutral-500">
+                      <td className="py-3 px-4 text-right font-mono text-[11px] text-neutral-500 dark:text-[#A0A8B8]">
                         #{sale.invoice_number}
                       </td>
                     </tr>
@@ -762,26 +762,26 @@ export default function ProductsPage() {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs text-left space-y-2">
+                <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-[#10141F] border border-neutral-100 dark:border-[#2A2F3A] text-xs text-left space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Total Billed:</span>
-                    <strong className="text-neutral-900">
+                    <span className="text-neutral-500 dark:text-neutral-400">Total Billed:</span>
+                    <strong className="text-neutral-900 dark:text-white">
                       ₹{saleSuccessInfo.invoice.total.toLocaleString('en-IN')}
                     </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Staff Credited:</span>
+                    <span className="text-neutral-500 dark:text-neutral-400">Staff Credited:</span>
                     <strong className="text-[#D4A77F]">{saleSuccessInfo.staff.name}</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Staff Commission Earned:</span>
-                    <strong className="text-emerald-700">
+                    <span className="text-neutral-500 dark:text-neutral-400">Staff Commission Earned:</span>
+                    <strong className="text-emerald-700 dark:text-emerald-400">
                       ₹{saleSuccessInfo.staff.commissionEarned} ({saleSuccessInfo.staff.commissionPct}%)
                     </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-neutral-500">Inventory Stock Remaining:</span>
-                    <strong className="text-neutral-800">
+                    <span className="text-neutral-500 dark:text-neutral-400">Inventory Stock Remaining:</span>
+                    <strong className="text-neutral-800 dark:text-neutral-200">
                       {saleSuccessInfo.product.remainingStock} units
                     </strong>
                   </div>
@@ -806,7 +806,7 @@ export default function ProductsPage() {
                       setSaleSuccessInfo(null);
                       setIsSellModalOpen(false);
                     }}
-                    className="w-full py-2.5 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-neutral-100 dark:bg-[#1C2230] hover:bg-neutral-200 dark:hover:bg-[#2A3445] text-neutral-800 dark:text-neutral-200 text-xs font-bold cursor-pointer"
                   >
                     Done / Close
                   </button>
@@ -816,14 +816,14 @@ export default function ProductsPage() {
               <form onSubmit={handleExecuteSell} className="space-y-4">
                 {/* 1. Select Product */}
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     Select Product <span className="text-[#D4A77F]">*</span>
                   </label>
                   <select
                     required
                     value={sellProductId}
                     onChange={(e) => setSellProductId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] focus:border-[#D4A77F] outline-none text-xs text-neutral-900 dark:text-white bg-white dark:bg-[#10141F]"
                   >
                     {products.map((p) => (
                       <option key={p.id} value={p.id} disabled={p.stock <= 0}>
@@ -836,7 +836,7 @@ export default function ProductsPage() {
                 {/* 2. Quantity & Staff Member */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                       Quantity <span className="text-[#D4A77F]">*</span>
                     </label>
                     <input
@@ -846,19 +846,19 @@ export default function ProductsPage() {
                       max={selectedProduct ? selectedProduct.stock : 99}
                       value={sellQty}
                       onChange={(e) => setSellQty(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] focus:border-[#D4A77F] outline-none text-xs text-neutral-900 dark:text-white bg-white dark:bg-[#10141F] font-mono"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                       Sold By (Staff) <span className="text-[#D4A77F]">*</span>
                     </label>
                     <select
                       required
                       value={sellStaffId}
                       onChange={(e) => setSellStaffId(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] focus:border-[#D4A77F] outline-none text-xs text-neutral-900 dark:text-white bg-white dark:bg-[#10141F]"
                     >
                       {staffList.map((st) => (
                         <option key={st.id} value={st.id}>
@@ -872,7 +872,7 @@ export default function ProductsPage() {
                 {/* 3. Customer Selection */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider">
                       Customer Info
                     </label>
                     <div className="flex items-center gap-2 text-[11px]">
@@ -880,19 +880,19 @@ export default function ProductsPage() {
                         type="button"
                         onClick={() => setCustomerSelectionType('new')}
                         className={`font-bold cursor-pointer ${
-                          customerSelectionType === 'new' ? 'text-[#D4A77F] underline' : 'text-neutral-400'
+                          customerSelectionType === 'new' ? 'text-[#D4A77F] underline' : 'text-neutral-400 dark:text-neutral-500'
                         }`}
                       >
                         + Walk-in Client
                       </button>
-                      <span>·</span>
+                      <span className="text-neutral-400 dark:text-neutral-600">·</span>
                       <button
                         type="button"
                         onClick={() => setCustomerSelectionType('existing')}
                         className={`font-bold cursor-pointer ${
                           customerSelectionType === 'existing'
                             ? 'text-[#D4A77F] underline'
-                            : 'text-neutral-400'
+                            : 'text-neutral-400 dark:text-neutral-500'
                         }`}
                       >
                         Existing Client
@@ -904,7 +904,7 @@ export default function ProductsPage() {
                     <select
                       value={sellCustomerId}
                       onChange={(e) => setSellCustomerId(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] focus:border-[#D4A77F] outline-none text-xs text-neutral-900 dark:text-white bg-white dark:bg-[#10141F]"
                     >
                       <option value="">-- Choose Existing Client --</option>
                       {customersList.map((c) => (
@@ -920,14 +920,14 @@ export default function ProductsPage() {
                         placeholder="Client Name"
                         value={sellCustomerName}
                         onChange={(e) => setSellCustomerName(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] focus:border-[#D4A77F] outline-none text-xs text-neutral-900 dark:text-white bg-white dark:bg-[#10141F] placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                       />
                       <input
                         type="tel"
                         placeholder="WhatsApp No. (for bill)"
                         value={sellCustomerMobile}
                         onChange={(e) => setSellCustomerMobile(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] focus:border-[#D4A77F] outline-none text-xs text-neutral-900 dark:text-white bg-white dark:bg-[#10141F] placeholder:text-neutral-400 dark:placeholder:text-neutral-500 font-mono"
                       />
                     </div>
                   )}
@@ -935,7 +935,7 @@ export default function ProductsPage() {
 
                 {/* 4. Payment Mode */}
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     Payment Mode
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -947,7 +947,7 @@ export default function ProductsPage() {
                         className={`py-2 px-3 rounded-xl border text-xs font-bold uppercase transition-all cursor-pointer ${
                           sellPaymentMethod === m
                             ? 'border-[#D4A77F] bg-[#D4A77F]/10 text-[#D4A77F]'
-                            : 'border-neutral-200 text-neutral-600'
+                            : 'border-neutral-200 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
                         }`}
                       >
                         {m}
@@ -957,29 +957,29 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Live Order Summary */}
-                <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200 text-xs space-y-1.5">
-                  <div className="flex justify-between font-bold text-neutral-900">
+                <div className="p-3.5 rounded-2xl bg-neutral-50 dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] text-xs space-y-1.5">
+                  <div className="flex justify-between font-bold text-neutral-900 dark:text-white">
                     <span>Retail Total (₹):</span>
                     <span className="text-sm font-black text-[#D4A77F]">
                       ₹{sellTotalPrice.toLocaleString('en-IN')}
                     </span>
                   </div>
-                  <div className="flex justify-between text-[11px] text-neutral-500">
+                  <div className="flex justify-between text-[11px] text-neutral-500 dark:text-neutral-400">
                     <span>
                       Staff Earns ({selectedStaff?.name || 'Staff'}{' '}
                       {selectedStaff?.product_commission_pct || 0}%):
                     </span>
-                    <strong className="text-emerald-700 font-mono">
+                    <strong className="text-emerald-700 dark:text-emerald-400 font-mono">
                       +₹{staffCommEarned.toFixed(2)}
                     </strong>
                   </div>
                 </div>
 
-                <div className="pt-2 flex items-center justify-end gap-3">
+                <div className="pt-2 flex items-center justify-end gap-3 border-t border-neutral-100 dark:border-[#2A2F3A]">
                   <button
                     type="button"
                     onClick={() => setIsSellModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-neutral-500 hover:bg-neutral-100 text-xs font-bold cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-[#1C2230] text-xs font-bold cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1017,7 +1017,7 @@ export default function ProductsPage() {
 
             <form onSubmit={handleSubmitProduct} className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 touch-scroll">
               <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                   Product Name <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
@@ -1026,13 +1026,13 @@ export default function ProductsPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="e.g. Moroccan Argan Hair Oil"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     Brand Name
                   </label>
                   <input
@@ -1040,11 +1040,11 @@ export default function ProductsPage() {
                     value={formBrand}
                     onChange={(e) => setFormBrand(e.target.value)}
                     placeholder="e.g. L'Oreal, Wella"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     SKU / Barcode
                   </label>
                   <input
@@ -1052,14 +1052,14 @@ export default function ProductsPage() {
                     value={formSku}
                     onChange={(e) => setFormSku(e.target.value)}
                     placeholder="e.g. OIL-001"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none font-mono"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     Selling Price (₹) <span className="text-[#D4A77F]">*</span>
                   </label>
                   <input
@@ -1069,11 +1069,11 @@ export default function ProductsPage() {
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
                     placeholder="999"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     Cost Price (₹)
                   </label>
                   <input
@@ -1082,14 +1082,14 @@ export default function ProductsPage() {
                     value={formCostPrice}
                     onChange={(e) => setFormCostPrice(e.target.value)}
                     placeholder="550"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none font-mono"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     Physical Stock Count <span className="text-[#D4A77F]">*</span>
                   </label>
                   <input
@@ -1099,11 +1099,11 @@ export default function ProductsPage() {
                     value={formStock}
                     onChange={(e) => setFormStock(e.target.value)}
                     placeholder="10"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none font-mono"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-1">
                     Low Stock Alert Limit
                   </label>
                   <input
@@ -1112,16 +1112,16 @@ export default function ProductsPage() {
                     value={formMinStock}
                     onChange={(e) => setFormMinStock(e.target.value)}
                     placeholder="5"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 focus:border-[#D4A77F] outline-none text-xs text-neutral-900 font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none font-mono"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-neutral-100 flex items-center justify-end gap-3">
+              <div className="pt-3 border-t border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-neutral-500 hover:bg-neutral-100 text-xs font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-[#1C2230] text-xs font-bold cursor-pointer"
                 >
                   Cancel
                 </button>

@@ -580,9 +580,9 @@ export default function CustomerPortalPage() {
               </div>
               <div className="min-w-0">
                 <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate">
-                  Salon<span className="text-[#D4A77F]">Pro</span>
+                  Salon<span className="text-[#8C5E2E] dark:text-[#D4A77F]">Pro</span>
                 </span>
-                <span className="text-[10px] text-[#D4A77F] font-bold block -mt-0.5 truncate">
+                <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
                   Client Portal
                 </span>
               </div>
@@ -788,7 +788,7 @@ export default function CustomerPortalPage() {
               <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate max-w-[140px] xs:max-w-xs sm:max-w-md">
                 {salon?.name || 'SalonPro'}
               </span>
-              <span className="text-[10px] text-[#D4A77F] font-bold block -mt-0.5 truncate">
+              <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
                 Customer Portal
               </span>
             </div>
@@ -964,7 +964,7 @@ export default function CustomerPortalPage() {
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30 flex flex-col items-center justify-center font-bold shrink-0">
+                            <div className="w-12 h-12 rounded-2xl bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30 flex flex-col items-center justify-center font-bold shrink-0">
                               <span className="text-[10px] uppercase">
                                 {new Date(appt.starts_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short' })}
                               </span>
@@ -978,7 +978,7 @@ export default function CustomerPortalPage() {
                                 Stylist: <span className="text-[#1F2937] dark:text-white font-semibold">{appt.staff_name}</span> ({appt.staff_role || 'Stylist'})
                               </div>
                               <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-[#6B7280] dark:text-[#A0A8B8]">
-                                <span className="flex items-center gap-1 text-[#D4A77F] font-medium">
+                                <span className="flex items-center gap-1 text-[#8C5E2E] dark:text-[#D4A77F] font-medium">
                                   <Clock className="w-3.5 h-3.5" />
                                   {new Date(appt.starts_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
                                 </span>
@@ -1291,13 +1291,13 @@ export default function CustomerPortalPage() {
                     className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 relative overflow-hidden shadow-xs"
                   >
                     <div className="flex justify-between items-start mb-3">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30">
                         {p.kind}
                       </span>
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                           p.is_active
-                            ? 'bg-[#10B981]/15 text-[#10B981]'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50'
                             : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'
                         }`}
                       >
@@ -1311,11 +1311,11 @@ export default function CustomerPortalPage() {
                       <div className="mt-3 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] space-y-1 text-xs">
                         <div className="flex justify-between text-[#6B7280] dark:text-[#A0A8B8]">
                           <span>Services Discount:</span>
-                          <span className="font-bold text-[#D4A77F]">{p.services_discount_pct}% OFF</span>
+                          <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F]">{p.services_discount_pct}% OFF</span>
                         </div>
                         <div className="flex justify-between text-[#6B7280] dark:text-[#A0A8B8]">
                           <span>Products Discount:</span>
-                          <span className="font-bold text-[#D4A77F]">{p.products_discount_pct}% OFF</span>
+                          <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F]">{p.products_discount_pct}% OFF</span>
                         </div>
                       </div>
                     )}
@@ -1860,12 +1860,12 @@ export default function CustomerPortalPage() {
       )}
 
       {/* Mobile Bottom Dock for Customer Portal */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] px-4 py-2 flex items-center justify-around shadow-2xl">
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] px-4 py-1.5 flex items-center justify-around shadow-2xl">
         <button
           type="button"
           onClick={() => handleSwitchTab('appointments')}
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'appointments' ? 'text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
+          className={`min-h-[44px] min-w-[44px] flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'appointments' ? 'text-[#8C5E2E] dark:text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
           }`}
         >
           <Calendar className="w-4 h-4" />
@@ -1875,8 +1875,8 @@ export default function CustomerPortalPage() {
         <button
           type="button"
           onClick={() => handleSwitchTab('bills')}
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'bills' ? 'text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
+          className={`min-h-[44px] min-w-[44px] flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'bills' ? 'text-[#8C5E2E] dark:text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
           }`}
         >
           <Receipt className="w-4 h-4" />
@@ -1886,8 +1886,8 @@ export default function CustomerPortalPage() {
         <button
           type="button"
           onClick={() => handleSwitchTab('memberships')}
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'memberships' ? 'text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
+          className={`min-h-[44px] min-w-[44px] flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'memberships' ? 'text-[#8C5E2E] dark:text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
           }`}
         >
           <Award className="w-4 h-4" />
@@ -1897,8 +1897,8 @@ export default function CustomerPortalPage() {
         <button
           type="button"
           onClick={() => handleSwitchTab('profile')}
-          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'profile' ? 'text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
+          className={`min-h-[44px] min-w-[44px] flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'profile' ? 'text-[#8C5E2E] dark:text-[#D4A77F] font-bold scale-105' : 'text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#1F2937] dark:hover:text-white'
           }`}
         >
           <User className="w-4 h-4" />
@@ -1908,7 +1908,7 @@ export default function CustomerPortalPage() {
         {salon?.slug && (
           <Link
             href={`/${salon.slug}`}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#D4A77F] text-[#080B12] rounded-xl text-xs font-bold shadow-md shadow-[#D4A77F]/30"
+            className="min-h-[44px] flex items-center gap-1.5 px-3 py-1.5 bg-[#D4A77F] text-[#080B12] rounded-xl text-xs font-bold shadow-md shadow-[#D4A77F]/30"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             <span>Book</span>

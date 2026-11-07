@@ -245,7 +245,7 @@ export default function MembershipsPage() {
               setFormValidity('365');
               setIsCreateModalOpen(true);
             }}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white border border-neutral-200 text-neutral-700 hover:text-neutral-900 text-xs font-bold shadow-sm transition-all whitespace-nowrap"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-neutral-700 dark:text-neutral-200 hover:text-neutral-900 dark:hover:text-white text-xs font-bold shadow-sm transition-all whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>New Plan</span>
@@ -258,27 +258,27 @@ export default function MembershipsPage() {
         <div
           className={`p-4 rounded-2xl text-xs sm:text-sm flex items-center gap-2 font-medium animate-fadeIn ${
             message.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-              : 'bg-rose-50 border border-rose-200 text-rose-800'
+              ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300'
+              : 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-800 dark:text-rose-300'
           }`}
         >
           {message.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-rose-600" />
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
           )}
           <span>{message.text}</span>
         </div>
       )}
 
       {/* Tabs Switcher */}
-      <div className="flex border-b border-neutral-200 overflow-x-auto no-scrollbar gap-1 sm:gap-2 pb-px touch-scroll">
+      <div className="flex border-b border-neutral-200 dark:border-[#2A2F3A] overflow-x-auto no-scrollbar gap-1 sm:gap-2 pb-px touch-scroll">
         <button
           onClick={() => setActiveTab('memberships')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'memberships'
-              ? 'border-[#D4A77F] text-[#D4A77F]'
-              : 'border-transparent text-neutral-400 hover:text-neutral-600'
+              ? 'border-[#D4A77F] text-[#8C5E2E] dark:text-[#D4A77F]'
+              : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
           }`}
         >
           <Award className="w-4 h-4" />
@@ -289,8 +289,8 @@ export default function MembershipsPage() {
           onClick={() => setActiveTab('packages')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'packages'
-              ? 'border-[#D4A77F] text-[#D4A77F]'
-              : 'border-transparent text-neutral-400 hover:text-neutral-600'
+              ? 'border-[#D4A77F] text-[#8C5E2E] dark:text-[#D4A77F]'
+              : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
           }`}
         >
           <Package className="w-4 h-4" />
@@ -301,8 +301,8 @@ export default function MembershipsPage() {
           onClick={() => setActiveTab('subscriptions')}
           className={`pb-2.5 sm:pb-3 px-3 sm:px-6 text-xs sm:text-sm font-bold border-b-2 transition-all flex items-center gap-2 shrink-0 whitespace-nowrap cursor-pointer ${
             activeTab === 'subscriptions'
-              ? 'border-[#D4A77F] text-[#D4A77F]'
-              : 'border-transparent text-neutral-400 hover:text-neutral-600'
+              ? 'border-[#D4A77F] text-[#8C5E2E] dark:text-[#D4A77F]'
+              : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -316,13 +316,13 @@ export default function MembershipsPage() {
           {membershipPlans.map((plan) => (
             <div
               key={plan.id}
-              className="bg-white rounded-3xl p-6 border border-neutral-200 shadow-sm flex flex-col justify-between hover:border-[#D4A77F]/40 transition-all relative overflow-hidden group"
+              className="bg-white dark:bg-[#141926] rounded-3xl p-6 border border-neutral-200 dark:border-[#2A2F3A] shadow-sm flex flex-col justify-between hover:border-[#D4A77F]/40 transition-all relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-pink-500/10 to-transparent rounded-bl-full pointer-events-none" />
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] uppercase font-extrabold tracking-wider bg-[#D4A77F]/10 text-[#D4A77F] px-3 py-1 rounded-full border border-[#D4A77F]/20">
+                  <span className="text-[10px] uppercase font-extrabold tracking-wider bg-[#D4A77F]/10 text-[#8C5E2E] dark:text-[#D4A77F] px-3 py-1 rounded-full border border-[#D4A77F]/20">
                     VIP Plan
                   </span>
                   <span className="text-xs text-neutral-400 flex items-center gap-1 font-medium">
@@ -333,18 +333,18 @@ export default function MembershipsPage() {
 
                 <h3 className="text-xl font-black text-[#1F2937] dark:text-white">{plan.name}</h3>
 
-                <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2.5 text-xs">
-                  <div className="flex items-center justify-between text-neutral-700">
+                <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between text-neutral-700 dark:text-neutral-300">
                     <span className="flex items-center gap-1.5 font-medium">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                       Services Discount:
                     </span>
-                    <span className="font-extrabold text-[#D4A77F] text-sm">
+                    <span className="font-extrabold text-[#8C5E2E] dark:text-[#D4A77F] text-sm">
                       {plan.services_discount_pct}% OFF
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-neutral-700">
+                  <div className="flex items-center justify-between text-neutral-700 dark:text-neutral-300">
                     <span className="flex items-center gap-1.5 font-medium">
                       <Gift className="w-3.5 h-3.5 text-purple-500" />
                       Products Discount:
@@ -382,11 +382,11 @@ export default function MembershipsPage() {
           {packagePlans.map((pkg) => (
             <div
               key={pkg.id}
-              className="bg-white rounded-3xl p-6 border border-neutral-200 shadow-sm flex flex-col justify-between hover:border-purple-400/40 transition-all relative overflow-hidden"
+              className="bg-white dark:bg-[#141926] rounded-3xl p-6 border border-neutral-200 dark:border-[#2A2F3A] shadow-sm flex flex-col justify-between hover:border-purple-400/40 transition-all relative overflow-hidden"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] uppercase font-extrabold tracking-wider bg-purple-50 text-purple-700 px-3 py-1 rounded-full border border-purple-100">
+                  <span className="text-[10px] uppercase font-extrabold tracking-wider bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full border border-purple-100 dark:border-purple-800/40">
                     Service Bundle
                   </span>
                   <span className="text-xs text-neutral-400 flex items-center gap-1 font-medium">
@@ -397,15 +397,15 @@ export default function MembershipsPage() {
 
                 <h3 className="text-xl font-black text-[#1F2937] dark:text-white">{pkg.name}</h3>
 
-                <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2">
+                <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] space-y-2">
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">
                     Included Treatments & Items
                   </span>
                   <div className="space-y-1.5">
                     {pkg.items?.map((it, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-xs bg-neutral-50 p-2 rounded-xl">
-                        <span className="font-semibold text-neutral-800">{it.name}</span>
-                        <span className="font-mono text-purple-700 font-bold bg-white px-2 py-0.5 rounded-lg border border-neutral-200">
+                      <div key={idx} className="flex justify-between items-center text-xs bg-neutral-50 dark:bg-[#10141F] p-2 rounded-xl border border-transparent dark:border-[#2A2F3A]">
+                        <span className="font-semibold text-neutral-800 dark:text-neutral-200">{it.name}</span>
+                        <span className="font-mono text-purple-700 dark:text-purple-300 font-bold bg-white dark:bg-[#141926] px-2 py-0.5 rounded-lg border border-neutral-200 dark:border-[#2A2F3A]">
                           {it.qty}x
                         </span>
                       </div>
@@ -414,7 +414,7 @@ export default function MembershipsPage() {
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between">
+              <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-between">
                 <div>
                   <span className="text-[10px] uppercase font-bold text-neutral-400 block">Package Price</span>
                   <span className="text-xl font-black text-[#1F2937] dark:text-white">
@@ -436,10 +436,10 @@ export default function MembershipsPage() {
 
       {/* ================= TAB 3: CUSTOMER SUBSCRIPTIONS ================= */}
       {activeTab === 'subscriptions' && (
-        <div className="bg-white rounded-3xl border border-neutral-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-500 uppercase tracking-wider font-bold">
+              <thead className="bg-neutral-50 dark:bg-[#10141F] border-b border-neutral-200 dark:border-[#2A2F3A] text-neutral-500 dark:text-neutral-400 uppercase tracking-wider font-bold">
                 <tr>
                   <th className="py-4 px-6">Customer</th>
                   <th className="py-4 px-4">Plan Name</th>
@@ -451,7 +451,7 @@ export default function MembershipsPage() {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-neutral-100 dark:divide-[#2A2F3A]">
                 {subscriptions.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-neutral-400">
@@ -460,36 +460,36 @@ export default function MembershipsPage() {
                   </tr>
                 ) : (
                   subscriptions.map((sub) => (
-                    <tr key={sub.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <tr key={sub.id} className="hover:bg-neutral-50/60 dark:hover:bg-[#1C2230] transition-colors">
                       <td className="py-4 px-6">
                         <div className="font-bold text-[#1F2937] dark:text-white text-sm">{sub.customer_name}</div>
                         <div className="text-[11px] text-neutral-400 font-mono">+91 {sub.customer_mobile}</div>
                       </td>
 
-                      <td className="py-4 px-4 font-bold text-neutral-800">
+                      <td className="py-4 px-4 font-bold text-neutral-800 dark:text-neutral-200">
                         {sub.plan_name}
                       </td>
 
                       <td className="py-4 px-4">
-                        <span className="capitalize font-semibold text-neutral-600">
+                        <span className="capitalize font-semibold text-neutral-600 dark:text-neutral-400">
                           {sub.kind}
                         </span>
                       </td>
 
                       <td className="py-4 px-4 text-center">
                         {sub.kind === 'membership' ? (
-                          <span className="text-[11px] font-bold text-[#D4A77F] bg-[#D4A77F]/10 px-2 py-1 rounded-lg border border-[#D4A77F]/20">
+                          <span className="text-[11px] font-bold text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/10 px-2 py-1 rounded-lg border border-[#D4A77F]/20">
                             {sub.services_discount_pct}% Svc / {sub.products_discount_pct}% Prod
                           </span>
                         ) : (
-                          <span className="text-[11px] text-neutral-500 font-medium">Bundled Services</span>
+                          <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">Bundled Services</span>
                         )}
                       </td>
 
-                      <td className="py-4 px-4 text-neutral-600">
+                      <td className="py-4 px-4 text-neutral-600 dark:text-neutral-400">
                         {new Date(sub.starts_on).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         {' → '}
-                        <span className="font-semibold text-neutral-800">
+                        <span className="font-semibold text-neutral-800 dark:text-neutral-200">
                           {new Date(sub.expires_on).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                       </td>
@@ -502,8 +502,8 @@ export default function MembershipsPage() {
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
                             sub.is_active
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-neutral-100 text-neutral-400'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50'
+                              : 'bg-neutral-100 dark:bg-[#10141F] text-neutral-500 dark:text-neutral-400'
                           }`}
                         >
                           {sub.is_active ? 'Active' : 'Expired'}

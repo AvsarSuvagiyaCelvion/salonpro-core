@@ -122,7 +122,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-tight truncate">
                   SalonPro Admin
                 </span>
-                <span className="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#D4A77F]/15 text-[#D4A77F] border border-[#D4A77F]/30 shrink-0">
+                <span className="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30 shrink-0">
                   Panel 1
                 </span>
               </div>
@@ -178,7 +178,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <span className="font-extrabold text-sm text-[#1F2937] dark:text-[#FFFFFF] block leading-tight">
                       SalonPro Admin
                     </span>
-                    <span className="text-[10px] text-[#D4A77F] font-bold bg-[#D4A77F]/15 px-1.5 py-0.5 rounded border border-[#D4A77F]/30">
+                    <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold bg-[#D4A77F]/15 px-1.5 py-0.5 rounded border border-[#D4A77F]/30">
                       Super Admin Panel
                     </span>
                   </div>
@@ -229,13 +229,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   href="/salon-owner"
                   target="_blank"
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-[#D4A77F] bg-[#D4A77F]/10 border border-[#D4A77F]/30 transition-all hover:bg-[#D4A77F]/20"
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/10 border border-[#D4A77F]/30 transition-all hover:bg-[#D4A77F]/20"
                 >
                   <span className="flex items-center gap-2">
                     <span>💇</span>
                     <span>Salon Owner ERP</span>
                   </span>
-                  <ExternalLink className="w-3 h-3 text-[#D4A77F]" />
+                  <ExternalLink className="w-3 h-3 text-[#8C5E2E] dark:text-[#D4A77F]" />
                 </Link>
                 <Link
                   href="/portal"
@@ -320,25 +320,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   href="/salon-owner"
                   target="_blank"
-                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-[#D4A77F] bg-[#D4A77F]/10 hover:bg-[#D4A77F]/20 transition-colors border border-[#D4A77F]/30"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/10 hover:bg-[#D4A77F]/20 transition-colors border border-[#D4A77F]/30"
                 >
                   <span className="flex items-center gap-2">
                     <span>💇</span>
                     <span>Salon Owner ERP</span>
                   </span>
-                  <ExternalLink className="w-3 h-3 text-[#D4A77F]" />
+                  <ExternalLink className="w-3 h-3 text-[#8C5E2E] dark:text-[#D4A77F]" />
                 </Link>
 
                 <Link
                   href="/portal"
                   target="_blank"
-                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-[#10B981] bg-[#10B981]/10 hover:bg-[#10B981]/20 transition-colors border border-[#10B981]/30"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors border border-emerald-200 dark:border-emerald-800/40"
                 >
                   <span className="flex items-center gap-2">
                     <span>📱</span>
                     <span>Customer Portal</span>
                   </span>
-                  <ExternalLink className="w-3 h-3 text-[#10B981]" />
+                  <ExternalLink className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />
                 </Link>
               </div>
             </div>

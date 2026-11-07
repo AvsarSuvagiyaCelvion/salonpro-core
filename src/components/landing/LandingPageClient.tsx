@@ -115,7 +115,7 @@ export default function LandingPageClient() {
               <Link
                 href="/dixa-beauty-salon"
                 target="_blank"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#10B981] hover:bg-[#059669] text-white font-sans font-semibold text-[15px] tracking-normal shadow-md shadow-[#10B981]/20 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-sans font-semibold text-[15px] tracking-normal shadow-md shadow-emerald-950/20 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
                 <span>⚡ Live Booking Demo</span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">Client</span>

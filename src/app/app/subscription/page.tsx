@@ -265,13 +265,13 @@ export default function SalonSubscriptionPage() {
       {/* Verifying Payment Fullscreen Spinner */}
       {verifyingPayment && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-neutral-100">
+          <div className="bg-white dark:bg-[#141926] rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl border border-neutral-100 dark:border-[#2A2F3A]">
             <div className="w-16 h-16 border-4 border-[#D4A77F] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <h3 className="text-lg font-black text-neutral-900 mb-1">Verifying Payment...</h3>
-            <p className="text-xs text-neutral-500 mb-2">
+            <h3 className="text-lg font-black text-neutral-900 dark:text-white mb-1">Verifying Payment...</h3>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">
               Confirming transaction with Razorpay and unlocking all your plan facilities.
             </p>
-            <div className="text-[11px] font-bold text-[#D4A77F] bg-[#D4A77F]/10 py-1 px-3 rounded-full inline-block">
+            <div className="text-[11px] font-bold text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/10 py-1 px-3 rounded-full inline-block">
               Please do not refresh this window
             </div>
           </div>
@@ -281,33 +281,33 @@ export default function SalonSubscriptionPage() {
       {/* Payment Success Celebration Modal with Unlocked Facilities & 30-Day Validity */}
       {celebrationData && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl border border-neutral-100 relative overflow-hidden">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+          <div className="bg-white dark:bg-[#141926] rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl border border-neutral-100 dark:border-[#2A2F3A] relative overflow-hidden">
+            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-300 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
               <CheckCircle2 className="w-10 h-10" />
             </div>
 
-            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
+            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
               Payment Successful
             </span>
 
-            <h3 className="text-2xl font-black text-neutral-900 mt-2">
+            <h3 className="text-2xl font-black text-neutral-900 dark:text-white mt-2">
               Welcome to {celebrationData.plan?.name || 'Pro'} Plan!
             </h3>
 
             {/* Exact Validity Date Badge */}
-            <div className="mt-3 p-3.5 bg-gradient-to-r from-emerald-50 via-pink-50 to-purple-50 rounded-2xl border border-emerald-200/80 text-left">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-1">
-                <span className="flex items-center gap-1.5 text-emerald-700">
+            <div className="mt-3 p-3.5 bg-gradient-to-r from-emerald-50 via-pink-50 to-purple-50 dark:from-emerald-950/40 dark:via-pink-950/20 dark:to-purple-950/40 rounded-2xl border border-emerald-200/80 dark:border-emerald-800/40 text-left">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
+                <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
                   <Calendar className="w-4 h-4" />
                   <span>Subscription Validity:</span>
                 </span>
-                <span className="text-emerald-900 font-black">
+                <span className="text-emerald-900 dark:text-emerald-200 font-black">
                   {celebrationData.plan?.billingInterval === 'yearly' ? 'Full 365 Days Access' : 'Full 30 Days Access'}
                 </span>
               </div>
-              <div className="text-xs text-slate-600 font-semibold">
+              <div className="text-xs text-slate-600 dark:text-slate-300 font-semibold">
                 Active & valid till:{' '}
-                <strong className="text-slate-900 font-bold">
+                <strong className="text-slate-900 dark:text-white font-bold">
                   {new Date(celebrationData.subscriptionEndsAt).toLocaleDateString('en-IN', {
                     day: 'numeric',
                     month: 'long',
@@ -330,9 +330,9 @@ export default function SalonSubscriptionPage() {
               </div>
 
               <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                  <Check className="w-4 h-4 text-emerald-600 shrink-0 font-black" />
-                  <span className="font-bold text-slate-800">
+                <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-[#10141F] border border-slate-100 dark:border-[#2A2F3A] text-xs">
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 font-black" />
+                  <span className="font-bold text-slate-800 dark:text-slate-200">
                     Stylists Capacity: {celebrationData.plan?.limits?.max_staff === 0 ? 'Unlimited Staff' : `Up to ${celebrationData.plan?.limits?.max_staff || 10} Staff Members`}
                   </span>
                 </div>
@@ -466,20 +466,20 @@ export default function SalonSubscriptionPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Staff Limit */}
-          <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-xs">
+          <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/90 dark:border-[#2A2F3A] p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/10 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center">
                   <Users className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold text-slate-700">Stylists & Staff</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Stylists & Staff</span>
               </div>
-              <span className="text-xs font-black text-slate-900">
+              <span className="text-xs font-black text-slate-900 dark:text-white">
                 {usage.staffCount} / {staffUnlimited ? '∞' : usage.maxStaff}
               </span>
             </div>
 
-            <div className="w-full bg-slate-100 rounded-full h-2.5 my-2.5 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 my-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full transition-all duration-300 ${
                   staffUnlimited ? 'bg-[#D4A77F]/100' : staffPct >= 90 ? 'bg-amber-500' : 'bg-[#D4A77F]'
@@ -488,27 +488,27 @@ export default function SalonSubscriptionPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-1">
               <span>{staffUnlimited ? 'Unlimited stylists allowed' : `${Math.max(0, usage.maxStaff - usage.staffCount)} slots remaining`}</span>
               <span className="font-bold">{staffUnlimited ? 'Unlimited' : `${staffPct}%`}</span>
             </div>
           </div>
 
           {/* Services Catalog Limit */}
-          <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-xs">
+          <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/90 dark:border-[#2A2F3A] p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 flex items-center justify-center">
                   <Scissors className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold text-slate-700">Services Catalog</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Services Catalog</span>
               </div>
-              <span className="text-xs font-black text-slate-900">
+              <span className="text-xs font-black text-slate-900 dark:text-white">
                 {usage.servicesCount} / {servicesUnlimited ? '∞' : usage.maxServices}
               </span>
             </div>
 
-            <div className="w-full bg-slate-100 rounded-full h-2.5 my-2.5 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 my-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full transition-all duration-300 ${
                   servicesUnlimited ? 'bg-purple-500' : servicesPct >= 90 ? 'bg-amber-500' : 'bg-purple-600'
@@ -517,27 +517,27 @@ export default function SalonSubscriptionPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-1">
               <span>{servicesUnlimited ? 'Unlimited catalog size' : `${Math.max(0, usage.maxServices - usage.servicesCount)} services remaining`}</span>
               <span className="font-bold">{servicesUnlimited ? 'Unlimited' : `${servicesPct}%`}</span>
             </div>
           </div>
 
           {/* WhatsApp Invoices Limit */}
-          <div className="bg-white rounded-3xl border border-neutral-200/90 p-5 shadow-xs">
+          <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/90 dark:border-[#2A2F3A] p-5 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
                   <MessageSquare className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold text-slate-700">WhatsApp This Month</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">WhatsApp This Month</span>
               </div>
-              <span className="text-xs font-black text-slate-900">
+              <span className="text-xs font-black text-slate-900 dark:text-white">
                 {waCount} / {waUnlimited ? '∞' : waLimit}
               </span>
             </div>
 
-            <div className="w-full bg-slate-100 rounded-full h-2.5 my-2.5 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 my-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full transition-all duration-300 ${
                   waUnlimited ? 'bg-emerald-500' : waLimit === 0 ? 'bg-slate-300' : waPct >= 90 ? 'bg-amber-500' : 'bg-emerald-600'
@@ -546,7 +546,7 @@ export default function SalonSubscriptionPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-1">
               <span>
                 {waLimit === 0 && !waUnlimited
                   ? 'No WhatsApp included (Upgrade to Pro)'
@@ -567,21 +567,21 @@ export default function SalonSubscriptionPage() {
             <h3 className="text-xl font-black text-[#1F2937] dark:text-white">
               Explore Subscription Plans
             </h3>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
               Upgrade anytime with instant Razorpay checkout (UPI, QR Code, Cards & Netbanking).
             </p>
           </div>
 
           {/* Monthly / Yearly Toggle */}
-          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-xs self-start sm:self-auto">
-            <span className={`text-xs font-bold ${interval === 'monthly' ? 'text-slate-900' : 'text-slate-500'}`}>
+          <div className="flex items-center gap-3 bg-white dark:bg-[#141926] px-4 py-2 rounded-2xl border border-slate-200 dark:border-[#2A2F3A] shadow-xs self-start sm:self-auto">
+            <span className={`text-xs font-bold ${interval === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
               Monthly
             </span>
             <button
               type="button"
               onClick={() => setInterval(interval === 'monthly' ? 'yearly' : 'monthly')}
-              className="w-12 h-6 bg-slate-200 rounded-full p-0.5 transition-colors relative cursor-pointer"
-              style={{ backgroundColor: interval === 'yearly' ? '#D4A77F' : '#cbd5e1' }}
+              className="w-12 h-6 bg-slate-200 dark:bg-slate-700 rounded-full p-0.5 transition-colors relative cursor-pointer"
+              style={{ backgroundColor: interval === 'yearly' ? '#D4A77F' : undefined }}
             >
               <div
                 className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
@@ -590,10 +590,10 @@ export default function SalonSubscriptionPage() {
               />
             </button>
             <div className="flex items-center gap-1.5">
-              <span className={`text-xs font-bold ${interval === 'yearly' ? 'text-[#D4A77F]' : 'text-slate-500'}`}>
+              <span className={`text-xs font-bold ${interval === 'yearly' ? 'text-[#8C5E2E] dark:text-[#D4A77F]' : 'text-slate-500 dark:text-slate-400'}`}>
                 Yearly
               </span>
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
                 Save 2 Months
               </span>
             </div>
@@ -611,12 +611,12 @@ export default function SalonSubscriptionPage() {
             return (
               <div
                 key={plan.id}
-                className={`relative bg-white rounded-3xl p-6 sm:p-7 border transition-all flex flex-col justify-between ${
+                className={`relative bg-white dark:bg-[#141926] rounded-3xl p-6 sm:p-7 border transition-all flex flex-col justify-between ${
                   isCurrent && isActivePaid
                     ? 'border-emerald-500 shadow-md ring-2 ring-emerald-500/20'
                     : isPopular
                     ? 'border-[#D4A77F] shadow-xl ring-2 ring-pink-500/20'
-                    : 'border-neutral-200 shadow-xs hover:border-neutral-300'
+                    : 'border-neutral-200 dark:border-[#2A2F3A] shadow-xs hover:border-neutral-300 dark:hover:border-neutral-600'
                 }`}
               >
                 {/* Popular / Current Badges */}
@@ -627,7 +627,7 @@ export default function SalonSubscriptionPage() {
                 )}
                 {!isCurrent && isPopular && (
                   <div className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4A77F] text-[#080B12] font-bold shadow-xs flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" />
+                    <Sparkles className="w-3.5 h-3.5" />
                     Most Popular
                   </div>
                 )}
@@ -636,12 +636,12 @@ export default function SalonSubscriptionPage() {
                   <div className="text-xs font-bold uppercase tracking-wider text-neutral-400">
                     {plan.name} Tier
                   </div>
-                  <h4 className="text-2xl font-black text-slate-900 mt-1">{plan.name}</h4>
-                  <p className="text-xs text-neutral-500 mt-1 min-h-[32px]">{plan.description}</p>
+                  <h4 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{plan.name}</h4>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 min-h-[32px]">{plan.description}</p>
 
-                  <div className="my-5 pb-5 border-b border-neutral-100">
+                  <div className="my-5 pb-5 border-b border-neutral-100 dark:border-[#2A2F3A]">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-slate-900">
+                      <span className="text-3xl font-black text-slate-900 dark:text-white">
                         ₹{Number(price).toLocaleString('en-IN')}
                       </span>
                       <span className="text-xs font-bold text-neutral-400">
@@ -649,7 +649,7 @@ export default function SalonSubscriptionPage() {
                       </span>
                     </div>
                     {interval === 'yearly' && (
-                      <div className="text-[11px] text-emerald-600 font-bold mt-1">
+                      <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">
                         Equivalent to ₹{Math.round(price / 12).toLocaleString('en-IN')}/month
                       </div>
                     )}
@@ -657,20 +657,20 @@ export default function SalonSubscriptionPage() {
 
                   {/* Limits bullets */}
                   <div className="space-y-2 mb-5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                      <Users className="w-4 h-4 text-[#D4A77F] shrink-0" />
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <Users className="w-4 h-4 text-[#8C5E2E] dark:text-[#D4A77F] shrink-0" />
                       <span>
                         {plan.limits?.max_staff === 0 ? 'Unlimited Staff' : `Up to ${plan.limits?.max_staff || 3} Staff Members`}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                      <Scissors className="w-4 h-4 text-[#D4A77F] shrink-0" />
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <Scissors className="w-4 h-4 text-[#8C5E2E] dark:text-[#D4A77F] shrink-0" />
                       <span>
                         {plan.limits?.max_services === 0 ? 'Unlimited Services' : `Up to ${plan.limits?.max_services || 30} Services`}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-                      <MessageSquare className="w-4 h-4 text-[#D4A77F] shrink-0" />
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <MessageSquare className="w-4 h-4 text-[#8C5E2E] dark:text-[#D4A77F] shrink-0" />
                       <span>
                         {(plan.limits?.wa_per_month || 0) === 0 ? '0 WhatsApp Invoices' : `${plan.limits.wa_per_month} WhatsApp/mo`}
                       </span>
@@ -678,10 +678,10 @@ export default function SalonSubscriptionPage() {
                   </div>
 
                   {/* Feature Checklist */}
-                  <div className="space-y-2 border-t border-neutral-100 pt-4">
+                  <div className="space-y-2 border-t border-neutral-100 dark:border-[#2A2F3A] pt-4">
                     {(Array.isArray(plan.features) ? plan.features : []).map((feat: string, i: number) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-neutral-600">
-                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                      <div key={i} className="flex items-start gap-2 text-xs text-neutral-600 dark:text-neutral-300">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </div>
                     ))}
@@ -694,7 +694,7 @@ export default function SalonSubscriptionPage() {
                   disabled={Boolean(activatingPlanId) || (isCurrent && isActivePaid)}
                   className={`w-full mt-6 py-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer ${
                     isCurrent && isActivePaid
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-not-allowed'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 cursor-not-allowed'
                       : isThisActivating
                       ? 'bg-neutral-800 text-white cursor-wait opacity-80'
                       : isPopular
@@ -724,12 +724,12 @@ export default function SalonSubscriptionPage() {
         </div>
 
         {/* 4. Detailed Feature Comparison Matrix */}
-        <div className="bg-white rounded-3xl border border-neutral-200/90 overflow-hidden shadow-xs mb-8">
-          <div className="p-5 bg-slate-50 border-b border-slate-200">
-            <h4 className="font-extrabold text-sm text-slate-900">
+        <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/90 dark:border-[#2A2F3A] overflow-hidden shadow-xs mb-8">
+          <div className="p-5 bg-slate-50 dark:bg-[#10141F] border-b border-slate-200 dark:border-[#2A2F3A]">
+            <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
               Detailed Plan Feature Matrix
             </h4>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Side-by-side comparison of limits and server-side feature access
             </p>
           </div>
@@ -737,8 +737,8 @@ export default function SalonSubscriptionPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/50">
-                  <th className="py-3 px-4 font-bold text-slate-700">Capabilities</th>
+                <tr className="border-b border-slate-200 dark:border-[#2A2F3A] bg-slate-50/50 dark:bg-[#10141F]">
+                  <th className="py-3 px-4 font-bold text-slate-700 dark:text-slate-300">Capabilities</th>
                   {plans.map((p) => {
                     const price =
                       interval === 'yearly'
@@ -749,7 +749,7 @@ export default function SalonSubscriptionPage() {
                       <th
                         key={p.id}
                         className={`py-3 px-4 font-black text-center ${
-                          isPopular ? 'text-[#D4A77F] bg-[#D4A77F]/15' : 'text-slate-900'
+                          isPopular ? 'text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/15' : 'text-slate-900 dark:text-white'
                         }`}
                       >
                         {p.name} (₹{price.toLocaleString('en-IN')})
@@ -758,35 +758,35 @@ export default function SalonSubscriptionPage() {
                   })}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-[#2A2F3A]">
                 <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Stylists & Staff Capacity</td>
+                  <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">Stylists & Staff Capacity</td>
                   {plans.map((p) => {
                     const lim = p.limits?.max_staff ?? p.max_staff ?? 3;
                     return (
-                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700">
+                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700 dark:text-slate-300">
                         {lim === 0 ? 'Unlimited' : `Up to ${lim}`}
                       </td>
                     );
                   })}
                 </tr>
                 <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">Services Catalog Limit</td>
+                  <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">Services Catalog Limit</td>
                   {plans.map((p) => {
                     const lim = p.limits?.max_services ?? 30;
                     return (
-                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700">
+                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700 dark:text-slate-300">
                         {lim === 0 ? 'Unlimited' : `Up to ${lim}`}
                       </td>
                     );
                   })}
                 </tr>
                 <tr>
-                  <td className="py-3 px-4 font-semibold text-slate-800">WhatsApp Digital Invoices</td>
+                  <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">WhatsApp Digital Invoices</td>
                   {plans.map((p) => {
                     const wa = p.limits?.wa_per_month ?? 0;
                     return (
-                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700">
+                      <td key={p.id} className="py-3 px-4 text-center font-bold text-slate-700 dark:text-slate-300">
                         {wa === 0 ? '0 / month' : `${wa.toLocaleString('en-IN')} / month`}
                       </td>
                     );
@@ -805,13 +805,13 @@ export default function SalonSubscriptionPage() {
                   { label: 'Dedicated Priority Support', key: 'priority_support' },
                 ].map((feat) => (
                   <tr key={feat.key}>
-                    <td className="py-3 px-4 font-semibold text-slate-800">{feat.label}</td>
+                    <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">{feat.label}</td>
                     {plans.map((p) => {
                       const enabled = Boolean(p.flags?.[feat.key]);
                       return (
                         <td key={p.id} className="py-3 px-4 text-center font-bold">
                           {enabled ? (
-                            <span className="text-emerald-600 font-black">✅ Included</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-black">✅ Included</span>
                           ) : (
                             <span className="text-slate-400">❌</span>
                           )}
@@ -826,14 +826,14 @@ export default function SalonSubscriptionPage() {
         </div>
 
         {/* 5. Recent Subscription Invoices & Payment Receipts */}
-        <div className="bg-white rounded-3xl border border-neutral-200/90 overflow-hidden shadow-xs">
-          <div className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200/90 dark:border-[#2A2F3A] overflow-hidden shadow-xs">
+          <div className="p-5 bg-slate-50 dark:bg-[#10141F] border-b border-slate-200 dark:border-[#2A2F3A] flex items-center justify-between">
             <div>
-              <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-[#D4A77F]" />
+              <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-[#8C5E2E] dark:text-[#D4A77F]" />
                 <span>Subscription Payment Invoices & Receipts</span>
               </h4>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Official transaction history with verified Razorpay payment IDs
               </p>
             </div>
@@ -850,7 +850,7 @@ export default function SalonSubscriptionPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50/50 text-slate-600">
+                  <tr className="border-b border-slate-200 dark:border-[#2A2F3A] bg-slate-50/50 dark:bg-[#10141F] text-slate-600 dark:text-slate-400">
                     <th className="py-3 px-4 font-bold">Date & Time</th>
                     <th className="py-3 px-4 font-bold">Plan Tier</th>
                     <th className="py-3 px-4 font-bold">Billing Interval</th>
@@ -859,10 +859,10 @@ export default function SalonSubscriptionPage() {
                     <th className="py-3 px-4 font-bold text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-[#2A2F3A]">
                   {pastPayments.map((pay) => (
-                    <tr key={pay.id} className="hover:bg-slate-50/50">
-                      <td className="py-3 px-4 text-slate-700 font-medium">
+                    <tr key={pay.id} className="hover:bg-slate-50/50 dark:hover:bg-[#1C2230]">
+                      <td className="py-3 px-4 text-slate-700 dark:text-slate-300 font-medium">
                         {new Date(pay.created_at).toLocaleDateString('en-IN', {
                           day: 'numeric',
                           month: 'short',
@@ -871,24 +871,24 @@ export default function SalonSubscriptionPage() {
                           minute: '2-digit',
                         })}
                       </td>
-                      <td className="py-3 px-4 font-bold text-slate-900">{pay.plan_name}</td>
-                      <td className="py-3 px-4 text-slate-600 uppercase font-semibold text-[10px]">
+                      <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">{pay.plan_name}</td>
+                      <td className="py-3 px-4 text-slate-600 dark:text-slate-400 uppercase font-semibold text-[10px]">
                         {pay.billing_interval}
                       </td>
-                      <td className="py-3 px-4 font-black text-slate-900">
+                      <td className="py-3 px-4 font-black text-slate-900 dark:text-white">
                         ₹{Number(pay.amount).toLocaleString('en-IN')}
                       </td>
-                      <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
+                      <td className="py-3 px-4 font-mono text-[11px] text-slate-600 dark:text-slate-400">
                         {pay.razorpay_payment_id || pay.razorpay_order_id || '—'}
                       </td>
                       <td className="py-3 px-4 text-center">
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                             pay.status === 'captured'
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50'
                               : pay.status === 'failed'
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-amber-100 text-amber-800'
+                              ? 'bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/50'
+                              : 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50'
                           }`}
                         >
                           {pay.status === 'captured' ? 'PAID' : pay.status}

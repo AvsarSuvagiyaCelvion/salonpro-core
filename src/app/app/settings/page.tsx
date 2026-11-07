@@ -873,7 +873,7 @@ export default function SettingsPage() {
                 <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-[#2A2F3A] space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-neutral-500 dark:text-neutral-400">Generated Invoice Format:</span>
-                    <span className="font-mono font-black text-sm text-[#D4A77F] px-2.5 py-0.5 rounded-lg bg-[#D4A77F]/10 border border-[#D4A77F]/30">
+                    <span className="font-mono font-black text-sm text-[#8C5E2E] dark:text-[#D4A77F] px-2.5 py-0.5 rounded-lg bg-[#D4A77F]/10 border border-[#D4A77F]/30">
                       {invoicePrefix.trim()
                         ? `${invoicePrefix.trim()}-${new Date().getFullYear()}-0001`
                         : `${

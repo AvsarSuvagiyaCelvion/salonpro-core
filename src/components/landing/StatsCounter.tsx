@@ -107,10 +107,10 @@ function CounterCard({ item }: { item: StatItem }) {
     >
       {/* Top micro badge */}
       <div className="flex items-center justify-between mb-1.5 sm:mb-3">
-        <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#D4A77F] flex items-center justify-center transition-transform group-hover:scale-110">
-          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D4A77F]" />
+        <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center transition-transform group-hover:scale-110">
+          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#8C5E2E] dark:text-[#D4A77F]" />
         </span>
-        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#10B981] animate-ping" />
+        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-ping" />
       </div>
 
       {/* Counter value */}
@@ -118,7 +118,7 @@ function CounterCard({ item }: { item: StatItem }) {
         <div className="text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-[#1F2937] dark:text-[#FFFFFF] flex items-baseline justify-center sm:justify-start gap-0.5">
           <span>{item.prefix || ''}</span>
           <span className="tabular-nums">{count}</span>
-          <span className="text-base sm:text-2xl lg:text-3xl font-extrabold text-[#D4A77F]">{item.suffix || ''}</span>
+          <span className="text-base sm:text-2xl lg:text-3xl font-extrabold text-[#8C5E2E] dark:text-[#D4A77F]">{item.suffix || ''}</span>
         </div>
       </div>
 

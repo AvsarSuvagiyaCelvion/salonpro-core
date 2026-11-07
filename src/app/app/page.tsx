@@ -259,7 +259,7 @@ export default function DashboardPage() {
               `₹${data?.totalRevenue.toLocaleString('en-IN')}`
             )}
           </div>
-          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#10B981] font-semibold flex items-center gap-1">
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
             <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span className="truncate">Verified payments</span>
           </div>
@@ -315,7 +315,7 @@ export default function DashboardPage() {
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
               Stylists
             </span>
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#10B981] flex items-center justify-center">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
               <UserCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
@@ -326,8 +326,8 @@ export default function DashboardPage() {
               data?.activeStaff
             )}
           </div>
-          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#10B981] font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse shrink-0" />
+          <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse shrink-0" />
             <span className="truncate">Available for booking</span>
           </div>
         </div>
@@ -458,7 +458,7 @@ export default function DashboardPage() {
 
           <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] flex items-center justify-between text-xs text-[#6B7280] dark:text-[#A0A8B8]">
             <span>Peak slot: <strong className="text-[#1F2937] dark:text-[#FFFFFF]">5 PM - 6 PM</strong></span>
-            <span className="text-[#10B981] font-bold">Highest density</span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-bold">Highest density</span>
           </div>
         </div>
 
@@ -474,8 +474,8 @@ export default function DashboardPage() {
               {/* Paid Invoices */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
-                  <span className="text-[#10B981] flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+                  <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 dark:bg-emerald-400" />
                     Fully Paid Invoices
                   </span>
                   <span className="font-bold text-[#1F2937] dark:text-[#FFFFFF]">{data?.paymentStatusCounts.paid || 0}</span>
@@ -494,7 +494,7 @@ export default function DashboardPage() {
                         100
                       }%`,
                     }}
-                    className="h-full bg-[#10B981] rounded-full transition-all"
+                    className="h-full bg-emerald-600 dark:bg-emerald-400 rounded-full transition-all"
                   />
                 </div>
               </div>
@@ -636,7 +636,7 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             {!data?.lowStockProducts || data.lowStockProducts.length === 0 ? (
-              <div className="text-xs text-[#10B981] font-medium py-6 text-center bg-[#10B981]/10 rounded-2xl border border-[#10B981]/20">
+              <div className="text-xs text-emerald-700 dark:text-emerald-300 font-medium py-6 text-center bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/40">
                 ✓ All retail product stocks are healthy!
               </div>
             ) : (

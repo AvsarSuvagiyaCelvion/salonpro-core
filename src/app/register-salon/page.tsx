@@ -409,9 +409,9 @@ export default function RegisterSalonPage() {
               <div className="pt-2">
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-xs font-bold text-[#1F2937] dark:text-white uppercase tracking-wider">
-                    Select Your Plan or Trial <span className="text-[#D4A77F]">*</span>
+                    Select Your Plan or Trial <span className="text-[#8C5E2E] dark:text-[#D4A77F]">*</span>
                   </label>
-                  <span className="text-[11px] text-[#D4A77F] font-bold">Instant activation</span>
+                  <span className="text-[11px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold">Instant activation</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
@@ -488,11 +488,11 @@ export default function RegisterSalonPage() {
                 />
                 <label htmlFor="terms-checkbox" className="text-xs text-[#6B7280] dark:text-[#A0A8B8] leading-tight cursor-pointer">
                   I agree to the{' '}
-                  <Link href="/terms" target="_blank" className="font-bold text-[#D4A77F] hover:underline">
+                  <Link href="/terms" target="_blank" className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] hover:underline">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link href="/privacy" target="_blank" className="font-bold text-[#D4A77F] hover:underline">
+                  <Link href="/privacy" target="_blank" className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] hover:underline">
                     Privacy Policy
                   </Link>
                   .
@@ -519,7 +519,7 @@ export default function RegisterSalonPage() {
                 </p>
                 <Link
                   href="/salon-owner"
-                  className="block mt-1 font-bold text-[#D4A77F] hover:underline text-xs"
+                  className="block mt-1 font-bold text-[#8C5E2E] dark:text-[#D4A77F] hover:underline text-xs"
                 >
                   Sign in to your dashboard ➔
                 </Link>

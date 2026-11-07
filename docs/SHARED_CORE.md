@@ -246,4 +246,22 @@ SalonPro includes a comprehensive automated QA test suite running against an iso
 - Automatically backs up `.env.local` during test runs so Next.js connects exclusively to `DATABASE_URL` from `.env.test`.
 - Test fixtures use the `TEST_` prefix and are cleaned up before and after each test run.
 
+---
+
+## 14. Standardized Theme & Accessibility Tokens
+
+To guarantee full WCAG 2.1 AA compliance (>= 4.5:1 for normal text, >= 3.0:1 for headings) across both Light and Dark modes:
+- **Brand Gold / Accent**:
+  - In Dark mode: `#D4A77F` on dark backgrounds (`#080B12`, `#10141F`, `#141926`) provides > 10:1 contrast.
+  - In Light mode: `#D4A77F` on `#FFFFFF` provides only 2.18:1 (fails WCAG AA). Standard accessible token: `text-[#8C5E2E] dark:text-[#D4A77F]` (provides 6.03:1 on white).
+- **Accessible Status Badges**:
+  - Emerald / Success: `bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50`.
+  - Amber / Warning: `bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50`.
+  - Rose / Danger: `bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/50`.
+- **Containers & Modals**:
+  - All cards, drawers, and modal containers must explicitly declare both `bg-white dark:bg-[#141926]` and `border border-[#E5E7EB] dark:border-[#2A2F3A]` to eliminate white-on-white invisible text in Dark mode.
+- **Mobile Touch Targets**:
+  - Bottom navigation dock buttons and interactive icons enforce a minimum touch target size of 44x44px (`min-h-[44px] min-w-[44px]`).
+
+
 

@@ -386,13 +386,13 @@ export default function AdminPlansPage() {
 
       {/* Plans Grid */}
       {loading ? (
-        <div className="text-center py-16 bg-white rounded-3xl border border-slate-200">
+        <div className="text-center py-16 bg-white dark:bg-[#141926] rounded-3xl border border-slate-200 dark:border-[#2A2F3A]">
           <div className="w-10 h-10 border-4 border-[#D4A77F] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <p className="text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8]">Loading subscription plans...</p>
         </div>
       ) : plans.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-3xl border border-slate-200">
-          <CreditCard className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+        <div className="text-center py-16 bg-white dark:bg-[#141926] rounded-3xl border border-slate-200 dark:border-[#2A2F3A]">
+          <CreditCard className="w-12 h-12 text-slate-300 dark:text-neutral-600 mx-auto mb-3" />
           <h3 className="text-base font-bold text-[#1F2937] dark:text-[#FFFFFF]">No subscription plans configured</h3>
           <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1">Create your first plan to start charging salons.</p>
         </div>
@@ -407,18 +407,18 @@ export default function AdminPlansPage() {
             return (
               <div
                 key={plan.id}
-                className={`bg-white rounded-3xl border-2 transition-all p-6 flex flex-col justify-between shadow-xs ${
+                className={`bg-white dark:bg-[#141926] rounded-3xl border-2 transition-all p-6 flex flex-col justify-between shadow-xs ${
                   plan.is_popular
-                    ? 'border-[#D4A77F] ring-4 ring-pink-50 shadow-md'
-                    : 'border-slate-200'
-                } ${!plan.is_active ? 'opacity-60 bg-slate-50' : ''}`}
+                    ? 'border-[#D4A77F] ring-4 ring-pink-50 dark:ring-pink-950/30 shadow-md'
+                    : 'border-slate-200 dark:border-[#2A2F3A]'
+                } ${!plan.is_active ? 'opacity-60 bg-slate-50 dark:bg-[#10141F]' : ''}`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <h3 className="font-black text-lg text-[#1F2937] dark:text-[#FFFFFF]">{plan.name}</h3>
                       {plan.is_popular && (
-                        <span className="px-2 py-0.5 rounded-full bg-pink-100 text-[#D4A77F] text-[10px] font-black uppercase">
+                        <span className="px-2 py-0.5 rounded-full bg-pink-100 dark:bg-pink-950/60 text-[#D4A77F] text-[10px] font-black uppercase">
                           Popular
                         </span>
                       )}
@@ -426,8 +426,8 @@ export default function AdminPlansPage() {
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                         plan.is_active
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-[#6B7280] dark:text-[#A0A8B8]'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
+                          : 'bg-slate-100 dark:bg-[#1C2230] text-[#6B7280] dark:text-[#A0A8B8]'
                       }`}
                     >
                       {plan.is_active ? 'Active' : 'Disabled'}
@@ -445,7 +445,7 @@ export default function AdminPlansPage() {
                       </span>
                       <span className="text-xs text-[#6B7280] dark:text-[#A0A8B8] ml-1">/mo</span>
                       {plan.yearly_price && (
-                        <span className="block text-[11px] text-emerald-600 font-bold">
+                        <span className="block text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
                           ₹{Number(plan.yearly_price).toLocaleString()} /year
                         </span>
                       )}
@@ -454,14 +454,14 @@ export default function AdminPlansPage() {
                     {/* Subscriber Count */}
                     <div className="text-right">
                       <span className="text-[10px] font-bold uppercase text-[#9CA3AF] dark:text-[#747D8D] block">Subscribers</span>
-                      <span className="text-lg font-black text-purple-700">
+                      <span className="text-lg font-black text-purple-700 dark:text-purple-400">
                         {plan.active_salons_count || 0} Salons
                       </span>
                     </div>
                   </div>
 
                   {/* Resource Limits Badge */}
-                  <div className="bg-slate-50 rounded-2xl p-3 mb-4 space-y-1.5 text-xs">
+                  <div className="bg-slate-50 dark:bg-[#10141F] rounded-2xl p-3 mb-4 space-y-1.5 text-xs border border-slate-100 dark:border-[#2A2F3A]">
                     <div className="flex justify-between">
                       <span className="text-[#6B7280] dark:text-[#A0A8B8]">Staff Limit:</span>
                       <strong className="text-[#1F2937] dark:text-[#FFFFFF] font-bold">{staffLim}</strong>
@@ -474,17 +474,17 @@ export default function AdminPlansPage() {
                       <span className="text-[#6B7280] dark:text-[#A0A8B8]">WhatsApp Quota:</span>
                       <strong className="text-[#1F2937] dark:text-[#FFFFFF] font-bold">{waLim}</strong>
                     </div>
-                    <div className="flex justify-between pt-1 border-t border-slate-200/60">
+                    <div className="flex justify-between pt-1 border-t border-slate-200/60 dark:border-[#2A2F3A]">
                       <span className="text-[#6B7280] dark:text-[#A0A8B8]">Active Flags:</span>
-                      <strong className="text-emerald-700 font-bold">{enabledFlagsCount} of {ALL_FLAGS.length} enabled</strong>
+                      <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{enabledFlagsCount} of {ALL_FLAGS.length} enabled</strong>
                     </div>
                   </div>
 
                   {/* Human-readable feature bullets */}
-                  <div className="space-y-1.5 border-t border-slate-100 pt-3">
+                  <div className="space-y-1.5 border-t border-slate-100 dark:border-[#2A2F3A] pt-3">
                     {(Array.isArray(plan.features) ? plan.features : []).slice(0, 5).map((feat, i) => (
                       <div key={i} className="flex items-start gap-1.5 text-xs text-[#6B7280] dark:text-[#A0A8B8] truncate">
-                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                         <span className="truncate">{feat}</span>
                       </div>
                     ))}
@@ -496,11 +496,11 @@ export default function AdminPlansPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100">
+                <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-100 dark:border-[#2A2F3A]">
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(plan)}
-                    className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#1F2937] dark:text-[#FFFFFF] font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-[#1C2230] hover:bg-slate-200 dark:hover:bg-[#2A3445] text-[#1F2937] dark:text-[#FFFFFF] font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                     <span>Edit Plan & Gates</span>
@@ -512,8 +512,8 @@ export default function AdminPlansPage() {
                     title={plan.is_active ? 'Deactivate Plan' : 'Activate Plan'}
                     className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                       plan.is_active
-                        ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
-                        : 'border-slate-200 text-[#9CA3AF] dark:text-[#747D8D] hover:bg-slate-100'
+                        ? 'border-emerald-200 dark:border-emerald-800/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30'
+                        : 'border-slate-200 dark:border-[#2A2F3A] text-[#9CA3AF] dark:text-[#747D8D] hover:bg-slate-100 dark:hover:bg-[#1C2230]'
                     }`}
                   >
                     <Power className="w-4 h-4" />
@@ -523,7 +523,7 @@ export default function AdminPlansPage() {
                     type="button"
                     onClick={() => handleDeletePlan(plan)}
                     title="Delete Plan Permanently"
-                    className="p-2 rounded-xl border border-red-200 text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl border border-red-200 dark:border-red-900/40 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -544,9 +544,9 @@ export default function AdminPlansPage() {
             aria-hidden="true"
           />
           <div className="min-h-full flex items-center justify-center py-6">
-            <div className="relative z-10 bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 max-h-[85vh] min-h-0 flex flex-col my-auto text-left animate-scale-in">
+            <div className="relative z-10 bg-white dark:bg-[#141926] rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-[#2A2F3A] max-h-[85vh] min-h-0 flex flex-col my-auto text-left animate-scale-in">
               {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4 shrink-0">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#2A2F3A] mb-4 shrink-0">
                 <div>
                   <h3 className="text-lg font-black text-[#1F2937] dark:text-[#FFFFFF]">
                     {editingPlan ? `Edit Subscription Plan: ${editingPlan.name}` : 'Create New Subscription Plan'}
@@ -558,7 +558,7 @@ export default function AdminPlansPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="p-1.5 rounded-lg text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:text-[#FFFFFF] hover:bg-slate-100 cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] hover:bg-slate-100 dark:hover:bg-[#1C2230] cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -577,7 +577,7 @@ export default function AdminPlansPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Pro Studio"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
 
@@ -587,7 +587,7 @@ export default function AdminPlansPage() {
                       type="checkbox"
                       checked={isPopular}
                       onChange={(e) => setIsPopular(e.target.checked)}
-                      className="w-4 h-4 text-[#D4A77F] rounded border-slate-300 focus:ring-[#D4A77F]"
+                      className="w-4 h-4 text-[#D4A77F] rounded border-slate-300 dark:border-[#2A2F3A] focus:ring-[#D4A77F]"
                     />
                     <span>Highlight as Popular</span>
                   </label>
@@ -606,7 +606,7 @@ export default function AdminPlansPage() {
                     min="0"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
 
@@ -620,7 +620,7 @@ export default function AdminPlansPage() {
                     min="0"
                     value={yearlyPrice}
                     onChange={(e) => setYearlyPrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
               </div>
@@ -636,7 +636,7 @@ export default function AdminPlansPage() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="e.g. Ideal for expanding multi-chair salons"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
                 <div>
@@ -649,7 +649,7 @@ export default function AdminPlansPage() {
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value)}
                     placeholder="1, 2, 3..."
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
               </div>
@@ -670,7 +670,7 @@ export default function AdminPlansPage() {
                       min="0"
                       value={maxStaff}
                       onChange={(e) => setMaxStaff(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] bg-white"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] bg-white dark:bg-[#141926]"
                     />
                     <span className="text-[10px] text-[#9CA3AF] dark:text-[#747D8D] mt-0.5 block">0 = unlimited</span>
                   </div>
@@ -685,7 +685,7 @@ export default function AdminPlansPage() {
                       min="0"
                       value={maxServices}
                       onChange={(e) => setMaxServices(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] bg-white"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] bg-white dark:bg-[#141926]"
                     />
                     <span className="text-[10px] text-[#9CA3AF] dark:text-[#747D8D] mt-0.5 block">0 = unlimited</span>
                   </div>
@@ -700,7 +700,7 @@ export default function AdminPlansPage() {
                       min="0"
                       value={waPerMonth}
                       onChange={(e) => setWaPerMonth(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] bg-white"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] bg-white dark:bg-[#141926]"
                     />
                     <span className="text-[10px] text-[#9CA3AF] dark:text-[#747D8D] mt-0.5 block">0 = blocked (no WA)</span>
                   </div>
@@ -721,8 +721,8 @@ export default function AdminPlansPage() {
                         onClick={() => handleToggleFlag(f.key)}
                         className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                           isChecked
-                            ? 'bg-pink-50/60 border-pink-300 text-[#1F2937] dark:text-[#FFFFFF]'
-                            : 'bg-white border-slate-200 text-[#6B7280] dark:text-[#A0A8B8] hover:border-slate-300'
+                            ? 'bg-pink-50/60 dark:bg-pink-950/40 border-pink-300 dark:border-pink-800/60 text-[#1F2937] dark:text-[#FFFFFF]'
+                            : 'bg-white dark:bg-[#10141F] border-slate-200 dark:border-[#2A2F3A] text-[#6B7280] dark:text-[#A0A8B8] hover:border-slate-300 dark:hover:border-slate-700'
                         }`}
                       >
                         <div className="min-w-0 pr-2">
@@ -737,7 +737,7 @@ export default function AdminPlansPage() {
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => {}} // handled by parent div
-                          className="w-4 h-4 text-[#D4A77F] rounded border-slate-300 focus:ring-[#D4A77F] shrink-0"
+                          className="w-4 h-4 text-[#D4A77F] rounded border-slate-300 dark:border-[#2A2F3A] focus:ring-[#D4A77F] shrink-0"
                         />
                       </div>
                     );
@@ -755,12 +755,12 @@ export default function AdminPlansPage() {
                   value={featuresText}
                   onChange={(e) => setFeaturesText(e.target.value)}
                   placeholder="Unlimited client appointments&#10;10-second GST billing&#10;WhatsApp digital receipts"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F]"
                 />
               </div>
 
               {/* Submit / Cancel / Delete */}
-              <div className="flex items-center justify-between gap-2.5 pt-4 mt-2 border-t border-slate-100 shrink-0">
+              <div className="flex items-center justify-between gap-2.5 pt-4 mt-2 border-t border-slate-100 dark:border-[#2A2F3A] shrink-0">
                 {editingPlan ? (
                   <button
                     type="button"
@@ -768,7 +768,7 @@ export default function AdminPlansPage() {
                       setIsModalOpen(false);
                       handleDeletePlan(editingPlan);
                     }}
-                    className="px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="px-3 py-2 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 border border-red-200 dark:border-red-900/40 transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Delete Plan</span>
@@ -781,7 +781,7 @@ export default function AdminPlansPage() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8] hover:bg-slate-100 transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8] hover:bg-slate-100 dark:hover:bg-[#1C2230] transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>

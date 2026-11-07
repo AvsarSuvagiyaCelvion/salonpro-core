@@ -413,8 +413,8 @@ export default function LiveStudioPage() {
       {/* Top Studio Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-[#141926] p-4 rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/10 text-[#D4A77F] flex items-center justify-center shrink-0">
-            <Radio className="w-5 h-5 animate-pulse text-[#D4A77F]" />
+          <div className="w-10 h-10 rounded-xl bg-[#D4A77F]/10 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center shrink-0">
+            <Radio className="w-5 h-5 animate-pulse text-[#8C5E2E] dark:text-[#D4A77F]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -670,7 +670,7 @@ export default function LiveStudioPage() {
                             setSelectedServiceId(services[0]?.id || '');
                             setSelectedStaffId(staff[0]?.id || '');
                           }}
-                          className="py-1.5 px-2 rounded-lg border border-[#D4A77F]/30 bg-[#D4A77F]/15 dark:bg-[#D4A77F]/10 hover:bg-pink-100/60 dark:hover:bg-[#D4A77F]/20 text-[#D4A77F] font-semibold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="py-1.5 px-2 rounded-lg border border-[#D4A77F]/30 bg-[#D4A77F]/15 dark:bg-[#D4A77F]/10 hover:bg-pink-100/60 dark:hover:bg-[#D4A77F]/20 text-[#8C5E2E] dark:text-[#D4A77F] font-semibold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
                         >
                           <Scissors className="w-3.5 h-3.5" />
                           <span>+ Service</span>
@@ -766,7 +766,7 @@ export default function LiveStudioPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-xs font-mono text-[#D4A77F]">
+                          <span className="font-bold text-xs font-mono text-[#8C5E2E] dark:text-[#D4A77F]">
                             {inv.number}
                           </span>
                           <span
@@ -1208,7 +1208,7 @@ export default function LiveStudioPage() {
                         Discounts applied: ₹{(srvDisc + prodDisc).toFixed(2)}
                       </div>
                     </div>
-                    <div className="text-2xl font-black text-[#D4A77F]">
+                    <div className="text-2xl font-black text-[#8C5E2E] dark:text-[#D4A77F]">
                       ₹{grandTotal.toFixed(2)}
                     </div>
                   </div>
@@ -1281,7 +1281,7 @@ export default function LiveStudioPage() {
                       onClick={() => setPayMethod(m)}
                       className={`py-2 text-xs font-semibold uppercase rounded-xl border transition-all cursor-pointer ${
                         payMethod === m
-                          ? 'border-[#D4A77F] bg-[#D4A77F]/10 text-[#D4A77F] shadow-xs'
+                          ? 'border-[#D4A77F] bg-[#D4A77F]/10 text-[#8C5E2E] dark:text-[#D4A77F] font-bold shadow-xs'
                           : 'border-neutral-200 dark:border-[#2A2F3A] text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
                       }`}
                     >

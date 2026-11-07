@@ -1,6 +1,8 @@
 import { query } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
+import Link from 'next/link';
+import ThemeToggle from '@/components/landing/ThemeToggle';
 import {
   COOKIE_NAME,
   ADMIN_COOKIE_NAME,
@@ -131,7 +133,20 @@ export default async function PublicBillPage({
     dueAmount <= 0 ? 'PAID' : totalPaid > 0 ? 'PARTIAL' : 'PENDING';
 
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-[#080B12] py-6 sm:py-12 px-4 flex justify-center items-start print:bg-white print:p-0 transition-colors duration-200">
+    <div className="min-h-screen bg-neutral-100 dark:bg-[#080B12] py-6 sm:py-12 px-4 flex flex-col justify-start items-center print:bg-white print:p-0 transition-colors duration-200">
+      {/* Top Navigation Row */}
+      <div className="w-full max-w-lg flex items-center justify-between gap-2 mb-4 px-1 print:hidden">
+        <Link
+          href="/portal"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] hover:underline"
+        >
+          ← Back to Customer Portal
+        </Link>
+        <div className="scale-90 origin-right">
+          <ThemeToggle />
+        </div>
+      </div>
+
       <div id="invoice-receipt-card" className="w-full max-w-lg bg-white dark:bg-[#141926] rounded-3xl shadow-xl border border-neutral-200 dark:border-[#2A2F3A] overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none">
         
         {/* Top Header Brand Banner */}

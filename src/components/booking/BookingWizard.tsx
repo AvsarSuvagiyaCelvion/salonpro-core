@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import ThemeToggle from '@/components/landing/ThemeToggle';
 
 interface Service {
   id: string;
@@ -674,6 +675,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
           >
             <span>🔐 Staff Login</span>
           </Link>
+
+          <div className="scale-90 origin-center shrink-0">
+            <ThemeToggle />
+          </div>
 
           <Link
             href="/portal"

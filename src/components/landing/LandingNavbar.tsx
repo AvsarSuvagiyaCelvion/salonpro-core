@@ -59,27 +59,27 @@ export default function LandingNavbar() {
 
           {/* 2. Center: Minimal, Clear Navigation Links (Desktop lg+) */}
           <div className="hidden lg:flex items-center gap-6 xl:gap-8 font-sans font-medium text-[14px] xl:text-[15px] text-[#6B7280] dark:text-[#A0A8B8] whitespace-nowrap">
-            <a
-              href="#features"
+            <Link
+              href="/#features"
               className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors whitespace-nowrap"
             >
               Features &amp; POS
-            </a>
-            <a
-              href="#how-it-works"
+            </Link>
+            <Link
+              href="/#how-it-works"
               className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors whitespace-nowrap"
             >
               How It Works
-            </a>
-            <a
-              href="#pricing"
+            </Link>
+            <Link
+              href="/#pricing"
               className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors flex items-center gap-1.5 whitespace-nowrap"
             >
               <span>Pricing</span>
               <span className="px-1.5 py-0.5 rounded-full bg-[#F3F4F6] dark:bg-[#1C2230] text-[#8C5E35] dark:text-[#D4A77F] text-[9px] font-semibold uppercase border border-[#E5E7EB] dark:border-[#2A2F3A]">
                 7 Days Free
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* 3. Right: Streamlined, Non-Confusing Actions (Desktop lg+) */}
@@ -220,34 +220,34 @@ export default function LandingNavbar() {
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF] dark:text-[#747D8D] px-2 py-1">
                   Navigation
                 </div>
-                <a
-                  href="#features"
+                <Link
+                  href="/#features"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF]"
                 >
                   Features &amp; POS Billing
-                </a>
-                <a
-                  href="#how-it-works"
+                </Link>
+                <Link
+                  href="/#how-it-works"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF]"
                 >
                   How It Works
-                </a>
-                <a
-                  href="#problems"
+                </Link>
+                <Link
+                  href="/#problems"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF]"
                 >
                   Problems We Solve
-                </a>
-                <a
-                  href="#pricing"
+                </Link>
+                <Link
+                  href="/#pricing"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF]"
                 >
                   7-Day Trial &amp; Pricing
-                </a>
+                </Link>
                 <Link
                   href="/portal"
                   onClick={() => setMobileMenuOpen(false)}

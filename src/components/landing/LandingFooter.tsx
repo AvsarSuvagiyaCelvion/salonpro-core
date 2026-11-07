@@ -88,39 +88,39 @@ export default function LandingFooter() {
             </h4>
             <ul className="space-y-3 text-sm sm:text-[15px] flex flex-col items-center md:items-start">
               <li>
-                <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
                   Client Booking Engine
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
                   Live Studio Kanban Floor
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
                   10-Second GST POS Billing
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
                   Staff Commission Tracker
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
                   WhatsApp Digital Receipts
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
-                  VIP Memberships & Passes
-                </a>
+                <Link href="/#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                  VIP Memberships &amp; Passes
+                </Link>
               </li>
               <li>
-                <a href="#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
+                <Link href="/#features" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors">
                   End-of-Day Cash Audits
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -196,9 +196,9 @@ export default function LandingFooter() {
                 </Link>
               </li>
               <li>
-                <a href="#pricing" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
+                <Link href="/#pricing" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
                   Subscription Pricing
-                </a>
+                </Link>
               </li>
               <li>
                 <a

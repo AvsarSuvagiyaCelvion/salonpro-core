@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home, User, Mail, Phone } from 'lucide-react';
+import ThemeToggle from '@/components/landing/ThemeToggle';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -20,6 +21,21 @@ export default function GlobalErrorPage({ error, reset }: ErrorProps) {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex flex-col items-center justify-center p-4 sm:p-6 text-center transition-colors duration-250">
+      {/* Top Header Bar */}
+      <div className="w-full max-w-md flex items-center justify-between mb-4 px-1">
+        <Link href="/" className="inline-flex items-center gap-2 group">
+          <div className="w-7 h-7 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xs text-[#D4A77F]">
+            ✂
+          </div>
+          <span className="font-extrabold text-sm text-[#1F2937] dark:text-white">
+            Salon<span className="text-[#D4A77F]">Pro</span>
+          </span>
+        </Link>
+        <div className="scale-90 origin-right">
+          <ThemeToggle />
+        </div>
+      </div>
+
       <div className="max-w-md w-full bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 sm:p-8 shadow-xl">
         <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center mx-auto mb-4 text-2xl font-black shadow-inner">
           <AlertTriangle className="w-8 h-8 text-rose-500" />

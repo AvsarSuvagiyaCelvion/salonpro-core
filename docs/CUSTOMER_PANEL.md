@@ -14,13 +14,16 @@ The Customer Panel enables salon clients to discover salon services, select styl
 
 | Route | File Path | What It Does | Key Components Used |
 |---|---|---|---|
-| `/[slug]` | `src/app/[slug]/page.tsx` | Primary public showcase & booking wizard for a salon identified by unique slug. Displays salon average rating stars & count, and recent customer reviews with owner replies (when `reviews` plan flag is active). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
-| `/book/[slug]` | `src/app/book/[slug]/page.tsx` | Alias for public booking wizard (supports direct `/book/<slug>` links). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`) |
+| `/[slug]` | `src/app/[slug]/page.tsx` | Primary public showcase & booking wizard for a salon identified by unique slug. Displays salon average rating stars & count, and recent customer reviews with owner replies (when `reviews` plan flag is active). Features responsive top nav with integrated ThemeToggle. | `BookingWizard` (`src/components/booking/BookingWizard.tsx`), `ThemeToggle` |
+| `/book/[slug]` | `src/app/book/[slug]/page.tsx` | Alias for public booking wizard (supports direct `/book/<slug>` links). | `BookingWizard` (`src/components/booking/BookingWizard.tsx`), `ThemeToggle` |
 | `/portal` | `src/app/portal/page.tsx` | Customer portal: features a sticky branded top navigation header with salon identity, Home/Book links, and integrated ThemeToggle. Authenticated client dashboard showing upcoming visits, past visits, invoices, VIP plans, profile editor, PIN change, self-service cancel/reschedule, and "Rate this visit" modal for completed appointments within 30 days. Also cleanly renders customer login/signup with header when unauthenticated. | `CustomerPortalPage`, `ThemeToggle`, `ImageUploader`, `PrintReceiptButton` |
 | `/my-account` | `src/app/my-account/page.tsx` | Alias route re-exporting `/portal`. | `CustomerPortalPage` |
 | `/customer/login` | `src/app/customer/login/page.tsx` | Alias route re-exporting `/portal` (renders in login mode). | `CustomerPortalPage` |
 | `/customer/signup` | `src/app/customer/signup/page.tsx` | Alias route re-exporting `/portal` (renders in signup mode). | `CustomerPortalPage` |
-| `/b/[number]` | `src/app/b/[number]/page.tsx` | Public or authenticated digital receipt and tax invoice view. Rendered in printable format with PDF download option. | `PrintReceiptButton` (`src/components/receipt/PrintReceiptButton.tsx`) |
+| `/b/[number]` | `src/app/b/[number]/page.tsx` | Public or authenticated digital receipt and tax invoice view. Rendered in printable format with PDF download option, top portal return link, and ThemeToggle. | `PrintReceiptButton` (`src/components/receipt/PrintReceiptButton.tsx`), `ThemeToggle` |
+| `/privacy` | `src/app/privacy/page.tsx` | Comprehensive Indian IT Act 2000 compliant Privacy Policy with universal LandingNavbar (including ThemeToggle), structured legal sections, summary highlight cards, and LandingFooter. | `LandingNavbar`, `LandingFooter`, `ThemeToggle` |
+| `/terms` | `src/app/terms/page.tsx` | Commercial SaaS Terms of Service covering 7-day free trial, Razorpay subscription processing, tenant logical data isolation, and customer self-service policies. Equipped with universal LandingNavbar and LandingFooter. | `LandingNavbar`, `LandingFooter`, `ThemeToggle` |
+| `/refund-policy` | `src/app/refund-policy/page.tsx` | Transparent Refund & Cancellation Policy outlining 1-click subscription cancellations, 5-7 business days Razorpay refund routing, and service defect guarantees. Equipped with universal LandingNavbar and LandingFooter. | `LandingNavbar`, `LandingFooter`, `ThemeToggle` |
 
 ---
 

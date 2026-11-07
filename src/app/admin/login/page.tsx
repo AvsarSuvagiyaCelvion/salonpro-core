@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, Sparkles, Building2, User } from 'lucide-react';
+import ThemeToggle from '@/components/landing/ThemeToggle';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -42,6 +43,21 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex flex-col justify-center items-center p-4 selection:bg-[#D4A77F] selection:text-[#080B12] font-sans transition-colors duration-300">
+      {/* Top Header Bar */}
+      <div className="w-full max-w-md flex items-center justify-between mb-4 relative z-10 px-1">
+        <Link href="/" className="inline-flex items-center gap-2 group">
+          <div className="w-7 h-7 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xs text-[#D4A77F]">
+            ✂
+          </div>
+          <span className="font-extrabold text-sm text-[#1F2937] dark:text-white">
+            Salon<span className="text-[#D4A77F]">Pro</span>
+          </span>
+        </Link>
+        <div className="scale-90 origin-right">
+          <ThemeToggle />
+        </div>
+      </div>
+
       <div className="max-w-md w-full relative z-10">
         {/* Top Tag & Header */}
         <div className="text-center mb-8">

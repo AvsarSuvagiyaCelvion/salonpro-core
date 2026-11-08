@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
+import { Sparkles, Lock, Mail, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 
 export default function LoginPage() {
@@ -249,7 +249,10 @@ export default function LoginPage() {
                 className="w-full mt-2 py-3 px-4 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-sm shadow-lg shadow-[#D4A77F]/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-xl active:scale-[0.99]"
               >
                 {loading ? (
-                  <span>Authenticating...</span>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#080B12]" />
+                    <span>Authenticating...</span>
+                  </>
                 ) : (
                   <>
                     <span>Sign In to Dashboard</span>

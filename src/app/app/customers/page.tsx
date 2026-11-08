@@ -26,6 +26,7 @@ import {
   MessageSquare,
   Wallet,
   MapPin,
+  Loader2,
 } from 'lucide-react';
 
 interface Customer {
@@ -76,6 +77,7 @@ export default function CustomersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Form fields
@@ -101,6 +103,8 @@ export default function CustomersPage() {
   useEffect(() => {
     if (message?.text) {
       showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
     }
   }, [message]);
 
@@ -221,6 +225,7 @@ export default function CustomersPage() {
   async function handleDelete(id: string) {
     if (!confirm('Are you sure you want to delete this customer?')) return;
 
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/customers/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
@@ -228,6 +233,8 @@ export default function CustomersPage() {
       setMessage({ type: 'success', text: 'Customer profile deleted' });
     } catch {
       setMessage({ type: 'error', text: 'Failed to delete customer' });
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -400,11 +407,16 @@ export default function CustomersPage() {
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
+                        disabled={deletingId === c.id}
                         onClick={() => handleDelete(c.id)}
-                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Delete client"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        {deletingId === c.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -712,9 +724,18 @@ export default function CustomersPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all"
                 >
-                  {saving ? 'Saving...' : editingCustomer ? 'Update Profile' : 'Add Client'}
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : editingCustomer ? (
+                    'Update Profile'
+                  ) : (
+                    'Add Client'
+                  )}
                 </button>
               </div>
             </form>

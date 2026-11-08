@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
+import { showToast } from '@/lib/toast';
 import {
   CreditCard,
   CheckCircle2,
@@ -45,6 +46,15 @@ export default function SalonSubscriptionPage() {
   const [verifyingPayment, setVerifyingPayment] = useState(false);
   const [celebrationData, setCelebrationData] = useState<any | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Auto-dismiss top notifications after 3 seconds and trigger global toast
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Preload Razorpay checkout script on mount so first click opens instantly
   useEffect(() => {

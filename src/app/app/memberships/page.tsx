@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { showToast } from '@/lib/toast';
 import {
   Award,
   Package,
@@ -16,6 +17,7 @@ import {
   DollarSign,
   Gift,
   Search,
+  Loader2,
 } from 'lucide-react';
 
 interface MembershipPlan {
@@ -73,6 +75,14 @@ export default function MembershipsPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Modal 1: Assign to customer
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -658,9 +668,16 @@ export default function MembershipsPage() {
                 <button
                   type="submit"
                   disabled={assigning}
-                  className="px-6 py-2.5 text-xs font-bold bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-2xl shadow-md disabled:opacity-50"
+                  className="px-6 py-2.5 text-xs font-bold bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] rounded-2xl shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  {assigning ? 'Assigning...' : 'Confirm Assignment'}
+                  {assigning ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Assigning...</span>
+                    </>
+                  ) : (
+                    'Confirm Assignment'
+                  )}
                 </button>
               </div>
             </form>
@@ -797,9 +814,16 @@ export default function MembershipsPage() {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-6 py-2.5 text-xs font-bold bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-2xl shadow-md disabled:opacity-50"
+                  className="px-6 py-2.5 text-xs font-bold bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] rounded-2xl shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  {creating ? 'Saving...' : 'Create Plan'}
+                  {creating ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    'Create Plan'
+                  )}
                 </button>
               </div>
             </form>

@@ -152,6 +152,8 @@ export default function CustomerPortalPage() {
   useEffect(() => {
     if (portalMessage?.text) {
       showToast(portalMessage.text, portalMessage.type);
+      const timer = setTimeout(() => setPortalMessage(null), 3000);
+      return () => clearTimeout(timer);
     }
   }, [portalMessage]);
 

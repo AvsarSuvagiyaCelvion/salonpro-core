@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, Sparkles, Building2, User } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, Sparkles, Building2, User, Loader2 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 
 export default function AdminLoginPage() {
@@ -118,9 +118,16 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-sm shadow-md shadow-[#D4A77F]/20 transition-all flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50 cursor-pointer"
+              className="w-full py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-sm shadow-md shadow-[#D4A77F]/20 transition-all flex items-center justify-center gap-2 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {loading ? 'Authenticating Admin...' : 'Sign In as Super Admin ➔'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-[#080B12]" />
+                  <span>Authenticating Admin...</span>
+                </>
+              ) : (
+                'Sign In as Super Admin ➔'
+              )}
             </button>
           </form>
 

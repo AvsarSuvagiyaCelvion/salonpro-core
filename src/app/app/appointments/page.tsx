@@ -29,6 +29,7 @@ import {
   CalendarDays,
   Sparkles,
   MessageCircle,
+  Loader2,
 } from 'lucide-react';
 
 interface Appointment {
@@ -120,6 +121,23 @@ export default function AppointmentsPage() {
   // Messages & Friendly Overlap Alert
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [overlapError, setOverlapError] = useState<string | null>(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+  // Auto-dismiss notification after 3 seconds and trigger global toast
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (overlapError) {
+      const timer = setTimeout(() => setOverlapError(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [overlapError]);
 
   // Staff Availability (Shifts & Leaves)
   const [staffAvailability, setStaffAvailability] = useState<
@@ -416,6 +434,7 @@ export default function AppointmentsPage() {
   }
 
   async function handleUpdateStatus(id: string, status: 'scheduled' | 'arrived' | 'cancelled') {
+    setActionLoadingId(id);
     try {
       const res = await fetch(`/api/appointments/${id}`, {
         method: 'PATCH',
@@ -430,10 +449,13 @@ export default function AppointmentsPage() {
       setMessage({ type: 'success', text: `Appointment marked as ${status}` });
     } catch {
       setMessage({ type: 'error', text: 'Failed to update appointment status' });
+    } finally {
+      setActionLoadingId(null);
     }
   }
 
   async function handleStartSessionFromAppt(id: string) {
+    setActionLoadingId(id);
     try {
       const res = await fetch(`/api/appointments/${id}/start-session`, {
         method: 'POST',
@@ -449,6 +471,8 @@ export default function AppointmentsPage() {
       router.push('/app/live');
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
+    } finally {
+      setActionLoadingId(null);
     }
   }
 
@@ -978,21 +1002,30 @@ export default function AppointmentsPage() {
                                       {isScheduled && (
                                         <button
                                           type="button"
+                                          disabled={actionLoadingId === appt.id}
                                           onClick={() => handleUpdateStatus(appt.id, 'arrived')}
-                                          className="flex-1 py-1 px-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-200 text-[10px] font-bold transition-colors cursor-pointer text-center"
+                                          className="flex-1 py-1 px-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 text-amber-900 dark:text-amber-200 text-[10px] font-bold transition-colors cursor-pointer text-center disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
                                         >
-                                          Seat In Chair
+                                          {actionLoadingId === appt.id ? (
+                                            <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                                          ) : null}
+                                          <span>{actionLoadingId === appt.id ? 'Seating...' : 'Seat In Chair'}</span>
                                         </button>
                                       )}
 
                                       {(isScheduled || isArrived) && (
                                         <button
                                           type="button"
+                                          disabled={actionLoadingId === appt.id}
                                           onClick={() => handleStartSessionFromAppt(appt.id)}
-                                          className="flex-1 py-1 px-2 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-bold text-[10px] transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1"
+                                          className="flex-1 py-1 px-2 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-bold text-[10px] transition-all shadow-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
                                         >
-                                          <Play className="w-2.5 h-2.5 fill-current" />
-                                          <span>Start POS</span>
+                                          {actionLoadingId === appt.id ? (
+                                            <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                                          ) : (
+                                            <Play className="w-2.5 h-2.5 fill-current" />
+                                          )}
+                                          <span>{actionLoadingId === appt.id ? 'Starting...' : 'Start POS'}</span>
                                         </button>
                                       )}
 
@@ -1016,11 +1049,16 @@ export default function AppointmentsPage() {
                                       {!isDone && !isCancelled && (
                                         <button
                                           type="button"
+                                          disabled={actionLoadingId === appt.id}
                                           onClick={() => handleUpdateStatus(appt.id, 'cancelled')}
                                           title="Cancel Appointment"
-                                          className="p-1 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                                          className="p-1 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                          <X className="w-3 h-3" />
+                                          {actionLoadingId === appt.id ? (
+                                            <Loader2 className="w-3 h-3 animate-spin text-red-500" />
+                                          ) : (
+                                            <X className="w-3 h-3" />
+                                          )}
                                         </button>
                                       )}
                                     </div>
@@ -1303,17 +1341,23 @@ export default function AppointmentsPage() {
                   {appt.status === 'scheduled' && (
                     <>
                       <button
+                        disabled={actionLoadingId === appt.id}
                         onClick={() => handleUpdateStatus(appt.id, 'arrived')}
-                        className="py-1.5 px-2.5 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 text-amber-800 dark:text-amber-200 font-semibold text-xs cursor-pointer transition-colors"
+                        className="py-1.5 px-2.5 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 text-amber-800 dark:text-amber-200 font-semibold text-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        Seat In Chair
+                        {actionLoadingId === appt.id ? 'Seating...' : 'Seat In Chair'}
                       </button>
                       <button
+                        disabled={actionLoadingId === appt.id}
                         onClick={() => handleStartSessionFromAppt(appt.id)}
-                        className="py-1.5 px-3 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-bold text-xs flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                        className="py-1.5 px-3 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-bold text-xs flex items-center gap-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors"
                       >
-                        <Play className="w-3 h-3 fill-current" />
-                        <span>Start POS</span>
+                        {actionLoadingId === appt.id ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Play className="w-3 h-3 fill-current" />
+                        )}
+                        <span>{actionLoadingId === appt.id ? 'Starting...' : 'Start POS'}</span>
                       </button>
                     </>
                   )}
@@ -1325,11 +1369,16 @@ export default function AppointmentsPage() {
                         <span>In Chair</span>
                       </span>
                       <button
+                        disabled={actionLoadingId === appt.id}
                         onClick={() => handleStartSessionFromAppt(appt.id)}
-                        className="py-1.5 px-3 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-bold text-xs flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                        className="py-1.5 px-3 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-sans font-bold text-xs flex items-center gap-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs transition-colors"
                       >
-                        <Play className="w-3 h-3 fill-current" />
-                        <span>Start POS</span>
+                        {actionLoadingId === appt.id ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Play className="w-3 h-3 fill-current" />
+                        )}
+                        <span>{actionLoadingId === appt.id ? 'Starting...' : 'Start POS'}</span>
                       </button>
                     </>
                   )}
@@ -1352,11 +1401,16 @@ export default function AppointmentsPage() {
 
                   {!appt.status.match(/done|cancelled/) && (
                     <button
+                      disabled={actionLoadingId === appt.id}
                       onClick={() => handleUpdateStatus(appt.id, 'cancelled')}
-                      className="p-1.5 text-neutral-400 hover:text-red-600 rounded-lg cursor-pointer"
+                      className="p-1.5 text-neutral-400 hover:text-red-600 rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       title="Cancel appointment"
                     >
-                      <Ban className="w-3.5 h-3.5" />
+                      {actionLoadingId === appt.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500" />
+                      ) : (
+                        <Ban className="w-3.5 h-3.5" />
+                      )}
                     </button>
                   )}
                 </div>
@@ -1581,9 +1635,16 @@ export default function AppointmentsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 text-xs font-sans font-semibold rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] shadow-sm cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 text-xs font-sans font-semibold rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                 >
-                  {submitting ? 'Checking Collision & Booking...' : 'Confirm Booking'}
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Checking Collision & Booking...</span>
+                    </>
+                  ) : (
+                    'Confirm Booking'
+                  )}
                 </button>
               </div>
             </form>

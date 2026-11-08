@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import { showToast } from '@/lib/toast';
 import {
   UserCheck,
   Plus,
@@ -17,6 +18,7 @@ import {
   Clock,
   Copy,
   ShieldAlert,
+  Loader2,
 } from 'lucide-react';
 
 interface StaffMember {
@@ -88,7 +90,19 @@ export default function StaffPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingLeaveId, setDeletingLeaveId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Auto-dismiss top notifications strictly after 3 seconds
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Schedule (Shifts & Leaves) Modal states
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -110,6 +124,14 @@ export default function StaffPage() {
   const [leaveAdding, setLeaveAdding] = useState(false);
   const [scheduleConflicts, setScheduleConflicts] = useState<ConflictingAppt[]>([]);
   const [scheduleMsg, setScheduleMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    if (scheduleMsg) {
+      showToast(scheduleMsg.text, scheduleMsg.type);
+      const timer = setTimeout(() => setScheduleMsg(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [scheduleMsg]);
 
   // Form fields
   const [formName, setFormName] = useState('');
@@ -313,6 +335,7 @@ export default function StaffPage() {
 
   async function handleDeleteLeave(leaveId: string) {
     if (!scheduleStaff) return;
+    setDeletingLeaveId(leaveId);
     try {
       const res = await fetch(
         `/api/staff/${scheduleStaff.id}/leaves?leaveId=${leaveId}`,
@@ -326,6 +349,8 @@ export default function StaffPage() {
       setScheduleMsg({ type: 'success', text: 'Leave removed' });
     } catch (err: any) {
       setScheduleMsg({ type: 'error', text: err.message || 'Failed to remove leave' });
+    } finally {
+      setDeletingLeaveId(null);
     }
   }
 
@@ -378,6 +403,7 @@ export default function StaffPage() {
 
   async function handleToggleStatus(id: string, field: 'active' | 'show_online', currentVal: boolean) {
     const newVal = !currentVal;
+    setTogglingId(id);
     setStaffList((prev) =>
       prev.map((s) => (s.id === id ? { ...s, [field]: newVal } : s))
     );
@@ -400,12 +426,15 @@ export default function StaffPage() {
         prev.map((s) => (s.id === id ? { ...s, [field]: currentVal } : s))
       );
       setMessage({ type: 'error', text: 'Failed to update status' });
+    } finally {
+      setTogglingId(null);
     }
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Are you sure you want to remove this staff member?')) return;
 
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/staff/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
@@ -413,6 +442,8 @@ export default function StaffPage() {
       setMessage({ type: 'success', text: 'Staff member deleted' });
     } catch {
       setMessage({ type: 'error', text: 'Failed to delete staff member' });
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -563,30 +594,48 @@ export default function StaffPage() {
                     {/* Working or On Leave Toggle */}
                     <td className="py-3.5 px-4 text-center">
                       <button
+                        disabled={togglingId === staff.id}
                         onClick={() => handleToggleStatus(staff.id, 'active', staff.active)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
+                          togglingId === staff.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                        } ${
                           staff.active
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                             : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                         }`}
                         title="Click to toggle Working / On Leave"
                       >
-                        {staff.active ? <UserCheck className="w-3.5 h-3.5" /> : <UserX className="w-3.5 h-3.5" />}
+                        {togglingId === staff.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-neutral-400" />
+                        ) : staff.active ? (
+                          <UserCheck className="w-3.5 h-3.5" />
+                        ) : (
+                          <UserX className="w-3.5 h-3.5" />
+                        )}
                         <span>{staff.active ? 'Working' : 'On Leave'}</span>
                       </button>
                     </td>
                     {/* Show Online Toggle */}
                     <td className="py-3.5 px-4 text-center">
                       <button
+                        disabled={togglingId === staff.id}
                         onClick={() => handleToggleStatus(staff.id, 'show_online', staff.show_online)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold transition-all ${
+                          togglingId === staff.id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                        } ${
                           staff.show_online
                             ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
                             : 'bg-neutral-100 dark:bg-[#1C2230] text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-[#2A2F3A]'
                         }`}
                         title="Click to toggle Online Booking visibility"
                       >
-                        {staff.show_online ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                        {togglingId === staff.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-neutral-400" />
+                        ) : staff.show_online ? (
+                          <Eye className="w-3.5 h-3.5" />
+                        ) : (
+                          <EyeOff className="w-3.5 h-3.5" />
+                        )}
                         <span>{staff.show_online ? 'Show Online' : 'Hidden'}</span>
                       </button>
                     </td>
@@ -606,11 +655,16 @@ export default function StaffPage() {
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
+                        disabled={deletingId === staff.id}
                         onClick={() => handleDelete(staff.id)}
-                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Delete staff"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        {deletingId === staff.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -765,9 +819,18 @@ export default function StaffPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                 >
-                  {saving ? 'Saving...' : editingStaff ? 'Update Staff' : 'Add Staff Member'}
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : editingStaff ? (
+                    'Update Staff'
+                  ) : (
+                    'Add Staff Member'
+                  )}
                 </button>
               </div>
             </form>
@@ -1001,9 +1064,16 @@ export default function StaffPage() {
                     type="button"
                     disabled={shiftsSaving || shiftsLoading}
                     onClick={handleSaveShifts}
-                    className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                    className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                   >
-                    {shiftsSaving ? 'Saving Shifts...' : 'Save Weekly Shifts'}
+                    {shiftsSaving ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving Shifts...</span>
+                      </>
+                    ) : (
+                      'Save Weekly Shifts'
+                    )}
                   </button>
                 </div>
               </div>
@@ -1066,9 +1136,16 @@ export default function StaffPage() {
                     <button
                       type="submit"
                       disabled={leaveAdding}
-                      className="px-4 py-1.5 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-lg shadow-sm cursor-pointer disabled:opacity-50 transition-all"
+                      className="px-4 py-1.5 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-lg shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                     >
-                      {leaveAdding ? 'Recording Leave...' : '+ Record Leave'}
+                      {leaveAdding ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Recording Leave...</span>
+                        </>
+                      ) : (
+                        '+ Record Leave'
+                      )}
                     </button>
                   </div>
                 </form>
@@ -1122,11 +1199,16 @@ export default function StaffPage() {
 
                             <button
                               type="button"
+                              disabled={deletingLeaveId === leave.id}
                               onClick={() => handleDeleteLeave(leave.id)}
-                              className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                              className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Delete leave"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              {deletingLeaveId === leave.id ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500" />
+                              ) : (
+                                <Trash2 className="w-3.5 h-3.5" />
+                              )}
                             </button>
                           </div>
                         );

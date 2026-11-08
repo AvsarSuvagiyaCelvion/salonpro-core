@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { showToast } from '@/lib/toast';
 import {
   Settings,
   Store,
@@ -23,6 +24,7 @@ import {
   Palmtree,
   Images,
   Receipt,
+  Loader2,
 } from 'lucide-react';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { MAX_GALLERY_PHOTOS } from '@/lib/storage';
@@ -44,6 +46,23 @@ export default function SettingsPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [userRole, setUserRole] = useState<'owner' | 'staff'>('owner');
+
+  // Auto-dismiss feedback after 3 seconds
+  useEffect(() => {
+    if (errorMessage) {
+      showToast(errorMessage, 'error');
+      const timer = setTimeout(() => setErrorMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
+  useEffect(() => {
+    if (saveSuccess) {
+      showToast('Salon settings saved successfully!', 'success');
+      const timer = setTimeout(() => setSaveSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveSuccess]);
 
   // Form fields
   const [salonId, setSalonId] = useState('');
@@ -83,6 +102,14 @@ export default function SettingsPage() {
   const [savingHoliday, setSavingHoliday] = useState(false);
   const [deletingHolidayId, setDeletingHolidayId] = useState<string | null>(null);
   const [holidayMessage, setHolidayMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    if (holidayMessage) {
+      showToast(holidayMessage.text, holidayMessage.type);
+      const timer = setTimeout(() => setHolidayMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [holidayMessage]);
 
   async function loadHolidays() {
     try {
@@ -1068,9 +1095,13 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleAddHoliday}
                   disabled={savingHoliday}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-black text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs font-bold shadow-md transition-all active:scale-95 cursor-pointer"
                 >
-                  <Plus className="w-4 h-4" />
+                  {savingHoliday ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  ) : (
+                    <Plus className="w-4 h-4" />
+                  )}
                   <span>{savingHoliday ? 'Scheduling...' : 'Save & Block Booking Slots'}</span>
                 </button>
               </div>
@@ -1164,10 +1195,14 @@ export default function SettingsPage() {
                           type="button"
                           onClick={() => handleDeleteHoliday(h.id)}
                           disabled={deletingHolidayId === h.id}
-                          className="self-end sm:self-auto p-2 rounded-xl text-neutral-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                          className="self-end sm:self-auto p-2 rounded-xl text-neutral-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Remove holiday & reopen bookings"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {deletingHolidayId === h.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     );
@@ -1184,9 +1219,13 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="w-full sm:w-auto justify-center px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 text-[#080B12] font-black text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto justify-center px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 disabled:cursor-not-allowed text-[#080B12] font-black text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
             >
-              <Save className="w-4 h-4 text-[#080B12]" />
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin text-[#080B12]" />
+              ) : (
+                <Save className="w-4 h-4 text-[#080B12]" />
+              )}
               <span>{saving ? 'Saving Settings...' : 'Save All Settings'}</span>
             </button>
           </div>

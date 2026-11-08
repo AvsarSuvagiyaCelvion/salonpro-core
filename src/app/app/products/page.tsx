@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { showToast } from '@/lib/toast';
 import {
   Package,
   Plus,
@@ -24,6 +25,7 @@ import {
   Check,
   ArrowRight,
   ExternalLink,
+  Loader2,
 } from 'lucide-react';
 
 interface Product {
@@ -75,7 +77,17 @@ export default function ProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Auto-dismiss top notifications after 3 seconds
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Form fields for Product
   const [formName, setFormName] = useState('');
@@ -245,14 +257,16 @@ export default function ProductsPage() {
 
   async function handleDeleteProduct(id: string) {
     if (!confirm('Are you sure you want to remove this product?')) return;
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       await fetchProducts();
       setMessage({ type: 'success', text: 'Product removed' });
-      setTimeout(() => setMessage(null), 3000);
     } catch {
       setMessage({ type: 'error', text: 'Failed to delete product' });
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -602,11 +616,16 @@ export default function ProductsPage() {
                     </button>
                     <button
                       type="button"
+                      disabled={deletingId === p.id}
                       onClick={() => handleDeleteProduct(p.id)}
-                      className="p-1.5 rounded-xl text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
+                      className="p-1.5 rounded-xl text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       title="Delete product"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {deletingId === p.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -986,9 +1005,16 @@ export default function ProductsPage() {
                   <button
                     type="submit"
                     disabled={selling || !selectedProduct || selectedProduct.stock <= 0}
-                    className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                   >
-                    {selling ? 'Processing Sale...' : 'Complete Sale & Issue Bill'}
+                    {selling ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Processing Sale...</span>
+                      </>
+                    ) : (
+                      'Complete Sale & Issue Bill'
+                    )}
                   </button>
                 </div>
               </form>
@@ -1128,9 +1154,18 @@ export default function ProductsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold font-extrabold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+                  className="px-6 py-2.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 active:scale-95"
                 >
-                  {submitting ? 'Saving...' : editingProduct ? 'Update Product' : 'Add to Inventory'}
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : editingProduct ? (
+                    'Update Product'
+                  ) : (
+                    'Add to Inventory'
+                  )}
                 </button>
               </div>
             </form>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import { showToast } from '@/lib/toast';
 import {
   Receipt,
   Search,
@@ -18,6 +19,7 @@ import {
   TrendingUp,
   Eye,
   Printer,
+  Loader2,
 } from 'lucide-react';
 
 interface InvoiceItem {
@@ -49,6 +51,15 @@ export default function BillingPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'partial' | 'paid'>('all');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Auto-dismiss notification after 3 seconds and trigger global toast
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -579,9 +590,16 @@ export default function BillingPage() {
                 <button
                   type="submit"
                   disabled={paying}
-                  className="px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all"
                 >
-                  {paying ? 'Recording...' : 'Record Payment'}
+                  {paying ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Recording...</span>
+                    </>
+                  ) : (
+                    'Record Payment'
+                  )}
                 </button>
               </div>
             </form>
@@ -701,9 +719,13 @@ export default function BillingPage() {
                   type="button"
                   onClick={() => handleMarkWhatsappSent(whatsappInvoice.id)}
                   disabled={sendingWhatsapp}
-                  className="w-full py-3 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+                  className="w-full py-3 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4" />
+                  {sendingWhatsapp ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
                   <span>{sendingWhatsapp ? 'Opening WhatsApp...' : 'Send Bill to Customer on WhatsApp ➔'}</span>
                 </button>
               )}

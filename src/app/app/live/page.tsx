@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import BrandLoader from '@/components/ui/BrandLoader';
+import { showToast } from '@/lib/toast';
 import {
   Radio,
   Clock,
@@ -22,6 +23,7 @@ import {
   Phone,
   Search,
   Printer,
+  Loader2,
 } from 'lucide-react';
 
 interface WaitingCustomer {
@@ -105,6 +107,16 @@ export default function LiveStudioPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [actionId, setActionId] = useState<string | null>(null);
+
+  // Auto-dismiss notification after 3 seconds and trigger global toast
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Modal 1: Add to Waiting
   const [isWaitModalOpen, setIsWaitModalOpen] = useState(false);
@@ -117,11 +129,13 @@ export default function LiveStudioPage() {
   const [serviceModalSession, setServiceModalSession] = useState<ActiveSession | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState('');
   const [selectedStaffId, setSelectedStaffId] = useState('');
+  const [serviceSubmitting, setServiceSubmitting] = useState(false);
 
   // Modal 3: Add Product to Session
   const [productModalSession, setProductModalSession] = useState<ActiveSession | null>(null);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [productQty, setProductQty] = useState(1);
+  const [productSubmitting, setProductSubmitting] = useState(false);
 
   // Modal 4: Complete Session
   const [completeModalSession, setCompleteModalSession] = useState<ActiveSession | null>(null);
@@ -214,14 +228,22 @@ export default function LiveStudioPage() {
   }
 
   async function handleRemoveWaiting(id: string) {
+    setActionId(id);
     try {
       await fetch(`/api/live/waiting/${id}`, { method: 'DELETE' });
       await fetchLiveData();
-    } catch {}
+      setMessage({ type: 'success', text: 'Removed from waiting queue' });
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to remove from waiting' });
+    } finally {
+      setActionId(null);
+    }
   }
 
   // --- Session handlers ---
   async function handleStartSession(customerId: string, waitingId?: string) {
+    const loadingKey = waitingId || customerId;
+    setActionId(loadingKey);
     setMessage(null);
     try {
       const res = await fetch('/api/live/sessions', {
@@ -236,6 +258,8 @@ export default function LiveStudioPage() {
       setMessage({ type: 'success', text: 'Beauty session started!' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
+    } finally {
+      setActionId(null);
     }
   }
 
@@ -243,6 +267,7 @@ export default function LiveStudioPage() {
     e.preventDefault();
     if (!serviceModalSession || !selectedServiceId) return;
 
+    setServiceSubmitting(true);
     try {
       const res = await fetch(`/api/live/sessions/${serviceModalSession.id}/items`, {
         method: 'POST',
@@ -262,6 +287,8 @@ export default function LiveStudioPage() {
       setMessage({ type: 'success', text: 'Service added to session' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
+    } finally {
+      setServiceSubmitting(false);
     }
   }
 
@@ -269,6 +296,7 @@ export default function LiveStudioPage() {
     e.preventDefault();
     if (!productModalSession || !selectedProductId) return;
 
+    setProductSubmitting(true);
     try {
       const res = await fetch(`/api/live/sessions/${productModalSession.id}/items`, {
         method: 'POST',
@@ -287,14 +315,22 @@ export default function LiveStudioPage() {
       setMessage({ type: 'success', text: 'Product added to session (Stock adjusted on completion)' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
+    } finally {
+      setProductSubmitting(false);
     }
   }
 
   async function handleRemoveSessionItem(sessionId: string, itemId: string) {
+    setActionId(itemId);
     try {
       await fetch(`/api/live/sessions/${sessionId}/items/${itemId}`, { method: 'DELETE' });
       await fetchLiveData();
-    } catch {}
+      setMessage({ type: 'success', text: 'Item removed from session' });
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to remove item' });
+    } finally {
+      setActionId(null);
+    }
   }
 
   async function handleCompleteSession(e: React.FormEvent) {
@@ -532,11 +568,16 @@ export default function LiveStudioPage() {
                       </div>
                     </div>
                     <button
+                      disabled={actionId === w.id}
                       onClick={() => handleRemoveWaiting(w.id)}
-                      className="text-neutral-300 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 cursor-pointer p-1"
+                      className="text-neutral-300 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed p-1 transition-colors"
                       title="Remove from waiting"
                     >
-                      <X className="w-4 h-4" />
+                      {actionId === w.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+                      ) : (
+                        <X className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
 
@@ -547,11 +588,16 @@ export default function LiveStudioPage() {
                     </span>
 
                     <button
+                      disabled={actionId === w.id}
                       onClick={() => handleStartSession(w.customer_id, w.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold cursor-pointer shadow-xs active:scale-95 transition-all"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs active:scale-95 transition-all"
                     >
-                      <Play className="w-3 h-3 fill-[#080B12]" />
-                      <span>Start Session</span>
+                      {actionId === w.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin fill-[#080B12]" />
+                      ) : (
+                        <Play className="w-3 h-3 fill-[#080B12]" />
+                      )}
+                      <span>{actionId === w.id ? 'Starting...' : 'Start Session'}</span>
                     </button>
                   </div>
                 </div>
@@ -643,10 +689,15 @@ export default function LiveStudioPage() {
                                 ₹{Number(item.unit_price) * Number(item.qty)}
                               </span>
                               <button
+                                disabled={actionId === item.id}
                                 onClick={() => handleRemoveSessionItem(s.id, item.id)}
-                                className="text-neutral-300 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 cursor-pointer p-0.5"
+                                className="text-neutral-300 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed p-0.5 transition-colors"
                               >
-                                <X className="w-3.5 h-3.5" />
+                                {actionId === item.id ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500" />
+                                ) : (
+                                  <X className="w-3.5 h-3.5" />
+                                )}
                               </button>
                             </div>
                           </div>
@@ -925,9 +976,16 @@ export default function LiveStudioPage() {
                 <button
                   type="submit"
                   disabled={waitSubmitting}
-                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                 >
-                  {waitSubmitting ? 'Adding...' : 'Add to Waiting'}
+                  {waitSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Adding...</span>
+                    </>
+                  ) : (
+                    'Add to Waiting'
+                  )}
                 </button>
               </div>
             </form>
@@ -998,9 +1056,17 @@ export default function LiveStudioPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer transition-all"
+                  disabled={serviceSubmitting}
+                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                 >
-                  Add Service
+                  {serviceSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Adding...</span>
+                    </>
+                  ) : (
+                    'Add Service'
+                  )}
                 </button>
               </div>
             </form>
@@ -1068,9 +1134,17 @@ export default function LiveStudioPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white rounded-xl shadow-md cursor-pointer transition-all"
+                  disabled={productSubmitting}
+                  className="px-5 py-2 text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                 >
-                  Add Product
+                  {productSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Adding...</span>
+                    </>
+                  ) : (
+                    'Add Product'
+                  )}
                 </button>
               </div>
             </form>
@@ -1224,9 +1298,16 @@ export default function LiveStudioPage() {
                     <button
                       type="submit"
                       disabled={completing}
-                      className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                      className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all"
                     >
-                      {completing ? 'Generating Bill...' : 'Complete & Generate Invoice'}
+                      {completing ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Generating Bill...</span>
+                        </>
+                      ) : (
+                        'Complete & Generate Invoice'
+                      )}
                     </button>
                   </div>
                 </form>
@@ -1329,9 +1410,16 @@ export default function LiveStudioPage() {
                 <button
                   type="submit"
                   disabled={paySubmitting}
-                  className="px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                  className="px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                 >
-                  {paySubmitting ? 'Recording...' : 'Record Payment'}
+                  {paySubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Recording...</span>
+                    </>
+                  ) : (
+                    'Record Payment'
+                  )}
                 </button>
               </div>
             </form>

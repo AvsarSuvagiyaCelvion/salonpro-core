@@ -23,10 +23,10 @@ export default function ToastContainer() {
 
       setToasts((prev) => [...prev.slice(-4), newToast]);
 
-      // Auto dismiss after 4 seconds
+      // Auto dismiss after exactly 3 seconds
       setTimeout(() => {
         dismissToast(newToast.id);
-      }, 4000);
+      }, 3000);
     }
 
     window.addEventListener('app-toast', handleToast);
@@ -41,7 +41,7 @@ export default function ToastContainer() {
     );
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 200);
+    }, 250);
   }
 
   if (toasts.length === 0) return null;
@@ -49,7 +49,7 @@ export default function ToastContainer() {
   return (
     <div
       aria-live="polite"
-      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] flex flex-col gap-2.5 max-w-[calc(100vw-2rem)] sm:max-w-md w-full pointer-events-none"
+      className="fixed top-4 right-4 sm:top-5 sm:right-6 z-[99999] flex flex-col gap-2.5 max-w-[calc(100vw-2rem)] sm:max-w-md w-full pointer-events-none"
     >
       {toasts.map((toast) => {
         const isSuccess = toast.type === 'success';
@@ -59,10 +59,10 @@ export default function ToastContainer() {
           <div
             key={toast.id}
             role="status"
-            className={`pointer-events-auto transform transition-all duration-200 ease-out flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl shadow-2xl backdrop-blur-md border ${
+            className={`pointer-events-auto transform transition-all duration-250 ease-out flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl shadow-2xl backdrop-blur-md border relative overflow-hidden ${
               toast.leaving
-                ? 'opacity-0 translate-y-2 scale-95'
-                : 'opacity-100 translate-y-0 scale-100'
+                ? 'opacity-0 -translate-y-3 scale-95'
+                : 'opacity-100 translate-y-0 scale-100 animate-in slide-in-from-top-4'
             } ${
               isSuccess
                 ? 'bg-[#064E3B] dark:bg-[#064E3B] text-white border-emerald-400/40 shadow-emerald-950/40'
@@ -102,6 +102,18 @@ export default function ToastContainer() {
             >
               <X className="w-4 h-4" />
             </button>
+
+            {/* 3-Second Countdown Progress Bar */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
+              <div
+                className={`h-full ${
+                  isSuccess ? 'bg-emerald-300' : isError ? 'bg-rose-300' : 'bg-[#D4A77F]'
+                }`}
+                style={{
+                  animation: 'toast-progress 3s linear forwards',
+                }}
+              />
+            </div>
           </div>
         );
       })}

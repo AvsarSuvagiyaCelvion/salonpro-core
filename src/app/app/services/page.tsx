@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import { showToast } from '@/lib/toast';
 import {
   Scissors,
   Plus,
@@ -12,6 +13,7 @@ import {
   AlertCircle,
   X,
   Search,
+  Loader2,
 } from 'lucide-react';
 
 interface Service {
@@ -34,7 +36,20 @@ export default function ServicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Auto-dismiss notification after exactly 3 seconds and trigger global toast
+  useEffect(() => {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Form fields
   const [formName, setFormName] = useState('');
@@ -135,6 +150,7 @@ export default function ServicesPage() {
 
   async function handleToggleOnline(id: string, currentVal: boolean) {
     const newVal = !currentVal;
+    setTogglingId(id);
     setServices((prev) =>
       prev.map((s) => (s.id === id ? { ...s, online_enabled: newVal } : s))
     );
@@ -155,12 +171,15 @@ export default function ServicesPage() {
         prev.map((s) => (s.id === id ? { ...s, online_enabled: currentVal } : s))
       );
       setMessage({ type: 'error', text: 'Failed to update online status' });
+    } finally {
+      setTogglingId(null);
     }
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Are you sure you want to delete this service?')) return;
 
+    setDeletingId(id);
     try {
       const res = await fetch(`/api/services/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
@@ -168,6 +187,8 @@ export default function ServicesPage() {
       setMessage({ type: 'success', text: 'Service deleted successfully' });
     } catch {
       setMessage({ type: 'error', text: 'Failed to delete service' });
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -308,18 +329,27 @@ export default function ServicesPage() {
                     </td>
                     <td className="py-3 px-4 text-center">
                       <button
+                        disabled={togglingId === service.id}
                         onClick={() => handleToggleOnline(service.id, service.online_enabled)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${
+                          togglingId === service.id
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'cursor-pointer'
+                        } ${
                           service.online_enabled
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                             : 'bg-neutral-100 dark:bg-[#1C2230] text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-[#2A2F3A]'
                         }`}
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            service.online_enabled ? 'bg-emerald-500' : 'bg-neutral-400'
-                          }`}
-                        ></span>
+                        {togglingId === service.id ? (
+                          <Loader2 className="w-2.5 h-2.5 animate-spin text-neutral-400" />
+                        ) : (
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              service.online_enabled ? 'bg-emerald-500' : 'bg-neutral-400'
+                            }`}
+                          ></span>
+                        )}
                         <span>{service.online_enabled ? 'Available' : 'Hidden'}</span>
                       </button>
                     </td>
@@ -332,11 +362,16 @@ export default function ServicesPage() {
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
+                        disabled={deletingId === service.id}
                         onClick={() => handleDelete(service.id)}
-                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Delete service"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        {deletingId === service.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-red-500" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -472,9 +507,18 @@ export default function ServicesPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                  className="px-5 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-all"
                 >
-                  {saving ? 'Saving...' : editingService ? 'Update Service' : 'Add Service'}
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : editingService ? (
+                    'Update Service'
+                  ) : (
+                    'Add Service'
+                  )}
                 </button>
               </div>
             </form>

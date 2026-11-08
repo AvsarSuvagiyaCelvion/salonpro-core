@@ -228,6 +228,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `018_reviews.sql` | Creates `reviews` table (`id`, `salon_id`, `customer_id`, `appointment_id` UNIQUE, `staff_id`, `rating`, `comment`, `owner_reply`, `owner_replied_at`, `status`, `created_at`) with RLS and compound indexes; configures `reviews` plan flag in `subscription_plans`. |
 | `019_staff_shifts_and_leaves.sql` | Creates `staff_shifts` table (`id`, `staff_id`, `salon_id`, `weekday` 0-6, `start_time`, `end_time`, `is_off`, `UNIQUE(staff_id, weekday)`) and `staff_leaves` table (`id`, `staff_id`, `salon_id`, `from_date`, `to_date`, `reason`) with RLS, foreign keys ON DELETE CASCADE, and indexes. |
 | `020_add_salon_invoice_prefix.sql` | Adds `invoice_prefix VARCHAR(16)` to `salons` for salon-branded invoice numbers (e.g. `PALAK-2026-0001`, `DIXA-2026-0001`) and custom prefix management in Settings. |
+| `021_add_customer_last_login_at.sql` | Adds `last_login_at TIMESTAMPTZ` to `customers` table with index for tracking customer login timestamps and ordering unified cross-salon account sessions. |
 
 ---
 

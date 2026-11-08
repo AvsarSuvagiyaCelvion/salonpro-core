@@ -522,7 +522,13 @@ export default function CustomerPortalPage() {
         }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error('Connection error. Please check your network or try again.');
+      }
+
       if (!res.ok) {
         if (data.requiresLogin) {
           setAuthMode('login');

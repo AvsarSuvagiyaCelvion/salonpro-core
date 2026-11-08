@@ -63,7 +63,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `staff` | `id`, `salon_id`, `name`, `role_title`, `active`, `show_online` | Read | `001_initial_schema.sql` |
 | `staff_services` | `staff_id`, `service_id` | Read | `001_initial_schema.sql` |
 | `salon_holidays` | `salon_id`, `start_date`, `end_date`, `title` | Read | `014_salon_holidays.sql` |
-| `customers` | `id`, `salon_id`, `name`, `mobile`, `email`, `address`, `avatar_url`, `pin`, `last_login_at` | Read / Write | `001_initial_schema.sql`, `004_add_customer_auth.sql`, `012_dedupe_and_unique_customers.sql`, `017_customer_profile_columns.sql` |
+| `customers` | `id`, `salon_id`, `name`, `mobile`, `email`, `address`, `avatar_url`, `pin`, `last_login_at` | Read / Write | `001_initial_schema.sql`, `004_add_customer_auth.sql`, `012_dedupe_and_unique_customers.sql`, `017_customer_profile_columns.sql`, `021_add_customer_last_login_at.sql` |
 | `appointments` | `id`, `salon_id`, `customer_id`, `staff_id`, `service_id`, `starts_at`, `ends_at`, `status`, `source`, `cancelled_by`, `cancelled_at`, `rescheduled_count` | Read / Write | `001_initial_schema.sql`, `015_customer_cancel_reschedule.sql` |
 | `invoices` | `id`, `salon_id`, `customer_id`, `number`, `receipt_token`, `subtotal`, `tax_amount`, `total` | Read | `001_initial_schema.sql`, `007_invoices_tax_and_tenant_indexes.sql`, `010_backfill_invoice_receipt_tokens.sql` |
 | `payments` | `invoice_id`, `amount`, `payment_method` | Read | `001_initial_schema.sql` |

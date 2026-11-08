@@ -14,6 +14,7 @@ import {
   resetRateLimit,
   getClientIp,
 } from '@/lib/rate-limit';
+import { serverError } from '@/lib/http';
 
 export async function GET() {
   try {
@@ -82,6 +83,14 @@ export async function POST(request: Request) {
 
     // Resolve salonId from reqSalonId or salonSlug or x-tenant-slug header
     let salonId: string | null = reqSalonId || null;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (salonId && !UUID_REGEX.test(salonId)) {
+      // If salonId was passed as a slug rather than a UUID, resolve it
+      const sRes = await query('SELECT id FROM salons WHERE LOWER(slug) = $1 LIMIT 1', [String(salonId).toLowerCase().trim()]);
+      salonId = sRes.rows[0]?.id || null;
+    }
+
     if (!salonId && salonSlug) {
       const sRes = await query('SELECT id FROM salons WHERE LOWER(slug) = $1 LIMIT 1', [String(salonSlug).toLowerCase().trim()]);
       if (sRes.rows.length > 0) salonId = sRes.rows[0].id;
@@ -388,7 +397,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid action. Use 'login' or 'signup'." }, { status: 400 });
     }
   } catch (error: any) {
-    console.error('Customer auth error:', error);
-    return NextResponse.json({ error: 'Authentication failed. Please try again.' }, { status: 500 });
+    return serverError(error, 'src/app/api/customer/auth/route.ts');
   }
 }

@@ -90,7 +90,7 @@ interface CachedPlanResult {
 }
 
 const planCache = new Map<string, CachedPlanResult>();
-const PLAN_CACHE_TTL = 30000; // 30 seconds
+const PLAN_CACHE_TTL = 60000; // 60 seconds cache to accelerate consecutive API calls
 
 export function invalidateSalonPlanCache(salonId?: string) {
   if (salonId) {

@@ -97,7 +97,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     trialEndsAt?: string | null;
     subscriptionEndsAt?: string | null;
     currentPlan: any;
-  } | null>(null);
+  } | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const s = localStorage.getItem('salonpro_subscription_info');
+        if (s) return JSON.parse(s);
+      } catch {}
+    }
+    return null;
+  });
 
   const [availablePlans, setAvailablePlans] = useState<any[]>([]);
   const [showPlanModal, setShowPlanModal] = useState(false);
@@ -193,6 +201,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           const subData = await subRes.json();
           if (subData.subscription) {
             setSubscription(subData.subscription);
+            try {
+              localStorage.setItem('salonpro_subscription_info', JSON.stringify(subData.subscription));
+            } catch {}
           }
         }
 

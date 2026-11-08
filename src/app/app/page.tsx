@@ -66,42 +66,63 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<'today' | '7d' | '30d'>('today');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
-  const [salonSlug, setSalonSlug] = useState<string>('');
-  const [subscription, setSubscription] = useState<any>(null);
-  const [salonHours, setSalonHours] = useState<{ open: string; close: string }>({
-    open: '09:00',
-    close: '21:00',
-  });
-
-  useEffect(() => {
-    async function loadSalon() {
+  const [salonSlug, setSalonSlug] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
       try {
-        const [res, subRes] = await Promise.all([
-          fetch('/api/settings'),
-          fetch('/api/subscription').catch(() => null),
-        ]);
-        if (res.ok) {
-          const sData = await res.json();
-          if (sData.salon?.slug) {
-            setSalonSlug(sData.salon.slug);
-          }
-          if (sData.salon?.open_time && sData.salon?.close_time) {
-            setSalonHours({
-              open: sData.salon.open_time.slice(0, 5),
-              close: sData.salon.close_time.slice(0, 5),
-            });
-          }
-        }
-        if (subRes && subRes.ok) {
-          const subData = await subRes.json();
-          if (subData.subscription) {
-            setSubscription(subData.subscription);
+        const s = localStorage.getItem('salonpro_salon_info');
+        if (s) return JSON.parse(s).slug || '';
+      } catch {}
+    }
+    return '';
+  });
+  const [subscription, setSubscription] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const s = localStorage.getItem('salonpro_subscription_info');
+        if (s) return JSON.parse(s);
+      } catch {}
+    }
+    return null;
+  });
+  const [salonHours, setSalonHours] = useState<{ open: string; close: string }>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const s = localStorage.getItem('salonpro_salon_info');
+        if (s) {
+          const parsed = JSON.parse(s);
+          if (parsed.open_time && parsed.close_time) {
+            return {
+              open: parsed.open_time.slice(0, 5),
+              close: parsed.close_time.slice(0, 5),
+            };
           }
         }
       } catch {}
     }
-    loadSalon();
-  }, []);
+    return { open: '09:00', close: '21:00' };
+  });
+
+  useEffect(() => {
+    // Only fetch if missing from localStorage to avoid redundant database roundtrips
+    if (!salonSlug) {
+      async function loadSalon() {
+        try {
+          const res = await fetch('/api/settings');
+          if (res.ok) {
+            const sData = await res.json();
+            if (sData.salon?.slug) setSalonSlug(sData.salon.slug);
+            if (sData.salon?.open_time && sData.salon?.close_time) {
+              setSalonHours({
+                open: sData.salon.open_time.slice(0, 5),
+                close: sData.salon.close_time.slice(0, 5),
+              });
+            }
+          }
+        } catch {}
+      }
+      loadSalon();
+    }
+  }, [salonSlug]);
 
   useEffect(() => {
     async function loadStats() {

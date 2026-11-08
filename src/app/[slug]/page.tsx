@@ -1,8 +1,6 @@
 import { notFound } from 'next/navigation';
 import BookingWizard from '@/components/booking/BookingWizard';
 
-export const instant = false;
-
 export const metadata = {
   title: 'Book Appointment - SalonPro',
   description: 'Book your salon appointment online in seconds',

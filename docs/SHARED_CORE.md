@@ -47,7 +47,7 @@ The proxy middleware intercepts every incoming HTTP request and performs:
 - **`customer`**: Self-service client authority. Can view personal appointments and receipts, cancel or reschedule bookings within policy windows.
 
 ### Role Re-verification
-In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re-queries `users.role` from PostgreSQL (with a 10-second in-memory cache `userAuthCache`) to immediately enforce role downgrades or account deactivations.
+In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re-queries `users.role` from PostgreSQL (with a 60-second in-memory cache `userAuthCache`) to immediately enforce role downgrades or account deactivations without overloading the database.
 
 ### Error Handling & RFC HTTP Responses (`src/lib/http.ts`, `src/app/error.tsx`, `src/app/not-found.tsx`)
 - **Centralized API Error Handler (`serverError`)**:
@@ -72,8 +72,8 @@ In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re
 - **Global Pool Caching**: Cached on `global.__dbPool` to preserve connection pools across warm serverless execution lambdas.
 - **Connection Configuration**:
   - `connectionString`: `process.env.DATABASE_URL`
-  - `max`: `process.env.DB_POOL_MAX` (defaults to 3 connections per serverless instance to prevent Supabase connection exhaustion)
-  - `idleTimeoutMillis`: 30,000ms
+  - `max`: `process.env.DB_POOL_MAX` (defaults to 20 connections to prevent queuing on concurrent analytical dashboard queries)
+  - `idleTimeoutMillis`: 60,000ms
   - `connectionTimeoutMillis`: 10,000ms
   - `ssl`: Uses `rejectUnauthorized: true` with `process.env.DATABASE_CA_CERT` if provided; otherwise `{ rejectUnauthorized: false }`.
 - **Automatic Retry**: Idempotent `SELECT` and `WITH` queries automatically retry once with a 150ms backoff if a transient network disconnect (`ECONNRESET`, `ETIMEDOUT`) occurs.

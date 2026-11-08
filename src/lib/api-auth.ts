@@ -44,7 +44,7 @@ interface CachedUserAuth {
 }
 
 const userAuthCache = new Map<string, CachedUserAuth>();
-const USER_CACHE_TTL = 10000; // 10 seconds
+const USER_CACHE_TTL = 60000; // 60 seconds in-memory cache for fast tab navigation
 
 export function invalidateUserAuthCache(email?: string) {
   if (email) {

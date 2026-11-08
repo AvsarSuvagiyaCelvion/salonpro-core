@@ -85,7 +85,22 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(true);
 
   // Operating hours for daily timeline
-  const [operatingHours, setOperatingHours] = useState<{ start: number; end: number }>({ start: 9, end: 21 });
+  const [operatingHours, setOperatingHours] = useState<{ start: number; end: number }>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const s = localStorage.getItem('salonpro_salon_info');
+        if (s) {
+          const parsed = JSON.parse(s);
+          if (parsed.open_time && parsed.close_time) {
+            const startH = parseInt(parsed.open_time.slice(0, 2), 10) || 9;
+            const endH = parseInt(parsed.close_time.slice(0, 2), 10) || 21;
+            return { start: startH, end: Math.max(endH, startH + 1) };
+          }
+        }
+      } catch {}
+    }
+    return { start: 9, end: 21 };
+  });
 
   // View Mode: Multi-Stylist Lanes vs 7-Day Matrix vs Card List
   const [viewMode, setViewMode] = useState<ViewMode>('lanes');
@@ -217,25 +232,18 @@ export default function AppointmentsPage() {
 
   async function fetchInitialData() {
     try {
-      const [srvRes, stfRes, custRes, setRes] = await Promise.all([
+      const [srvRes, stfRes, custRes] = await Promise.all([
         fetch('/api/services'),
         fetch('/api/staff'),
         fetch('/api/customers'),
-        fetch('/api/settings'),
       ]);
       const srvData = await srvRes.json();
       const stfData = await stfRes.json();
       const custData = await custRes.json();
-      const setData = await setRes.json();
 
       if (srvRes.ok) setServices(srvData.services || []);
       if (stfRes.ok) setStaffList(stfData.staff || []);
       if (custRes.ok) setCustomers(custData.customers || []);
-      if (setRes.ok && setData.salon?.open_time && setData.salon?.close_time) {
-        const startH = parseInt(setData.salon.open_time.slice(0, 2), 10) || 9;
-        const endH = parseInt(setData.salon.close_time.slice(0, 2), 10) || 21;
-        setOperatingHours({ start: startH, end: Math.max(endH, startH + 1) });
-      }
     } catch {}
   }
 

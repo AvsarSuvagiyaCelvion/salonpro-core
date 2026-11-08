@@ -4,7 +4,7 @@ declare global {
   var __dbPool: Pool | undefined;
 }
 
-const poolMax = process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 3;
+const poolMax = process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 20;
 
 const sslConfig = process.env.DATABASE_CA_CERT
   ? {
@@ -21,7 +21,7 @@ const pool =
     connectionString: process.env.DATABASE_URL,
     ssl: sslConfig,
     max: poolMax,
-    idleTimeoutMillis: 30000,
+    idleTimeoutMillis: 60000,
     connectionTimeoutMillis: 10000,
     allowExitOnIdle: false,
   });

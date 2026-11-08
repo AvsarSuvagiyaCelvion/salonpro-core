@@ -18,8 +18,6 @@ export const metadata = {
   description: 'View your digital salon receipt',
 };
 
-export const instant = false;
-
 function maskMobile(mobile: string | null | undefined): string {
   if (!mobile) return '';
   const digits = mobile.replace(/\D/g, '');

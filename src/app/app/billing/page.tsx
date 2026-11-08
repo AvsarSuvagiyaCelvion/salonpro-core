@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { showToast } from '@/lib/toast';
-import { dispatchSmartWhatsAppBill } from '@/lib/whatsapp-bill';
+import { dispatchSmartWhatsAppBill, downloadInvoicePdf } from '@/lib/whatsapp-bill';
 import {
   Receipt,
   Search,
@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Eye,
   Printer,
+  Download,
   Loader2,
 } from 'lucide-react';
 
@@ -78,6 +79,36 @@ export default function BillingPage() {
   // WhatsApp Preview Modal
   const [whatsappInvoice, setWhatsappInvoice] = useState<Invoice | null>(null);
   const [sendingWhatsapp, setSendingWhatsapp] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  async function handleDownloadPdfClick() {
+    if (!whatsappInvoice) return;
+    setDownloadingPdf(true);
+    try {
+      const ok = await downloadInvoicePdf({
+        id: whatsappInvoice.id,
+        number: whatsappInvoice.number,
+        receipt_token: whatsappInvoice.receipt_token,
+        customer_name: whatsappInvoice.customer_name,
+        customer_mobile: whatsappInvoice.customer_mobile,
+        subtotal: whatsappInvoice.subtotal,
+        discount_amount: whatsappInvoice.discount_amount,
+        total: whatsappInvoice.total,
+        paid_amount: whatsappInvoice.paid_amount,
+        created_at: whatsappInvoice.created_at,
+        items: whatsappInvoice.items,
+      });
+      if (ok) {
+        showToast('Official PDF Invoice downloaded to your device!', 'success');
+      } else {
+        window.open(`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`, '_blank');
+      }
+    } catch {
+      window.open(`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`, '_blank');
+    } finally {
+      setDownloadingPdf(false);
+    }
+  }
 
   // Full Receipt View Modal
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
@@ -678,21 +709,10 @@ export default function BillingPage() {
               </div>
 
               <div className="p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/40 text-[10px] text-emerald-800 dark:text-emerald-300">
-                ⚡ <strong>Smart Device Dispatch:</strong> On Mobile/Tablet, generates &amp; attaches the PDF bill directly into WhatsApp chat. On PC, saves PDF to computer and opens WhatsApp Web.
+                ⚡ <strong>Instant WhatsApp Dispatch:</strong> Opens WhatsApp directly into customer (+91 {whatsappInvoice.customer_mobile}) chat with itemized tax invoice &amp; PDF link.
               </div>
 
-              <div className="pt-2 border-t border-neutral-200/60 dark:border-[#2A3942] flex gap-2">
-                <a
-                  href={`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-white dark:bg-[#1F2C34] hover:bg-neutral-50 dark:hover:bg-[#2A3942] text-neutral-800 dark:text-neutral-100 text-xs font-bold border border-neutral-300 dark:border-[#2A3942] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
-                >
-                  <Printer className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
-                  <span>📥 View &amp; Print Official Tax Receipt ↗</span>
-                </a>
-              </div>
-
+              {/* Direct WhatsApp Chat Action */}
               {whatsappInvoice.whatsapp_sent ? (
                 <div className="space-y-2">
                   <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold text-center flex items-center justify-center gap-1.5">
@@ -702,9 +722,9 @@ export default function BillingPage() {
                   <button
                     type="button"
                     onClick={() => handleMarkWhatsappSent(whatsappInvoice.id)}
-                    className="w-full py-2 px-3 rounded-xl bg-white dark:bg-[#1F2C34] hover:bg-neutral-50 dark:hover:bg-[#2A3942] text-neutral-800 dark:text-neutral-100 text-xs font-bold border border-neutral-300 dark:border-[#2A3942] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
                   >
-                    <Send className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <Send className="w-3.5 h-3.5" />
                     <span>Resend to Customer on WhatsApp ↗</span>
                   </button>
                 </div>
@@ -723,6 +743,33 @@ export default function BillingPage() {
                   <span>{sendingWhatsapp ? 'Opening WhatsApp...' : 'Send Bill to Customer on WhatsApp ➔'}</span>
                 </button>
               )}
+
+              {/* Secondary Actions: Direct PDF Download & Web Receipt */}
+              <div className="pt-2 border-t border-neutral-200/60 dark:border-[#2A3942] grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={handleDownloadPdfClick}
+                  disabled={downloadingPdf}
+                  className="py-2.5 px-3 rounded-xl bg-white dark:bg-[#1F2C34] hover:bg-neutral-50 dark:hover:bg-[#2A3942] text-neutral-800 dark:text-neutral-100 text-xs font-bold border border-neutral-300 dark:border-[#2A3942] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {downloadingPdf ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#D4A77F]" />
+                  ) : (
+                    <Download className="w-3.5 h-3.5 text-[#D4A77F]" />
+                  )}
+                  <span>{downloadingPdf ? 'Saving...' : '📥 Download PDF'}</span>
+                </button>
+
+                <a
+                  href={`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-2.5 px-3 rounded-xl bg-white dark:bg-[#1F2C34] hover:bg-neutral-50 dark:hover:bg-[#2A3942] text-neutral-800 dark:text-neutral-100 text-xs font-bold border border-neutral-300 dark:border-[#2A3942] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95 text-center"
+                >
+                  <Printer className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-300" />
+                  <span>🖨️ View &amp; Print ↗</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

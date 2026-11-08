@@ -31,8 +31,8 @@ export async function GET() {
     }
     const customer = custRes.rows[0];
 
-    // 2. Execute Salon, Appointments, Invoices, and Plans queries concurrently
-    const [salonRes, apptsRes, invRes, plansRes] = await Promise.all([
+    // 2. Execute Salon, Appointments, Invoices, Plans, and All Salons queries concurrently
+    const [salonRes, apptsRes, invRes, plansRes, allSalonsRes] = await Promise.all([
       query(
         `SELECT id, name, slug, address, phone, brand_color, COALESCE(cancel_policy_hours, 2) as cancel_policy_hours, max_advance_days, min_advance_hours FROM salons WHERE id = $1 LIMIT 1`,
         [customer.salon_id]
@@ -78,6 +78,12 @@ export async function GET() {
          ORDER BY cp.expires_on DESC`,
         [customerId]
       ),
+      query(
+        `SELECT id, name, slug, address, phone, brand_color, logo_url
+         FROM salons
+         WHERE is_active = true
+         ORDER BY name ASC`
+      ),
     ]);
 
     const salon = salonRes.rows[0];
@@ -93,6 +99,7 @@ export async function GET() {
     return NextResponse.json({
       customer,
       salon,
+      allSalons: allSalonsRes.rows,
       upcomingAppointments,
       pastAppointments,
       invoices: invRes.rows,

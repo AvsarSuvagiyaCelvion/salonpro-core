@@ -34,6 +34,7 @@ interface Salon {
   min_advance_hours: number;
   max_advance_days: number;
   phone?: string;
+  address?: string;
   booking_enabled?: boolean;
 }
 
@@ -1618,42 +1619,44 @@ export default function BookingWizard({ slug }: { slug: string }) {
               </div>
             </div>
 
-            {/* WhatsApp Preview Bubble */}
-            <div className="mt-8 max-w-md mx-auto text-left">
-              <div className="flex items-center gap-2 mb-2 px-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-                  WhatsApp Confirmation Preview
-                </span>
-              </div>
-
-              <div className="bg-[#0b141a] border border-[#202c33] rounded-3xl p-4 shadow-2xl relative overflow-hidden">
-                {/* Chat Header */}
-                <div className="flex items-center gap-2.5 pb-3 border-b border-[#202c33] mb-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white text-xs">
-                    {salon.name.charAt(0)}
+            {/* Booking Details & Salon Info Card */}
+            <div className="mt-6 max-w-md mx-auto text-left space-y-3">
+              <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl p-4 flex items-start gap-3 shadow-xs">
+                <span className="text-xl">📍</span>
+                <div className="text-xs space-y-1">
+                  <div className="font-bold text-emerald-900 dark:text-emerald-300">
+                    {salon.name}
                   </div>
-                  <div>
-                    <div className="text-xs font-bold text-[#e9edef]">{salon.name} (Official)</div>
-                    <div className="text-[10px] text-emerald-400">Verified Business Account</div>
-                  </div>
-                </div>
-
-                {/* WhatsApp Chat Bubble */}
-                <div className="bg-[#005c4b] text-[#e9edef] rounded-2xl rounded-tl-sm p-3.5 text-xs sm:text-sm shadow-md leading-relaxed">
-                  <p>{confirmedBooking.whatsappMessage}</p>
-                  <div className="mt-2 flex items-center justify-end gap-1 text-[10px] text-[#8696a0]">
-                    <span>Just now</span>
-                    <span className="text-[#53bdeb] font-bold">✓✓</span>
-                  </div>
-                </div>
-
-                <div className="mt-3 text-center">
-                  <span className="text-[10px] text-neutral-400">
-                    This official confirmation message has been dispatched to your registered WhatsApp number.
-                  </span>
+                  {salon.address && (
+                    <p className="text-neutral-600 dark:text-neutral-300 text-[11px] leading-relaxed">
+                      {salon.address}
+                    </p>
+                  )}
+                  {salon.phone && (
+                    <p className="text-neutral-500 dark:text-neutral-400 text-[11px]">
+                      Contact: <span className="font-semibold text-neutral-800 dark:text-neutral-200">{salon.phone}</span>
+                    </p>
+                  )}
                 </div>
               </div>
+
+              <div className="p-3.5 rounded-2xl bg-neutral-100 dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-center text-xs text-neutral-600 dark:text-neutral-300">
+                ✨ Your appointment is reserved in our schedule. Please arrive 5–10 minutes prior to your slot.
+              </div>
+
+              {/* Optional: Direct Chat with Salon on WhatsApp */}
+              {salon.phone && (
+                <a
+                  href={`https://wa.me/${salon.phone.replace(/\D/g, '').length === 10 ? `91${salon.phone.replace(/\D/g, '')}` : salon.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                    `Hello ${salon.name}, I have booked an appointment for ${confirmedBooking.serviceName} on ${confirmedBooking.formattedDate} at ${confirmedBooking.formattedTime}.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-[#141926] hover:bg-neutral-50 dark:hover:bg-[#1C2230] text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2"
+                >
+                  <span>💬 Have a question? Chat with Salon on WhatsApp ↗</span>
+                </a>
+              )}
             </div>
 
             {/* Customer Portal Link & Action Buttons */}

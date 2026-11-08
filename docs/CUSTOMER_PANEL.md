@@ -41,6 +41,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `/api/customer/profile` | `GET`, `PATCH` | `src/app/api/customer/profile/route.ts` | `salonpro_customer_session` | `GET` returns logged-in client profile. `PATCH` updates name (2-60 chars), email, address (max 250), and avatar_url (strictly within customer's own folder in `salon-media` bucket). Phone is read-only. Rate-limited to 20 updates / 15 min. |
 | `/api/customer/profile/pin` | `POST` | `src/app/api/customer/profile/pin/route.ts` | `salonpro_customer_session` | Updates customer 4-digit PIN. Requires current PIN, new 4-digit PIN (must differ), and confirm PIN. Verifies current PIN via bcryptjs and hashes new PIN. Protected by strict brute-force rate limit (5 attempts / 15 min per customer + IP). |
 | `/api/customer/reviews` | `GET`, `POST` | `src/app/api/customer/reviews/route.ts` | `salonpro_customer_session` | `GET` lists all reviews submitted by the authenticated customer. `POST` submits review for a completed appointment within 30 days (1-5 stars, optional comment max 500 chars). Rate-limited to 10 submissions / 15 min. Simulates success for demo salon `dixa-beauty-salon`. |
+| `/api/salons` | `GET` | `src/app/api/salons/route.ts` | None (Public) | Returns all active salons on the platform (`id`, `name`, `slug`, `address`, `phone`, `brand_color`, `logo_url`) for customer discovery and multi-salon slot booking selector. |
 
 ---
 

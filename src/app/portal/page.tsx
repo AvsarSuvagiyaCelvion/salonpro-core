@@ -21,6 +21,7 @@ import {
   KeyRound,
   ShieldCheck,
   Star,
+  Search,
 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 import { showToast } from '@/lib/toast';
@@ -98,6 +99,21 @@ export default function CustomerPortalPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [activeTab, setActiveTab] = useState<'appointments' | 'bills' | 'memberships' | 'profile'>('appointments');
+
+  // Salon Selector Modal State (Option 1)
+  const [allSalons, setAllSalons] = useState<Array<{ id: string; name: string; slug: string; address?: string; phone?: string; brand_color?: string; logo_url?: string }>>([]);
+  const [isSalonModalOpen, setIsSalonModalOpen] = useState(false);
+  const [salonSearchQuery, setSalonSearchQuery] = useState('');
+
+  const filteredSalons = allSalons.filter((s) => {
+    if (!salonSearchQuery) return true;
+    const q = salonSearchQuery.toLowerCase().trim();
+    return (
+      s.name.toLowerCase().includes(q) ||
+      (s.address && s.address.toLowerCase().includes(q)) ||
+      (s.phone && s.phone.includes(q))
+    );
+  });
 
   // Profile form state
   const [profileName, setProfileName] = useState('');
@@ -294,6 +310,9 @@ export default function CustomerPortalPage() {
         syncProfile(data.customer);
       }
       setSalon(data.salon);
+      if (data.allSalons && Array.isArray(data.allSalons)) {
+        setAllSalons(data.allSalons);
+      }
       setUpcomingAppts(data.upcomingAppointments || []);
       setPastAppts(data.pastAppointments || []);
       setInvoices(data.invoices || []);
@@ -361,6 +380,18 @@ export default function CustomerPortalPage() {
     }
   }
 
+  async function fetchSalonsList() {
+    try {
+      const res = await fetch('/api/salons');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.salons && Array.isArray(data.salons)) {
+          setAllSalons(data.salons);
+        }
+      }
+    } catch {}
+  }
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -377,6 +408,7 @@ export default function CustomerPortalPage() {
       if (slug) setLastSalonSlug(slug);
     }
 
+    fetchSalonsList();
     checkSession();
   }, []);
 
@@ -570,6 +602,163 @@ export default function CustomerPortalPage() {
     }
   }
 
+  function renderSalonSelectorModal() {
+    if (!isSalonModalOpen) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+        <div className="relative w-full max-w-lg bg-white dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-200 dark:border-[#2A2F3A]">
+            <div>
+              <h3 className="text-base sm:text-lg font-extrabold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <span>✂</span>
+                <span>Select a Salon to Book Slot</span>
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                Choose any registered beauty studio on SalonPro
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSalonModalOpen(false);
+                setSalonSearchQuery('');
+              }}
+              className="w-8 h-8 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-white/10 dark:hover:bg-white/20 text-neutral-600 dark:text-neutral-300 flex items-center justify-center transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Search Input */}
+          <div className="p-3.5 border-b border-neutral-200/80 dark:border-[#2A2F3A] bg-neutral-50/70 dark:bg-[#141926]/70">
+            <div className="relative">
+              <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search salons by name, area, or city..."
+                value={salonSearchQuery}
+                onChange={(e) => setSalonSearchQuery(e.target.value)}
+                className="w-full bg-white dark:bg-[#080B12] border border-neutral-200 dark:border-[#2A2F3A] rounded-2xl pl-10 pr-4 py-2 text-xs sm:text-sm text-[#1F2937] dark:text-white placeholder-neutral-400 focus:outline-none focus:border-[#D4A77F] transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Content List */}
+          <div className="overflow-y-auto p-4 space-y-4 touch-scroll flex-1">
+            {/* Pinned Current Salon if available */}
+            {salon && !salonSearchQuery && (
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C5E2E] dark:text-[#D4A77F] px-1">
+                  ⭐ Your Current / Recent Salon
+                </span>
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#D4A77F]/15 via-[#D4A77F]/5 to-transparent border border-[#D4A77F]/30 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-2xl bg-[#D4A77F] text-[#080B12] flex items-center justify-center font-black text-base shrink-0 shadow-sm">
+                      ✂
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-xs sm:text-sm font-bold text-[#1F2937] dark:text-white truncate">
+                        {salon.name}
+                      </h4>
+                      {salon.address && (
+                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
+                          📍 {salon.address}
+                        </p>
+                      )}
+                      {salon.phone && (
+                        <p className="text-[10px] text-neutral-400 font-mono">
+                          📞 {salon.phone}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <a
+                    href={`/${salon.slug}`}
+                    onClick={() => {
+                      try { localStorage.setItem('salonpro_last_salon', salon.slug); } catch {}
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold transition-all shadow-xs shrink-0 whitespace-nowrap active:scale-95"
+                  >
+                    Book Slot ➔
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Salons List */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 px-1">
+                All Registered Salons ({filteredSalons.length})
+              </span>
+
+              {filteredSalons.length === 0 ? (
+                <div className="text-center py-8 text-neutral-400 text-xs">
+                  No salons found matching &quot;{salonSearchQuery}&quot;
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredSalons.map((s) => (
+                    <div
+                      key={s.id}
+                      className="p-3 rounded-2xl bg-white dark:bg-[#141926] hover:bg-neutral-50 dark:hover:bg-[#1C2230] border border-neutral-200/80 dark:border-[#2A2F3A] flex items-center justify-between gap-3 transition-all shadow-2xs"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-2xl bg-neutral-100 dark:bg-white/10 border border-neutral-200 dark:border-[#2A2F3A] flex items-center justify-center font-bold text-sm text-[#8C5E2E] dark:text-[#D4A77F] shrink-0 overflow-hidden">
+                          {s.logo_url ? (
+                            <img src={s.logo_url} alt={s.name} className="w-full h-full object-cover" />
+                          ) : (
+                            s.name.charAt(0)
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-xs sm:text-sm font-bold text-[#1F2937] dark:text-white truncate">
+                              {s.name}
+                            </h4>
+                            {salon?.id === s.id && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                                Current
+                              </span>
+                            )}
+                          </div>
+                          {s.address ? (
+                            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
+                              📍 {s.address}
+                            </p>
+                          ) : (
+                            <p className="text-[11px] text-neutral-400">
+                              Boutique Salon &amp; Hair Spa
+                            </p>
+                          )}
+                          {s.phone && (
+                            <p className="text-[10px] text-neutral-400 font-mono">
+                              📞 {s.phone}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <a
+                        href={`/${s.slug}`}
+                        onClick={() => {
+                          try { localStorage.setItem('salonpro_last_salon', s.slug); } catch {}
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-[#D4A77F] dark:bg-white/10 dark:hover:bg-[#D4A77F] text-[#1F2937] hover:text-[#080B12] dark:text-white dark:hover:text-[#080B12] text-xs font-bold transition-all shrink-0 whitespace-nowrap active:scale-95"
+                      >
+                        Book Slot ➔
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] flex flex-col items-center justify-center p-4">
@@ -605,22 +794,14 @@ export default function CustomerPortalPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {lastSalonSlug ? (
-              <Link
-                href={`/${lastSalonSlug}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">Book Slot</span>
-              </Link>
-            ) : (
-              <Link
-                href="/"
-                className="text-xs text-[#6B7280] dark:text-[#A0A8B8] hover:text-[#D4A77F] transition-colors font-medium px-2 py-1"
-              >
-                Home
-              </Link>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsSalonModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Explore Salons</span>
+            </button>
             <ThemeToggle />
           </div>
         </header>
@@ -780,6 +961,7 @@ export default function CustomerPortalPage() {
             </div>
           </div>
         </main>
+        {renderSalonSelectorModal()}
       </div>
     );
   }
@@ -808,18 +990,26 @@ export default function CustomerPortalPage() {
               </span>
             </div>
           </Link>
+          <button
+            type="button"
+            onClick={() => setIsSalonModalOpen(true)}
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 dark:bg-white/10 dark:hover:bg-white/15 text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold transition-all cursor-pointer border border-neutral-200/60 dark:border-white/10"
+            title="Explore or switch to another salon"
+          >
+            <span>Change Salon</span>
+            <span>▾</span>
+          </button>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {salon?.slug && (
-            <Link
-              href={`/${salon.slug}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap"
-            >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span className="hidden xs:inline">Book Visit</span>
-            </Link>
-          )}
+          <button
+            type="button"
+            onClick={() => setIsSalonModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap cursor-pointer"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span className="hidden xs:inline">Book Visit</span>
+          </button>
 
           <ThemeToggle />
 
@@ -867,15 +1057,14 @@ export default function CustomerPortalPage() {
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            {salon?.slug && (
-              <Link
-                href={`/${salon.slug}`}
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-md transition-all active:scale-95 whitespace-nowrap"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Book Slot</span>
-              </Link>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsSalonModalOpen(true)}
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-md transition-all active:scale-95 whitespace-nowrap cursor-pointer"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Book Slot</span>
+            </button>
 
             <button
               onClick={handleLogout}
@@ -948,22 +1137,14 @@ export default function CustomerPortalPage() {
                   <Calendar className="w-10 h-10 text-[#9CA3AF] dark:text-[#747D8D] mx-auto mb-2" />
                   <p className="text-sm font-semibold text-[#1F2937] dark:text-white">No upcoming appointments scheduled</p>
                   <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1">Book your next beauty session in seconds</p>
-                  {salon?.slug ? (
-                    <Link
-                      href={`/${salon.slug}`}
-                      className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-md whitespace-nowrap"
-                    >
-                      <span>Book Slot Now</span>
-                      <span aria-hidden="true">&rarr;</span>
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/"
-                      className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-[#F3F4F6] dark:bg-[#1C2230] text-[#1F2937] dark:text-white text-xs font-bold"
-                    >
-                      <span>Explore Services</span>
-                    </Link>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsSalonModalOpen(true)}
+                    className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-md whitespace-nowrap cursor-pointer active:scale-95"
+                  >
+                    <span>Book Slot Now</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -1921,16 +2102,17 @@ export default function CustomerPortalPage() {
           <span className="text-[10px]">Profile</span>
         </button>
 
-        {salon?.slug && (
-          <Link
-            href={`/${salon.slug}`}
-            className="min-h-[44px] flex items-center gap-1.5 px-3 py-1.5 bg-[#D4A77F] text-[#080B12] rounded-xl text-xs font-bold shadow-md shadow-[#D4A77F]/30"
-          >
-            <PlusCircle className="w-3.5 h-3.5" />
-            <span>Book</span>
-          </Link>
-        )}
+        <button
+          type="button"
+          onClick={() => setIsSalonModalOpen(true)}
+          className="min-h-[44px] flex items-center gap-1.5 px-3 py-1.5 bg-[#D4A77F] text-[#080B12] rounded-xl text-xs font-bold shadow-md shadow-[#D4A77F]/30 cursor-pointer active:scale-95"
+        >
+          <PlusCircle className="w-3.5 h-3.5" />
+          <span>Book</span>
+        </button>
       </div>
+
+      {renderSalonSelectorModal()}
     </div>
   );
 }

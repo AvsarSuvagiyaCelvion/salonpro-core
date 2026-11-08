@@ -304,18 +304,14 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   return doc;
 }
 
-/**
- * Smart Device-Adaptive WhatsApp Bill Dispatcher:
- * - On Mobile/Tablet: Uses Web Share API to attach the PDF document directly into WhatsApp.
- * - On Desktop PC: Downloads PDF file directly to downloads and opens WhatsApp Web with the client chat & direct PDF link.
- */
-export async function dispatchSmartWhatsAppBill(invoice: InvoiceBillData): Promise<ShareResult> {
+export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: string; waUrl: string; cleanPhone: string } {
   const rawPhone = (invoice.customer_mobile || '').replace(/[^0-9]/g, '');
   const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const receiptLink = `${origin}/b/${invoice.receipt_token || invoice.number}`;
   const totalFormatted = Number(invoice.total || 0).toLocaleString('en-IN');
   const paidFormatted = Number(invoice.paid_amount || invoice.total || 0).toLocaleString('en-IN');
+
   let salonName = invoice.salon_name;
   if (typeof window !== 'undefined' && !salonName) {
     try {
@@ -327,28 +323,70 @@ export async function dispatchSmartWhatsAppBill(invoice: InvoiceBillData): Promi
     } catch {}
   }
   salonName = salonName || 'Our Salon';
-  const fileName = `Invoice_${invoice.number}.pdf`;
 
-  // 1. Generate PDF in memory
-  let pdfFile: File | null = null;
-  let doc: any = null;
+  const lines: string[] = [
+    `✨ *${salonName.toUpperCase()}* ✨`,
+    `*Official Tax Invoice*`,
+    ``,
+    `Dear *${invoice.customer_name}*, thank you for visiting us!`,
+    ``,
+    `🧾 *Invoice #:* ${invoice.number}`,
+    `💰 *Total Amount:* ₹${totalFormatted}`,
+    `💳 *Payment Received:* ₹${paidFormatted} (Paid in Full ✓)`,
+  ];
 
-  try {
-    doc = await generateInvoicePdfDoc(invoice);
-    const pdfBlob = doc.output('blob');
-    pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-  } catch (err) {
-    console.error('Failed to generate in-memory PDF:', err);
+  if (invoice.items && invoice.items.length > 0) {
+    lines.push(``, `✂ *Services & Products:*`);
+    for (const item of invoice.items) {
+      const priceStr = item.unit_price !== undefined ? ` - ₹${Number(item.unit_price).toLocaleString('en-IN')}` : '';
+      const qtyStr = item.qty && item.qty > 1 ? ` (x${item.qty})` : '';
+      lines.push(`  • ${item.name}${qtyStr}${priceStr}`);
+    }
   }
 
-  // 2. Check if device supports Web Share API with files (Mobile Phones & Tablets)
-  const canShareFiles =
-    pdfFile &&
-    typeof navigator !== 'undefined' &&
-    typeof navigator.canShare === 'function' &&
-    navigator.canShare({ files: [pdfFile] });
+  lines.push(
+    ``,
+    `📄 *View & Download Official PDF Receipt:*`,
+    `👉 ${receiptLink}`,
+    ``,
+    `_We look forward to welcoming you again!_ ✨`
+  );
 
-  // 3. Mark sent in backend DB
+  const text = lines.join('\n');
+  const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+
+  return { text, waUrl, cleanPhone };
+}
+
+/**
+ * Downloads the high-resolution vector PDF invoice directly to the device.
+ */
+export async function downloadInvoicePdf(invoice: InvoiceBillData): Promise<boolean> {
+  try {
+    const doc = await generateInvoicePdfDoc(invoice);
+    const cleanSalon = (invoice.salon_name || 'Salon').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    const cleanInv = (invoice.number || 'Receipt').replace(/[^a-zA-Z0-9_-]/g, '_');
+    doc.save(`${cleanSalon}-${cleanInv}.pdf`);
+    return true;
+  } catch (err) {
+    console.error('Failed to download invoice PDF:', err);
+    return false;
+  }
+}
+
+/**
+ * Opens WhatsApp directly into the customer's chat with the pre-filled itemized bill and digital receipt link.
+ * Synchronous execution ensures ZERO browser popup blocker issues on PC & Mobile!
+ */
+export async function openDirectWhatsAppChat(invoice: InvoiceBillData): Promise<ShareResult> {
+  const { waUrl } = buildInvoiceWhatsAppMessage(invoice);
+
+  // 1. Immediately open customer's chat directly in WhatsApp
+  if (typeof window !== 'undefined') {
+    window.open(waUrl, '_blank');
+  }
+
+  // 2. Mark sent in backend DB
   try {
     await fetch('/api/billing/whatsapp', {
       method: 'POST',
@@ -357,57 +395,16 @@ export async function dispatchSmartWhatsAppBill(invoice: InvoiceBillData): Promi
     });
   } catch {}
 
-  // 4A. Mobile / Tablet Path: Native file sharing directly into WhatsApp
-  if (canShareFiles && pdfFile) {
-    try {
-      await navigator.share({
-        files: [pdfFile],
-        title: `Invoice #${invoice.number}`,
-        text: `Dear ${invoice.customer_name}, thank you for visiting ${salonName}! Here is your official PDF bill for ₹${totalFormatted}. Digital Bill: ${receiptLink}`,
-      });
-
-      return {
-        success: true,
-        method: 'native_share',
-        message: 'WhatsApp opened with PDF bill attached! Tap Send in WhatsApp.',
-      };
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        return {
-          success: false,
-          method: 'cancelled',
-          message: 'Sharing cancelled by user.',
-        };
-      }
-      // If native share encountered an error, fall through to Desktop/WhatsApp Web path
-    }
-  }
-
-  // 4B. Desktop PC / Laptop Path: Trigger PDF download + Open WhatsApp Web with prefilled message
-  if (doc) {
-    try {
-      doc.save(fileName);
-    } catch {}
-  }
-
-  const msg = [
-    `✨ *Dear ${invoice.customer_name}, thank you for visiting ${salonName}!* ✨`,
-    `🧾 *Invoice #:* ${invoice.number}`,
-    `💰 *Total Amount:* ₹${totalFormatted}`,
-    `💳 *Payment Received:* ₹${paidFormatted} (Paid in Full ✓)`,
-    ``,
-    `📄 *View & Download Official PDF Receipt:*`,
-    `👉 ${receiptLink}`,
-    ``,
-    `_We look forward to welcoming you again!_`,
-  ].join('\n');
-
-  const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-  window.open(waUrl, '_blank');
-
   return {
     success: true,
     method: 'whatsapp_web',
-    message: 'PDF bill downloaded to PC & WhatsApp Web opened! Press Send in chat.',
+    message: 'WhatsApp opened directly in customer chat! Press Send to deliver the bill.',
   };
+}
+
+/**
+ * Smart Device-Adaptive WhatsApp Bill Dispatcher
+ */
+export async function dispatchSmartWhatsAppBill(invoice: InvoiceBillData): Promise<ShareResult> {
+  return openDirectWhatsAppChat(invoice);
 }

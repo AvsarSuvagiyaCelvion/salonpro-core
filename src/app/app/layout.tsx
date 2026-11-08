@@ -113,6 +113,39 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [activatingPlan, setActivatingPlan] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
+  // Super Admin Impersonation Support Mode State
+  const [impersonation, setImpersonation] = useState<{
+    salonId: string;
+    salonName: string;
+    salonSlug?: string;
+    adminEmail: string;
+  } | null>(null);
+  const [exitingImpersonation, setExitingImpersonation] = useState(false);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const match = document.cookie.match(/(?:^|;\s*)salonpro_impersonation=([^;]*)/);
+      if (match && match[1]) {
+        try {
+          const decoded = decodeURIComponent(match[1]);
+          setImpersonation(JSON.parse(decoded));
+        } catch {}
+      }
+    }
+  }, []);
+
+  async function handleExitImpersonation() {
+    setExitingImpersonation(true);
+    try {
+      await fetch('/api/admin/exit-impersonation', { method: 'POST' });
+    } catch {}
+    try {
+      localStorage.removeItem('salonpro_salon_info');
+      localStorage.removeItem('salonpro_user_info');
+    } catch {}
+    window.location.href = '/admin/salons';
+  }
+
   // Global Plan Gate / Upgrade Modal Prompt
   const [planPrompt, setPlanPrompt] = useState<{
     isOpen: boolean;
@@ -325,6 +358,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen lg:h-screen flex flex-col bg-white dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] overflow-x-hidden lg:overflow-hidden transition-colors duration-250">
+      {/* Super Admin Support / Impersonation Mode Banner */}
+      {impersonation && (
+        <div className="shrink-0 bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 text-white text-xs py-2 px-3 sm:px-5 font-semibold flex items-center justify-between z-50 shadow-md border-b border-amber-500/40 animate-in slide-in-from-top-2">
+          <div className="flex items-center gap-2 truncate text-xs">
+            <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse shrink-0"></span>
+            <span className="truncate">
+              🛡️ <strong>SUPER ADMIN SUPPORT MODE:</strong> You are actively viewing <strong>{impersonation.salonName}</strong> workspace as <em>{impersonation.adminEmail}</em>.
+            </span>
+          </div>
+          <button
+            type="button"
+            disabled={exitingImpersonation}
+            onClick={handleExitImpersonation}
+            className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white hover:bg-neutral-100 text-amber-950 font-black text-[11px] sm:text-xs shadow-sm transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+          >
+            <span>{exitingImpersonation ? 'Exiting...' : 'Exit Support Mode ➔'}</span>
+          </button>
+        </div>
+      )}
+
       {/* Top Professional Trial Notification Banner (Only shown if on active 7-Day trial) */}
       {subscription?.isTrial && !subscription?.isTrialExpired && (
         <div className="shrink-0 bg-[#10141F] text-white text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-[#2A2F3A] shadow-xs">

@@ -37,6 +37,8 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 | `/api/admin/plans/[id]` | `PATCH`, `DELETE` | `src/app/api/admin/plans/[id]/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Updates plan limits, pricing, and feature flags. |
 | `/api/admin/admins` | `GET`, `POST`, `DELETE` | `src/app/api/admin/admins/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Manages platform administrator accounts in `platform_admins`. |
 | `/api/admin/export` | `GET` | `src/app/api/admin/export/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Exports platform-wide salon directories and transaction records. |
+| `/api/admin/impersonate` | `POST` | `src/app/api/admin/impersonate/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Mints temporary tenant JWT session for any salon owner account and sets impersonation cookie so super admin can log in without password for support. |
+| `/api/admin/exit-impersonation` | `POST` | `src/app/api/admin/exit-impersonation/route.ts` | None / Authenticated | Clears impersonation and tenant session cookies, returning super admin back to `/admin/salons`. |
 
 ---
 

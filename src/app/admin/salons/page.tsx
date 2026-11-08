@@ -26,6 +26,8 @@ import {
   Clock,
   X,
   Download,
+  Key,
+  Loader2,
 } from 'lucide-react';
 import ReportExportModal from '@/components/reports/ReportExportModal';
 
@@ -35,6 +37,35 @@ export default function AdminSalonsPage() {
   const [search, setSearch] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
+
+  async function handleImpersonate(salonId: string, salonName: string) {
+    setImpersonatingId(salonId);
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ salonId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to connect to salon dashboard');
+      }
+      if (typeof localStorage !== 'undefined' && data.salon) {
+        localStorage.setItem(
+          'salonpro_salon_info',
+          JSON.stringify({
+            name: data.salon.name,
+            slug: data.salon.slug,
+          })
+        );
+      }
+      window.location.href = data.redirectUrl || '/app';
+    } catch (err: any) {
+      alert(err.message || 'Unable to connect to salon dashboard');
+      setImpersonatingId(null);
+    }
+  }
 
   // Add New Salon Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -478,14 +509,25 @@ export default function AdminSalonsPage() {
                       <span>Public Booking</span>
                       <span className="font-bold shrink-0">↗</span>
                     </a>
-                    <a
-                      href="/app"
-                      target="_blank"
-                      className="py-2 px-2 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/60 text-center text-xs font-bold transition-all inline-flex items-center justify-center gap-1 shrink-0 whitespace-nowrap"
+                    <button
+                      type="button"
+                      disabled={impersonatingId === s.id}
+                      onClick={() => handleImpersonate(s.id, s.name)}
+                      className="py-2 px-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-[#080B12] font-black text-center text-xs shadow-xs transition-all inline-flex items-center justify-center gap-1 shrink-0 whitespace-nowrap cursor-pointer active:scale-95 disabled:opacity-50"
+                      title={`Login directly to ${s.name} dashboard as Super Admin without password`}
                     >
-                      <span>Owner ERP</span>
-                      <span className="font-bold shrink-0">➔</span>
-                    </a>
+                      {impersonatingId === s.id ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Connecting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Key className="w-3.5 h-3.5 text-[#080B12]" />
+                          <span>Login as Salon ➔</span>
+                        </>
+                      )}
+                    </button>
                   </div>
                   {s.phone && (
                     <a

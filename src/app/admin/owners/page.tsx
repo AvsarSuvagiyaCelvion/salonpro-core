@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Users, Building2, ShieldCheck, Mail, Phone, Scissors } from 'lucide-react';
+import { Users, Building2, ShieldCheck, Mail, Phone, Scissors, Key, Loader2 } from 'lucide-react';
 
 export default function AdminOwnersPage() {
   const [loading, setLoading] = useState(true);
   const [salons, setSalons] = useState<any[]>([]);
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -21,6 +22,34 @@ export default function AdminOwnersPage() {
     }
     load();
   }, []);
+
+  async function handleImpersonate(salonId: string, salonName: string) {
+    setImpersonatingId(salonId);
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ salonId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to connect to salon dashboard');
+      }
+      if (typeof localStorage !== 'undefined' && data.salon) {
+        localStorage.setItem(
+          'salonpro_salon_info',
+          JSON.stringify({
+            name: data.salon.name,
+            slug: data.salon.slug,
+          })
+        );
+      }
+      window.location.href = data.redirectUrl || '/app';
+    } catch (err: any) {
+      alert(err.message || 'Unable to connect to salon dashboard');
+      setImpersonatingId(null);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -84,6 +113,28 @@ export default function AdminOwnersPage() {
                   Salon Managed
                 </span>
               </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A]">
+              <button
+                type="button"
+                disabled={impersonatingId === s.id}
+                onClick={() => handleImpersonate(s.id, s.name)}
+                className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-[#080B12] font-black text-center text-xs shadow-xs transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
+                title={`Login directly to ${s.name} dashboard without password`}
+              >
+                {impersonatingId === s.id ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Connecting to {s.name}...</span>
+                  </>
+                ) : (
+                  <>
+                    <Key className="w-3.5 h-3.5 text-[#080B12]" />
+                    <span>Login to Salon Dashboard ➔</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         ))}

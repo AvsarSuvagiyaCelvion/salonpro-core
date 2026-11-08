@@ -39,13 +39,14 @@ export interface PrintReceiptButtonProps {
   status: 'PAID' | 'PARTIAL' | 'PENDING';
 }
 
-function maskMobile(mobile: string | null | undefined): string {
+function formatFullMobile(mobile: string | null | undefined): string {
   if (!mobile) return 'N/A';
   const digits = mobile.replace(/\D/g, '');
-  if (digits.length >= 10) {
-    const first2 = digits.slice(0, 2);
-    const last3 = digits.slice(-3);
-    return `${first2}${'X'.repeat(digits.length - 5)}${last3}`;
+  if (digits.length === 10) {
+    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+  } else if (digits.length === 12 && digits.startsWith('91')) {
+    const ten = digits.slice(2);
+    return `+91 ${ten.slice(0, 5)} ${ten.slice(5)}`;
   }
   return mobile;
 }
@@ -89,13 +90,15 @@ export default function PrintReceiptButton({
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(18);
-      doc.text(salon.name || 'Salon Receipt', margin, 16);
+      const salonTitle = doc.splitTextToSize(salon.name || 'Salon Receipt', 125)[0];
+      doc.text(salonTitle, margin, 16);
 
       // Salon Address & Phone
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
       doc.setTextColor(200, 200, 200);
-      doc.text(salon.address || 'Boutique Salon & Spa', margin, 23);
+      const salonAddr = doc.splitTextToSize(salon.address || 'Boutique Salon & Spa', 125)[0];
+      doc.text(salonAddr, margin, 23);
       if (salon.phone) {
         doc.text(`Ph: ${salon.phone}`, margin, 28);
       }
@@ -139,12 +142,13 @@ export default function PrintReceiptButton({
       doc.setTextColor(15, 23, 42);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.text(invoice.customer_name || 'Walk-in Client', margin + 6, y + 14);
+      const custName = doc.splitTextToSize(invoice.customer_name || 'Walk-in Client', 85)[0];
+      doc.text(custName, margin + 6, y + 14);
 
       doc.setTextColor(100, 116, 139);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
-      doc.text(`Mobile: ${maskMobile(invoice.customer_mobile)}`, margin + 6, y + 20);
+      doc.text(`Mobile: ${formatFullMobile(invoice.customer_mobile)}`, margin + 6, y + 20);
 
       // Right: Invoice Details
       const rightX = pageWidth - margin - 6;
@@ -192,7 +196,8 @@ export default function PrintReceiptButton({
         doc.setTextColor(15, 23, 42);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(9);
-        doc.text(item.name, margin + 4, y + 4.5);
+        const itemName = doc.splitTextToSize(item.name || 'Service', 80)[0];
+        doc.text(itemName, margin + 4, y + 4.5);
 
         doc.setTextColor(100, 116, 139);
         doc.setFont('helvetica', 'normal');
@@ -219,7 +224,7 @@ export default function PrintReceiptButton({
       y += 4;
 
       // 5. Financial Summary
-      const totalsX = pageWidth - margin - 75;
+      const totalsX = 120;
       const totalsValX = pageWidth - margin - 4;
 
       function renderTotalRow(label: string, value: string, isBold = false, color = [71, 85, 105]) {
@@ -253,33 +258,34 @@ export default function PrintReceiptButton({
         renderTotalRow('SGST (9%)', `Rs. ${Number(sgst).toFixed(2)}`);
       }
 
-      // Grand Total Box
+      // Grand Total Box (Width strictly fits right margin: totalsX - 3 to pageWidth - margin = 78mm)
       y += 2;
+      const grandTotalBoxWidth = pageWidth - margin - (totalsX - 3); // 78mm
       doc.setFillColor(38, 22, 48); // #261630
-      doc.roundedRect(totalsX - 4, y - 4, 82, 11, 2, 2, 'F');
+      doc.roundedRect(totalsX - 3, y - 3.5, grandTotalBoxWidth, 9.5, 2, 2, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text('GRAND TOTAL', totalsX, y + 2.5);
       doc.setFontSize(10);
-      doc.text('GRAND TOTAL', totalsX, y + 3);
-      doc.setFontSize(11);
       doc.text(
         `Rs. ${Number(invoice.total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-        totalsValX - 2,
-        y + 3,
+        pageWidth - margin - 3,
+        y + 2.5,
         { align: 'right' }
       );
 
-      y += 18;
+      y += 16;
 
       // 6. Payment Summary Box
       doc.setFillColor(248, 250, 252);
       doc.setDrawColor(226, 232, 240);
-      doc.roundedRect(margin, y, contentWidth, 18, 2, 2, 'FD');
+      doc.roundedRect(margin, y, contentWidth, 16, 2, 2, 'FD');
 
       doc.setTextColor(100, 116, 139);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(7.5);
-      doc.text('PAYMENT SUMMARY', margin + 4, y + 5.5);
+      doc.text('PAYMENT SUMMARY', margin + 4, y + 5);
 
       const payStr =
         (payments || [])
@@ -287,8 +293,9 @@ export default function PrintReceiptButton({
           .join(' | ') || 'No payment recorded';
       doc.setTextColor(15, 23, 42);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.text(payStr, margin + 4, y + 12);
+      doc.setFontSize(8.5);
+      const paySummaryText = doc.splitTextToSize(payStr, 115)[0];
+      doc.text(paySummaryText, margin + 4, y + 11);
 
       const totalPaid = (payments || []).reduce((s, p) => s + Number(p.amount), 0);
       doc.setTextColor(16, 185, 129);
@@ -296,25 +303,19 @@ export default function PrintReceiptButton({
       doc.text(
         `Total Paid: Rs. ${totalPaid.toLocaleString('en-IN')}`,
         pageWidth - margin - 4,
-        y + 12,
+        y + 11,
         { align: 'right' }
       );
 
-      // 7. Footer
-      doc.setTextColor(148, 163, 184);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.text('Thank you for pampering yourself with us! ✨', pageWidth / 2, 275, {
-        align: 'center',
-      });
-      doc.setFontSize(7);
-      doc.text(
-        'Prices are inclusive of all applicable GST. This is a computer generated invoice.',
-        pageWidth / 2,
-        280,
-        { align: 'center' }
-      );
-      doc.text('Powered by SalonPro ERP Cloud', pageWidth / 2, 284, { align: 'center' });
+      // 7. Clean Minimal Footer: ONLY "Thank You! Please Visit Again ✨"
+      const footerY = Math.max(y + 18, 265);
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margin + 20, footerY - 5, pageWidth - margin - 20, footerY - 5);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(71, 85, 105);
+      doc.text('Thank You! Please Visit Again ✨', pageWidth / 2, footerY + 2, { align: 'center' });
 
       // Direct Browser File Download: Name with salon name and invoice number instead of generic "Invoice-INV-..."
       const cleanSalonName = (salon.name || 'Salon')

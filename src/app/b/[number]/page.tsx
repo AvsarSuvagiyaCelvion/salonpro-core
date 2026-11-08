@@ -18,13 +18,14 @@ export const metadata = {
   description: 'View your digital salon receipt',
 };
 
-function maskMobile(mobile: string | null | undefined): string {
+function formatFullMobile(mobile: string | null | undefined): string {
   if (!mobile) return '';
   const digits = mobile.replace(/\D/g, '');
-  if (digits.length >= 10) {
-    const first2 = digits.slice(0, 2);
-    const last3 = digits.slice(-3);
-    return `${first2}${'X'.repeat(digits.length - 5)}${last3}`;
+  if (digits.length === 10) {
+    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+  } else if (digits.length === 12 && digits.startsWith('91')) {
+    const ten = digits.slice(2);
+    return `+91 ${ten.slice(0, 5)} ${ten.slice(5)}`;
   }
   return mobile;
 }
@@ -240,7 +241,7 @@ export default async function PublicBillPage({
           <div className="flex justify-between items-center">
             <div>
               <div className="font-bold text-neutral-900 dark:text-white text-base">{invoice.customer_name}</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">{maskMobile(invoice.customer_mobile)}</div>
+              <div className="text-xs text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">{formatFullMobile(invoice.customer_mobile)}</div>
             </div>
             <div className="text-right text-xs text-neutral-400">
               Verified Client
@@ -356,11 +357,8 @@ export default async function PublicBillPage({
 
         {/* Footer info & Print Button */}
         <div className="bg-neutral-50 dark:bg-[#10141F] p-6 border-t border-neutral-200 dark:border-[#2A2F3A] text-center">
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            Thank you for pampering yourself with us! ✨
-          </p>
-          <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">
-            Prices are inclusive of all applicable GST. This is a computer generated invoice.
+          <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+            Thank You! Please Visit Again ✨
           </p>
 
           <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center print:hidden">

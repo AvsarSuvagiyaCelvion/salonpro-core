@@ -18,3 +18,4 @@ export async function GET() {
     return serverError(error, 'src/app/api/salons/route.ts');
   }
 }
+

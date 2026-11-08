@@ -3,6 +3,7 @@ import { query } from '@/lib/db';
 import { requireTenant } from '@/lib/api-auth';
 import { serverError } from '@/lib/http';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { requireFeature } from '@/lib/plan';
 
 export async function PATCH(
   request: Request,
@@ -13,6 +14,8 @@ export async function PATCH(
     if (auth.error) return auth.error;
 
     const salonId = auth.session.salonId;
+    const featureCheck = await requireFeature('reviews', salonId);
+    if (!featureCheck.success) return featureCheck.error;
     const { id } = await props.params;
 
     const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

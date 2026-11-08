@@ -56,6 +56,7 @@ export async function GET(request: Request) {
           email: auth.session.email,
           role: auth.session.role || 'owner',
         },
+        plan: auth.session.plan || null,
       },
       {
         headers: {

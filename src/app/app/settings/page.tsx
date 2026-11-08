@@ -71,6 +71,7 @@ export default function SettingsPage() {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [planFlags, setPlanFlags] = useState<{ logo_upload?: boolean; custom_domain?: boolean } | null>(null);
   const [galleryPhotos, setGalleryPhotos] = useState<
     Array<{ id: string; url: string; storage_path: string; sort_order: number }>
   >([]);
@@ -197,6 +198,7 @@ export default function SettingsPage() {
         if (data.user?.role) setUserRole(data.user.role);
 
         if (s) {
+          if (data.plan?.flags) setPlanFlags(data.plan.flags);
           setSalonId(s.id);
           setSlug(s.slug || '');
           setName(s.name || '');
@@ -539,15 +541,32 @@ export default function SettingsPage() {
 
               {/* Logo Upload Section */}
               <div className="pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] sm:col-span-2">
-                <ImageUploader
-                  mode="logo"
-                  type="logo"
-                  value={logoUrl}
-                  onChange={(newUrl) => setLogoUrl(newUrl)}
-                  onRemove={() => setLogoUrl(null)}
-                  label="Salon Logo (Optional)"
-                  helperText="Square or horizontal image recommended (WebP/JPEG, max 60KB). Displayed on receipts, invoices, and booking pages."
-                />
+                {planFlags && planFlags.logo_upload === false ? (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+                        🔒
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#1F2937] dark:text-white">Custom Logo Upload Locked</h4>
+                        <p className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">Your current Basic plan does not support custom logo branding. Upgrade to Pro to add your salon logo.</p>
+                      </div>
+                    </div>
+                    <Link href="/app/subscription" className="px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shrink-0 shadow-xs">
+                      Upgrade ➔
+                    </Link>
+                  </div>
+                ) : (
+                  <ImageUploader
+                    mode="logo"
+                    type="logo"
+                    value={logoUrl}
+                    onChange={(newUrl) => setLogoUrl(newUrl)}
+                    onRemove={() => setLogoUrl(null)}
+                    label="Salon Logo (Optional)"
+                    helperText="Square or horizontal image recommended (WebP/JPEG, max 60KB). Displayed on receipts, invoices, and booking pages."
+                  />
+                )}
               </div>
 
               {/* Salon Photos Gallery Section */}

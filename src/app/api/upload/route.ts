@@ -10,6 +10,7 @@ import {
 } from '@/lib/auth';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { serverError } from '@/lib/http';
+import { requireFeature } from '@/lib/plan';
 import {
   MAX_GALLERY_PHOTOS,
   MAX_SERVER_FILE_SIZE,
@@ -124,7 +125,11 @@ export async function POST(request: Request) {
         }
         destinationPath = `salons/${salonId}/gallery/${fileUUID}.${sigCheck.extension}`;
       } else {
-        // Logo upload
+        // Logo upload: Gated by plan feature flag
+        if (salonId) {
+          const logoCheck = await requireFeature('logo_upload', salonId);
+          if (!logoCheck.success) return logoCheck.error;
+        }
         destinationPath = `salons/${salonId}/logo-${fileUUID}.${sigCheck.extension}`;
       }
     } else {

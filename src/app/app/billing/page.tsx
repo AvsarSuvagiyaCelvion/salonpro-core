@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { showToast } from '@/lib/toast';
+import { dispatchSmartWhatsAppBill } from '@/lib/whatsapp-bill';
 import {
   Receipt,
   Search,
@@ -153,47 +154,36 @@ export default function BillingPage() {
   async function handleMarkWhatsappSent(invoiceId: string) {
     setSendingWhatsapp(true);
     try {
-      // 1. Open real WhatsApp with customer number, exact requested template & digital receipt link
       if (whatsappInvoice) {
-        const rawPhone = (whatsappInvoice.customer_mobile || '').replace(/[^0-9]/g, '');
-        const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
-        const receiptLink = `${window.location.origin}/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`;
-        const total = Number(whatsappInvoice.total || 0).toLocaleString('en-IN');
-        const paid = Number(whatsappInvoice.paid_amount || whatsappInvoice.total || 0).toLocaleString('en-IN');
+        const shareResult = await dispatchSmartWhatsAppBill({
+          id: whatsappInvoice.id,
+          number: whatsappInvoice.number,
+          receipt_token: whatsappInvoice.receipt_token,
+          customer_name: whatsappInvoice.customer_name,
+          customer_mobile: whatsappInvoice.customer_mobile,
+          subtotal: whatsappInvoice.subtotal,
+          discount_amount: whatsappInvoice.discount_amount,
+          total: whatsappInvoice.total,
+          paid_amount: whatsappInvoice.paid_amount,
+          created_at: whatsappInvoice.created_at,
+          items: whatsappInvoice.items,
+        });
 
-        const msg = [
-          `Dear ${whatsappInvoice.customer_name}, thank you for visiting us today!`,
-          `Invoice #: ${whatsappInvoice.number}`,
-          `Total Amount: ₹${total}`,
-          `Payment Received: ₹${paid}`,
-          `View & Download your official PDF receipt: ${receiptLink}`,
-          `We look forward to welcoming you again!`,
-        ].join('\n');
-
-        const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-        window.open(waUrl, '_blank');
+        if (shareResult.success) {
+          setInvoices((prev) =>
+            prev.map((i) => (i.id === invoiceId ? { ...i, whatsapp_sent: true } : i))
+          );
+          if (whatsappInvoice && whatsappInvoice.id === invoiceId) {
+            setWhatsappInvoice({ ...whatsappInvoice, whatsapp_sent: true });
+          }
+          setMessage({
+            type: 'success',
+            text: shareResult.message,
+          });
+        }
       }
-
-      // 2. Mark sent in DB
-      const res = await fetch('/api/billing/whatsapp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invoice_id: invoiceId }),
-      });
-      if (!res.ok) throw new Error();
-
-      setInvoices((prev) =>
-        prev.map((i) => (i.id === invoiceId ? { ...i, whatsapp_sent: true } : i))
-      );
-      if (whatsappInvoice && whatsappInvoice.id === invoiceId) {
-        setWhatsappInvoice({ ...whatsappInvoice, whatsapp_sent: true });
-      }
-      setMessage({
-        type: 'success',
-        text: 'Bill opened on WhatsApp & marked as sent (Confirmed with two blue ticks ✓✓)',
-      });
-    } catch {
-      setMessage({ type: 'error', text: 'Failed to update WhatsApp status' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err?.message || 'Failed to dispatch WhatsApp bill' });
     } finally {
       setSendingWhatsapp(false);
     }
@@ -687,6 +677,10 @@ export default function BillingPage() {
                 </div>
               </div>
 
+              <div className="p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/40 text-[10px] text-emerald-800 dark:text-emerald-300">
+                ⚡ <strong>Smart Device Dispatch:</strong> On Mobile/Tablet, generates &amp; attaches the PDF bill directly into WhatsApp chat. On PC, saves PDF to computer and opens WhatsApp Web.
+              </div>
+
               <div className="pt-2 border-t border-neutral-200/60 dark:border-[#2A3942] flex gap-2">
                 <a
                   href={`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`}
@@ -695,7 +689,7 @@ export default function BillingPage() {
                   className="flex-1 py-2.5 px-3 rounded-xl bg-white dark:bg-[#1F2C34] hover:bg-neutral-50 dark:hover:bg-[#2A3942] text-neutral-800 dark:text-neutral-100 text-xs font-bold border border-neutral-300 dark:border-[#2A3942] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Printer className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
-                  <span>📥 Download PDF Bill (to attach in chat) ↗</span>
+                  <span>📥 View &amp; Print Official Tax Receipt ↗</span>
                 </a>
               </div>
 

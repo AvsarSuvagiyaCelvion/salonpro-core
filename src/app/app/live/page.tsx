@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import BrandLoader from '@/components/ui/BrandLoader';
 import { showToast } from '@/lib/toast';
+import { dispatchSmartWhatsAppBill } from '@/lib/whatsapp-bill';
 import {
   Radio,
   Clock,
@@ -75,6 +76,7 @@ interface ToCollectInvoice {
   customer_id: string;
   customer_name: string;
   customer_mobile: string;
+  items?: Array<{ name: string; qty?: number; unit_price?: string | number; kind?: string }>;
 }
 
 interface ServiceOption {
@@ -155,6 +157,7 @@ export default function LiveStudioPage() {
   // Modal 6: WhatsApp Bill Preview
   const [whatsappInvoice, setWhatsappInvoice] = useState<ToCollectInvoice | null>(null);
   const [whatsappSent, setWhatsappSent] = useState(false);
+  const [dispatchingWhatsapp, setDispatchingWhatsapp] = useState(false);
 
   useEffect(() => {
     fetchLiveData();
@@ -403,35 +406,38 @@ export default function LiveStudioPage() {
   }
 
   async function handleSendWhatsappBill(invoice: ToCollectInvoice) {
+    setDispatchingWhatsapp(true);
     try {
-      const rawPhone = (invoice.customer_mobile || '').replace(/[^0-9]/g, '');
-      const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const receiptLink = `${origin}/b/${invoice.receipt_token || invoice.number}`;
-      const total = Number(invoice.total || 0).toLocaleString('en-IN');
-      const paid = Number(invoice.paid_amount || invoice.total || 0).toLocaleString('en-IN');
-
-      const msg = [
-        `Dear ${invoice.customer_name}, thank you for visiting us today!`,
-        `Invoice #: ${invoice.number}`,
-        `Total Amount: ₹${total}`,
-        `Payment Received: ₹${paid}`,
-        `View & Download your official PDF receipt: ${receiptLink}`,
-        `We look forward to welcoming you again!`,
-      ].join('\n');
-
-      const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-      window.open(waUrl, '_blank');
-
-      await fetch('/api/billing/whatsapp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invoice_id: invoice.id }),
+      const shareResult = await dispatchSmartWhatsAppBill({
+        id: invoice.id,
+        number: invoice.number,
+        receipt_token: invoice.receipt_token,
+        customer_name: invoice.customer_name,
+        customer_mobile: invoice.customer_mobile,
+        subtotal: invoice.subtotal,
+        discount_amount: invoice.discount_amount,
+        total: invoice.total,
+        paid_amount: invoice.paid_amount,
+        created_at: invoice.created_at,
+        items: invoice.items,
       });
 
-      setWhatsappSent(true);
-    } catch {
-      // Continue
+      if (shareResult.success) {
+        setWhatsappSent(true);
+        setMessage({
+          type: 'success',
+          text: shareResult.message,
+        });
+      } else if (shareResult.method === 'cancelled') {
+        setMessage({
+          type: 'error',
+          text: 'Sharing was cancelled.',
+        });
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err?.message || 'Failed to dispatch WhatsApp bill' });
+    } finally {
+      setDispatchingWhatsapp(false);
     }
   }
 
@@ -1475,39 +1481,53 @@ We look forward to welcoming you again!`}
 
               {/* Action Buttons: Open Original Bill PDF + Send on WhatsApp */}
               <div className="space-y-2">
+                <div className="p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/40 text-[10px] text-emerald-800 dark:text-emerald-300">
+                  ⚡ <strong>Smart Device Dispatch:</strong> On Mobile/Tablet, generates &amp; attaches the PDF bill directly into WhatsApp chat. On PC, saves PDF to computer and opens WhatsApp Web.
+                </div>
+
                 <a
                   href={`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-[#111B21] hover:bg-neutral-50 dark:hover:bg-[#202C33] text-neutral-800 dark:text-neutral-200 text-xs font-bold border border-neutral-300 dark:border-[#222E35] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-[#111B21] hover:bg-neutral-50 dark:hover:bg-[#202C33] text-neutral-800 dark:text-neutral-200 text-xs font-bold border border-neutral-300 dark:border-[#222E35] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                 >
                   <Printer className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                  <span>📥 Download PDF Bill (to attach in chat) ↗</span>
+                  <span>📥 View &amp; Print Official Tax Receipt ↗</span>
                 </a>
 
                 {whatsappSent ? (
                   <div className="space-y-2">
                     <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 text-xs font-semibold text-center flex items-center justify-center gap-1.5 border border-emerald-300 dark:border-emerald-800">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      <span>WhatsApp Bill Sent (Confirmed with Two Blue Ticks ✓✓)</span>
+                      <span>WhatsApp Bill Sent (Confirmed with Blue Ticks ✓✓)</span>
                     </div>
                     <button
                       type="button"
+                      disabled={dispatchingWhatsapp}
                       onClick={() => handleSendWhatsappBill(whatsappInvoice)}
-                      className="w-full py-2 px-3 rounded-xl bg-white dark:bg-[#111B21] hover:bg-neutral-50 dark:hover:bg-[#202C33] text-neutral-800 dark:text-neutral-200 text-xs font-bold border border-neutral-300 dark:border-[#222E35] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                      className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-[#111B21] hover:bg-neutral-50 dark:hover:bg-[#202C33] disabled:opacity-50 text-neutral-800 dark:text-neutral-200 text-xs font-bold border border-neutral-300 dark:border-[#222E35] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                     >
-                      <Send className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>Resend to Customer on WhatsApp ↗</span>
+                      {dispatchingWhatsapp ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+                      ) : (
+                        <Send className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      )}
+                      <span>{dispatchingWhatsapp ? 'Preparing Bill PDF...' : 'Resend PDF Bill on WhatsApp ↗'}</span>
                     </button>
                   </div>
                 ) : (
                   <button
                     type="button"
+                    disabled={dispatchingWhatsapp}
                     onClick={() => handleSendWhatsappBill(whatsappInvoice)}
-                    className="w-full py-3 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                    className="w-full py-3 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] disabled:opacity-50 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
                   >
-                    <Send className="w-4 h-4" />
-                    <span>Send Bill to Customer on WhatsApp ➔</span>
+                    {dispatchingWhatsapp ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
+                    <span>{dispatchingWhatsapp ? 'Generating & Attaching PDF...' : 'Send PDF Bill on WhatsApp ➔'}</span>
                   </button>
                 )}
               </div>

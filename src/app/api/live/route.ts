@@ -123,7 +123,32 @@ export async function GET(request: Request) {
       [salonId]
     );
 
-    // 4. Reference catalogs (services, active staff, products with stock)
+    // 4. Attach items to toCollect invoices (for receipts & WhatsApp PDF generation)
+    const invoiceSessionIds = invoicesRes.rows
+      .map((i) => i.session_id)
+      .filter((sid) => sid && !itemsBySession[sid]);
+
+    if (invoiceSessionIds.length > 0) {
+      const moreItemsRes = await query(
+        `SELECT si.session_id, si.kind, si.name, si.qty, si.unit_price
+         FROM session_items si
+         WHERE si.session_id = ANY($1::uuid[])`,
+        [invoiceSessionIds]
+      );
+      for (const item of moreItemsRes.rows) {
+        if (!itemsBySession[item.session_id]) {
+          itemsBySession[item.session_id] = [];
+        }
+        itemsBySession[item.session_id].push(item);
+      }
+    }
+
+    const toCollect = invoicesRes.rows.map((inv) => ({
+      ...inv,
+      items: inv.session_id ? itemsBySession[inv.session_id] || [] : [],
+    }));
+
+    // 5. Reference catalogs (services, active staff, products with stock)
     const [servicesRes, staffRes, productsRes] = await Promise.all([
       query(
         `SELECT id, name, category, duration_min, price 
@@ -145,7 +170,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       waiting: waitingRes.rows,
       activeSessions,
-      toCollect: invoicesRes.rows,
+      toCollect,
       services: servicesRes.rows,
       staff: staffRes.rows,
       products: productsRes.rows,

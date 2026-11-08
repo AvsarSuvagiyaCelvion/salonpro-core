@@ -102,6 +102,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `HourlyRushChart` | `src/components/charts/HourlyRushChart.tsx` | Peak hours hourly rush histogram for salon footfall. |
 | `BrandLoader` | `src/components/ui/BrandLoader.tsx` | Branded spinner for full-screen loading transitions. |
 | `ImageUploader` | `src/components/ui/ImageUploader.tsx` | Client-side image upload and preview component with canvas compression (target <=200KB for gallery, <=60KB square crop for logo/avatar). Fully responsive from 320px with dedicated `mode="logo"`, `mode="avatar"`, and `mode="default"` styles. |
+| `dispatchSmartWhatsAppBill` | `src/lib/whatsapp-bill.ts` | Smart device-adaptive WhatsApp bill dispatcher. Generates in-memory vector PDF using jsPDF. On Mobile/Tablet (Android/iOS), attaches the PDF directly to WhatsApp chat via Web Share API (`navigator.share({ files })`). On Desktop PC, triggers direct PDF download and opens WhatsApp Web with the direct view/download link. |
 
 ---
 
@@ -183,6 +184,14 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 4. **Calendar & Walk-in Integration**:
    - In `/app/appointments`, Multi-Stylist Lanes greys out stylists who are on leave or off, showing "🌴 Leave" or "⛔ Off" indicators.
    - Walk-in appointments booked via ERP check `getStaffWorkingWindow` and block scheduling when a stylist is off, on leave, or outside shift hours.
+
+### Flow 6: Smart Device-Adaptive WhatsApp Bill Delivery
+1. **Trigger**: After checkout on Live Studio Floor (`/app/live`) or settling payment on POS Billing (`/app/billing`), staff clicks "Send PDF Bill on WhatsApp".
+2. **In-Memory PDF Generation**: `dispatchSmartWhatsAppBill` generates an official high-resolution vector PDF receipt matching the salon's brand, address, phone number, itemized services/products, taxes, and payment status badge.
+3. **Adaptive Hardware Dispatch**:
+   - **Mobile / Tablet (Android & iOS)**: Leverages the browser Web Share API (`navigator.share({ files: [pdfFile] })`). Directly attaches the generated `Invoice_<NUMBER>.pdf` into the customer's WhatsApp chat. Staff only has to tap "Send" in WhatsApp without downloading or manually uploading files.
+   - **Desktop PC / Laptop (Windows & Mac)**: Automatically saves the PDF invoice to the computer's Downloads directory and launches WhatsApp Web (`https://wa.me/<phone>?text=...`) in a new tab with pre-filled greeting and a 1-click digital receipt view link (`/b/<receipt_token>`).
+4. **Delivery Confirmation**: Calls `POST /api/billing/whatsapp` to mark `invoices.whatsapp_sent = true`, updating UI status with confirmed double blue ticks (✓✓).
 
 ---
 

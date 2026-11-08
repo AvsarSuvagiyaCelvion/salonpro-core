@@ -102,7 +102,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `HourlyRushChart` | `src/components/charts/HourlyRushChart.tsx` | Peak hours hourly rush histogram for salon footfall. |
 | `BrandLoader` | `src/components/ui/BrandLoader.tsx` | Branded spinner for full-screen loading transitions. |
 | `ImageUploader` | `src/components/ui/ImageUploader.tsx` | Client-side image upload and preview component with canvas compression (target <=200KB for gallery, <=60KB square crop for logo/avatar). Fully responsive from 320px with dedicated `mode="logo"`, `mode="avatar"`, and `mode="default"` styles. |
-| `dispatchSmartWhatsAppBill` | `src/lib/whatsapp-bill.ts` | Instant direct WhatsApp bill dispatcher and PDF generator. Opens customer WhatsApp chat directly (`https://wa.me/91<phone>?text=...`) pre-filled with the itemized bill and 1-click digital receipt link (`/b/<token>`) with zero popup blocker interference. Also exports `downloadInvoicePdf` for instant 1-click vector PDF file download to device. |
+| `dispatchSmartWhatsAppBill` | `src/lib/whatsapp-bill.ts` | Smart device-adaptive WhatsApp bill dispatcher and PDF generator. On desktop, opens `web.whatsapp.com` directly (preventing the intermediate `wa.me` redirect which corrupts multi-byte emojis into `` diamonds); on mobile, deep-links into native WhatsApp (`api.whatsapp.com`). Pre-filled with itemized bill and 1-click digital receipt link (`/b/<token>`). Also auto-copies text to clipboard and exports `downloadInvoicePdf` for instant vector PDF file download. |
 
 ---
 

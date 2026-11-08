@@ -486,9 +486,15 @@ export default function AppointmentsPage() {
       hour: '2-digit',
       minute: '2-digit',
     });
-    const message = `Hello ${appt.customer_name}, reminder for your upcoming salon appointment for "${appt.service_name}" on ${formattedDate} at ${formattedTime} with ${appt.staff_name}. We look forward to pampering you!`;
+    const message = `Hello ${appt.customer_name}, reminder for your upcoming salon appointment for "${appt.service_name}" on ${formattedDate} at ${formattedTime} with ${appt.staff_name}. We look forward to pampering you! ✨`;
     const cleanMobile = appt.customer_mobile.replace(/[^0-9]/g, '');
-    const url = `https://wa.me/91${cleanMobile}?text=${encodeURIComponent(message)}`;
+    const isMobile =
+      typeof navigator !== 'undefined' &&
+      /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent || '');
+    const encoded = encodeURIComponent(message);
+    const url = isMobile
+      ? `https://api.whatsapp.com/send/?phone=91${cleanMobile}&text=${encoded}`
+      : `https://web.whatsapp.com/send?phone=91${cleanMobile}&text=${encoded}`;
     window.open(url, '_blank');
   }
 

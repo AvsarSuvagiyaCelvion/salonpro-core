@@ -294,6 +294,12 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   return doc;
 }
 
+export function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  const ua = navigator.userAgent || navigator.vendor || (window as any).opera || '';
+  return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+}
+
 export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: string; waUrl: string; cleanPhone: string } {
   const rawPhone = (invoice.customer_mobile || '').replace(/[^0-9]/g, '');
   const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
@@ -326,7 +332,7 @@ export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: s
   ];
 
   if (invoice.items && invoice.items.length > 0) {
-    lines.push(``, `✂ *Services & Products:*`);
+    lines.push(``, `✂️ *Services & Products:*`);
     for (const item of invoice.items) {
       const priceStr = item.unit_price !== undefined ? ` - ₹${Number(item.unit_price).toLocaleString('en-IN')}` : '';
       const qtyStr = item.qty && item.qty > 1 ? ` (x${item.qty})` : '';
@@ -343,7 +349,16 @@ export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: s
   );
 
   const text = lines.join('\n');
-  const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+  const encodedText = encodeURIComponent(text);
+
+  // CRITICAL FIX: Desktop browsers hitting wa.me experience an intermediate redirect bug on WhatsApp's
+  // redirect server where multi-byte UTF-8 emojis get corrupted into  replacement diamonds (\uFFFD).
+  // 1. On Desktop / Laptop: Use web.whatsapp.com directly (zero intermediate redirect -> emojis remain 100% intact).
+  // 2. On Mobile (Android/iOS): Use api.whatsapp.com to trigger the native WhatsApp app intent directly.
+  const isMobile = isMobileDevice();
+  const waUrl = isMobile
+    ? `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodedText}`
+    : `https://web.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
 
   return { text, waUrl, cleanPhone };
 }
@@ -369,14 +384,21 @@ export async function downloadInvoicePdf(invoice: InvoiceBillData): Promise<bool
  * Synchronous execution ensures ZERO browser popup blocker issues on PC & Mobile!
  */
 export async function openDirectWhatsAppChat(invoice: InvoiceBillData): Promise<ShareResult> {
-  const { waUrl } = buildInvoiceWhatsAppMessage(invoice);
+  const { text, waUrl } = buildInvoiceWhatsAppMessage(invoice);
 
-  // 1. Immediately open customer's chat directly in WhatsApp
+  // 1. Copy exact message with emojis to clipboard as instant fallback
+  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {}
+  }
+
+  // 2. Immediately open customer's chat directly in WhatsApp
   if (typeof window !== 'undefined') {
     window.open(waUrl, '_blank');
   }
 
-  // 2. Mark sent in backend DB
+  // 3. Mark sent in backend DB
   try {
     await fetch('/api/billing/whatsapp', {
       method: 'POST',
@@ -385,10 +407,13 @@ export async function openDirectWhatsAppChat(invoice: InvoiceBillData): Promise<
     });
   } catch {}
 
+  const isMobile = isMobileDevice();
   return {
     success: true,
     method: 'whatsapp_web',
-    message: 'WhatsApp opened directly in customer chat! Press Send to deliver the bill.',
+    message: isMobile
+      ? 'WhatsApp app opened directly in customer chat! Press Send to deliver the bill.'
+      : 'WhatsApp Web opened directly in customer chat! Message also copied to clipboard. Press Send.',
   };
 }
 

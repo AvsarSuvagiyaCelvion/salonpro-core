@@ -304,7 +304,7 @@ export async function POST(request: Request) {
         .join('\n');
 
       const fullMobile = cleanMobile.length === 10 ? `91${cleanMobile}` : cleanMobile;
-      whatsappUrl = `https://wa.me/${fullMobile}?text=${encodeURIComponent(waMsg)}`;
+      whatsappUrl = `https://api.whatsapp.com/send?phone=${fullMobile}&text=${encodeURIComponent(waMsg)}`;
     }
 
     return NextResponse.json({

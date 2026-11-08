@@ -30,16 +30,38 @@ async function ensureRateLimitTable() {
 }
 
 /**
- * Extracts client IP safely from request headers (first x-forwarded-for entry)
+ * Extracts client IP safely from request headers.
+ * Prioritizes Vercel Edge / Reverse Proxy authoritative headers (x-vercel-forwarded-for, x-real-ip)
+ * to prevent spoofing via user-crafted x-forwarded-for headers.
  */
 export function getClientIp(request: Request): string {
+  // 1. Authoritative Vercel edge proxy client IP
+  const vercelIp = request.headers.get('x-vercel-forwarded-for');
+  if (vercelIp && vercelIp.trim()) {
+    return vercelIp.split(',')[0].trim();
+  }
+
+  // 2. Standard single authoritative reverse-proxy header
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp && realIp.trim()) {
+    return realIp.trim();
+  }
+
+  // 3. Cloudflare connecting IP (if behind Cloudflare)
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp && cfIp.trim()) {
+    return cfIp.trim();
+  }
+
+  // 4. Standard x-forwarded-for fallback
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
-    const first = forwarded.split(',')[0].trim();
-    if (first) return first;
+    const parts = forwarded.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length > 0) {
+      return parts[0];
+    }
   }
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp.trim();
+
   return '127.0.0.1';
 }
 

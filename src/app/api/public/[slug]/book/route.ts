@@ -483,13 +483,13 @@ export async function POST(
           );
         }
 
-        // If stored in plaintext, upgrade to bcrypt
+        // If stored in plaintext, upgrade to bcrypt (cost factor 12)
         if (!storedPin.startsWith('$2')) {
-          const newHash = await bcrypt.hash(cleanPin, 10);
+          const newHash = await bcrypt.hash(cleanPin, 12);
           await client.query('UPDATE customers SET pin = $1 WHERE id = $2', [newHash, customerId]);
         }
       } else {
-        const newHash = await bcrypt.hash(cleanPin, 10);
+        const newHash = await bcrypt.hash(cleanPin, 12);
         await client.query('UPDATE customers SET pin = $1 WHERE id = $2', [newHash, customerId]);
       }
 
@@ -498,7 +498,7 @@ export async function POST(
         [cleanName, customerId]
       );
     } else {
-      const hashedPin = await bcrypt.hash(cleanPin, 10);
+      const hashedPin = await bcrypt.hash(cleanPin, 12);
       const newCust = await client.query(
         `INSERT INTO customers (salon_id, name, mobile, pin) VALUES ($1, $2, $3, $4) RETURNING id`,
         [salon.id, cleanName, cleanMobile, hashedPin]

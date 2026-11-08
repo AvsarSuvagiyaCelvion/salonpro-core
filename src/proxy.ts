@@ -203,6 +203,38 @@ export async function proxy(request: NextRequest) {
 
   // 3. API ROUTE PROTECTION (/api/*)
   if (pathname.startsWith('/api/')) {
+    // CSRF Defense: For state-changing requests, enforce that Origin matches the target host or allowed platform domains
+    const stateChangingMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+    if (stateChangingMethods.includes(request.method) && pathname !== '/api/subscription/razorpay/webhook') {
+      const origin = request.headers.get('origin');
+      if (origin) {
+        try {
+          const originHost = new URL(origin).host.toLowerCase().split(':')[0];
+          const reqHost = host.toLowerCase().split(':')[0];
+
+          const isAllowedOrigin =
+            originHost === reqHost ||
+            originHost.endsWith(`.${rootDomain}`) ||
+            originHost.endsWith('.vercel.app') ||
+            originHost === 'localhost' ||
+            originHost.endsWith('.localhost') ||
+            originHost === '127.0.0.1';
+
+          if (!isAllowedOrigin) {
+            return NextResponse.json(
+              { error: 'Forbidden: Cross-site request rejected (CSRF check failed).' },
+              { status: 403 }
+            );
+          }
+        } catch {
+          return NextResponse.json(
+            { error: 'Forbidden: Malformed request origin header.' },
+            { status: 403 }
+          );
+        }
+      }
+    }
+
     // Check if endpoint is public
     const isPublic = PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
     if (isPublic) {

@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordHash = await bcrypt.hash(cleanPassword, 10);
+    const passwordHash = await bcrypt.hash(cleanPassword, 12);
 
     const res = await query(
       `INSERT INTO platform_admins (email, password_hash, name, role, is_active)

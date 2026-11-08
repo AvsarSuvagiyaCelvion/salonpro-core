@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       passwordMatch = (user.password_hash === cleanPassword);
       if (passwordMatch) {
         // Automatically upgrade to secure bcrypt hash on first successful login
-        const upgradedHash = await bcrypt.hash(cleanPassword, 10);
+        const upgradedHash = await bcrypt.hash(cleanPassword, 12);
         await query('UPDATE users SET password_hash = $1 WHERE id = $2', [upgradedHash, user.id]);
       }
     }

@@ -148,8 +148,8 @@ export async function POST(request: Request) {
       ? `${address ? address.trim() + ', ' : ''}${city.trim()}`
       : address?.trim() || null;
 
-    // 3. Hash password using bcrypt
-    const passwordHash = await bcrypt.hash(cleanPassword, 10);
+    // 3. Hash password using bcrypt (cost factor 12)
+    const passwordHash = await bcrypt.hash(cleanPassword, 12);
 
     // Registration ALWAYS starts with a 7-day free trial; never activate paid on registration
     const subStatus = 'trial';

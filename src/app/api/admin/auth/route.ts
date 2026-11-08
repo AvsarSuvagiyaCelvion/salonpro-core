@@ -111,7 +111,7 @@ export async function POST(request: Request) {
         } else {
           passwordMatch = (adminRow.password_hash === cleanPassword);
           if (passwordMatch) {
-            const upgraded = await bcrypt.hash(cleanPassword, 10);
+            const upgraded = await bcrypt.hash(cleanPassword, 12);
             await query('UPDATE platform_admins SET password_hash = $1 WHERE id = $2', [upgraded, adminRow.id]);
           }
         }
@@ -129,12 +129,14 @@ export async function POST(request: Request) {
       console.error('Database error during admin auth query:', err);
     }
 
-    // 2. Fallback check ONLY against environment variables (if configured)
-    const envAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-    const envAdminPassword = process.env.ADMIN_PASSWORD?.trim();
+    // 2. Fallback check ONLY against environment variables in development mode
+    // Strictly disallowed and disabled in production to prevent unauthorized bootstrap via env defaults
+    const isProduction = process.env.NODE_ENV === 'production';
+    const envAdminEmail = !isProduction ? process.env.ADMIN_EMAIL?.trim().toLowerCase() : null;
+    const envAdminPassword = !isProduction ? process.env.ADMIN_PASSWORD?.trim() : null;
 
     let isEnvAuthMatch = false;
-    if (!authenticatedAdmin && envAdminEmail && envAdminPassword && cleanEmail === envAdminEmail) {
+    if (!isProduction && !authenticatedAdmin && envAdminEmail && envAdminPassword && cleanEmail === envAdminEmail) {
       const bInput = Buffer.from(cleanPassword);
       const bTarget = Buffer.from(envAdminPassword);
       if (bInput.length === bTarget.length && crypto.timingSafeEqual(bInput, bTarget)) {
@@ -143,9 +145,9 @@ export async function POST(request: Request) {
     }
 
     if (isEnvAuthMatch && envAdminEmail) {
-      // Bootstrap this admin into the database with bcrypt hash if not already present
+      // Bootstrap this admin into the database with bcrypt hash (cost factor 12) if not already present
       try {
-        const hash = await bcrypt.hash(cleanPassword, 10);
+        const hash = await bcrypt.hash(cleanPassword, 12);
         const insertRes = await query(
           `INSERT INTO platform_admins (email, password_hash, name, role, is_active)
            VALUES ($1, $2, 'Primary Super Admin', 'super_admin', true)

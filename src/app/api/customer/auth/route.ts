@@ -163,7 +163,7 @@ export async function POST(request: Request) {
         const existingCust = existing.rows[0];
         // If the existing customer has no PIN set yet, allow them to set their PIN right now!
         if (!existingCust.pin) {
-          const hashedPin = await bcrypt.hash(cleanPin, 10);
+          const hashedPin = await bcrypt.hash(cleanPin, 12);
           const updated = await query(
             `UPDATE customers
              SET pin = $1,
@@ -222,7 +222,7 @@ export async function POST(request: Request) {
       }
 
       // Hash PIN securely with bcrypt
-      const hashedPin = await bcrypt.hash(cleanPin, 10);
+      const hashedPin = await bcrypt.hash(cleanPin, 12);
 
       // Create new customer with hashed PIN
       const created = await query(
@@ -303,7 +303,7 @@ export async function POST(request: Request) {
         } else {
           isMatch = (candidate.pin === cleanPin);
           if (isMatch) {
-            const newHash = await bcrypt.hash(cleanPin, 10);
+            const newHash = await bcrypt.hash(cleanPin, 12);
             await query(`UPDATE customers SET pin = $1 WHERE id = $2`, [newHash, candidate.id]);
           }
         }

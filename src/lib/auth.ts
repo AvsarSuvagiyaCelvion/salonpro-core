@@ -2,8 +2,10 @@ import { SignJWT, jwtVerify } from 'jose';
 
 function getSecretKey(): Uint8Array {
   const secret = process.env.SESSION_SECRET;
-  if (!secret || secret.trim().length === 0) {
-    throw new Error('FATAL SECURITY ERROR: SESSION_SECRET environment variable is missing.');
+  if (!secret || secret.trim().length < 32) {
+    throw new Error(
+      'FATAL SECURITY ERROR: SESSION_SECRET environment variable is missing or shorter than 32 characters. Minimum 32 random characters required.'
+    );
   }
   return new TextEncoder().encode(secret);
 }

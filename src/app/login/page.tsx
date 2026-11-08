@@ -53,8 +53,15 @@ export default function LoginPage() {
       }
 
       const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const returnUrl = searchParams?.get('returnUrl');
-      const targetPath = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/app';
+      const returnUrl = searchParams?.get('returnUrl') || searchParams?.get('from');
+      // SEC-03: Safe redirect protection - reject protocol-relative URLs (//evil.com), backslashes, and schemes (javascript:, etc.)
+      const isSafeInternalPath =
+        returnUrl &&
+        returnUrl.startsWith('/') &&
+        !returnUrl.startsWith('//') &&
+        !returnUrl.includes('\\') &&
+        !returnUrl.includes(':');
+      const targetPath = isSafeInternalPath ? returnUrl : '/app';
       window.location.href = targetPath;
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please check your credentials.');

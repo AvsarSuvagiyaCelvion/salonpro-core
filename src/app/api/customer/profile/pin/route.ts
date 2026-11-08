@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     }
 
     // Hash new PIN securely
-    const hashedPin = await bcrypt.hash(cleanNewPin, 10);
+    const hashedPin = await bcrypt.hash(cleanNewPin, 12);
 
     await query(
       `UPDATE customers

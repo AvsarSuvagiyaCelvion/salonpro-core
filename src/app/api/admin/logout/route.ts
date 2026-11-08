@@ -6,6 +6,9 @@ export async function POST() {
   response.cookies.set({
     name: ADMIN_COOKIE_NAME,
     value: '',
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     path: '/',
     expires: new Date(0),
     maxAge: 0,

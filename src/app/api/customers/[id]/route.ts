@@ -15,7 +15,37 @@ export async function PUT(
     const salonId = auth.session.salonId;
     const { id } = await params;
     const body = await request.json();
-    const { name, mobile, email, note, birthday } = body;
+    const { name, mobile, email, note, birthday, resetPin } = body;
+
+    // Counter PIN Reset Action: If receptionist/salon counter is resetting customer's 4-digit PIN
+    if (resetPin !== undefined) {
+      const cleanPin = String(resetPin).trim();
+      if (!/^\d{4}$/.test(cleanPin)) {
+        return NextResponse.json({ error: 'Security PIN must be exactly 4 numeric digits (e.g. 1234)' }, { status: 400 });
+      }
+
+      const bcrypt = await import('bcryptjs');
+      const hashedPin = await bcrypt.hash(cleanPin, 10);
+
+      const pinRes = await query(
+        `UPDATE customers
+         SET pin = $1, updated_at = NOW()
+         WHERE id = $2 AND salon_id = $3
+         RETURNING id, name, mobile`,
+        [hashedPin, id, salonId]
+      );
+
+      if (pinRes.rows.length === 0) {
+        return NextResponse.json({ error: 'Customer not found in this salon' }, { status: 404 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Customer portal PIN reset successfully to ${cleanPin}`,
+        newPin: cleanPin,
+        customer: pinRes.rows[0],
+      });
+    }
 
     if (!name || name.trim().length === 0) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });

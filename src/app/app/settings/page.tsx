@@ -25,6 +25,8 @@ import {
   Images,
   Receipt,
   Loader2,
+  Globe,
+  CheckCircle2,
 } from 'lucide-react';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { MAX_GALLERY_PHOTOS } from '@/lib/storage';
@@ -71,6 +73,8 @@ export default function SettingsPage() {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [customDomain, setCustomDomain] = useState('');
+  const [customDomainVerified, setCustomDomainVerified] = useState(false);
   const [planFlags, setPlanFlags] = useState<{ logo_upload?: boolean; custom_domain?: boolean } | null>(null);
   const [galleryPhotos, setGalleryPhotos] = useState<
     Array<{ id: string; url: string; storage_path: string; sort_order: number }>
@@ -205,6 +209,8 @@ export default function SettingsPage() {
           setAddress(s.address || '');
           setPhone(s.phone || '');
           setLogoUrl(s.logo_url || null);
+          setCustomDomain(s.custom_domain || '');
+          setCustomDomainVerified(Boolean(s.custom_domain_verified));
           setGalleryPhotos(data.photos || []);
           setBookingEnabled(s.booking_enabled ?? true);
           setOpenTime(s.open_time ? s.open_time.slice(0, 5) : '10:00');
@@ -333,6 +339,7 @@ export default function SettingsPage() {
         cancel_policy_hours: Number(cancelPolicyHours),
         send_reminders: sendReminders,
         invoice_prefix: invoicePrefix.trim().toUpperCase() || null,
+        custom_domain: customDomain.trim().toLowerCase() || null,
       };
 
       const res = await fetch('/api/settings', {
@@ -351,6 +358,8 @@ export default function SettingsPage() {
         if (data.salon.close_time) setCloseTime(data.salon.close_time.slice(0, 5));
         if (data.salon.name) setName(data.salon.name);
         if (data.salon.invoice_prefix !== undefined) setInvoicePrefix(data.salon.invoice_prefix || '');
+        if (data.salon.custom_domain !== undefined) setCustomDomain(data.salon.custom_domain || '');
+        if (data.salon.custom_domain_verified !== undefined) setCustomDomainVerified(Boolean(data.salon.custom_domain_verified));
       }
 
       // Notify layout and other components of updated timing & settings
@@ -567,6 +576,53 @@ export default function SettingsPage() {
                     helperText="Square or horizontal image recommended (WebP/JPEG, max 60KB). Displayed on receipts, invoices, and booking pages."
                   />
                 )}
+              </div>
+
+              {/* Custom Domain Whitelabel Mapping */}
+              <div className="pt-4 border-t border-neutral-100 dark:border-[#2A2F3A] sm:col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-[#D4A77F]" />
+                    <label className="text-xs font-bold text-neutral-800 dark:text-neutral-100">
+                      Custom Domain Whitelabel (Optional)
+                    </label>
+                  </div>
+                  {customDomain ? (
+                    customDomainVerified ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                        <span>Live &amp; Verified SSL</span>
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800/50 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                        <span>DNS Verification Pending</span>
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-[10px] text-neutral-400">Enterprise Feature</span>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={customDomain}
+                    onChange={(e) => setCustomDomain(e.target.value.toLowerCase())}
+                    placeholder="e.g. booking.palakbeautysalon.com or salon.mybrand.in"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 text-sm font-mono focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
+                  />
+                </div>
+                <div className="mt-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 space-y-1">
+                  <p>
+                    Host your booking portal and customer bills on your own website address. Point a <strong>CNAME</strong> record in your GoDaddy/Cloudflare DNS to your platform root domain.
+                  </p>
+                  {customDomain && !customDomainVerified && (
+                    <p className="text-amber-700 dark:text-amber-400 font-semibold">
+                      ℹ️ Once you save your domain, platform administration will verify your CNAME record within 24 hours.
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Salon Photos Gallery Section */}

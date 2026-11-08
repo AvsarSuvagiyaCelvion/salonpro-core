@@ -253,22 +253,36 @@ async function handleUpdateSettings(request: Request) {
       }
     }
 
-    // Feature gating: custom_domain and custom_domain_verified
-    if (custom_domain !== undefined && custom_domain) {
-      const domainCheck = await requireFeature('custom_domain', salonId);
-      if (!domainCheck.success) return domainCheck.error;
+    // Feature gating: custom_domain mapping
+    let sanitizedCustomDomain: string | null = undefined as any;
+    if (custom_domain !== undefined) {
+      if (custom_domain && typeof custom_domain === 'string' && custom_domain.trim().length > 0) {
+        const domainCheck = await requireFeature('custom_domain', salonId);
+        if (!domainCheck.success) return domainCheck.error;
 
-      const salonCheck = await query('SELECT custom_domain_verified FROM salons WHERE id = $1', [salonId]);
-      if (!salonCheck.rows[0]?.custom_domain_verified) {
-        return NextResponse.json(
-          {
-            error: 'Custom domain is a Premium feature and requires DNS verification by platform administration. Please contact support.',
-            code: 'DOMAIN_UNVERIFIED',
-            feature: 'custom_domain',
-            requiredPlan: 'Premium',
-          },
-          { status: 403 }
+        const cleanDomain = custom_domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+        
+        // Uniqueness check across other salons
+        const dupRes = await query(
+          `SELECT id FROM salons WHERE custom_domain = $1 AND id != $2 LIMIT 1`,
+          [cleanDomain, salonId]
         );
+        if (dupRes.rows.length > 0) {
+          return NextResponse.json(
+            { error: 'This custom domain is already linked to another salon on the platform.' },
+            { status: 409 }
+          );
+        }
+
+        sanitizedCustomDomain = cleanDomain;
+        // If domain is updated to a new domain, reset verification until verified by admin
+        const currentRes = await query(`SELECT custom_domain FROM salons WHERE id = $1`, [salonId]);
+        if (currentRes.rows[0]?.custom_domain !== cleanDomain) {
+          await query(`UPDATE salons SET custom_domain_verified = false WHERE id = $1`, [salonId]);
+        }
+      } else {
+        sanitizedCustomDomain = null;
+        await query(`UPDATE salons SET custom_domain_verified = false WHERE id = $1`, [salonId]);
       }
     }
 
@@ -301,10 +315,10 @@ async function handleUpdateSettings(request: Request) {
            min_advance_hours = COALESCE($12, min_advance_hours),
            max_advance_days = COALESCE($13, max_advance_days),
            send_reminders = COALESCE($14, send_reminders),
-           custom_domain = COALESCE($15, custom_domain),
-           cancel_policy_hours = COALESCE($16::integer, cancel_policy_hours),
-           invoice_prefix = CASE WHEN $17::boolean THEN $18::text ELSE invoice_prefix END
-       WHERE id = $19::uuid
+           custom_domain = CASE WHEN $15::boolean THEN $16::text ELSE custom_domain END,
+           cancel_policy_hours = COALESCE($17::integer, cancel_policy_hours),
+           invoice_prefix = CASE WHEN $18::boolean THEN $19::text ELSE invoice_prefix END
+       WHERE id = $20::uuid
        RETURNING *`,
       [
         name,
@@ -321,7 +335,8 @@ async function handleUpdateSettings(request: Request) {
         min_advance_hours,
         max_advance_days,
         send_reminders,
-        custom_domain,
+        sanitizedCustomDomain !== undefined,
+        sanitizedCustomDomain || null,
         parsedCancelPolicyHours,
         hasInvoicePrefixUpdate,
         parsedInvoicePrefix,

@@ -27,6 +27,8 @@ import {
   Wallet,
   MapPin,
   Loader2,
+  Key,
+  Send,
 } from 'lucide-react';
 
 interface Customer {
@@ -91,6 +93,64 @@ export default function CustomersPage() {
   const [selectedCustomerForBills, setSelectedCustomerForBills] = useState<Customer | null>(null);
   const [customerInvoices, setCustomerInvoices] = useState<CustomerInvoice[]>([]);
   const [loadingBills, setLoadingBills] = useState(false);
+
+  // Modal 3: Counter Reset Customer PIN Modal
+  const [resetPinCustomer, setResetPinCustomer] = useState<Customer | null>(null);
+  const [newPin, setNewPin] = useState('');
+  const [savingPin, setSavingPin] = useState(false);
+  const [pinSuccessData, setPinSuccessData] = useState<{ pin: string; customerName: string; customerMobile: string } | null>(null);
+
+  function openResetPinModal(customer: Customer) {
+    setResetPinCustomer(customer);
+    setNewPin(String(Math.floor(1000 + Math.random() * 9000)));
+    setPinSuccessData(null);
+  }
+
+  async function handleSaveResetPin(e: React.FormEvent) {
+    e.preventDefault();
+    if (!resetPinCustomer) return;
+    const cleanPin = newPin.trim();
+    if (!/^\d{4}$/.test(cleanPin)) {
+      showToast('PIN must be exactly 4 numeric digits (e.g. 1234)', 'error');
+      return;
+    }
+
+    setSavingPin(true);
+    try {
+      const res = await fetch(`/api/customers/${resetPinCustomer.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resetPin: cleanPin }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to reset PIN');
+
+      showToast(`Security PIN reset to ${cleanPin} for ${resetPinCustomer.name}!`, 'success');
+      setPinSuccessData({
+        pin: cleanPin,
+        customerName: resetPinCustomer.name,
+        customerMobile: resetPinCustomer.mobile,
+      });
+    } catch (err: any) {
+      showToast(err.message, 'error');
+    } finally {
+      setSavingPin(false);
+    }
+  }
+
+  function handleSendPinOnWhatsApp(mobile: string, name: string, pin: string) {
+    const rawMobile = mobile.replace(/[^0-9]/g, '');
+    const cleanMobile = rawMobile.length === 10 ? `91${rawMobile}` : rawMobile;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const portalUrl = `${origin}/portal`;
+    const message = `Hello ${name}! ✨ Your 4-digit security PIN for our Salon Customer Portal has been reset to: *${pin}*\n\nYou can now log in at: ${portalUrl}\nto view your appointment history, digital PDF bills, and book your next pampering visit!`;
+    const encoded = encodeURIComponent(message);
+    const isMobile = typeof navigator !== 'undefined' && /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent || '');
+    const url = isMobile
+      ? `https://api.whatsapp.com/send/?phone=${cleanMobile}&text=${encoded}`
+      : `https://web.whatsapp.com/send?phone=${cleanMobile}&text=${encoded}`;
+    window.open(url, '_blank');
+  }
 
   useEffect(() => {
     setPage(1);
@@ -399,6 +459,13 @@ export default function CustomersPage() {
                       </button>
                     </td>
                     <td className="py-3 px-4 text-right space-x-1">
+                      <button
+                        onClick={() => openResetPinModal(c)}
+                        className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg transition-colors cursor-pointer"
+                        title="Reset customer 4-digit portal security PIN"
+                      >
+                        <Key className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      </button>
                       <button
                         onClick={() => openEditModal(c)}
                         className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-[#D4A77F] hover:bg-[#D4A77F]/10 rounded-lg transition-colors cursor-pointer"
@@ -739,6 +806,146 @@ export default function CustomersPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL 3: COUNTER RESET CUSTOMER PORTAL PIN ================= */}
+      {resetPinCustomer && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-4 flex min-h-full items-center justify-center animate-in fade-in duration-150">
+          <div className="relative bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-[#2A2F3A]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                  <Key className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-neutral-900 dark:text-white leading-tight">
+                    Reset Portal PIN
+                  </h3>
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                    Salon Counter Security Override
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setResetPinCustomer(null)}
+                className="p-1 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {pinSuccessData ? (
+              <div className="py-4 space-y-4 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-xl font-bold">
+                  ✓
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-base text-neutral-900 dark:text-white">
+                    PIN Reset Successfully!
+                  </h4>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                    New portal security PIN for <strong>{pinSuccessData.customerName}</strong>:
+                  </p>
+                  <div className="my-3 py-2.5 px-4 rounded-2xl bg-neutral-100 dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] text-2xl font-black font-mono tracking-widest text-[#D4A77F]">
+                    {pinSuccessData.pin}
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSendPinOnWhatsApp(
+                        pinSuccessData.customerMobile,
+                        pinSuccessData.customerName,
+                        pinSuccessData.pin
+                      )
+                    }
+                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Send New PIN on WhatsApp ➔</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setResetPinCustomer(null)}
+                    className="w-full py-2 px-3 rounded-xl bg-neutral-100 dark:bg-[#10141F] hover:bg-neutral-200 dark:hover:bg-[#1C2230] text-neutral-700 dark:text-neutral-300 font-semibold text-xs cursor-pointer transition-all"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSaveResetPin} className="py-4 space-y-4">
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#10141F] border border-slate-100 dark:border-[#2A2F3A] text-xs">
+                  <div className="font-bold text-neutral-900 dark:text-white">
+                    {resetPinCustomer.name}
+                  </div>
+                  <div className="text-[11px] text-neutral-500 font-mono mt-0.5">
+                    Mobile: +91 {resetPinCustomer.mobile}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-neutral-700 dark:text-neutral-200">
+                      New 4-Digit Security PIN *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setNewPin(String(Math.floor(1000 + Math.random() * 9000)))
+                      }
+                      className="text-[11px] text-[#D4A77F] hover:underline font-bold cursor-pointer"
+                    >
+                      🎲 Randomize
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    maxLength={4}
+                    required
+                    value={newPin}
+                    onChange={(e) =>
+                      setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))
+                    }
+                    placeholder="e.g. 1234"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white text-center font-mono text-xl tracking-widest font-black focus:border-[#D4A77F] outline-none"
+                  />
+                  <p className="text-[10px] text-neutral-400 mt-1 text-center">
+                    Customer uses this PIN with their mobile number to log in at /portal
+                  </p>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100 dark:border-[#2A2F3A]">
+                  <button
+                    type="button"
+                    onClick={() => setResetPinCustomer(null)}
+                    className="px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-[#10141F] rounded-xl cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingPin || newPin.length !== 4}
+                    className="px-4 py-2 text-xs bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all"
+                  >
+                    {savingPin ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Updating PIN...</span>
+                      </>
+                    ) : (
+                      'Save & Update PIN ➔'
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

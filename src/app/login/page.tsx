@@ -28,7 +28,12 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error('Database connection issue. Please check your network or try again.');
+      }
 
       if (!res.ok) {
         throw new Error(data.error || 'Failed to sign in');

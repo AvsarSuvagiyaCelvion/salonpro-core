@@ -94,7 +94,12 @@ export default function RegisterSalonPage() {
         }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error('Database / server error. Please verify database connection or try again.');
+      }
 
       if (!res.ok) {
         throw new Error(data.error || 'Registration failed. Please try again.');

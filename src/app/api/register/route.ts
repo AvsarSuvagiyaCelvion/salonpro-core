@@ -5,6 +5,7 @@ import { clearSalonCache } from '@/lib/salon';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
 import { normalizeMobile } from '@/lib/phone';
 import { checkRateLimit, recordFailedAttempt, getClientIp } from '@/lib/rate-limit';
+import { serverError } from '@/lib/http';
 
 const RESERVED_SLUGS = new Set([
   'admin',
@@ -31,22 +32,25 @@ const RESERVED_SLUGS = new Set([
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
-  const clientIp = getClientIp(request);
-  const ipRateLimitKey = `register_ip:${clientIp}`;
-
-  // IP rate limit: max 5 salon registrations per hour (3600 seconds)
-  const ipCheck = await checkRateLimit(ipRateLimitKey, 5, 3600);
-  if (ipCheck.isLocked) {
-    return NextResponse.json(
-      { error: 'Too many salon registration requests from this network. Please wait before trying again.' },
-      { status: 429 }
-    );
-  }
-
-  const client = await pool.connect();
+  let client: any = null;
   let inTransaction = false;
+  let ipRateLimitKey = 'register_ip:unknown';
 
   try {
+    const clientIp = getClientIp(request);
+    ipRateLimitKey = `register_ip:${clientIp}`;
+
+    // IP rate limit: max 5 salon registrations per hour (3600 seconds)
+    const ipCheck = await checkRateLimit(ipRateLimitKey, 5, 3600);
+    if (ipCheck.isLocked) {
+      return NextResponse.json(
+        { error: 'Too many salon registration requests from this network. Please wait before trying again.' },
+        { status: 429 }
+      );
+    }
+
+    client = await pool.connect();
+
     const body = await request.json();
     const { salonName, ownerName, email, mobile, city, address, password, confirmPassword, planId } = body;
 
@@ -248,7 +252,7 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error: any) {
-    if (inTransaction) {
+    if (inTransaction && client) {
       try {
         await client.query('ROLLBACK');
       } catch {}
@@ -269,11 +273,12 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(
-      { error: 'Failed to register salon. Please try again.' },
-      { status: 500 }
-    );
+    return serverError(error, 'Salon registration');
   } finally {
-    client.release();
+    if (client) {
+      try {
+        client.release();
+      } catch {}
+    }
   }
 }

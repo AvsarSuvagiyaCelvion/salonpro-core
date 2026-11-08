@@ -4,7 +4,7 @@ import pool, { query } from '@/lib/db';
 import { clearSalonCache } from '@/lib/salon';
 import { createSessionToken, COOKIE_NAME } from '@/lib/auth';
 import { normalizeMobile } from '@/lib/phone';
-import { checkRateLimit, recordFailedAttempt, getClientIp } from '@/lib/rate-limit';
+import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp } from '@/lib/rate-limit';
 import { serverError } from '@/lib/http';
 
 const RESERVED_SLUGS = new Set([
@@ -48,8 +48,6 @@ export async function POST(request: Request) {
         { status: 429 }
       );
     }
-
-    client = await pool.connect();
 
     const body = await request.json();
     const { salonName, ownerName, email, mobile, city, address, password, confirmPassword, planId } = body;
@@ -167,6 +165,7 @@ export async function POST(request: Request) {
     }
 
     // 4. Begin transactional registration
+    client = await pool.connect();
     await client.query('BEGIN');
     inTransaction = true;
 
@@ -213,8 +212,10 @@ export async function POST(request: Request) {
 
     await client.query('COMMIT');
     inTransaction = false;
+    client.release();
+    client = null;
     clearSalonCache();
-    await recordFailedAttempt(ipRateLimitKey, 5, 3600);
+    await resetRateLimit(ipRateLimitKey);
 
     // 5. Issue multi-tenant session token
     const token = await createSessionToken({

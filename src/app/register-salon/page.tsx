@@ -43,8 +43,6 @@ export default function RegisterSalonPage() {
   // Plans & Trial State
   const [plans, setPlans] = useState<any[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string>('trial'); // 'trial' or plan.id
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card'>('upi');
   const [registeredPlanName, setRegisteredPlanName] = useState<string>('7-Day Free Trial');
 
   const [loading, setLoading] = useState(false);
@@ -52,6 +50,7 @@ export default function RegisterSalonPage() {
   const [registeredSalon, setRegisteredSalon] = useState<{ id: string; name: string; slug: string } | null>(null);
 
   useEffect(() => {
+    // 1. Fetch available plans from DB
     async function loadPlans() {
       try {
         const res = await fetch('/api/plans');
@@ -62,6 +61,14 @@ export default function RegisterSalonPage() {
       } catch {}
     }
     loadPlans();
+
+    // 2. Preload Razorpay Checkout SDK for instant gateway launch
+    if (typeof window !== 'undefined' && !(window as any).Razorpay) {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   // Computed slug preview
@@ -74,53 +81,7 @@ export default function RegisterSalonPage() {
         .replace(/^-|-$/g, '')
     : 'your-salon';
 
-  async function handleCompleteRegistration(planIdToSubmit: string | null) {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          salonName,
-          ownerName,
-          email,
-          mobile,
-          city,
-          password,
-          confirmPassword,
-          planId: planIdToSubmit,
-        }),
-      });
-
-      let data: any = {};
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error('Database / server error. Please verify database connection or try again.');
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Registration failed. Please try again.');
-      }
-
-      setRegisteredSalon(data.salon);
-      if (planIdToSubmit) {
-        const chosen = plans.find((p) => p.id === planIdToSubmit);
-        setRegisteredPlanName(chosen?.name || 'Pro Plan');
-      } else {
-        setRegisteredPlanName('7-Day Free Trial');
-      }
-      setShowPaymentModal(false);
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please check your details.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleRegisterAndPay(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
@@ -144,10 +105,151 @@ export default function RegisterSalonPage() {
       return;
     }
 
-    if (selectedPlanId === 'trial') {
-      await handleCompleteRegistration(null);
-    } else {
-      setShowPaymentModal(true);
+    setLoading(true);
+
+    try {
+      // 1. Create account & salon workspace
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          salonName,
+          ownerName,
+          email,
+          mobile,
+          city,
+          password,
+          confirmPassword,
+          planId: selectedPlanId === 'trial' ? null : selectedPlanId,
+        }),
+      });
+
+      let regData: any = {};
+      try {
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          regData = await res.json();
+        } else {
+          const text = await res.text();
+          regData = { error: text || 'Server returned an invalid response' };
+        }
+      } catch {
+        regData = { error: 'Database / server error. Please try again.' };
+      }
+
+      if (!res.ok) {
+        throw new Error(regData.error || 'Registration failed. Please try again.');
+      }
+
+      // If user selected Free Trial, complete immediately!
+      if (selectedPlanId === 'trial') {
+        setRegisteredSalon(regData.salon);
+        setRegisteredPlanName('7-Day Free Trial');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Paid Plan selected: Trigger Razorpay Order Creation
+      const chosenPlan = plans.find((p) => p.id === selectedPlanId);
+      const chosenPlanName = chosenPlan?.name || 'Selected Plan';
+
+      const orderRes = await fetch('/api/subscription/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId: selectedPlanId,
+          interval: 'monthly',
+        }),
+      });
+
+      let orderData: any = {};
+      try {
+        orderData = await orderRes.json();
+      } catch {}
+
+      if (!orderRes.ok || !orderData.orderId) {
+        // If gateway order creation failed, salon is still safely created on trial
+        console.warn('Could not initiate gateway order:', orderData?.error);
+        setRegisteredSalon(regData.salon);
+        setRegisteredPlanName('7-Day Free Trial');
+        setError('Salon registered! Online payment gateway is currently updating. You can explore your dashboard on a 7-day trial and complete payment in Settings.');
+        setLoading(false);
+        return;
+      }
+
+      // 3. Open native Razorpay modal
+      if (typeof window === 'undefined' || !(window as any).Razorpay) {
+        setRegisteredSalon(regData.salon);
+        setRegisteredPlanName('7-Day Free Trial');
+        setLoading(false);
+        return;
+      }
+
+      const rzp = new (window as any).Razorpay({
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency || 'INR',
+        name: 'SalonPro Cloud ERP',
+        description: `${chosenPlanName} Subscription`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: ownerName,
+          email: email,
+          contact: mobile,
+        },
+        theme: {
+          color: '#D4A77F',
+        },
+        handler: async function (response: any) {
+          setLoading(true);
+          try {
+            const verifyRes = await fetch('/api/subscription/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok && verifyData.success) {
+              setRegisteredPlanName(chosenPlanName);
+              setRegisteredSalon(regData.salon);
+            } else {
+              setError(verifyData.error || 'Payment received. System is verifying your invoice.');
+              setRegisteredPlanName(chosenPlanName);
+              setRegisteredSalon(regData.salon);
+            }
+          } catch {
+            setRegisteredPlanName(chosenPlanName);
+            setRegisteredSalon(regData.salon);
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            // Salon created safely, trial active
+            setRegisteredPlanName('7-Day Free Trial (Upgrade anytime)');
+            setRegisteredSalon(regData.salon);
+            setLoading(false);
+          },
+        },
+      });
+
+      rzp.on('payment.failed', function (resp: any) {
+        console.error('Payment failed:', resp.error);
+        setError(resp.error?.description || 'Payment was declined. You can retry inside your salon settings.');
+        setRegisteredSalon(regData.salon);
+        setRegisteredPlanName('7-Day Free Trial (Upgrade anytime)');
+        setLoading(false);
+      });
+
+      rzp.open();
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please check your details.');
+      setLoading(false);
     }
   }
 
@@ -287,7 +389,7 @@ export default function RegisterSalonPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleRegisterAndPay} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-[#1F2937] dark:text-white uppercase tracking-wider mb-1.5">
                   Salon Business Name <span className="text-[#D4A77F]">*</span>
@@ -531,98 +633,6 @@ export default function RegisterSalonPage() {
               </div>
             </form>
           </div>
-
-          {/* Payment Modal */}
-          {showPaymentModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080B12]/80 backdrop-blur-xs animate-fade-in">
-              <div className="bg-white dark:bg-[#141926] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-[#E5E7EB] dark:border-[#2A2F3A]">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2F3A] mb-4">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-[#D4A77F]" />
-                    <h3 className="font-black text-[#1F2937] dark:text-white text-base">Payment &amp; Plan Activation</h3>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowPaymentModal(false)}
-                    className="p-1 rounded-lg text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-white cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {(() => {
-                  const currentSelectedPlan = plans.find((p) => p.id === selectedPlanId);
-                  return (
-                    <div>
-                      <div className="p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 mb-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-extrabold text-sm text-[#1F2937] dark:text-white">{currentSelectedPlan?.name}</span>
-                          <span className="text-lg font-black text-[#D4A77F] font-variant-numeric tabular-nums">
-                            ₹{Number(currentSelectedPlan?.price || 0).toLocaleString()}
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8]">
-                          {currentSelectedPlan?.billing_interval === 'yearly' ? 'Billed annually · 2 months free' : 'Billed monthly · Cancel anytime'}
-                        </p>
-                      </div>
-
-                      <div className="space-y-3 mb-6">
-                        <label className="block text-xs font-bold text-[#1F2937] dark:text-white uppercase tracking-wider">
-                          Select Payment Mode
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setPaymentMethod('upi')}
-                            className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                              paymentMethod === 'upi'
-                                ? 'border-[#D4A77F] bg-[#D4A77F]/15 text-[#D4A77F]'
-                                : 'border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F9FAFB] dark:bg-[#10141F] text-[#1F2937] dark:text-white'
-                            }`}
-                          >
-                            <span>⚡ Instant UPI / QR</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPaymentMethod('card')}
-                            className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                              paymentMethod === 'card'
-                                ? 'border-[#D4A77F] bg-[#D4A77F]/15 text-[#D4A77F]'
-                                : 'border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F9FAFB] dark:bg-[#10141F] text-[#1F2937] dark:text-white'
-                            }`}
-                          >
-                            <span>💳 Card / NetBanking</span>
-                          </button>
-                        </div>
-
-                        {paymentMethod === 'upi' ? (
-                          <div className="p-3.5 rounded-xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] text-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
-                            <span className="font-bold text-[#1F2937] dark:text-white block mb-1">Fast UPI QR Simulation</span>
-                            <span>Scan with GPay, PhonePe, or Paytm for instant salon onboarding.</span>
-                          </div>
-                        ) : (
-                          <div className="p-3.5 rounded-xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] text-center text-xs text-[#6B7280] dark:text-[#A0A8B8]">
-                            <span className="font-bold text-[#1F2937] dark:text-white block mb-1">Card / NetBanking Gateway</span>
-                            <span>Supports Visa, Mastercard, RuPay &amp; all Indian Banks.</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleCompleteRegistration(selectedPlanId)}
-                        disabled={loading}
-                        className="w-full py-3.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-                      >
-                        <ShieldCheck className="w-4 h-4" />
-                        <span>{loading ? 'Processing Activation...' : `Authorize & Pay ₹${Number(currentSelectedPlan?.price || 0).toLocaleString()}`}</span>
-                      </button>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
 
           {/* Right Column: Benefits & Preview */}
           <div className="lg:col-span-5 space-y-5">

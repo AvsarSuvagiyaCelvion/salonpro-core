@@ -150,8 +150,17 @@ export default function BookingWizard({ slug }: { slug: string }) {
   // Confirmed booking state
   const [confirmedBooking, setConfirmedBooking] = useState<any | null>(null);
 
-  // Check if customer is already logged in
+  // Check if customer is already logged in & sync theme state
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('salonpro_theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
     async function checkCustomerAuth() {
       try {
         const res = await fetch('/api/customer/auth');
@@ -637,7 +646,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#080B12] text-neutral-100 flex flex-col font-sans selection:bg-[#D4A77F] selection:text-[#080B12]">
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-neutral-100 flex flex-col font-sans selection:bg-[#D4A77F] selection:text-[#080B12] transition-colors duration-200">
       {/* Live Demo Sandbox Beacon (Zero data stored in DB) */}
       {slug.toLowerCase().trim() === 'dixa-beauty-salon' && (
         <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-pink-500/20 border-b border-amber-500/30 px-3 py-2.5 text-center text-xs text-amber-200">
@@ -662,9 +671,9 @@ export default function BookingWizard({ slug }: { slug: string }) {
       )}
 
       {/* Universal Sticky Top Header for Public Salon Page */}
-      <header className="sticky top-0 z-40 w-full bg-[#10141F]/95 backdrop-blur-md border-b border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-2xs transition-colors duration-250">
+      <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-xs transition-colors duration-250">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center font-bold text-sm text-[#D4A77F] overflow-hidden shrink-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-neutral-100 dark:bg-white/10 border border-[#E5E7EB] dark:border-white/20 flex items-center justify-center font-bold text-sm text-[#8C5E2E] dark:text-[#D4A77F] overflow-hidden shrink-0">
             {salon?.logo_url && !logoError ? (
               <img src={salon.logo_url} alt={salon.name} className="w-full h-full object-cover" />
             ) : (
@@ -672,10 +681,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
             )}
           </div>
           <div className="min-w-0">
-            <span className="font-extrabold text-sm sm:text-base text-white tracking-tight block leading-tight truncate">
+            <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-white tracking-tight block leading-tight truncate">
               {salon?.name || 'Salon Workspace'}
             </span>
-            <span className="text-[10px] text-[#D4A77F] font-bold block -mt-0.5 truncate">
+            <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
               Online Booking &amp; Client Suite
             </span>
           </div>
@@ -685,7 +694,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
           <ThemeToggle />
           <Link
             href="/portal"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all shadow-sm shrink-0 whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#1F2937] dark:text-white text-xs font-semibold backdrop-blur-md border border-[#E5E7EB] dark:border-white/20 transition-all shadow-xs shrink-0 whitespace-nowrap"
             title="Customer Appointments Portal"
           >
             <span>👤</span>
@@ -693,7 +702,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
           </Link>
           <Link
             href="/salon-owner"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold transition-all shadow-sm shrink-0 whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold transition-all shadow-xs shrink-0 whitespace-nowrap"
             title="Salon Owner & Staff ERP Login"
           >
             <span>🔐</span>
@@ -704,15 +713,15 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
       {/* Top Salon Hero Banner */}
       <div 
-        className="relative overflow-hidden border-b border-[#2A2F3A] pb-6"
+        className="relative overflow-hidden border-b border-[#E5E7EB] dark:border-[#2A2F3A] pb-6 bg-[#F8F9FA] dark:bg-[#080B12]"
         style={{
-          background: `radial-gradient(ellipse at top, ${brandColor}40 0%, #0a0a0a 75%)`,
+          background: `radial-gradient(ellipse at top, ${brandColor}25 0%, transparent 75%)`,
         }}
       >
 
         <div className="max-w-2xl mx-auto px-4 pt-2 text-center">
           <div 
-            className="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center font-bold text-3xl shadow-xl border border-white/20 mb-3 overflow-hidden"
+            className="w-16 h-16 mx-auto rounded-3xl flex items-center justify-center font-bold text-3xl shadow-xl border border-[#E5E7EB] dark:border-white/20 mb-3 overflow-hidden"
             style={{ backgroundColor: brandColor, color: '#ffffff' }}
           >
             {salon.logo_url && !logoError ? (
@@ -727,23 +736,23 @@ export default function BookingWizard({ slug }: { slug: string }) {
               salon.name.charAt(0)
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">{salon.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1F2937] dark:text-white">{salon.name}</h1>
           {reviewsSummary.enabled && reviewsSummary.count > 0 && (
             <div className="flex items-center justify-center gap-1.5 mt-1.5">
-              <div className="flex items-center text-amber-400 text-xs sm:text-sm">
+              <div className="flex items-center text-amber-500 text-xs sm:text-sm">
                 <span>★</span>
-                <span className="font-extrabold text-white ml-1">{reviewsSummary.average.toFixed(1)}</span>
+                <span className="font-extrabold text-[#1F2937] dark:text-white ml-1">{reviewsSummary.average.toFixed(1)}</span>
               </div>
-              <span className="text-neutral-500 text-xs">·</span>
-              <span className="text-neutral-300 text-xs font-semibold">
+              <span className="text-[#9CA3AF] dark:text-neutral-500 text-xs">·</span>
+              <span className="text-[#6B7280] dark:text-neutral-300 text-xs font-semibold">
                 ({reviewsSummary.count} {reviewsSummary.count === 1 ? 'review' : 'reviews'})
               </span>
             </div>
           )}
-          <p className="text-xs sm:text-sm text-neutral-400 mt-1 flex items-center justify-center gap-2">
+          <p className="text-xs sm:text-sm text-[#6B7280] dark:text-neutral-400 mt-1 flex items-center justify-center gap-2">
             <span>✨ Premium Beauty & Hair Studio</span>
             <span>·</span>
-            <span className="text-emerald-400 font-medium">Open {salon.open_time.slice(0, 5)} - {salon.close_time.slice(0, 5)}</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Open {salon.open_time.slice(0, 5)} - {salon.close_time.slice(0, 5)}</span>
           </p>
 
           {/* Stepper Progress Bar */}
@@ -758,12 +767,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <div key={st.num} className="flex-1 flex flex-col items-center">
                   <div
                     className={`w-full h-1.5 rounded-full transition-all duration-300 ${
-                      currentStep >= st.num ? 'bg-[#D4A77F]' : 'bg-[#1C2230]'
+                      currentStep >= st.num ? 'bg-[#D4A77F]' : 'bg-[#E5E7EB] dark:bg-[#1C2230]'
                     }`}
                   />
                   <span
-                    className={`text-[10px] mt-1 font-medium transition-colors ${
-                      currentStep >= st.num ? 'text-[#D4A77F]' : 'text-[#747D8D]'
+                    className={`text-[10px] mt-1 font-semibold transition-colors ${
+                      currentStep >= st.num ? 'text-[#8C5E2E] dark:text-[#D4A77F]' : 'text-[#6B7280] dark:text-[#747D8D]'
                     }`}
                   >
                     {st.label}
@@ -824,8 +833,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
             <div className="flex justify-between items-end mb-4">
               <div>
-                <h2 className="text-lg font-bold text-white">1. Select a Service</h2>
-                <p className="text-xs text-neutral-400">Choose from our curated range of treatments</p>
+                <h2 className="text-lg font-bold text-[#1F2937] dark:text-white">1. Select a Service</h2>
+                <p className="text-xs text-[#6B7280] dark:text-neutral-400">Choose from our curated range of treatments</p>
               </div>
             </div>
 
@@ -835,10 +844,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     selectedCategory === cat
                       ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-lg shadow-[#D4A77F]/20'
-                      : 'bg-[#141926] text-neutral-400 hover:text-white border border-[#2A2F3A]'
+                      : 'bg-white dark:bg-[#141926] text-[#4B5563] dark:text-neutral-400 hover:text-[#1F2937] dark:hover:text-white border border-[#E5E7EB] dark:border-[#2A2F3A]'
                   }`}
                 >
                   {cat}
@@ -856,36 +865,36 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     onClick={() => handleSelectService(svc)}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer flex justify-between items-center ${
                       isSelected
-                        ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
-                        : 'bg-[#141926]/60 hover:bg-[#141926] border-[#2A2F3A]'
+                        ? 'bg-white dark:bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20 shadow-md'
+                        : 'bg-white dark:bg-[#141926]/60 hover:bg-neutral-50 dark:hover:bg-[#141926] border-[#E5E7EB] dark:border-[#2A2F3A]'
                     }`}
                   >
                     <div className="flex-1 pr-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm sm:text-base text-white">{svc.name}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#1C2230] text-neutral-400 font-medium">
+                        <span className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-white">{svc.name}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#F3F4F6] dark:bg-[#1C2230] text-[#6B7280] dark:text-neutral-400 font-medium">
                           {svc.category}
                         </span>
                       </div>
                       {svc.description && (
-                        <p className="text-xs text-neutral-400 mt-1 line-clamp-2">{svc.description}</p>
+                        <p className="text-xs text-[#6B7280] dark:text-neutral-400 mt-1 line-clamp-2">{svc.description}</p>
                       )}
-                      <div className="flex items-center gap-3 mt-2 text-xs text-neutral-400">
-                        <span className="flex items-center gap-1 text-[#D4A77F] font-medium">
+                      <div className="flex items-center gap-3 mt-2 text-xs text-[#6B7280] dark:text-neutral-400">
+                        <span className="flex items-center gap-1 text-[#8C5E2E] dark:text-[#D4A77F] font-bold">
                           ⏱ {svc.duration_min} mins
                         </span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-base sm:text-lg font-bold text-white">
+                      <div className="text-base sm:text-lg font-bold text-[#1F2937] dark:text-white">
                         ₹{Number(svc.price).toLocaleString('en-IN')}
                       </div>
                       <button
                         type="button"
-                        className={`mt-2 px-3.5 py-1 rounded-xl text-xs font-semibold transition-all ${
+                        className={`mt-2 px-3.5 py-1 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-md'
-                            : 'bg-[#1C2230] text-neutral-300 hover:bg-neutral-700'
+                            : 'bg-[#F3F4F6] dark:bg-[#1C2230] text-[#374151] dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                         }`}
                       >
                         {isSelected ? 'Selected ✓' : 'Select'}
@@ -900,12 +909,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
             {reviewsSummary.enabled && latestReviews.length > 0 && (
               <div className="mt-8 space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                    <span className="text-amber-400">★</span>
+                  <h3 className="text-sm font-bold text-[#1F2937] dark:text-white flex items-center gap-1.5">
+                    <span className="text-amber-500">★</span>
                     <span>Client Experiences ({reviewsSummary.count})</span>
                   </h3>
-                  <span className="text-xs text-neutral-400 font-medium">
-                    Average: <strong className="text-white">{reviewsSummary.average.toFixed(1)} / 5</strong>
+                  <span className="text-xs text-[#6B7280] dark:text-neutral-400 font-medium">
+                    Average: <strong className="text-[#1F2937] dark:text-white">{reviewsSummary.average.toFixed(1)} / 5</strong>
                   </span>
                 </div>
 
@@ -913,20 +922,20 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   {latestReviews.map((rev) => (
                     <div
                       key={rev.id}
-                      className="p-4 rounded-2xl bg-[#141926]/70 border border-[#2A2F3A] space-y-2 text-xs"
+                      className="p-4 rounded-2xl bg-white dark:bg-[#141926]/70 border border-[#E5E7EB] dark:border-[#2A2F3A] space-y-2 text-xs"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white">{rev.customer_name}</span>
+                          <span className="font-bold text-[#1F2937] dark:text-white">{rev.customer_name}</span>
                           {rev.service_name && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-300 border border-neutral-700">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-[#4B5563] dark:text-neutral-300 border border-[#E5E7EB] dark:border-neutral-700">
                               {rev.service_name}
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center text-amber-400 text-xs">
+                        <div className="flex items-center text-amber-500 text-xs">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <span key={i} className={i < rev.rating ? 'text-amber-400' : 'text-neutral-700'}>
+                            <span key={i} className={i < rev.rating ? 'text-amber-500' : 'text-neutral-300 dark:text-neutral-700'}>
                               ★
                             </span>
                           ))}
@@ -934,14 +943,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       </div>
 
                       {rev.comment && (
-                        <p className="text-neutral-300 leading-relaxed text-xs italic">
+                        <p className="text-[#4B5563] dark:text-neutral-300 leading-relaxed text-xs italic">
                           &ldquo;{rev.comment}&rdquo;
                         </p>
                       )}
 
                       {rev.owner_reply && (
-                        <div className="p-2.5 rounded-xl bg-[#1C2230] border-l-2 border-[#D4A77F] text-[11px] text-neutral-300 mt-2 space-y-0.5">
-                          <span className="font-bold text-[#D4A77F] block">Response from {salon.name}:</span>
+                        <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#1C2230] border-l-2 border-[#D4A77F] text-[11px] text-[#4B5563] dark:text-neutral-300 mt-2 space-y-0.5">
+                          <span className="font-bold text-[#8C5E2E] dark:text-[#D4A77F] block">Response from {salon.name}:</span>
                           <p>{rev.owner_reply}</p>
                         </div>
                       )}
@@ -961,25 +970,25 @@ export default function BookingWizard({ slug }: { slug: string }) {
             )}
 
             {/* Floating Next Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#080B12]/90 backdrop-blur-md border-t border-[#2A2F3A] z-10 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-[#080B12]/90 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] z-10 flex justify-center shadow-lg">
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <div>
                   {selectedService ? (
                     <div>
-                      <span className="text-xs text-neutral-400">Selected:</span>
-                      <div className="text-sm font-bold text-white">{selectedService.name} (₹{Number(selectedService.price)})</div>
+                      <span className="text-xs text-[#6B7280] dark:text-neutral-400">Selected:</span>
+                      <div className="text-sm font-bold text-[#1F2937] dark:text-white">{selectedService.name} (₹{Number(selectedService.price).toLocaleString('en-IN')})</div>
                     </div>
                   ) : (
-                    <span className="text-xs text-neutral-500">Pick a service to continue</span>
+                    <span className="text-xs text-[#6B7280] dark:text-neutral-500">Pick a service to continue</span>
                   )}
                 </div>
                 <button
                   type="button"
                   disabled={!selectedService}
                   onClick={() => updateStep(2)}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95"
+                  className="px-6 py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-40 disabled:cursor-not-allowed text-[#080B12] text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
                 >
-                  Continue →
+                  Select Stylist →
                 </button>
               </div>
             </div>
@@ -993,12 +1002,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div>
                 <button
                   onClick={() => updateStep(1)}
-                  className="text-xs text-[#D4A77F] hover:underline mb-1 inline-block"
+                  className="text-xs text-[#8C5E2E] dark:text-[#D4A77F] hover:underline mb-1 inline-block font-semibold"
                 >
                   ← Back to Services
                 </button>
-                <h2 className="text-lg font-bold text-white">2. Choose Your Specialist</h2>
-                <p className="text-xs text-neutral-400">
+                <h2 className="text-lg font-bold text-[#1F2937] dark:text-white">2. Choose Your Specialist</h2>
+                <p className="text-xs text-[#6B7280] dark:text-neutral-400">
                   Select a specific stylist or choose anyone for maximum availability
                 </p>
               </div>
@@ -1010,22 +1019,22 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 onClick={() => handleSelectStaff('anyone')}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                   selectedStaffId === 'anyone'
-                    ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
-                    : 'bg-[#141926]/60 hover:bg-[#141926] border-[#2A2F3A]'
+                    ? 'bg-white dark:bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20 shadow-md'
+                    : 'bg-white dark:bg-[#141926]/60 hover:bg-neutral-50 dark:hover:bg-[#141926] border-[#E5E7EB] dark:border-[#2A2F3A]'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-md">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#D4A77F] to-[#B8905F] text-[#080B12] flex items-center justify-center font-bold text-lg shadow-md">
                     ⚡
                   </div>
                   <div>
-                    <div className="font-bold text-sm sm:text-base text-white">Any Available Specialist</div>
-                    <div className="text-xs text-emerald-400 font-medium">Fastest availability · Recommended</div>
+                    <div className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-white">Any Available Specialist</div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Fastest availability · Recommended</div>
                   </div>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                    selectedStaffId === 'anyone' ? 'border-[#D4A77F] bg-[#D4A77F] text-[#080B12] font-bold text-xs' : 'border-[#2A2F3A]'
+                    selectedStaffId === 'anyone' ? 'border-[#D4A77F] bg-[#D4A77F] text-[#080B12] font-bold text-xs' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'
                   }`}
                 >
                   {selectedStaffId === 'anyone' && '✓'}
@@ -1041,22 +1050,22 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     onClick={() => handleSelectStaff(st.id)}
                     className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
-                        ? 'bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20'
-                        : 'bg-[#141926]/60 hover:bg-[#141926] border-[#2A2F3A]'
+                        ? 'bg-white dark:bg-[#141926] border-[#D4A77F] ring-2 ring-[#D4A77F]/20 shadow-md'
+                        : 'bg-white dark:bg-[#141926]/60 hover:bg-neutral-50 dark:hover:bg-[#141926] border-[#E5E7EB] dark:border-[#2A2F3A]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-[#1C2230] text-[#D4A77F] flex items-center justify-center font-bold text-base border border-[#2A2F3A]">
+                      <div className="w-11 h-11 rounded-2xl bg-neutral-100 dark:bg-[#1C2230] text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center font-bold text-base border border-[#E5E7EB] dark:border-[#2A2F3A]">
                         {st.name.charAt(0)}
                       </div>
                       <div>
-                        <div className="font-bold text-sm sm:text-base text-white">{st.name}</div>
-                        <div className="text-xs text-neutral-400">{st.role_title || 'Stylist & Artist'}</div>
+                        <div className="font-bold text-sm sm:text-base text-[#1F2937] dark:text-white">{st.name}</div>
+                        <div className="text-xs text-[#6B7280] dark:text-neutral-400">{st.role_title || 'Stylist & Artist'}</div>
                       </div>
                     </div>
                     <div
                       className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                        isSelected ? 'border-[#D4A77F] bg-[#D4A77F] text-[#080B12] font-bold text-xs' : 'border-[#2A2F3A]'
+                        isSelected ? 'border-[#D4A77F] bg-[#D4A77F] text-[#080B12] font-bold text-xs' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'
                       }`}
                     >
                       {isSelected && '✓'}
@@ -1070,14 +1079,14 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => updateStep(1)}
-                  className="px-4 py-2.5 rounded-2xl bg-[#141926] text-neutral-300 text-xs font-semibold hover:bg-[#1C2230] cursor-pointer"
+                  className="px-4 py-2.5 rounded-2xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#374151] dark:text-neutral-300 text-xs font-semibold hover:bg-neutral-100 dark:hover:bg-[#1C2230] cursor-pointer"
                 >
                   ← Back to Services
                 </button>
                 <button
                   type="button"
                   onClick={() => updateStep(3)}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
+                  className="px-6 py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
                 >
                   Select Date & Time →
                 </button>
@@ -1085,19 +1094,19 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Floating Next Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#080B12]/90 backdrop-blur-md border-t border-[#2A2F3A] z-10 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-[#080B12]/90 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] z-10 flex justify-center shadow-lg">
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <button
                   type="button"
                   onClick={() => updateStep(1)}
-                  className="px-4 py-2.5 rounded-2xl bg-[#141926] text-neutral-300 text-xs font-semibold hover:bg-[#1C2230]"
+                  className="px-4 py-2.5 rounded-2xl bg-white dark:bg-[#141926] text-[#374151] dark:text-neutral-300 text-xs font-semibold hover:bg-neutral-100 dark:hover:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] cursor-pointer"
                 >
                   ← Back
                 </button>
                 <button
                   type="button"
                   onClick={() => updateStep(3)}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95"
+                  className="px-6 py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
                 >
                   Select Date & Time →
                 </button>
@@ -1113,12 +1122,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div>
                 <button
                   onClick={() => updateStep(2)}
-                  className="text-xs text-[#D4A77F] hover:underline mb-1 inline-block"
+                  className="text-xs text-[#8C5E2E] dark:text-[#D4A77F] hover:underline mb-1 inline-block font-semibold"
                 >
                   ← Back to Stylist
                 </button>
-                <h2 className="text-lg font-bold text-white">3. Pick Date & Available Slot</h2>
-                <p className="text-xs text-neutral-400">
+                <h2 className="text-lg font-bold text-[#1F2937] dark:text-white">3. Pick Date & Available Slot</h2>
+                <p className="text-xs text-[#6B7280] dark:text-neutral-400">
                   Real-time slots computed with buffer and opening hours
                 </p>
               </div>
@@ -1126,7 +1135,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
             {/* Horizontal Date Picker */}
             <div className="mb-6">
-              <label className="text-[11px] uppercase tracking-wider font-bold text-neutral-400 mb-2 block">
+              <label className="text-[11px] uppercase tracking-wider font-bold text-[#6B7280] dark:text-neutral-400 mb-2 block">
                 Select Date
               </label>
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none">
@@ -1140,10 +1149,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       onClick={() => handleSelectDate(d.dateStr)}
                       className={`flex flex-col items-center justify-center shrink-0 min-w-[84px] sm:min-w-[92px] px-2.5 py-3 rounded-2xl border transition-all cursor-pointer ${
                         d.isClosed
-                          ? 'opacity-30 cursor-not-allowed bg-[#141926]/40 border-[#2A2F3A]'
+                          ? 'opacity-30 cursor-not-allowed bg-neutral-100 dark:bg-[#141926]/40 border-[#E5E7EB] dark:border-[#2A2F3A]'
                           : isSelected
-                          ? 'bg-pink-500 border-[#D4A77F] text-white shadow-lg shadow-[#D4A77F]/20 scale-102'
-                          : 'bg-[#141926]/80 border-[#2A2F3A] text-neutral-300 hover:bg-[#141926]'
+                          ? 'bg-[#D4A77F] border-[#D4A77F] text-[#080B12] shadow-lg shadow-[#D4A77F]/20 scale-102 font-bold'
+                          : 'bg-white dark:bg-[#141926]/80 border-[#E5E7EB] dark:border-[#2A2F3A] text-[#1F2937] dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#141926]'
                       }`}
                     >
                       <span className="text-[10px] uppercase font-bold opacity-80 tracking-wider">{d.dayName}</span>
@@ -1158,7 +1167,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         </div>
                       )}
                       {d.isClosed && (
-                        <span className="text-[9px] text-rose-400 font-bold mt-0.5 truncate max-w-[76px] px-1 text-center" title={d.holidayTitle || 'Closed'}>
+                        <span className="text-[9px] text-rose-500 font-bold mt-0.5 truncate max-w-[76px] px-1 text-center" title={d.holidayTitle || 'Closed'}>
                           {d.holidayTitle ? '🏖️ Holiday' : 'Closed'}
                         </span>
                       )}
@@ -1171,25 +1180,25 @@ export default function BookingWizard({ slug }: { slug: string }) {
             {/* Time Slots Grid */}
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-neutral-400">
+                <label className="text-[11px] uppercase tracking-wider font-bold text-[#6B7280] dark:text-neutral-400">
                   Available Slots ({availableSlots.length})
                 </label>
                 {selectedSlot && (
-                  <span className="text-xs text-[#D4A77F] font-semibold">
+                  <span className="text-xs text-[#8C5E2E] dark:text-[#D4A77F] font-bold">
                     Selected: {selectedSlot.formattedTime}
                   </span>
                 )}
               </div>
 
               {slotsLoading ? (
-                <div className="py-12 flex flex-col items-center justify-center bg-[#141926]/40 rounded-3xl border border-[#2A2F3A]">
+                <div className="py-12 flex flex-col items-center justify-center bg-white dark:bg-[#141926]/40 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A]">
                   <div className="w-8 h-8 border-3 border-[#D4A77F] border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-xs text-neutral-400 mt-3">Finding available free slots...</p>
+                  <p className="text-xs text-[#6B7280] dark:text-neutral-400 mt-3">Finding available free slots...</p>
                 </div>
               ) : availableSlots.length === 0 ? (
-                <div className="py-10 px-4 text-center bg-[#141926]/40 rounded-3xl border border-[#2A2F3A]">
+                <div className="py-10 px-4 text-center bg-white dark:bg-[#141926]/40 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2F3A]">
                   <span className="text-2xl block mb-2">🗓️</span>
-                  <p className="text-xs sm:text-sm text-neutral-300 font-medium">
+                  <p className="text-xs sm:text-sm text-[#374151] dark:text-neutral-300 font-medium">
                     {slotNotice || 'The shop is closed for today. Please book an appointment for another date.'}
                   </p>
                   {availableDates.find((d) => d.dateStr > selectedDate && !d.isClosed) && (
@@ -1201,7 +1210,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           handleSelectDate(next.dateStr);
                         }
                       }}
-                      className="mt-4 px-5 py-2.5 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
+                      className="mt-4 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
                     >
                       <span>👉 View Available Slots for Tomorrow</span>
                     </button>
@@ -1210,7 +1219,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               ) : (
                 <>
                   {slotNotice && (
-                    <div className="mb-4 bg-amber-500/10 border border-amber-500/30 text-amber-300 p-3.5 rounded-2xl text-xs flex items-center gap-2.5">
+                    <div className="mb-4 bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 p-3.5 rounded-2xl text-xs flex items-center gap-2.5">
                       <span>ℹ️</span>
                       <span>{slotNotice}</span>
                     </div>
@@ -1225,13 +1234,13 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         onClick={() => handleSelectSlot(slot)}
                         className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-pink-500 border-[#D4A77F] text-white font-bold shadow-lg shadow-[#D4A77F]/20 scale-102'
-                            : 'bg-[#141926]/80 border-[#2A2F3A] hover:border-[#2A2F3A] text-neutral-200'
+                            ? 'bg-[#D4A77F] border-[#D4A77F] text-[#080B12] font-bold shadow-lg shadow-[#D4A77F]/20 scale-102'
+                            : 'bg-white dark:bg-[#141926]/80 border-[#E5E7EB] dark:border-[#2A2F3A] hover:border-[#D4A77F]/50 text-[#1F2937] dark:text-neutral-200'
                         }`}
                       >
                         <div className="text-xs sm:text-sm font-semibold">{slot.formattedTime}</div>
                         {selectedStaffId === 'anyone' && (
-                          <div className={`text-[10px] mt-0.5 truncate ${isSelected ? 'text-pink-100' : 'text-neutral-500'}`}>
+                          <div className={`text-[10px] mt-0.5 truncate ${isSelected ? 'text-[#080B12] font-bold' : 'text-[#6B7280] dark:text-neutral-500'}`}>
                             {slot.staffName}
                           </div>
                         )}
@@ -1244,12 +1253,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
             </div>
 
             {/* Floating Next Button */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#080B12]/90 backdrop-blur-md border-t border-[#2A2F3A] z-10 flex justify-center">
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-[#080B12]/90 backdrop-blur-md border-t border-[#E5E7EB] dark:border-[#2A2F3A] z-10 flex justify-center shadow-lg">
               <div className="max-w-2xl w-full flex justify-between items-center">
                 <button
                   type="button"
                   onClick={() => updateStep(2)}
-                  className="px-4 py-2.5 rounded-2xl bg-[#141926] text-neutral-300 text-xs font-semibold hover:bg-[#1C2230] cursor-pointer"
+                  className="px-4 py-2.5 rounded-2xl bg-white dark:bg-[#141926] text-[#374151] dark:text-neutral-300 text-xs font-semibold hover:bg-neutral-100 dark:hover:bg-[#1C2230] border border-[#E5E7EB] dark:border-[#2A2F3A] cursor-pointer"
                 >
                   ← Back
                 </button>
@@ -1257,7 +1266,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   type="button"
                   disabled={!selectedSlot}
                   onClick={handleProceedToDetails}
-                  className="px-6 py-3 rounded-2xl bg-pink-500 hover:bg-pink-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
+                  className="px-6 py-3 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-40 disabled:cursor-not-allowed text-[#080B12] text-sm font-bold transition-all shadow-lg shadow-[#D4A77F]/20 active:scale-95 cursor-pointer"
                 >
                   Enter Details →
                 </button>
@@ -1273,36 +1282,36 @@ export default function BookingWizard({ slug }: { slug: string }) {
               <div>
                 <button
                   onClick={() => updateStep(3)}
-                  className="text-xs text-[#D4A77F] hover:underline mb-1 inline-block"
+                  className="text-xs text-[#8C5E2E] dark:text-[#D4A77F] hover:underline mb-1 inline-block font-semibold"
                 >
                   ← Back to Slot Selection
                 </button>
-                <h2 className="text-lg font-bold text-white">4. Confirm Your Appointment</h2>
-                <p className="text-xs text-neutral-400">
+                <h2 className="text-lg font-bold text-[#1F2937] dark:text-white">4. Confirm Your Appointment</h2>
+                <p className="text-xs text-[#6B7280] dark:text-neutral-400">
                   Please enter your contact information to receive confirmation
                 </p>
               </div>
             </div>
 
             {/* Booking Summary Box */}
-            <div className="bg-[#141926] border border-[#2A2F3A] rounded-3xl p-5 mb-6">
-              <div className="text-[10px] uppercase font-bold tracking-wider text-[#D4A77F] mb-2">
+            <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 mb-6 shadow-sm">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-[#8C5E2E] dark:text-[#D4A77F] mb-2">
                 Booking Summary
               </div>
-              <div className="flex justify-between items-center border-b border-[#2A2F3A] pb-3 mb-3">
+              <div className="flex justify-between items-center border-b border-[#E5E7EB] dark:border-[#2A2F3A] pb-3 mb-3">
                 <div>
-                  <div className="font-bold text-base text-white">{selectedService?.name}</div>
-                  <div className="text-xs text-neutral-400">
+                  <div className="font-bold text-base text-[#1F2937] dark:text-white">{selectedService?.name}</div>
+                  <div className="text-xs text-[#6B7280] dark:text-neutral-400">
                     ⏱ {selectedService?.duration_min} mins · Stylist: {selectedSlot?.staffName}
                   </div>
                 </div>
-                <div className="text-right font-extrabold text-lg text-white">
+                <div className="text-right font-extrabold text-lg text-[#1F2937] dark:text-white">
                   ₹{Number(selectedService?.price).toLocaleString('en-IN')}
                 </div>
               </div>
-              <div className="flex justify-between text-xs text-neutral-300">
+              <div className="flex justify-between text-xs text-[#4B5563] dark:text-neutral-300">
                 <span>🗓️ Date & Time:</span>
-                <span className="font-bold text-white">
+                <span className="font-bold text-[#1F2937] dark:text-white">
                   {new Date(`${selectedDate}T00:00:00+05:30`).toLocaleDateString('en-IN', {
                     timeZone: 'Asia/Kolkata',
                     weekday: 'short',
@@ -1316,23 +1325,23 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
             {/* Customer Authentication State & Options */}
             {activeCustomer ? (
-              <div className="bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-pink-500/10 border border-emerald-500/30 rounded-3xl p-5 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-3xl p-5 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xl border border-emerald-500/30">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xl border border-emerald-500/30 shrink-0">
                     ✓
                   </div>
                   <div>
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                       <span>Verified Customer Account</span>
                     </div>
-                    <div className="text-base font-extrabold text-white">
+                    <div className="text-base font-extrabold text-[#1F2937] dark:text-white">
                       {activeCustomer.name}{' '}
-                      <span className="font-mono text-neutral-400 text-xs font-normal">
+                      <span className="font-mono text-[#6B7280] dark:text-neutral-400 text-xs font-normal">
                         (+91 {activeCustomer.mobile})
                       </span>
                     </div>
-                    <div className="text-xs text-neutral-400 mt-0.5">
-                      Your booking and digital invoice will automatically save to your customer portal.
+                    <div className="text-xs text-[#6B7280] dark:text-neutral-400 mt-0.5">
+                      Your booking and digital invoice will automatically save to your customer portal. No PIN needed.
                     </div>
                   </div>
                 </div>
@@ -1344,24 +1353,24 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     setCustomerName('');
                     setCustomerMobile('');
                   }}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#1C2230] hover:bg-neutral-700 text-neutral-300 text-xs font-semibold self-start sm:self-auto transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-neutral-100 dark:bg-[#1C2230] hover:bg-neutral-200 dark:hover:bg-neutral-700 text-[#374151] dark:text-neutral-300 text-xs font-semibold self-start sm:self-auto transition-all border border-[#E5E7EB] dark:border-transparent cursor-pointer"
                 >
                   Switch / Log Out
                 </button>
               </div>
             ) : (
               <div className="mb-5">
-                <div className="flex rounded-2xl bg-[#141926] border border-[#2A2F3A] p-1 mb-4">
+                <div className="flex rounded-2xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] p-1 mb-4">
                   <button
                     type="button"
                     onClick={() => {
                       setCustomerAuthMode('new');
                       setSubmitError(null);
                     }}
-                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                       customerAuthMode === 'new'
                         ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-md'
-                        : 'text-neutral-400 hover:text-white'
+                        : 'text-[#6B7280] dark:text-neutral-400 hover:text-[#1F2937] dark:hover:text-white'
                     }`}
                   >
                     ✨ New Customer (Sign Up & Book)
@@ -1372,10 +1381,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       setCustomerAuthMode('existing');
                       setSubmitError(null);
                     }}
-                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                       customerAuthMode === 'existing'
                         ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-md'
-                        : 'text-neutral-400 hover:text-white'
+                        : 'text-[#6B7280] dark:text-neutral-400 hover:text-[#1F2937] dark:hover:text-white'
                     }`}
                   >
                     🔑 Returning Customer (Login)
@@ -1383,13 +1392,13 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 </div>
 
                 {customerAuthMode === 'existing' && (
-                  <div className="bg-[#141926]/90 border border-[#2A2F3A] rounded-3xl p-5 mb-4 space-y-3">
-                    <div className="text-xs font-bold text-[#D4A77F] uppercase tracking-wider">
+                  <div className="bg-white dark:bg-[#141926]/90 border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 mb-4 space-y-3">
+                    <div className="text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] uppercase tracking-wider">
                       Quick Login to Autofill Profile
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[11px] font-semibold text-neutral-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-[#4B5563] dark:text-neutral-300 mb-1">
                           Registered Mobile Number
                         </label>
                         <input
@@ -1397,12 +1406,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           placeholder="9898023456"
                           value={customerMobile}
                           onChange={(e) => setCustomerMobile(e.target.value)}
-                          className="w-full bg-[#080B12] border border-[#2A2F3A] rounded-xl px-3 py-2 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:border-[#D4A77F]"
+                          className="w-full bg-[#F9FAFB] dark:bg-[#080B12] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-neutral-500 font-mono focus:outline-none focus:border-[#D4A77F]"
                         />
                       </div>
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <label className="block text-[11px] font-semibold text-neutral-300">
+                          <label className="block text-[11px] font-semibold text-[#4B5563] dark:text-neutral-300">
                             4-Digit Security PIN
                           </label>
                         </div>
@@ -1412,7 +1421,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                           placeholder="Enter PIN"
                           value={loginPin}
                           onChange={(e) => setLoginPin(e.target.value)}
-                          className="w-full bg-[#080B12] border border-[#2A2F3A] rounded-xl px-3 py-2 text-sm text-white text-center font-mono focus:outline-none focus:border-[#D4A77F]"
+                          className="w-full bg-[#F9FAFB] dark:bg-[#080B12] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 text-sm text-[#1F2937] dark:text-white text-center font-mono focus:outline-none focus:border-[#D4A77F]"
                         />
                       </div>
                     </div>
@@ -1420,7 +1429,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       type="button"
                       disabled={verifyingLogin}
                       onClick={handleCustomerQuickLogin}
-                      className="w-full py-2.5 rounded-xl bg-[#1C2230] hover:bg-neutral-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 border border-[#2A2F3A]"
+                      className="w-full py-2.5 rounded-xl bg-neutral-100 dark:bg-[#1C2230] hover:bg-neutral-200 dark:hover:bg-neutral-700 text-[#1F2937] dark:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 border border-[#E5E7EB] dark:border-[#2A2F3A] cursor-pointer"
                     >
                       {verifyingLogin ? 'Verifying...' : 'Verify & Load My Profile ➔'}
                     </button>
@@ -1432,7 +1441,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
             {/* Input Form */}
             <form onSubmit={handleBookAppointment} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#374151] dark:text-neutral-300 mb-1.5">
                   Your Full Name <span className="text-[#D4A77F]">*</span>
                 </label>
                 <input
@@ -1441,29 +1450,29 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   placeholder="e.g. Diya Joshi"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full bg-[#141926] border border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-pink-500"
+                  className="w-full bg-[#F9FAFB] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#374151] dark:text-neutral-300 mb-1.5">
                   Mobile Number (WhatsApp) <span className="text-[#D4A77F]">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-3 text-sm text-neutral-500 font-mono">+91</span>
+                  <span className="absolute left-4 top-3 text-sm text-[#9CA3AF] dark:text-neutral-500 font-mono">+91</span>
                   <input
                     type="tel"
                     required
                     placeholder="9898023456"
                     value={customerMobile}
                     onChange={(e) => setCustomerMobile(e.target.value)}
-                    className="w-full bg-[#141926] border border-[#2A2F3A] rounded-2xl pl-14 pr-4 py-3 text-sm text-white placeholder-neutral-500 font-mono focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-pink-500"
+                    className="w-full bg-[#F9FAFB] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-14 pr-4 py-3 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-neutral-500 font-mono focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[#374151] dark:text-neutral-300 mb-1.5">
                   Special Request or Note (Optional)
                 </label>
                 <input
@@ -1471,7 +1480,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   placeholder="e.g. First time visiting, prefer sensitive skin products"
                   value={bookingNote}
                   onChange={(e) => setBookingNote(e.target.value)}
-                  className="w-full bg-[#141926] border border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-pink-500"
+                  className="w-full bg-[#F9FAFB] dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F]"
                 />
               </div>
 
@@ -1480,8 +1489,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 <div className="bg-[#D4A77F]/15 border border-[#D4A77F]/30 rounded-2xl p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
                     <div>
-                      <label className="block text-xs font-bold text-[#D4A77F] mb-1.5">
-                        Set 4-Digit Security PIN <span className="text-[#D4A77F]">*</span>
+                      <label className="block text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] mb-1.5">
+                        Set 4-Digit Security PIN <span className="text-[#8C5E2E] dark:text-[#D4A77F]">*</span>
                       </label>
                       <input
                         type="password"
@@ -1490,12 +1499,12 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         placeholder="Enter 4-digit PIN"
                         value={verificationCode}
                         onChange={(e) => setVerificationCode(e.target.value)}
-                        className="w-full bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-[#D4A77F]"
+                        className="w-full bg-white dark:bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[#D4A77F] mb-1.5">
-                        Confirm 4-Digit PIN <span className="text-[#D4A77F]">*</span>
+                      <label className="block text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] mb-1.5">
+                        Confirm 4-Digit PIN <span className="text-[#8C5E2E] dark:text-[#D4A77F]">*</span>
                       </label>
                       <input
                         type="password"
@@ -1504,11 +1513,11 @@ export default function BookingWizard({ slug }: { slug: string }) {
                         placeholder="Re-enter 4-digit PIN"
                         value={confirmVerificationCode}
                         onChange={(e) => setConfirmVerificationCode(e.target.value)}
-                        className="w-full bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none focus:border-[#D4A77F]"
+                        className="w-full bg-white dark:bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
                       />
                     </div>
                   </div>
-                  <p className="text-[10px] text-neutral-400">
+                  <p className="text-[10px] text-[#6B7280] dark:text-neutral-400">
                     You can use this 4-digit PIN to log into your Customer Portal (/portal) to view your visits, invoices, and rewards.
                   </p>
                 </div>
@@ -1549,10 +1558,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
             <div className="w-16 h-16 rounded-3xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 mx-auto flex items-center justify-center text-3xl font-bold mb-4 shadow-xl shadow-emerald-500/20">
               ✓
             </div>
-            <h2 className="text-2xl font-black text-white">
+            <h2 className="text-2xl font-black text-[#1F2937] dark:text-white">
               {confirmedBooking.isDemo ? 'Demo Booking Simulated!' : 'Booking Confirmed!'}
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-400 mt-1 max-w-sm mx-auto">
+            <p className="text-xs sm:text-sm text-[#6B7280] dark:text-neutral-400 mt-1 max-w-sm mx-auto">
               {confirmedBooking.isDemo
                 ? 'This was an interactive demonstration. Zero data was saved to our database.'
                 : 'Your appointment has been reserved directly in the salon scheduling system.'}
@@ -1561,10 +1570,10 @@ export default function BookingWizard({ slug }: { slug: string }) {
             {/* Demo Sandbox Alert Callout */}
             {confirmedBooking.isDemo && (
               <div className="mt-4 mb-2 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 max-w-md mx-auto text-center">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs uppercase mb-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold text-xs uppercase mb-2">
                   <span>🧪 Zero Database Storage</span>
                 </span>
-                <p className="text-xs text-amber-200">
+                <p className="text-xs text-amber-700 dark:text-amber-200">
                   Are you a salon owner? See how this appointment instantly shows up on the manager dashboard and calendar:
                 </p>
                 <div className="mt-3">
@@ -1580,31 +1589,31 @@ export default function BookingWizard({ slug }: { slug: string }) {
             )}
 
             {/* Appointment Card */}
-            <div className="mt-6 bg-[#141926] border border-[#2A2F3A] rounded-3xl p-6 text-left max-w-md mx-auto shadow-xl">
-              <div className="text-[10px] uppercase font-bold tracking-wider text-[#D4A77F] mb-1">
+            <div className="mt-6 bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 text-left max-w-md mx-auto shadow-xl">
+              <div className="text-[10px] uppercase font-bold tracking-wider text-[#8C5E2E] dark:text-[#D4A77F] mb-1">
                 Confirmed Appointment
               </div>
-              <div className="text-xl font-extrabold text-white">{confirmedBooking.serviceName}</div>
-              <div className="text-xs text-neutral-400 mt-1">
-                Stylist: <span className="text-white font-semibold">{confirmedBooking.staffName}</span>
+              <div className="text-xl font-extrabold text-[#1F2937] dark:text-white">{confirmedBooking.serviceName}</div>
+              <div className="text-xs text-[#6B7280] dark:text-neutral-400 mt-1">
+                Stylist: <span className="text-[#1F2937] dark:text-white font-semibold">{confirmedBooking.staffName}</span>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[#2A2F3A] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="mt-4 pt-4 border-t border-[#E5E7EB] dark:border-[#2A2F3A] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span className="text-neutral-500 block text-[10px] uppercase font-bold">Date</span>
-                  <span className="font-bold text-white">{confirmedBooking.formattedDate}</span>
+                  <span className="text-[#6B7280] dark:text-neutral-500 block text-[10px] uppercase font-bold">Date</span>
+                  <span className="font-bold text-[#1F2937] dark:text-white">{confirmedBooking.formattedDate}</span>
                 </div>
                 <div>
-                  <span className="text-neutral-500 block text-[10px] uppercase font-bold">Time</span>
-                  <span className="font-bold text-emerald-400">{confirmedBooking.formattedTime}</span>
+                  <span className="text-[#6B7280] dark:text-neutral-500 block text-[10px] uppercase font-bold">Time</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">{confirmedBooking.formattedTime}</span>
                 </div>
                 <div>
-                  <span className="text-neutral-500 block text-[10px] uppercase font-bold">Client</span>
-                  <span className="font-bold text-white">{confirmedBooking.cleanName}</span>
+                  <span className="text-[#6B7280] dark:text-neutral-500 block text-[10px] uppercase font-bold">Client</span>
+                  <span className="font-bold text-[#1F2937] dark:text-white">{confirmedBooking.cleanName}</span>
                 </div>
                 <div>
-                  <span className="text-neutral-500 block text-[10px] uppercase font-bold">Phone</span>
-                  <span className="font-bold font-mono text-neutral-300">{confirmedBooking.cleanMobile}</span>
+                  <span className="text-[#6B7280] dark:text-neutral-500 block text-[10px] uppercase font-bold">Phone</span>
+                  <span className="font-bold font-mono text-[#4B5563] dark:text-neutral-300">{confirmedBooking.cleanMobile}</span>
                 </div>
               </div>
             </div>
@@ -1664,7 +1673,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                   setConfirmedBooking(null);
                   setSubmitError(null);
                 }}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[#141926] hover:bg-[#1C2230] text-neutral-300 text-xs font-bold border border-[#2A2F3A] transition-all active:scale-95"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white dark:bg-[#141926] hover:bg-neutral-100 dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-neutral-300 text-xs font-bold border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all active:scale-95 cursor-pointer"
               >
                 Book Another Appointment ↺
               </button>
@@ -1672,21 +1681,21 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
             {/* Account Records Reminder Card */}
             {!confirmedBooking.isDemo && (
-              <div className="mt-5 p-4 rounded-2xl bg-[#141926]/80 border border-[#2A2F3A] text-neutral-400 text-xs flex items-center justify-center gap-2 max-w-md mx-auto text-center leading-relaxed">
+              <div className="mt-5 p-4 rounded-2xl bg-white dark:bg-[#141926]/80 border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#6B7280] dark:text-neutral-400 text-xs flex items-center justify-center gap-2 max-w-md mx-auto text-center leading-relaxed">
                 <span>💡</span>
                 <span>
                   Your customer record is permanently stored! You can log in anytime at{' '}
-                  <Link href="/portal" className="text-[#D4A77F] underline font-semibold">/portal</Link> with mobile{' '}
-                  <strong className="text-white font-mono">{confirmedBooking.cleanMobile}</strong> and PIN{' '}
-                  <strong className="text-white font-mono">{confirmedBooking.customerPin || '••••'}</strong> to review your past visits, itemized bills, and VIP benefits.
+                  <Link href="/portal" className="text-[#8C5E2E] dark:text-[#D4A77F] underline font-semibold">/portal</Link> with mobile{' '}
+                  <strong className="text-[#1F2937] dark:text-white font-mono">{confirmedBooking.cleanMobile}</strong> and PIN{' '}
+                  <strong className="text-[#1F2937] dark:text-white font-mono">{confirmedBooking.customerPin || '••••'}</strong> to review your past visits, itemized bills, and VIP benefits.
                 </span>
               </div>
             )}
             {confirmedBooking.isDemo && (
-              <div className="mt-5 p-4 rounded-2xl bg-[#141926]/80 border border-[#2A2F3A] text-neutral-400 text-xs flex flex-col sm:flex-row items-center justify-between gap-3 max-w-md mx-auto text-center sm:text-left leading-relaxed">
+              <div className="mt-5 p-4 rounded-2xl bg-white dark:bg-[#141926]/80 border border-[#E5E7EB] dark:border-[#2A2F3A] text-[#6B7280] dark:text-neutral-400 text-xs flex flex-col sm:flex-row items-center justify-between gap-3 max-w-md mx-auto text-center sm:text-left leading-relaxed">
                 <div>
-                  <span className="text-white font-bold block mb-0.5">Want to launch your own salon online?</span>
-                  <span className="text-[11px] text-neutral-400">Setup your branded booking link & ERP in 60s.</span>
+                  <span className="text-[#1F2937] dark:text-white font-bold block mb-0.5">Want to launch your own salon online?</span>
+                  <span className="text-[11px] text-[#6B7280] dark:text-neutral-400">Setup your branded booking link & ERP in 60s.</span>
                 </div>
                 <Link
                   href="/register-salon"

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import pool, { query } from '@/lib/db';
-import { createCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth';
+import { createCustomerSessionToken, verifyCustomerSessionToken, CUSTOMER_COOKIE_NAME } from '@/lib/auth';
 import { getSalonPlan } from '@/lib/plan';
 import { normalizeMobile } from '@/lib/phone';
 import { checkRateLimit, recordFailedAttempt, resetRateLimit, getClientIp } from '@/lib/rate-limit';
@@ -87,19 +88,27 @@ export async function POST(
       );
     }
 
-    const cleanPin = (code || '').trim();
-    if (!cleanPin || cleanPin.length < 4) {
-      return NextResponse.json(
-        { error: 'Please enter a 4-digit security PIN for your customer portal access.' },
-        { status: 400 }
-      );
-    }
+    // Inspect customer portal authentication state via session cookie
+    const cookieStore = await cookies();
+    const customerToken = cookieStore.get(CUSTOMER_COOKIE_NAME)?.value;
+    const customerSession = customerToken ? await verifyCustomerSessionToken(customerToken) : null;
+    const isCustomerAuthenticated = !!customerSession && normalizeMobile(customerSession.mobile) === cleanMobile;
 
-    if (confirmCode !== undefined && cleanPin !== confirmCode?.trim()) {
-      return NextResponse.json(
-        { error: 'Security PIN and Confirm PIN do not match.' },
-        { status: 400 }
-      );
+    const cleanPin = (code || '').trim();
+    if (!isCustomerAuthenticated) {
+      if (!cleanPin || cleanPin.length < 4) {
+        return NextResponse.json(
+          { error: 'Please enter a 4-digit security PIN for your customer portal access.' },
+          { status: 400 }
+        );
+      }
+
+      if (confirmCode !== undefined && cleanPin !== confirmCode?.trim()) {
+        return NextResponse.json(
+          { error: 'Security PIN and Confirm PIN do not match.' },
+          { status: 400 }
+        );
+      }
     }
 
     if (!service_id || !name?.trim()) {
@@ -460,7 +469,9 @@ export async function POST(
     if (existingCust.rows.length > 0) {
       customerId = existingCust.rows[0].id;
       const storedPin = existingCust.rows[0].pin;
-      if (storedPin) {
+
+      // Only verify PIN if customer is not already authenticated via customer session cookie
+      if (!isCustomerAuthenticated && storedPin) {
         let isMatch = false;
         if (storedPin.startsWith('$2a$') || storedPin.startsWith('$2b$')) {
           isMatch = await bcrypt.compare(cleanPin, storedPin);
@@ -478,7 +489,7 @@ export async function POST(
           await recordFailedAttempt(ipRateLimitKey, 20, 900);
 
           return NextResponse.json(
-            { error: 'Incorrect customer PIN for this mobile number. Please enter your existing PIN or log in first.' },
+            { error: 'Incorrect customer PIN for this mobile number. Please enter your existing PIN or log into your portal.' },
             { status: 401 }
           );
         }
@@ -488,7 +499,7 @@ export async function POST(
           const newHash = await bcrypt.hash(cleanPin, 12);
           await client.query('UPDATE customers SET pin = $1 WHERE id = $2', [newHash, customerId]);
         }
-      } else {
+      } else if (!storedPin && cleanPin) {
         const newHash = await bcrypt.hash(cleanPin, 12);
         await client.query('UPDATE customers SET pin = $1 WHERE id = $2', [newHash, customerId]);
       }
@@ -498,7 +509,7 @@ export async function POST(
         [cleanName, customerId]
       );
     } else {
-      const hashedPin = await bcrypt.hash(cleanPin, 12);
+      const hashedPin = cleanPin ? await bcrypt.hash(cleanPin, 12) : null;
       const newCust = await client.query(
         `INSERT INTO customers (salon_id, name, mobile, pin) VALUES ($1, $2, $3, $4) RETURNING id`,
         [salon.id, cleanName, cleanMobile, hashedPin]

@@ -167,69 +167,69 @@ export default function AdminOverviewPage() {
         </button>
       </div>
 
-      {/* 4 Primary Platform KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* 4 Primary Platform KPI Cards - Modern 2x2 on Mobile, 4-Cols on Desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
         {/* Total Salons */}
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 shadow-xs">
-          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Total Salons</span>
-            <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center">
-              <Building2 className="w-4 h-4" />
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Total Salons</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-center shrink-0">
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? '...' : metrics?.totalSalons}
           </div>
-          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 font-semibold flex items-center gap-1">
-            <span>● 100% active branches</span>
+          <div className="text-[10px] sm:text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 font-semibold flex items-center gap-1 truncate">
+            <span>● 100% active</span>
           </div>
         </div>
 
         {/* Platform Revenue */}
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 shadow-xs">
-          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Gross Platform Volume</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <CreditCard className="w-4 h-4" />
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Gross Volume</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 font-bold text-xs">
+              ₹
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-600 font-mono">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 dark:text-emerald-400 font-mono truncate">
             {loading ? '...' : `₹${metrics?.totalRevenue?.toLocaleString('en-IN')}`}
           </div>
-          <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 font-medium">
-            Collected: ₹{metrics?.totalPaid?.toLocaleString('en-IN')}
+          <div className="text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 font-medium truncate">
+            Paid: ₹{metrics?.totalPaid?.toLocaleString('en-IN')}
           </div>
         </div>
 
         {/* Total Appointments */}
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 shadow-xs">
-          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Total Appointments</span>
-            <div className="w-8 h-8 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
-              <Calendar className="w-4 h-4" />
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Appointments</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center shrink-0">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? '...' : metrics?.totalAppointments}
           </div>
-          <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 font-medium">
-            Across all salon branches
+          <div className="text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 font-medium truncate">
+            All branches
           </div>
         </div>
 
         {/* Total Customers */}
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-5 shadow-xs">
-          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Registered Clients</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between text-[#6B7280] dark:text-[#A0A8B8] mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Clients</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {loading ? '...' : metrics?.totalCustomers}
           </div>
-          <div className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 font-medium">
-            Permanent client profiles
+          <div className="text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] mt-1 font-medium truncate">
+            Registered profiles
           </div>
         </div>
       </div>
@@ -353,22 +353,24 @@ export default function AdminOverviewPage() {
                     ₹{Number(s.total_revenue || 0).toLocaleString('en-IN')}
                   </td>
                   <td className="py-3.5 px-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                       <a
                         href={`/${s.slug}`}
                         target="_blank"
-                        className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1C2230] hover:bg-slate-200 dark:hover:bg-[#252D3D] text-[#1F2937] dark:text-[#FFFFFF] text-[11px] font-semibold transition-all border border-slate-200 dark:border-[#2A2F3A]"
+                        className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1C2230] hover:bg-slate-200 dark:hover:bg-[#252D3D] text-[#1F2937] dark:text-[#FFFFFF] text-[11px] font-semibold transition-all border border-slate-200 dark:border-[#2A2F3A] inline-flex items-center gap-1 shrink-0 whitespace-nowrap"
                         title="View Customer Booking Page"
                       >
-                        Public Page ↗
+                        <span>Public Page</span>
+                        <span className="shrink-0 font-bold">↗</span>
                       </a>
                       <a
                         href="/app"
                         target="_blank"
-                        className="px-2.5 py-1.5 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/50 text-[11px] font-bold transition-all"
+                        className="px-2.5 py-1.5 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/50 text-[11px] font-bold transition-all inline-flex items-center gap-1 shrink-0 whitespace-nowrap"
                         title="Manage as Salon Owner"
                       >
-                        Owner ERP ➔
+                        <span>Owner ERP</span>
+                        <span className="shrink-0 font-bold">➔</span>
                       </a>
                     </div>
                   </td>
@@ -475,15 +477,15 @@ export default function AdminOverviewPage() {
                 <label className="block text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
                   Public Booking URL Slug *
                 </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-2.5 text-[#9CA3AF] dark:text-[#747D8D] font-mono text-xs">salonpro.app/</span>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-[#8C5E2E] dark:text-[#D4A77F] font-mono text-sm font-bold select-none">/</span>
                   <input
                     type="text"
                     required
                     placeholder="luxury-hair-studio"
                     value={newSalonSlug}
                     onChange={(e) => setNewSalonSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl pl-28 pr-3.5 py-2.5 text-sm text-[#1F2937] dark:text-[#FFFFFF] font-mono focus:outline-none focus:border-[#D4A77F]"
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl pl-8 pr-3.5 py-2.5 text-sm text-[#1F2937] dark:text-[#FFFFFF] font-mono focus:outline-none focus:border-[#D4A77F]"
                   />
                 </div>
               </div>

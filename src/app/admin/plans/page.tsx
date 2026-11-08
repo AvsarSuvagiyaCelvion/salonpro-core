@@ -313,72 +313,72 @@ export default function AdminPlansPage() {
         </button>
       </div>
 
-      {/* Analytics KPI Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider">
+      {/* Analytics KPI Stat Cards - Modern 2x2 on Mobile, 4-Cols on Desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider truncate">
               Paid Subscribers
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
+          <div className="text-xl sm:text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {stats?.active_paid_count || 0}
           </div>
-          <span className="text-[11px] text-emerald-600 font-semibold mt-0.5 block">
+          <span className="text-[10px] sm:text-[11px] text-emerald-600 font-semibold mt-0.5 block truncate">
             Active Paid Salons
           </span>
         </div>
 
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider truncate">
               7-Day Trials Active
             </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
+          <div className="text-xl sm:text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {stats?.active_trials_count || 0}
           </div>
-          <span className="text-[11px] text-purple-600 font-semibold mt-0.5 block">
+          <span className="text-[10px] sm:text-[11px] text-purple-600 font-semibold mt-0.5 block truncate">
             Evaluating Trial Period
           </span>
         </div>
 
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider truncate">
               Expired Trials
             </span>
-            <div className="w-8 h-8 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center">
-              <AlertCircle className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#D4A77F]/15 text-[#D4A77F] flex items-center justify-center shrink-0">
+              <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
+          <div className="text-xl sm:text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {stats?.expired_trials_count || 0}
           </div>
-          <span className="text-[11px] text-amber-600 font-semibold mt-0.5 block">
+          <span className="text-[10px] sm:text-[11px] text-amber-600 font-semibold mt-0.5 block truncate">
             Access Locked (Paywall)
           </span>
         </div>
 
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider">
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A]/80 rounded-2xl p-3.5 sm:p-4 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider truncate">
               Total Workspaces
             </span>
-            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Building2 className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
+          <div className="text-xl sm:text-2xl font-black text-[#1F2937] dark:text-[#FFFFFF]">
             {stats?.total_salons_count || 0}
           </div>
-          <span className="text-[11px] text-blue-600 font-semibold mt-0.5 block">
+          <span className="text-[10px] sm:text-[11px] text-blue-600 font-semibold mt-0.5 block truncate">
             Registered Salons
           </span>
         </div>

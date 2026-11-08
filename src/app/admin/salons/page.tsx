@@ -387,8 +387,8 @@ export default function AdminSalonsPage() {
                 {/* Subdomain & Custom Domain */}
                 <div className="my-3 p-2.5 rounded-xl bg-slate-50 dark:bg-[#10141F] border border-slate-100 dark:border-[#2A2F3A] text-[11px] font-mono text-[#6B7280] dark:text-[#A0A8B8] flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 truncate">
-                    <Globe className="w-3.5 h-3.5 text-[#9CA3AF] dark:text-[#747D8D] shrink-0" />
-                    <span className="text-[#1F2937] dark:text-[#FFFFFF] font-semibold truncate">{s.slug}.{process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'salonpro.in'}</span>
+                    <Globe className="w-3.5 h-3.5 text-[#D4A77F] shrink-0" />
+                    <span className="text-[#8C5E2E] dark:text-[#D4A77F] font-bold truncate">/{s.slug}</span>
                   </div>
                   {s.custom_domain && (
                     <div className="flex items-center gap-1.5 text-purple-700 dark:text-purple-300 font-semibold truncate">
@@ -468,30 +468,34 @@ export default function AdminSalonsPage() {
               </div>
 
               <div className="mt-5 pt-3 border-t border-slate-100 dark:border-[#2A2F3A] flex flex-col gap-2">
-                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
-                  <a
-                    href={`/${s.slug}`}
-                    target="_blank"
-                    className="flex-1 min-w-[100px] py-2 px-2.5 rounded-xl bg-slate-50 dark:bg-[#1C2230] hover:bg-slate-100 dark:hover:bg-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF] text-center text-xs font-semibold transition-all border border-slate-200 dark:border-[#2A2F3A]"
-                  >
-                    Public Booking ↗
-                  </a>
-                  <a
-                    href="/app"
-                    target="_blank"
-                    className="flex-1 min-w-[90px] py-2 px-2.5 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/60 text-center text-xs font-bold transition-all"
-                  >
-                    Owner ERP ➔
-                  </a>
+                <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <a
+                      href={`/${s.slug}`}
+                      target="_blank"
+                      className="py-2 px-2 rounded-xl bg-slate-50 dark:bg-[#1C2230] hover:bg-slate-100 dark:hover:bg-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF] text-center text-xs font-semibold transition-all border border-slate-200 dark:border-[#2A2F3A] inline-flex items-center justify-center gap-1 shrink-0 whitespace-nowrap"
+                    >
+                      <span>Public Booking</span>
+                      <span className="font-bold shrink-0">↗</span>
+                    </a>
+                    <a
+                      href="/app"
+                      target="_blank"
+                      className="py-2 px-2 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/60 text-center text-xs font-bold transition-all inline-flex items-center justify-center gap-1 shrink-0 whitespace-nowrap"
+                    >
+                      <span>Owner ERP</span>
+                      <span className="font-bold shrink-0">➔</span>
+                    </a>
+                  </div>
                   {s.phone && (
                     <a
                       href={`https://wa.me/91${s.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${s.name} team, this is SalonPro Platform Admin.`)}`}
                       target="_blank"
-                      className="py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-center text-xs font-bold transition-all flex items-center justify-center gap-1 shrink-0"
+                      className="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-center text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
                       title="Direct WhatsApp Chat with Salon Owner"
                     >
-                      <Phone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>Chat</span>
+                      <Phone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>WhatsApp Owner</span>
                     </a>
                   )}
                 </div>
@@ -584,8 +588,9 @@ export default function AdminSalonsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF] mb-1">Subdomain Slug *</label>
+                <label className="block text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF] mb-1">Booking Slug *</label>
                 <div className="flex items-center bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3.5 py-2 text-sm text-[#6B7280] dark:text-[#A0A8B8] font-mono">
+                  <span className="text-[#8C5E2E] dark:text-[#D4A77F] font-bold mr-1">/</span>
                   <input
                     type="text"
                     required
@@ -594,7 +599,6 @@ export default function AdminSalonsPage() {
                     onChange={(e) => setNewSalonSlug(e.target.value)}
                     className="w-full bg-transparent text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none font-mono font-semibold"
                   />
-                  <span>.{process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'salonpro.in'}</span>
                 </div>
               </div>
 

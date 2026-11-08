@@ -97,51 +97,51 @@ export default function AdminAnalyticsPage() {
         </button>
       </div>
 
-      {/* 3 Primary Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
+      {/* 3 Primary Metric Cards - 2x2 on Mobile with Featured Top Card */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4">
+        <div className="col-span-2 md:col-span-1 bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8] truncate">
               Total Billed GMV
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
               ₹
             </div>
           </div>
-          <div className="text-3xl font-black text-emerald-700 dark:text-emerald-400 font-mono">
+          <div className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 font-mono truncate">
             ₹{totalRevenue.toLocaleString('en-IN')}
           </div>
-          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Cumulative invoices generated across all salon tenants</p>
+          <p className="text-[10px] sm:text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1.5 truncate">Cumulative invoices generated across all salons</p>
         </div>
 
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
-              Completed Collections
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8] truncate">
+              Collections
             </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-              <CreditCard className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+              <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] font-mono">
+          <div className="text-xl sm:text-3xl font-black text-[#1F2937] dark:text-[#FFFFFF] font-mono truncate">
             ₹{totalPaid.toLocaleString('en-IN')}
           </div>
-          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Verified payments collected via UPI, Cash & Cards</p>
+          <p className="text-[10px] sm:text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1.5 truncate">Verified payments</p>
         </div>
 
-        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8]">
-              Appointments Booked
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-xs relative overflow-hidden group hover:border-[#D4A77F]/60 transition-all">
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#A0A8B8] truncate">
+              Appointments
             </span>
-            <div className="w-8 h-8 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center">
-              <Calendar className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center shrink-0">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="text-3xl font-black text-pink-700 dark:text-pink-400 font-mono">
+          <div className="text-xl sm:text-3xl font-black text-pink-700 dark:text-pink-400 font-mono truncate">
             {totalAppts}
           </div>
-          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-2">Online bookings and in-store walk-in sessions</p>
+          <p className="text-[10px] sm:text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1.5 truncate">Bookings & walk-ins</p>
         </div>
       </div>
 

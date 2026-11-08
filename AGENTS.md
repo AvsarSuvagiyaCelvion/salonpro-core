@@ -10,6 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Working rules
 
+- **CRITICAL TAILWIND V4 & BUILD RULE**: NEVER alter `"build": "next build"` in `package.json` to `--webpack`. Tailwind CSS v4 in this repository is strictly bound to Turbopack (`@tailwindcss/turbopack`). Adding `--webpack` strips all Tailwind CSS classes during production build and produces raw unstyled HTML in live deployments (Vercel).
 - Before any task, read `docs/SHARED_CORE.md` and the relevant panel MD (`docs/CUSTOMER_PANEL.md`, `docs/OWNER_PANEL.md`, or `docs/ADMIN_PANEL.md`); use them to locate files instead of exploring the whole repo.
 - After finishing any task, update the affected MD (routes, tables, flows, new migration number) in the same change.
 - New migrations: check the latest number in `docs/SHARED_CORE.md` first.

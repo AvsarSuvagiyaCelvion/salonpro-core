@@ -572,7 +572,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       key={item.name}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 ${
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-200 ${
                         isActive
                           ? 'bg-[#D4A77F] text-[#080B12] shadow-md shadow-[#D4A77F]/20 font-bold'
                           : isLocked
@@ -653,7 +653,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Left Sidebar (Desktop & Large Screens) */}
         <aside className="hidden lg:flex w-64 xl:w-72 bg-[#F8F9FA] dark:bg-[#10141F] border-r border-[#E5E7EB] dark:border-[#2A2F3A] flex-col h-full shrink-0 select-none transition-colors duration-250">
           <div className="flex-1 overflow-y-auto py-3.5 px-3 space-y-0.5 no-scrollbar">
-            <div className="px-3 pb-1.5 text-[10px] font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider">
+            <div className="px-3 pb-1.5 text-xs font-bold text-[#6B7280] dark:text-[#A0A8B8] uppercase tracking-wider">
               Management
             </div>
             <nav className="space-y-0.5">
@@ -670,7 +670,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
                       isActive
                         ? 'bg-[#D4A77F] text-[#080B12] shadow-md shadow-[#D4A77F]/20 font-bold'
                         : isLocked
@@ -683,7 +683,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       <span>{item.name}</span>
                     </div>
                     {isLocked && (
-                      <span className="flex items-center gap-1 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#D4A77F]/20 text-[#8C5E2E] dark:text-[#D4A77F]">
+                      <span className="flex items-center gap-1 text-[11px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-[#D4A77F]/20 text-[#8C5E2E] dark:text-[#D4A77F]">
                         <Lock className="w-2.5 h-2.5" />
                         <span>{item.requiredPlanName || 'PRO'}</span>
                       </span>
@@ -696,11 +696,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
           <div className="p-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F8F9FA] dark:bg-[#10141F] shrink-0">
             <div className="p-2.5 rounded-2xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-2xs">
-              <div className="text-[10px] text-[#4B5563] dark:text-[#CBD5E1] mb-0.5 font-bold uppercase">Signed in as:</div>
-              <div className="text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF] truncate" title={user?.email || 'pari.branch1@gmail.com'}>
+              <div className="text-xs text-[#4B5563] dark:text-[#CBD5E1] mb-0.5 font-bold uppercase">Signed in as:</div>
+              <div className="text-sm font-semibold text-[#1F2937] dark:text-[#FFFFFF] truncate" title={user?.email || 'pari.branch1@gmail.com'}>
                 {user?.email || 'pari.branch1@gmail.com'}
               </div>
-              <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5 flex items-center gap-1">
+              <div className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400"></span>
                 <span className="capitalize">{user?.role || 'Owner'} Account</span>
               </div>

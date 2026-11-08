@@ -263,5 +263,14 @@ To guarantee full WCAG 2.1 AA compliance (>= 4.5:1 for normal text, >= 3.0:1 for
 - **Mobile Touch Targets**:
   - Bottom navigation dock buttons and interactive icons enforce a minimum touch target size of 44x44px (`min-h-[44px] min-w-[44px]`).
 
+---
+
+## 15. Turbopack, Tailwind CSS v4 & High-Legibility Typography Rules
+- **CRITICAL TAILWIND V4 & BUILD RULE**: NEVER alter `"build": "next build"` in `package.json` to `--webpack`. Next.js 16 binds Tailwind CSS v4 to Turbopack (`@tailwindcss/turbopack`). Adding `--webpack` bypasses Turbopack, strips all Tailwind utility classes from the build, and deploys raw unstyled HTML in live environments (Vercel).
+- **High-Legibility Fluid Typography Base**:
+  - The root `html` font size scales responsively: `16.5px` (mobile), `17px` (tablet/iPad), `17.5px` (desktop/monitor), `18px` (ultra-wide).
+  - Sub-12px micro classes (`text-[9px]`, `text-[10px]`, `text-[11px]`) are elevated to a minimum of ~12px to 14px in `src/app/globals.css` so numbers, badges, and POS tables are readable across all screens without eye strain.
+  - Mobile form inputs enforce `16px` minimum to eliminate iOS Safari auto-zoom.
+
 
 

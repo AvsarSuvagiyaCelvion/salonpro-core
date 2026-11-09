@@ -81,25 +81,6 @@ export default function AdminLoginPage() {
 
         {/* Login Card */}
         <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-7 sm:p-8 shadow-xl">
-          {/* Master Credential Quick-Fill Notice */}
-          <div className="mb-5 p-3 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/25 text-xs text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="font-bold text-xs shrink-0">🔑 Admin Account:</span>
-              <span className="font-mono text-[11px] truncate">avsarsuvagiya968@gmail.com</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail('avsarsuvagiya968@gmail.com');
-                setPassword('Admin@123');
-              }}
-              className="px-2.5 py-1 rounded-lg bg-[#D4A77F]/20 hover:bg-[#D4A77F]/30 text-xs font-bold shrink-0 transition-colors cursor-pointer"
-              title="Autofill Super Admin credentials"
-            >
-              Autofill
-            </button>
-          </div>
-
           {error && (
             <div className="mb-5 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-semibold flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0" />

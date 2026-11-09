@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Lock, UserPlus, Users, Key, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { ShieldCheck, Lock, UserPlus, Users, Key, AlertCircle, CheckCircle2, X, Eye, EyeOff } from 'lucide-react';
 
 interface AdminUser {
   id: string;
@@ -21,6 +21,8 @@ export default function AdminSecurityPage() {
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newConfirmPassword, setNewConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showNewConfirmPassword, setShowNewConfirmPassword] = useState(false);
   const [newRole, setNewRole] = useState<'super_admin' | 'admin'>('admin');
   const [saving, setSaving] = useState(false);
   const [modalMessage, setModalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -314,26 +316,48 @@ export default function AdminSecurityPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF] mb-1">Admin Password *</label>
-                <input
-                  type="password"
-                  required
-                  placeholder="Minimum 8 characters"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3.5 py-2.5 text-sm text-[#1F2937] dark:text-[#FFFFFF] font-mono focus:outline-none focus:border-[#D4A77F]"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    placeholder="Minimum 8 characters"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-[#1F2937] dark:text-[#FFFFFF] font-mono focus:outline-none focus:border-[#D4A77F]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                    aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                    title={showNewPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-[#1F2937] dark:text-[#FFFFFF] mb-1">Confirm Admin Password *</label>
-                <input
-                  type="password"
-                  required
-                  placeholder="Re-enter password"
-                  value={newConfirmPassword}
-                  onChange={(e) => setNewConfirmPassword(e.target.value)}
-                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3.5 py-2.5 text-sm text-[#1F2937] dark:text-[#FFFFFF] font-mono focus:outline-none focus:border-[#D4A77F]"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewConfirmPassword ? 'text' : 'password'}
+                    required
+                    placeholder="Re-enter password"
+                    value={newConfirmPassword}
+                    onChange={(e) => setNewConfirmPassword(e.target.value)}
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-[#1F2937] dark:text-[#FFFFFF] font-mono focus:outline-none focus:border-[#D4A77F]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewConfirmPassword(!showNewConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                    aria-label={showNewConfirmPassword ? 'Hide password' : 'Show password'}
+                    title={showNewConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showNewConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div>

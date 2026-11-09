@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 import { showToast } from '@/lib/toast';
 
@@ -139,6 +140,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [bookingNote, setBookingNote] = useState<string>('');
   const [verificationCode, setVerificationCode] = useState<string>('');
   const [confirmVerificationCode, setConfirmVerificationCode] = useState<string>('');
+  const [showVerificationCode, setShowVerificationCode] = useState<boolean>(false);
+  const [showConfirmVerificationCode, setShowConfirmVerificationCode] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -146,6 +149,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
   const [activeCustomer, setActiveCustomer] = useState<{ id: string; name: string; mobile: string } | null>(null);
   const [customerAuthMode, setCustomerAuthMode] = useState<'new' | 'existing'>('new');
   const [loginPin, setLoginPin] = useState<string>('');
+  const [showLoginPin, setShowLoginPin] = useState<boolean>(false);
   const [verifyingLogin, setVerifyingLogin] = useState<boolean>(false);
 
   // Confirmed booking state
@@ -1416,14 +1420,25 @@ export default function BookingWizard({ slug }: { slug: string }) {
                             4-Digit Security PIN
                           </label>
                         </div>
-                        <input
-                          type="password"
-                          maxLength={6}
-                          placeholder="Enter PIN"
-                          value={loginPin}
-                          onChange={(e) => setLoginPin(e.target.value)}
-                          className="w-full bg-[#F9FAFB] dark:bg-[#080B12] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 text-sm text-[#1F2937] dark:text-white text-center font-mono focus:outline-none focus:border-[#D4A77F]"
-                        />
+                        <div className="relative">
+                          <input
+                            type={showLoginPin ? 'text' : 'password'}
+                            maxLength={6}
+                            placeholder="Enter PIN"
+                            value={loginPin}
+                            onChange={(e) => setLoginPin(e.target.value)}
+                            className="w-full bg-[#F9FAFB] dark:bg-[#080B12] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl pl-3 pr-8 py-2 text-sm text-[#1F2937] dark:text-white text-center font-mono focus:outline-none focus:border-[#D4A77F]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowLoginPin(!showLoginPin)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-neutral-500 hover:text-[#1F2937] dark:hover:text-white transition-colors p-0.5 cursor-pointer focus:outline-none"
+                            aria-label={showLoginPin ? 'Hide PIN' : 'Show PIN'}
+                            title={showLoginPin ? 'Hide PIN' : 'Show PIN'}
+                          >
+                            {showLoginPin ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <button
@@ -1493,29 +1508,51 @@ export default function BookingWizard({ slug }: { slug: string }) {
                       <label className="block text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] mb-1.5">
                         Set 4-Digit Security PIN <span className="text-[#8C5E2E] dark:text-[#D4A77F]">*</span>
                       </label>
-                      <input
-                        type="password"
-                        maxLength={6}
-                        required
-                        placeholder="Enter 4-digit PIN"
-                        value={verificationCode}
-                        onChange={(e) => setVerificationCode(e.target.value)}
-                        className="w-full bg-white dark:bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showVerificationCode ? 'text' : 'password'}
+                          maxLength={6}
+                          required
+                          placeholder="Enter 4-digit PIN"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value)}
+                          className="w-full bg-white dark:bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl pl-4 pr-10 py-2.5 text-center font-mono text-base tracking-widest text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowVerificationCode(!showVerificationCode)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C5E2E] dark:text-[#D4A77F] hover:opacity-80 transition-opacity p-0.5 cursor-pointer focus:outline-none"
+                          aria-label={showVerificationCode ? 'Hide PIN' : 'Show PIN'}
+                          title={showVerificationCode ? 'Hide PIN' : 'Show PIN'}
+                        >
+                          {showVerificationCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] mb-1.5">
                         Confirm 4-Digit PIN <span className="text-[#8C5E2E] dark:text-[#D4A77F]">*</span>
                       </label>
-                      <input
-                        type="password"
-                        maxLength={6}
-                        required
-                        placeholder="Re-enter 4-digit PIN"
-                        value={confirmVerificationCode}
-                        onChange={(e) => setConfirmVerificationCode(e.target.value)}
-                        className="w-full bg-white dark:bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl px-4 py-2.5 text-center font-mono text-base tracking-widest text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showConfirmVerificationCode ? 'text' : 'password'}
+                          maxLength={6}
+                          required
+                          placeholder="Re-enter 4-digit PIN"
+                          value={confirmVerificationCode}
+                          onChange={(e) => setConfirmVerificationCode(e.target.value)}
+                          className="w-full bg-white dark:bg-[#141926]/90 border border-[#D4A77F]/40 rounded-xl pl-4 pr-10 py-2.5 text-center font-mono text-base tracking-widest text-[#1F2937] dark:text-white focus:outline-none focus:border-[#D4A77F]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmVerificationCode(!showConfirmVerificationCode)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C5E2E] dark:text-[#D4A77F] hover:opacity-80 transition-opacity p-0.5 cursor-pointer focus:outline-none"
+                          aria-label={showConfirmVerificationCode ? 'Hide PIN' : 'Show PIN'}
+                          title={showConfirmVerificationCode ? 'Hide PIN' : 'Show PIN'}
+                        >
+                          {showConfirmVerificationCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <p className="text-[10px] text-[#6B7280] dark:text-neutral-400">

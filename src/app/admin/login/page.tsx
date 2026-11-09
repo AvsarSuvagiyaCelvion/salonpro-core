@@ -3,13 +3,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, Sparkles, Building2, User, Loader2 } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, Sparkles, Building2, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,6 +81,25 @@ export default function AdminLoginPage() {
 
         {/* Login Card */}
         <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-7 sm:p-8 shadow-xl">
+          {/* Master Credential Quick-Fill Notice */}
+          <div className="mb-5 p-3 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/25 text-xs text-[#8C5E2E] dark:text-[#D4A77F] flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-bold text-xs shrink-0">🔑 Admin Account:</span>
+              <span className="font-mono text-[11px] truncate">avsarsuvagiya968@gmail.com</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('avsarsuvagiya968@gmail.com');
+                setPassword('Admin@123');
+              }}
+              className="px-2.5 py-1 rounded-lg bg-[#D4A77F]/20 hover:bg-[#D4A77F]/30 text-xs font-bold shrink-0 transition-colors cursor-pointer"
+              title="Autofill Super Admin credentials"
+            >
+              Autofill
+            </button>
+          </div>
+
           {error && (
             <div className="mb-5 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-semibold flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -112,13 +132,22 @@ export default function AdminLoginPage() {
               <div className="relative">
                 <Lock className="w-4 h-4 text-[#9CA3AF] dark:text-[#747D8D] absolute left-4 top-3.5" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter admin password"
-                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-11 pr-4 py-3 text-sm text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 transition-all font-mono"
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-11 pr-11 py-3 text-sm text-[#1F2937] dark:text-[#FFFFFF] focus:outline-none focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 transition-all font-mono"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-3.5 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-0.5 cursor-pointer focus:outline-none"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 

@@ -24,6 +24,8 @@ import {
   Zap,
   Check,
   X,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 import ThemeToggle from '@/components/landing/ThemeToggle';
@@ -38,6 +40,8 @@ export default function RegisterSalonPage() {
   const [city, setCity] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Plans & Trial State
@@ -484,13 +488,22 @@ export default function RegisterSalonPage() {
                   <div className="relative">
                     <Lock className="w-4 h-4 text-[#9CA3AF] dark:text-[#747D8D] absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Min 8 characters"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
+                      className="w-full pl-10 pr-10 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
@@ -501,13 +514,22 @@ export default function RegisterSalonPage() {
                   <div className="relative">
                     <Lock className="w-4 h-4 text-[#9CA3AF] dark:text-[#747D8D] absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
-                      type="password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Re-enter password"
-                      className="w-full pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
+                      className="w-full pl-10 pr-10 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all text-[#1F2937] dark:text-white bg-[#F9FAFB] dark:bg-[#10141F] focus:bg-white dark:focus:bg-[#10141F] placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                      title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
               </div>

@@ -53,6 +53,23 @@ export async function POST(request: Request) {
     );
 
     if (userRes.rows.length === 0) {
+      // Check if user is attempting to sign in with Platform Super Admin credentials on tenant salon login
+      try {
+        const adminCheck = await query(
+          `SELECT id FROM platform_admins WHERE LOWER(email) = $1 LIMIT 1`,
+          [cleanEmail]
+        );
+        if (adminCheck.rows.length > 0) {
+          return NextResponse.json(
+            {
+              error: 'This email is registered as a Platform Super Admin. Please sign in at the Super Admin Portal (/admin/login).',
+              redirectTo: '/admin/login',
+            },
+            { status: 403 }
+          );
+        }
+      } catch {}
+
       await recordFailedAttempt(ipRateLimitKey, 20, 900);
       const fail = await recordFailedAttempt(rateLimitKey, 5, 900);
       return NextResponse.json(

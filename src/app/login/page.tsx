@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Lock, Mail, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { Sparkles, Lock, Mail, AlertCircle, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForgotNotice, setShowForgotNotice] = useState(false);
@@ -152,9 +153,17 @@ export default function LoginPage() {
             {error && (
               <div className="mb-5 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start gap-3 text-red-500 text-sm animate-in fade-in">
                 <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-500" />
-                <div>
-                  <p className="font-semibold">Sign in failed</p>
+                <div className="flex-1">
+                  <p className="font-semibold">Sign in notice</p>
                   <p className="text-xs mt-0.5">{error}</p>
+                  {error.includes('/admin/login') && (
+                    <Link
+                      href="/admin/login"
+                      className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-[#D4A77F] text-[#080B12] font-bold text-xs hover:bg-[#B8905F] transition-all shadow-xs"
+                    >
+                      <span>Go to Super Admin Portal ➔</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             )}
@@ -193,13 +202,22 @@ export default function LoginPage() {
                 <div className="relative">
                   <Lock className="w-4 h-4 text-[#9CA3AF] dark:text-[#747D8D] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all bg-[#F8F9FA] dark:bg-[#10141F] text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2F3A] focus:border-[#D4A77F] focus:ring-2 focus:ring-[#D4A77F]/20 outline-none text-sm transition-all bg-[#F8F9FA] dark:bg-[#10141F] text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#5A6275]"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
 
                 {showForgotNotice && (

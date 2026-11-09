@@ -22,6 +22,8 @@ import {
   ShieldCheck,
   Star,
   Search,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 import { showToast } from '@/lib/toast';
@@ -128,6 +130,9 @@ export default function CustomerPortalPage() {
   const [currentPin, setCurrentPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
+  const [showCurrentPin, setShowCurrentPin] = useState(false);
+  const [showNewPin, setShowNewPin] = useState(false);
+  const [showConfirmPin, setShowConfirmPin] = useState(false);
   const [changingPin, setChangingPin] = useState(false);
   const [pinSuccessMsg, setPinSuccessMsg] = useState<string | null>(null);
   const [pinErrorMsg, setPinErrorMsg] = useState<string | null>(null);
@@ -146,6 +151,8 @@ export default function CustomerPortalPage() {
   const [authEmail, setAuthEmail] = useState('');
   const [authPin, setAuthPin] = useState('');
   const [authConfirmPin, setAuthConfirmPin] = useState('');
+  const [showAuthPin, setShowAuthPin] = useState(false);
+  const [showAuthConfirmPin, setShowAuthConfirmPin] = useState(false);
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [lastSalonSlug, setLastSalonSlug] = useState<string | null>(null);
@@ -914,15 +921,26 @@ export default function CustomerPortalPage() {
                 <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
                   4-Digit PIN / Password <span className="text-[#D4A77F]">*</span>
                 </label>
-                <input
-                  type="password"
-                  maxLength={6}
-                  required
-                  placeholder="Enter 4-digit PIN"
-                  value={authPin}
-                  onChange={(e) => setAuthPin(e.target.value)}
-                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                />
+                <div className="relative">
+                  <input
+                    type={showAuthPin ? 'text' : 'password'}
+                    maxLength={6}
+                    required
+                    placeholder="Enter 4-digit PIN"
+                    value={authPin}
+                    onChange={(e) => setAuthPin(e.target.value)}
+                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-4 pr-11 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAuthPin(!showAuthPin)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                    aria-label={showAuthPin ? 'Hide PIN' : 'Show PIN'}
+                    title={showAuthPin ? 'Hide PIN' : 'Show PIN'}
+                  >
+                    {showAuthPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               {authMode === 'signup' && (
@@ -930,15 +948,26 @@ export default function CustomerPortalPage() {
                   <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
                     Confirm 4-Digit PIN <span className="text-[#D4A77F]">*</span>
                   </label>
-                  <input
-                    type="password"
-                    maxLength={6}
-                    required
-                    placeholder="Re-enter 4-digit PIN"
-                    value={authConfirmPin}
-                    onChange={(e) => setAuthConfirmPin(e.target.value)}
-                    className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showAuthConfirmPin ? 'text' : 'password'}
+                      maxLength={6}
+                      required
+                      placeholder="Re-enter 4-digit PIN"
+                      value={authConfirmPin}
+                      onChange={(e) => setAuthConfirmPin(e.target.value)}
+                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-4 pr-11 py-3 text-sm font-mono text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAuthConfirmPin(!showAuthConfirmPin)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                      aria-label={showAuthConfirmPin ? 'Hide PIN' : 'Show PIN'}
+                      title={showAuthConfirmPin ? 'Hide PIN' : 'Show PIN'}
+                    >
+                      {showAuthConfirmPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -1688,30 +1717,52 @@ export default function CustomerPortalPage() {
                     <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
                       Current 4-Digit PIN <span className="text-[#D4A77F]">*</span>
                     </label>
-                    <input
-                      type="password"
-                      maxLength={4}
-                      required
-                      value={currentPin}
-                      onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, ''))}
-                      placeholder="••••"
-                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showCurrentPin ? 'text' : 'password'}
+                        maxLength={4}
+                        required
+                        value={currentPin}
+                        onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, ''))}
+                        placeholder="••••"
+                        className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-4 pr-10 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPin(!showCurrentPin)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                        aria-label={showCurrentPin ? 'Hide PIN' : 'Show PIN'}
+                        title={showCurrentPin ? 'Hide PIN' : 'Show PIN'}
+                      >
+                        {showCurrentPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
                       New 4-Digit PIN <span className="text-[#D4A77F]">*</span>
                     </label>
-                    <input
-                      type="password"
-                      maxLength={4}
-                      required
-                      value={newPin}
-                      onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
-                      placeholder="••••"
-                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showNewPin ? 'text' : 'password'}
+                        maxLength={4}
+                        required
+                        value={newPin}
+                        onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ''))}
+                        placeholder="••••"
+                        className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-4 pr-10 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPin(!showNewPin)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                        aria-label={showNewPin ? 'Hide PIN' : 'Show PIN'}
+                        title={showNewPin ? 'Hide PIN' : 'Show PIN'}
+                      >
+                        {showNewPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                     <p className="text-[10px] text-neutral-400 mt-1">
                       Must be 4 numbers (0-9) and different from current PIN.
                     </p>
@@ -1721,15 +1772,26 @@ export default function CustomerPortalPage() {
                     <label className="block text-xs font-bold text-[#1F2937] dark:text-white mb-1.5">
                       Confirm New 4-Digit PIN <span className="text-[#D4A77F]">*</span>
                     </label>
-                    <input
-                      type="password"
-                      maxLength={4}
-                      required
-                      value={confirmPin}
-                      onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
-                      placeholder="••••"
-                      className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl px-4 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showConfirmPin ? 'text' : 'password'}
+                        maxLength={4}
+                        required
+                        value={confirmPin}
+                        onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, ''))}
+                        placeholder="••••"
+                        className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl pl-4 pr-10 py-2.5 text-xs font-mono tracking-widest text-[#1F2937] dark:text-white placeholder-[#9CA3AF] dark:placeholder-[#747D8D] focus:outline-none focus:border-[#D4A77F]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPin(!showConfirmPin)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] dark:text-[#747D8D] hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors p-1 cursor-pointer focus:outline-none"
+                        aria-label={showConfirmPin ? 'Hide PIN' : 'Show PIN'}
+                        title={showConfirmPin ? 'Hide PIN' : 'Show PIN'}
+                      >
+                        {showConfirmPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="pt-2">

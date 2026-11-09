@@ -267,12 +267,25 @@ To guarantee full WCAG 2.1 AA compliance (>= 4.5:1 for normal text, >= 3.0:1 for
 
 ---
 
-## 15. Turbopack, Tailwind CSS v4 & High-Legibility Typography Rules
+## 15. Turbopack, Tailwind CSS v4 & Standardized Typography System
 - **CRITICAL TAILWIND V4 & BUILD RULE**: NEVER alter `"build": "next build"` in `package.json` to `--webpack`. Next.js 16 binds Tailwind CSS v4 to Turbopack (`@tailwindcss/turbopack`). Adding `--webpack` bypasses Turbopack, strips all Tailwind utility classes from the build, and deploys raw unstyled HTML in live environments (Vercel).
-- **High-Legibility Fluid Typography Base**:
-  - The root `html` font size scales responsively: `16.5px` (mobile), `17px` (tablet/iPad), `17.5px` (desktop/monitor), `18px` (ultra-wide).
-  - Sub-12px micro classes (`text-[9px]`, `text-[10px]`, `text-[11px]`) are elevated to a minimum of ~12px to 14px in `src/app/globals.css` so numbers, badges, and POS tables are readable across all screens without eye strain.
-  - Mobile form inputs enforce `16px` minimum to eliminate iOS Safari auto-zoom.
+- **Global Typography Scale (Inter + DM Sans)**:
+  - **Body & Interface**: Inter (`--font-body`) for body text, tables, forms, buttons, sidebar navigation, and dashboard data.
+  - **Headings & Sections**: DM Sans (`--font-heading`) for page titles and section headers.
+  - **Serif Accent**: Playfair Display (`--font-serif`) for luxury hero highlights (`.hero-italic-gold`).
+  - **10-Tier Standard Font Scale**:
+    - **Page Title**: `24px` / `600` (DM Sans, responsive `20px` on mobile)
+    - **Section Title**: `18px` / `600` (DM Sans, responsive `16px` on mobile)
+    - **Card Title**: `15px` / `600` (DM Sans)
+    - **Body Text**: `14px` / `400` (Inter)
+    - **Table Text**: `13px` / `400` (Inter, `tabular-nums`)
+    - **Sidebar Navigation**: `13px` / `500` (Inter)
+    - **Form Labels**: `13px` / `500` (Inter)
+    - **Buttons**: `13px` / `600` (Inter)
+    - **Helper Text**: `12px` / `400` (Inter)
+    - **KPI Numbers**: `26px` / `700` (Inter, `tabular-nums`, responsive `22px` on mobile)
+  - **Tabular Figures**: `font-variant-numeric: tabular-nums` enforced on `.tabular-nums`, `table`, `th`, `td`, `[data-tabular="true"]`, and `.font-mono` for stable currency (`₹`), dates, and statistics.
+  - **Mobile Form Zoom Guard**: Mobile form inputs enforce `16px` minimum font size to eliminate iOS Safari auto-zoom.
 
 
 

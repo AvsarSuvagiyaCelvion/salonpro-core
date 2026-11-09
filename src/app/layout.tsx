@@ -1,22 +1,29 @@
 import type { Metadata } from 'next';
-import { Manrope, Playfair_Display, Noto_Sans_Gujarati } from 'next/font/google';
+import { Inter, DM_Sans, Playfair_Display, Noto_Sans_Gujarati } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import ToastContainer from '@/components/ui/ToastContainer';
 import './globals.css';
 
-const playfair = Playfair_Display({
+const dmSans = DM_Sans({
   variable: '--font-heading',
   subsets: ['latin'],
   display: 'swap',
   weight: ['500', '600', '700'],
-  style: ['normal', 'italic'],
 });
 
-const manrope = Manrope({
+const inter = Inter({
   variable: '--font-body',
   subsets: ['latin'],
   display: 'swap',
   weight: ['400', '500', '600', '700'],
+});
+
+const playfair = Playfair_Display({
+  variable: '--font-serif',
+  subsets: ['latin'],
+  display: 'swap',
+  weight: ['500', '600'],
+  style: ['normal', 'italic'],
 });
 
 const notoGujarati = Noto_Sans_Gujarati({
@@ -45,7 +52,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${playfair.variable} ${manrope.variable} ${notoGujarati.variable} h-full`}
+      className={`${dmSans.variable} ${inter.variable} ${playfair.variable} ${notoGujarati.variable} h-full`}
     >
       <head>
         <script

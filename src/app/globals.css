@@ -4,9 +4,32 @@
 
 :root {
   /* Site-wide Typography Tokens */
-  --font-heading: var(--font-heading, "Playfair Display", Georgia, "Times New Roman", serif);
-  --font-body: var(--font-body, "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif);
+  --font-heading: var(--font-heading, "DM Sans", system-ui, -apple-system, sans-serif);
+  --font-body: var(--font-body, "Inter", system-ui, -apple-system, sans-serif);
+  --font-serif: var(--font-serif, "Playfair Display", Georgia, "Times New Roman", serif);
   --font-gujarati: var(--font-gujarati, "Noto Sans Gujarati", var(--font-body));
+
+  /* Standard Typography System Scale */
+  --font-size-page-title: 24px;
+  --font-weight-page-title: 600;
+  --font-size-section-title: 18px;
+  --font-weight-section-title: 600;
+  --font-size-card-title: 15px;
+  --font-weight-card-title: 600;
+  --font-size-body: 14px;
+  --font-weight-body: 400;
+  --font-size-table: 13px;
+  --font-weight-table: 400;
+  --font-size-sidebar: 13px;
+  --font-weight-sidebar: 500;
+  --font-size-label: 13px;
+  --font-weight-label: 500;
+  --font-size-button: 13px;
+  --font-weight-button: 600;
+  --font-size-helper: 12px;
+  --font-weight-helper: 400;
+  --font-size-kpi: 26px;
+  --font-weight-kpi: 700;
 
   /* Exact Light Mode Color Palette */
   --brand-primary: #D4A77F;
@@ -57,7 +80,7 @@
   --font-sans: var(--font-body);
   --font-body: var(--font-body);
   --font-heading: var(--font-heading);
-  --font-serif: var(--font-heading);
+  --font-serif: var(--font-serif);
   --font-gujarati: var(--font-gujarati);
 
   --color-ink: var(--ink);
@@ -77,39 +100,24 @@
   --color-elevated-light: #F3F4F6;
 }
 
-/* High-Legibility Responsive Typography Scale */
+/* ==========================================================================
+   CENTRALIZED TYPOGRAPHY SYSTEM
+   Primary Body & Interface: Inter
+   Headings & Sections: DM Sans
+   ========================================================================== */
+
 html {
-  font-size: 16.5px;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Tablet (iPad, Surface, counter tablets) */
-@media (min-width: 640px) {
-  html {
-    font-size: 17px;
-  }
-}
-
-/* Desktop (Monitors, POS terminals, Laptops) */
-@media (min-width: 1024px) {
-  html {
-    font-size: 17.5px;
-  }
-}
-
-/* Ultra-wide / Large Displays */
-@media (min-width: 1536px) {
-  html {
-    font-size: 18px;
-  }
-}
-
 body {
   font-family: var(--font-body);
-  font-size: 0.95rem;
-  line-height: 1.55;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
   letter-spacing: -0.011em;
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
@@ -121,78 +129,239 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Elevate small micro-copy classes site-wide so no text is ever strained or illegible */
-.text-\[9px\] {
-  font-size: 0.725rem !important;
-  line-height: 1.3 !important;
+/* 1. Page Title (24px / 600 - DM Sans) */
+h1,
+.page-title,
+[data-typography="page-title"] {
+  font-family: var(--font-heading);
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em;
 }
-
-.text-\[10px\] {
-  font-size: 0.775rem !important;
-  line-height: 1.35 !important;
-}
-
-.text-\[11px\] {
-  font-size: 0.825rem !important;
-  line-height: 1.4 !important;
-}
-
-/* Ensure mobile form fields never zoom in and remain large & clear */
 @media (max-width: 640px) {
-  input:not([type="checkbox"]):not([type="radio"]), 
-  select, 
-  textarea {
+  h1:not(.landing-h1),
+  .page-title,
+  [data-typography="page-title"] {
+    font-size: 20px !important;
+  }
+}
+
+/* Landing Page Hero H1 Exception */
+.landing-h1 {
+  font-family: var(--font-heading) !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.015em;
+  font-size: clamp(1.75rem, 4.2vw, 3.25rem) !important;
+}
+
+/* 2. Section Title (18px / 600 - DM Sans) */
+h2,
+.section-title,
+[data-typography="section-title"] {
+  font-family: var(--font-heading);
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.015em;
+}
+@media (max-width: 640px) {
+  h2:not(.landing-h2),
+  .section-title,
+  [data-typography="section-title"] {
     font-size: 16px !important;
   }
 }
 
-/* Better table cell legibility for counters and POS */
-table th {
-  font-size: 0.825rem !important;
-  letter-spacing: 0.03em;
+/* Landing H2 Exception */
+.landing-h2 {
+  font-family: var(--font-heading) !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+  font-size: clamp(1.75rem, 4vw, 2.5rem) !important;
 }
 
-table td {
-  font-size: 0.9rem !important;
-}
-
-:lang(gu), [lang="gu"] {
-  font-family: var(--font-gujarati);
-}
-
-/* Headings default to Manrope for all general app, dashboard, POS, billing, tables, forms, and modals */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-body);
+/* 3. Card Title (15px / 600 - DM Sans) */
+h3,
+.card-title,
+[data-typography="card-title"] {
+  font-family: var(--font-heading);
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
   letter-spacing: -0.01em;
 }
 
-/* Landing H1: Playfair Display, weight 600, line-height 1.14, letter-spacing -0.015em, size clamp(1.75rem, 4.2vw, 3.5rem) */
-.landing-h1 {
+/* Sub-headings h4, h5, h6 (14px / 600 - DM Sans) */
+h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  line-height: 1.14;
-  letter-spacing: -0.015em;
-  font-size: clamp(1.75rem, 4.2vw, 3.5rem);
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -0.01em;
 }
 
-/* Landing H2: Playfair Display, weight 600, line-height 1.15, size clamp(1.75rem, 4vw, 2.75rem) */
-.landing-h2 {
-  font-family: var(--font-heading);
+/* 4. Body Text (14px / 400 - Inter) */
+p,
+.body-text,
+[data-typography="body"] {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* 5. Table Text (13px / 400 - Inter + Tabular Nums) */
+table td,
+.table-text,
+[data-typography="table"] {
+  font-family: var(--font-body);
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Table Headers (12px / 600 - Inter uppercase) */
+table th,
+.table-header {
+  font-family: var(--font-body);
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+/* 6. Sidebar Navigation (13px / 500 - Inter) */
+aside nav a,
+aside nav button,
+.sidebar-nav,
+[data-sidebar-nav="true"] {
+  font-family: var(--font-body);
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.4;
+}
+
+aside nav a[class*="bg-[#D4A77F]"],
+aside nav a[class*="font-bold"],
+aside nav a.active {
+  font-weight: 600 !important;
+}
+
+/* 7. Form Labels (13px / 500 - Inter) */
+label,
+.form-label,
+[data-typography="label"] {
+  font-family: var(--font-body);
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.35;
+}
+
+/* Form Inputs */
+input,
+select,
+textarea {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+}
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important; /* Prevents iOS auto-zoom on mobile forms */
+  }
+}
+
+/* 8. Buttons (13px / 600 - Inter) */
+button,
+.btn-text {
+  font-family: var(--font-body);
+}
+
+button[class*="rounded-"]:not([class*="text-["]):not([class*="p-0"]):not([class*="p-1"]):not([class*="p-1.5"]),
+.btn-text {
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1.15;
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+/* 9. Helper Text (12px / 400 - Inter) */
+small,
+.helper-text,
+.text-muted,
+[data-typography="helper"] {
+  font-family: var(--font-body);
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.4;
+}
+
+/* 10. KPI Numbers (26px / 700 - Inter Tabular) */
+.kpi-number,
+[data-kpi="true"],
+.kpi-stat,
+.stat-number {
+  font-family: var(--font-body) !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  .kpi-number,
+  [data-kpi="true"],
+  .kpi-stat,
+  .stat-number {
+    font-size: 22px !important;
+  }
+}
+
+/* Tame unnecessarily large text throughout dashboard KPI cards and stats */
+[class*="rounded-2xl"] > div[class*="font-black"][class*="text-"],
+[class*="rounded-3xl"] > div[class*="font-black"][class*="text-"],
+[class*="rounded-2xl"] > div[class*="font-extrabold"][class*="text-"],
+[class*="rounded-3xl"] > div[class*="font-extrabold"][class*="text-"] {
+  font-family: var(--font-body);
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  [class*="rounded-2xl"] > div[class*="font-black"][class*="text-"],
+  [class*="rounded-3xl"] > div[class*="font-black"][class*="text-"],
+  [class*="rounded-2xl"] > div[class*="font-extrabold"][class*="text-"],
+  [class*="rounded-3xl"] > div[class*="font-extrabold"][class*="text-"] {
+    font-size: 22px !important;
+  }
+}
+
+/* Tabular figures for numbers, currency, prices, dates & tables */
+.tabular-nums,
+table,
+th,
+td,
+[data-tabular="true"],
+.font-mono,
+[class*="tabular-"] {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Hero Italic Gold Word (Playfair italic 500) */
 .hero-italic-gold {
-  font-family: var(--font-heading);
+  font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
 }
 
-/* Tabular figures for numbers, prices, tables, KPIs */
-.tabular-nums, table, th, td, [data-tabular="true"], .font-mono {
-  font-variant-numeric: tabular-nums;
+:lang(gu), [lang="gu"] {
+  font-family: var(--font-gujarati);
 }
 
 /* Global Keyframe Animations */

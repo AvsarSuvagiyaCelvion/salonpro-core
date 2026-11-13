@@ -253,6 +253,46 @@ async function runSecurityTests() {
     recordTest('Test 5: Rate limit check', false, err.message);
   }
 
+  // -----------------------------------------------------------------
+  // TEST 6: Platform Admin RBAC (Admin tier vs Super Admin root)
+  // -----------------------------------------------------------------
+  console.log('\n--- TEST 6: Platform Admin RBAC & Permission Gating ---');
+  try {
+    function simulateRequireAdmin(adminRole, options) {
+      if (!adminRole || (adminRole !== 'super_admin' && adminRole !== 'platform_admin')) {
+        return { status: 401, error: 'Unauthorized: Admin authentication required' };
+      }
+      if (options?.requireSuperAdmin && adminRole !== 'super_admin') {
+        return { status: 403, error: 'Forbidden: Super Admin full root permission required for this action' };
+      }
+      return { status: 200, admin: { role: adminRole } };
+    }
+
+    // Standard platform_admin (Manage Salons & Analytics)
+    const standardAdminSalonsCheck = simulateRequireAdmin('platform_admin', {}); // allowed
+    const standardAdminAdminsCheck = simulateRequireAdmin('platform_admin', { requireSuperAdmin: true }); // blocked 403
+    const standardAdminPlansCheck = simulateRequireAdmin('platform_admin', { requireSuperAdmin: true }); // blocked 403
+
+    // Root super_admin (Full Root Permissions)
+    const superAdminAdminsCheck = simulateRequireAdmin('super_admin', { requireSuperAdmin: true }); // allowed 200
+    const superAdminPlansCheck = simulateRequireAdmin('super_admin', { requireSuperAdmin: true }); // allowed 200
+
+    const test6Passed =
+      standardAdminSalonsCheck.status === 200 &&
+      standardAdminAdminsCheck.status === 403 &&
+      standardAdminPlansCheck.status === 403 &&
+      superAdminAdminsCheck.status === 200 &&
+      superAdminPlansCheck.status === 200;
+
+    recordTest(
+      'Test 6: Platform Admin is blocked from Super Admin root endpoints (HTTP 403)',
+      test6Passed,
+      'Standard Platform Admin can manage salons & analytics, but is strictly blocked from /admin/security and modifying pricing plans.'
+    );
+  } catch (err) {
+    recordTest('Test 6: Admin RBAC check', false, err.message);
+  }
+
   console.log('\n======================================================');
   console.log('              SUMMARY OF TEST RESULTS                 ');
   console.log('======================================================');

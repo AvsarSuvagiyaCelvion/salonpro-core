@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 // 2. POST create a new subscription plan
 export async function POST(request: Request) {
   try {
-    const auth = await requireAdmin(request);
+    const auth = await requireAdmin(request, { requireSuperAdmin: true });
     if (auth.error) return auth.error;
 
     const body = await request.json();

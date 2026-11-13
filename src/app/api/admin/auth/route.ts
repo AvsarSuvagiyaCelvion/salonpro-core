@@ -29,12 +29,26 @@ export async function GET() {
       return NextResponse.json({ loggedIn: false });
     }
 
+    let adminName = payload.role === 'super_admin' ? 'Platform Super Admin' : 'Platform Admin';
+    let adminRole = payload.role || 'platform_admin';
+
+    try {
+      const dbAdmin = await query(
+        `SELECT name, role FROM platform_admins WHERE LOWER(email) = $1 LIMIT 1`,
+        [payload.email.toLowerCase()]
+      );
+      if (dbAdmin.rows.length > 0) {
+        adminName = dbAdmin.rows[0].name || adminName;
+        adminRole = dbAdmin.rows[0].role || adminRole;
+      }
+    } catch {}
+
     return NextResponse.json({
       loggedIn: true,
       admin: {
         email: payload.email,
-        role: payload.role || 'super_admin',
-        name: 'Platform Super Admin',
+        role: adminRole,
+        name: adminName,
       },
     });
   } catch (error: any) {

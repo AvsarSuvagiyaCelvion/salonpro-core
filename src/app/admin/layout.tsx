@@ -77,13 +77,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }
 
+  const isSuperAdmin = admin?.role === 'super_admin';
+
   const navItems = [
     { href: '/admin', label: 'Platform Overview', icon: LayoutDashboard },
     { href: '/admin/salons', label: 'Salons Directory', icon: Building2 },
     { href: '/admin/plans', label: 'Subscription Plans', icon: CreditCard },
     { href: '/admin/owners', label: 'Owners & Staff', icon: Users },
     { href: '/admin/analytics', label: 'Platform Analytics', icon: BarChart3 },
-    { href: '/admin/security', label: 'Admins & Security', icon: ShieldCheck },
+    ...(isSuperAdmin
+      ? [{ href: '/admin/security', label: 'Admins & Security', icon: ShieldCheck }]
+      : []),
   ];
 
   return (
@@ -92,7 +96,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="shrink-0 bg-[#10141F] text-[#D4A77F] text-xs py-1.5 px-3 sm:px-4 font-medium tracking-wide flex items-center justify-between z-40 border-b border-[#2A2F3A]">
         <div className="flex items-center gap-1.5 text-[11px] sm:text-xs truncate">
           <ShieldCheck className="w-3.5 h-3.5 text-[#D4A77F] shrink-0" />
-          <span className="truncate">Master Platform Admin<span className="hidden sm:inline"> · Multi-Tenant Cloud Architecture</span></span>
+          <span className="truncate">
+            {isSuperAdmin
+              ? '👑 Master Super Admin · Full Root Platform Authority'
+              : '🛡️ Platform Admin · Salons & Analytics Management'}
+          </span>
         </div>
         <div className="hidden sm:flex items-center gap-3 text-[11px] text-[#A0A8B8] shrink-0">
           <Link
@@ -136,7 +144,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   SalonPro Admin
                 </span>
                 <span className="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30 shrink-0">
-                  Panel 1
+                  {isSuperAdmin ? 'Super Admin' : 'Platform Admin'}
                 </span>
               </div>
               <span className="text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] hidden sm:block truncate">
@@ -273,10 +281,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] truncate">
-                    {admin?.name || 'Super Admin'}
+                    {admin?.name || (isSuperAdmin ? 'Super Admin' : 'Platform Admin')}
                   </div>
                   <div className="text-[10px] text-[#6B7280] dark:text-[#A0A8B8] font-mono truncate">
                     {admin?.email || 'admin@salonpro.in'}
+                  </div>
+                  <div className="text-[9px] font-bold text-[#8C5E2E] dark:text-[#D4A77F] uppercase tracking-wider">
+                    {isSuperAdmin ? '👑 Full Root Admin' : '🛡️ Salons & Analytics'}
                   </div>
                 </div>
               </div>
@@ -367,13 +378,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] truncate">
-                  {admin?.name || 'Super Admin'}
+                  {admin?.name || (isSuperAdmin ? 'Super Admin' : 'Platform Admin')}
                 </div>
                 <div
                   className="text-[11px] text-[#6B7280] dark:text-[#A0A8B8] font-mono truncate"
                   title={admin?.email || 'admin@salonpro.in'}
                 >
                   {admin?.email || 'admin@salonpro.in'}
+                </div>
+                <div className="text-[9px] font-bold text-[#8C5E2E] dark:text-[#D4A77F] uppercase tracking-wider">
+                  {isSuperAdmin ? '👑 Full Root Admin' : '🛡️ Salons & Analytics'}
                 </div>
               </div>
             </div>

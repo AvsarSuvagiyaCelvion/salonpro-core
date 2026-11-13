@@ -41,7 +41,8 @@ The proxy middleware intercepts every incoming HTTP request and performs:
 ---
 
 ## 3. Permissions & Role Hierarchy
-- **`super_admin`**: Full platform authority across all salons, plans, domains, and global analytics.
+- **`super_admin`**: Full platform authority across all salons, plans, domains, admin accounts (`/admin/security`), and global analytics.
+- **`platform_admin`**: Operational platform authority. Can manage salons and view analytics, but strictly restricted (`HTTP 403 Forbidden`) from managing other administrators or modifying SaaS pricing tiers.
 - **`owner`**: Full salon tenant authority. Can edit salon settings, operating hours, cancellation policies, staff commissions, product prices, and manage subscription billing.
 - **`staff`**: Operational floor authority. Can view appointments, manage live sessions, add services/products, and complete POS billing. Blocked from viewing business commission reports, modifying salon settings, or changing plans.
 - **`customer`**: Self-service client authority. Can view personal appointments and receipts, cancel or reschedule bookings within policy windows.

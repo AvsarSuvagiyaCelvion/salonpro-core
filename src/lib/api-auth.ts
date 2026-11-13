@@ -292,10 +292,14 @@ export async function getTenantContext(request?: Request): Promise<TenantSession
 }
 
 /**
- * Ensures caller has an active Platform Super Admin session.
+ * Ensures caller has an active Platform Admin session.
+ * Supports role checking: pass `{ requireSuperAdmin: true }` to restrict to Super Admin only.
  * Returns { admin, error: null } if authorized, or { admin: null, error: NextResponse } if not.
  */
-export async function requireAdmin(request?: Request): Promise<
+export async function requireAdmin(
+  request?: Request,
+  options?: { requireSuperAdmin?: boolean }
+): Promise<
   | { admin: AdminSession; error: null }
   | { admin: null; error: NextResponse }
 > {
@@ -318,7 +322,7 @@ export async function requireAdmin(request?: Request): Promise<
       return {
         admin: null,
         error: NextResponse.json(
-          { error: 'Unauthorized: Super Admin access required' },
+          { error: 'Unauthorized: Admin authentication required' },
           { status: 401 }
         ),
       };
@@ -335,10 +339,22 @@ export async function requireAdmin(request?: Request): Promise<
       };
     }
 
+    const adminRole = payload.role || 'platform_admin';
+
+    if (options?.requireSuperAdmin && adminRole !== 'super_admin') {
+      return {
+        admin: null,
+        error: NextResponse.json(
+          { error: 'Forbidden: Super Admin full root permission required for this action', code: 'SUPER_ADMIN_REQUIRED' },
+          { status: 403 }
+        ),
+      };
+    }
+
     return {
       admin: {
         email: payload.email,
-        role: payload.role || 'super_admin',
+        role: adminRole,
       },
       error: null,
     };

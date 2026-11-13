@@ -92,8 +92,10 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 ---
 
 ## 7. Business Rules and Edge Cases
-- **Strict Role Isolation**: Admin routes require `role === 'super_admin'`. Regular salon owners or staff cannot access `/admin/*` or `/api/admin/*`.
-- **Environment Fallback**: In bootstrap or emergency recovery scenarios, `ADMIN_EMAIL` and `ADMIN_PASSWORD` from `.env.local` grant super admin access even if the `platform_admins` table is empty.
+- **Two-Tier Admin RBAC**: Platform administrators operate under two distinct tiers:
+  - **`super_admin` (Full Root)**: Root platform authority. Exclusively permitted to manage administrator accounts (`/admin/security`, `/api/admin/admins`), create/modify/delete SaaS pricing tiers and feature flags (`/admin/plans`, `/api/admin/plans`), and permanently purge salon workspaces.
+  - **`platform_admin` (Salons & Analytics)**: Operational partner tier. Can view platform analytics, inspect and manage salons, toggle active status, adjust salon trial/subscription expiry, and impersonate owners for technical support. Strictly blocked (`HTTP 403 Forbidden`) from viewing or modifying platform administrators, security credentials, or SaaS plan pricing structures.
+- **Environment Fallback**: In bootstrap or emergency recovery scenarios, `ADMIN_EMAIL` and `ADMIN_PASSWORD` from `.env.local` grant super admin access in development mode even if the `platform_admins` table is empty.
 - **Deactivating a Salon**: Setting `is_active = false` immediately prevents salon owners/staff from logging in (`SALON_INACTIVE` error) and disables public customer booking for that slug.
 - **Trial Extensions**: Super admins can manually extend `trial_ends_at` or override `subscription_status` to `'active'` directly from the salon edit modal.
 - **Responsive Mobile Layout & Typography**: Admin KPI statistics (Overview, Plans, Analytics) render as a 2x2 responsive grid on mobile screens (`grid-cols-2 lg:grid-cols-4`) to eliminate excessive vertical scroll on small devices (e.g. 320px–375px). Action buttons (`Public Page ↗`, `Owner ERP ➔`, `Public Booking ↗`) enforce `inline-flex shrink-0 whitespace-nowrap` to prevent arrow glyphs from wrapping onto subsequent lines. Tenant URLs are displayed with clean root-relative routing (`/[slug]`).

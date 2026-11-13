@@ -75,7 +75,8 @@ export async function verifyCustomerSessionToken(token: string) {
 export const ADMIN_COOKIE_NAME = 'salonpro_admin_session';
 
 export async function createAdminSessionToken(payload: { email: string; role?: string }) {
-  return await new SignJWT({ ...payload, role: 'super_admin' })
+  const role = payload.role === 'super_admin' ? 'super_admin' : 'platform_admin';
+  return await new SignJWT({ email: payload.email, role })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('8h')
@@ -85,10 +86,11 @@ export async function createAdminSessionToken(payload: { email: string; role?: s
 export async function verifyAdminSessionToken(token: string) {
   try {
     const { payload } = await jwtVerify(token, getSecretKey());
-    if (payload.role !== 'super_admin') return null;
+    const role = (payload.role as string) || '';
+    if (role !== 'super_admin' && role !== 'platform_admin') return null;
     return payload as unknown as {
       email: string;
-      role: string;
+      role: 'super_admin' | 'platform_admin';
     };
   } catch {
     return null;

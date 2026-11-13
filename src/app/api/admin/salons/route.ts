@@ -17,22 +17,31 @@ export async function GET(request: Request) {
         u.email as owner_email,
         u.full_name as owner_name,
         u.phone as owner_phone,
-        COUNT(DISTINCT st.id) as staff_count,
-        COUNT(DISTINCT sv.id) as services_count,
-        COUNT(DISTINCT c.id) as customer_count,
-        COUNT(DISTINCT a.id) as appointments_count,
-        COALESCE(SUM(i.total), 0)::numeric(10,2) as total_revenue
+        COALESCE(st.cnt, 0) as staff_count,
+        COALESCE(sv.cnt, 0) as services_count,
+        COALESCE(c.cnt, 0) as customer_count,
+        COALESCE(a.cnt, 0) as appointments_count,
+        COALESCE(i.rev, 0)::numeric(10,2) as total_revenue
       FROM salons s
       LEFT JOIN subscription_plans sp ON s.subscription_plan_id = sp.id
       LEFT JOIN LATERAL (
         SELECT email, full_name, phone FROM users WHERE salon_id = s.id AND role = 'owner' LIMIT 1
       ) u ON true
-      LEFT JOIN staff st ON s.id = st.salon_id
-      LEFT JOIN services sv ON s.id = sv.salon_id
-      LEFT JOIN customers c ON s.id = c.salon_id
-      LEFT JOIN appointments a ON s.id = a.salon_id
-      LEFT JOIN invoices i ON s.id = i.salon_id
-      GROUP BY s.id, sp.name, sp.billing_interval, u.email, u.full_name, u.phone
+      LEFT JOIN LATERAL (
+        SELECT COUNT(*) as cnt FROM staff WHERE salon_id = s.id
+      ) st ON true
+      LEFT JOIN LATERAL (
+        SELECT COUNT(*) as cnt FROM services WHERE salon_id = s.id
+      ) sv ON true
+      LEFT JOIN LATERAL (
+        SELECT COUNT(*) as cnt FROM customers WHERE salon_id = s.id
+      ) c ON true
+      LEFT JOIN LATERAL (
+        SELECT COUNT(*) as cnt FROM appointments WHERE salon_id = s.id
+      ) a ON true
+      LEFT JOIN LATERAL (
+        SELECT COALESCE(SUM(total), 0) as rev FROM invoices WHERE salon_id = s.id
+      ) i ON true
       ORDER BY s.created_at ASC
     `);
 

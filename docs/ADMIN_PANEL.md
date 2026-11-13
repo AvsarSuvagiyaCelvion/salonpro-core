@@ -97,6 +97,7 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 - **Deactivating a Salon**: Setting `is_active = false` immediately prevents salon owners/staff from logging in (`SALON_INACTIVE` error) and disables public customer booking for that slug.
 - **Trial Extensions**: Super admins can manually extend `trial_ends_at` or override `subscription_status` to `'active'` directly from the salon edit modal.
 - **Responsive Mobile Layout & Typography**: Admin KPI statistics (Overview, Plans, Analytics) render as a 2x2 responsive grid on mobile screens (`grid-cols-2 lg:grid-cols-4`) to eliminate excessive vertical scroll on small devices (e.g. 320px–375px). Action buttons (`Public Page ↗`, `Owner ERP ➔`, `Public Booking ↗`) enforce `inline-flex shrink-0 whitespace-nowrap` to prevent arrow glyphs from wrapping onto subsequent lines. Tenant URLs are displayed with clean root-relative routing (`/[slug]`).
+- **High-Performance Lateral Queries & Instant Prefetch**: `/api/admin/salons` and `/api/admin/overview` use optimized PostgreSQL lateral joins (`LEFT JOIN LATERAL`) for salon metrics (staff, services, customers, appointments, revenue), eliminating Cartesian multiplication. Navigation links enforce `prefetch={true}` with skeleton loaders for instantaneous directory tab switching. One-click owner impersonation (`handleImpersonate`) is available directly on both `/admin` overview and `/admin/salons`.
 
 ---
 

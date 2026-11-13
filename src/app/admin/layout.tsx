@@ -25,6 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [admin, setAdmin] = useState<{ email: string; name: string; role: string } | null>(null);
 
   useEffect(() => {
+    if (admin) return;
     async function loadAdmin() {
       try {
         const res = await fetch('/api/admin/auth');
@@ -41,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
     }
     loadAdmin();
-  }, [pathname]);
+  }, [pathname, admin]);
 
   useEffect(() => {
     function handlePageShow(event: PageTransitionEvent) {
@@ -216,6 +217,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch={true}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 ${
                         isActive
@@ -309,6 +311,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch={true}
                       className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                         isActive
                           ? 'bg-[#D4A77F] text-[#080B12] font-bold shadow-sm shadow-[#D4A77F]/20'

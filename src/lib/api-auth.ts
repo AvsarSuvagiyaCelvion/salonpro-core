@@ -120,12 +120,11 @@ export async function requireTenant(
       };
     }
 
-    // Static Demo Owner Workspace Bypass: Strictly disabled in production.
-    // Slug-based auth bypass is REMOVED: setting salonSlug to 'dixa-beauty-salon' never bypasses auth.
+    // Static Demo Owner Workspace: Isolated sandbox for 1-click prospective client test-drive
+    // Strictly scoped to DEMO_SALON_ID and isolated static data in src/lib/demo-data.ts
     if (
-      process.env.NODE_ENV !== 'production' &&
-      process.env.ENABLE_DEMO_WORKSPACE === 'true' &&
-      payload.email.toLowerCase() === 'owner@dixabeautysalon.in'
+      payload.email.toLowerCase() === 'owner@dixabeautysalon.in' &&
+      payload.salonId === '00000000-0000-0000-0000-000000000001'
     ) {
       return {
         session: {

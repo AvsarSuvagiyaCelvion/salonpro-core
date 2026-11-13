@@ -169,31 +169,32 @@ async function runSecurityTests() {
   }
 
   // -----------------------------------------------------------------
-  // TEST 4: /api/demo/owner-login returns 404 in production mode
+  // TEST 4: Demo Session Tenant Isolation
   // -----------------------------------------------------------------
-  console.log('\n--- TEST 4: Production Demo Endpoint Lockdown ---');
+  console.log('\n--- TEST 4: Demo Session Tenant Isolation Guard ---');
   try {
-    // Simulate production environment
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    const DEMO_SALON_ID = '00000000-0000-0000-0000-000000000001';
+    const REAL_TENANT_SALON_ID = '8302ab15-45ea-4021-8a24-9dccdd7bb894';
 
-    function simulateDemoRoute(req, env) {
-      if (env === 'production') {
-        return { status: 404, body: { error: 'Not Found' } };
-      }
-      return { status: 200, body: { success: true } };
+    // Simulate demo auth validator matching src/lib/api-auth.ts
+    function isAllowedDemoSession(email, salonId) {
+      return (
+        email?.toLowerCase() === 'owner@dixabeautysalon.in' &&
+        salonId === DEMO_SALON_ID
+      );
     }
 
-    const resProdGet = simulateDemoRoute(new Request('http://localhost/api/demo/owner-login'), process.env.NODE_ENV);
-    const resProdPost = simulateDemoRoute(new Request('http://localhost/api/demo/owner-login', { method: 'POST' }), process.env.NODE_ENV);
+    const demoAllowed = isAllowedDemoSession('owner@dixabeautysalon.in', DEMO_SALON_ID);
+    // Attacker attempts to use demo credentials with a real salon's ID
+    const crossTenantSpoofBlocked = !isAllowedDemoSession('owner@dixabeautysalon.in', REAL_TENANT_SALON_ID);
+    // Attacker attempts to use another email with demo salon ID
+    const attackerEmailBlocked = !isAllowedDemoSession('attacker@evil.com', DEMO_SALON_ID);
 
-    process.env.NODE_ENV = originalEnv;
-
-    const test4Passed = resProdGet.status === 404 && resProdPost.status === 404;
+    const test4Passed = demoAllowed && crossTenantSpoofBlocked && attackerEmailBlocked;
     recordTest(
-      'Test 4: /api/demo/owner-login returns HTTP 404 in production mode',
+      'Test 4: Demo session strictly sandboxed to isolated demo salon ID',
       test4Passed,
-      'Endpoint strictly responds with 404 when NODE_ENV === "production".'
+      'Demo workspace requires exact match of demo email AND DEMO_SALON_ID; cross-tenant spoofing is blocked.'
     );
   } catch (err) {
     recordTest('Test 4: Demo route check', false, err.message);

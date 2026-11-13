@@ -338,8 +338,39 @@ export default function AdminSalonsPage() {
         </div>
       </div>
 
+      {/* Loading Skeleton Grid */}
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-[#141926] border border-slate-200/90 dark:border-[#2A2F3A] rounded-3xl p-4 sm:p-6 shadow-xs flex flex-col justify-between animate-pulse"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-slate-200 dark:bg-[#1F2937]" />
+                    <div className="space-y-1.5">
+                      <div className="w-32 h-4 bg-slate-200 dark:bg-[#1F2937] rounded" />
+                      <div className="w-20 h-3 bg-slate-200 dark:bg-[#1F2937] rounded" />
+                    </div>
+                  </div>
+                  <div className="w-16 h-6 rounded-full bg-slate-200 dark:bg-[#1F2937]" />
+                </div>
+                <div className="my-3 p-2.5 rounded-xl bg-slate-100 dark:bg-[#10141F] h-14" />
+                <div className="pt-2 border-t border-slate-100 dark:border-[#2A2F3A] grid grid-cols-2 gap-2">
+                  <div className="h-8 bg-slate-200 dark:bg-[#1F2937] rounded" />
+                  <div className="h-8 bg-slate-200 dark:bg-[#1F2937] rounded" />
+                </div>
+              </div>
+              <div className="mt-5 pt-3 border-t border-slate-100 dark:border-[#2A2F3A] h-10 bg-slate-200 dark:bg-[#1F2937] rounded-xl" />
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Empty State when 0 salons registered */}
-      {salons.length === 0 && !loading && (
+      {!loading && salons.length === 0 && (
         <div className="bg-white dark:bg-[#141926] border-2 border-dashed border-slate-200 dark:border-[#2A2F3A] rounded-3xl p-12 text-center max-w-lg mx-auto shadow-xs my-8">
           <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
             🏢
@@ -362,7 +393,19 @@ export default function AdminSalonsPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* No matching salons filter state */}
+      {!loading && salons.length > 0 && filtered.length === 0 && (
+        <div className="bg-white dark:bg-[#141926] border border-slate-200 dark:border-[#2A2F3A] rounded-3xl p-10 text-center max-w-md mx-auto shadow-xs my-8">
+          <div className="text-2xl mb-2">🔍</div>
+          <h3 className="text-sm font-bold text-[#1F2937] dark:text-[#FFFFFF]">No salons found</h3>
+          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1">
+            No salons match your search &ldquo;{search}&rdquo;. Try another name, slug, or mobile.
+          </p>
+        </div>
+      )}
+
+      {!loading && filtered.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filtered.map((s) => {
           const isActive = s.is_active !== false;
           const planName = (s.plan || 'pro').toUpperCase();
@@ -577,6 +620,7 @@ export default function AdminSalonsPage() {
           );
         })}
       </div>
+      )}
 
       {/* Add New Salon Modal */}
       {isModalOpen && (

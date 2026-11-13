@@ -63,6 +63,35 @@ export default function AdminOverviewPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [salons, setSalons] = useState<SalonItem[]>([]);
   const [recentAppointments, setRecentAppointments] = useState<RecentAppt[]>([]);
+  const [impersonatingId, setImpersonatingId] = useState<string | null>(null);
+
+  async function handleImpersonate(salonId: string, salonName: string) {
+    setImpersonatingId(salonId);
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ salonId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to connect to salon dashboard');
+      }
+      if (typeof localStorage !== 'undefined' && data.salon) {
+        localStorage.setItem(
+          'salonpro_salon_info',
+          JSON.stringify({
+            name: data.salon.name,
+            slug: data.salon.slug,
+          })
+        );
+      }
+      window.location.href = data.redirectUrl || '/app';
+    } catch (err: any) {
+      alert(err.message || 'Unable to connect to salon dashboard');
+      setImpersonatingId(null);
+    }
+  }
 
   // Add New Salon Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -363,15 +392,16 @@ export default function AdminOverviewPage() {
                         <span>Public Page</span>
                         <span className="shrink-0 font-bold">↗</span>
                       </a>
-                      <a
-                        href="/app"
-                        target="_blank"
-                        className="px-2.5 py-1.5 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/50 text-[11px] font-bold transition-all inline-flex items-center gap-1 shrink-0 whitespace-nowrap"
-                        title="Manage as Salon Owner"
+                      <button
+                        type="button"
+                        disabled={impersonatingId === s.id}
+                        onClick={() => handleImpersonate(s.id, s.name)}
+                        className="px-2.5 py-1.5 rounded-xl bg-pink-50 dark:bg-pink-950/40 hover:bg-pink-100 dark:hover:bg-pink-900/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800/50 text-[11px] font-bold transition-all inline-flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer disabled:opacity-50"
+                        title="Login directly into salon dashboard as Super Admin without password"
                       >
-                        <span>Owner ERP</span>
+                        <span>{impersonatingId === s.id ? 'Connecting...' : 'Owner ERP'}</span>
                         <span className="shrink-0 font-bold">➔</span>
-                      </a>
+                      </button>
                     </div>
                   </td>
                 </tr>

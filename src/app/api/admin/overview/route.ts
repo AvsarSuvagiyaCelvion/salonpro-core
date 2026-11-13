@@ -34,16 +34,23 @@ export async function GET(request: Request) {
           s.open_time,
           s.close_time,
           s.created_at,
-          COUNT(DISTINCT st.id) as staff_count,
-          COUNT(DISTINCT c.id) as customer_count,
-          COUNT(DISTINCT a.id) as appointment_count,
-          COALESCE(SUM(i.total), 0)::numeric(10,2) as total_revenue
+          COALESCE(st.cnt, 0) as staff_count,
+          COALESCE(c.cnt, 0) as customer_count,
+          COALESCE(a.cnt, 0) as appointment_count,
+          COALESCE(i.rev, 0)::numeric(10,2) as total_revenue
         FROM salons s
-        LEFT JOIN staff st ON s.id = st.salon_id
-        LEFT JOIN customers c ON s.id = c.salon_id
-        LEFT JOIN appointments a ON s.id = a.salon_id
-        LEFT JOIN invoices i ON s.id = i.salon_id
-        GROUP BY s.id
+        LEFT JOIN LATERAL (
+          SELECT COUNT(*) as cnt FROM staff WHERE salon_id = s.id
+        ) st ON true
+        LEFT JOIN LATERAL (
+          SELECT COUNT(*) as cnt FROM customers WHERE salon_id = s.id
+        ) c ON true
+        LEFT JOIN LATERAL (
+          SELECT COUNT(*) as cnt FROM appointments WHERE salon_id = s.id
+        ) a ON true
+        LEFT JOIN LATERAL (
+          SELECT COALESCE(SUM(total), 0) as rev FROM invoices WHERE salon_id = s.id
+        ) i ON true
         ORDER BY s.created_at ASC
       `),
       query(`

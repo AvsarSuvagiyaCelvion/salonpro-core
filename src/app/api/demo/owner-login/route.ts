@@ -8,16 +8,10 @@ import {
 } from '@/lib/demo-data';
 
 export async function GET(request: Request) {
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ error: 'Not Found' }, { status: 404 });
-  }
   return handleDemoLogin(request);
 }
 
 export async function POST(request: Request) {
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ error: 'Not Found' }, { status: 404 });
-  }
   return handleDemoLogin(request);
 }
 

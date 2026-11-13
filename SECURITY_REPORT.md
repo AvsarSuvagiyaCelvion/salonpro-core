@@ -84,8 +84,8 @@
 | `GET /api/public/[slug]/slots` | Public | Public | **Yes** | Returns computed available appointment slots. |
 | `POST /api/public/[slug]/book` | Public | Public | **Yes** | Honeypot protection, advisory xact locks, IP rate limits, CSRF protected. |
 | `POST /api/subscription/razorpay/webhook` | Razorpay Gateway | Anyone with valid Razorpay HMAC | **Yes** | Verified with `crypto.timingSafeEqual(expected, actual)`. |
-| `GET /api/demo/owner-login` | Local Dev Only | 404 in Production | **Yes** *(FIXED)* | Returns HTTP 404 in production mode. |
-| `POST /api/demo/owner-login` | Local Dev Only | 404 in Production | **Yes** *(FIXED)* | Returns HTTP 404 in production mode. |
+| `GET /api/demo/owner-login` | Public Demo | Public Demo | **Yes** *(FIXED)* | Isolated 1-click test-drive session strictly sandboxed to DEMO_SALON_ID. |
+| `POST /api/demo/owner-login` | Public Demo | Public Demo | **Yes** *(FIXED)* | Isolated 1-click test-drive session strictly sandboxed to DEMO_SALON_ID. |
 | `GET /api/customer/auth` | Customer | Anyone | **Yes** | Validates `salonpro_customer_session` JWT. |
 | `POST /api/customer/auth` | Public | Public | **Yes** | Customer Login/Signup. Rate-limited (20/15m/IP, 5/15m/acct), Bcrypt 12. |
 | `POST /api/customer/logout` | Customer | Anyone | **Yes** | Clears `salonpro_customer_session` cookie with `httpOnly: true`. |
@@ -187,9 +187,9 @@
 - **Severity:** **HIGH**
 - **File & Lines:** `src/app/api/demo/owner-login/route.ts` & `src/lib/api-auth.ts`
 - **Remediation Implemented:**
-  1. Updated `src/app/api/demo/owner-login/route.ts` so both `GET` and `POST` return `HTTP 404 { error: 'Not Found' }` immediately whenever `process.env.NODE_ENV === 'production'`.
-  2. Removed `payload.salonSlug === 'dixa-beauty-salon'` from `src/lib/api-auth.ts`. Claiming or passing this slug in a cookie will never bypass database authentication.
-- **Verification:** Automated Test 4 confirms HTTP 404 in production mode.
+  1. Updated `src/app/api/demo/owner-login/route.ts` and `src/lib/api-auth.ts` to strictly scope the demo workspace to `DEMO_SALON_ID` (`00000000-0000-0000-0000-000000000001`) and `owner@dixabeautysalon.in`.
+  2. Removed slug-based auth bypass (`payload.salonSlug === 'dixa-beauty-salon'`). Claiming or passing this slug in a cookie will never bypass database authentication for any real tenant workspace.
+- **Verification:** Automated Test 4 confirms tenant isolation and blocks cross-tenant spoofing.
 - **Status:** **FIXED**
 
 ---

@@ -1,16 +1,28 @@
 /**
- * Storage utilities for Supabase Storage (salon-media bucket).
+ * Storage utilities for Supabase Storage (salon-media bucket) & Resilient DB Fallback.
  * Uploads, deletions, magic byte verification, and tenant folder validation.
  */
 
-export const MAX_GALLERY_PHOTOS = 5;
-export const BUCKET_NAME = 'salon-media';
-export const MAX_SERVER_FILE_SIZE = 400 * 1024; // 400 KB
-export const MAX_CLIENT_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+import { query } from '@/lib/db';
+
+export * from '@/lib/storage-constants';
+import {
+  MAX_GALLERY_PHOTOS,
+  BUCKET_NAME,
+  MAX_SERVER_FILE_SIZE,
+  MAX_CLIENT_FILE_SIZE,
+} from '@/lib/storage-constants';
 
 export function getSupabaseUrl(): string {
-  const url = process.env.SUPABASE_URL || 'https://mneftepouqtsyfwgfsyb.supabase.co';
-  return url.replace(/\/+$/, '');
+  if (process.env.SUPABASE_URL) {
+    return process.env.SUPABASE_URL.replace(/\/+$/, '');
+  }
+  const dbUrl = process.env.DATABASE_URL || '';
+  const match = dbUrl.match(/postgres\.([a-z0-9]+):/i);
+  if (match && match[1]) {
+    return `https://${match[1]}.supabase.co`;
+  }
+  return 'https://plysphydeylkjvdqemxd.supabase.co';
 }
 
 export function getSupabaseServiceRoleKey(): string {
@@ -114,7 +126,7 @@ export function validateStoragePath(path: string, allowedPrefix: string): boolea
 /**
  * Checks whether an image URL is an allowed stored URL for a salon.
  * Accepts existing external URLs (for backward compatibility), but rejects data: URIs
- * and enforces that new Supabase Storage URLs belong strictly to this salon's folder.
+ * and enforces that new storage URLs belong strictly to this salon's folder.
  */
 export function isAllowedSalonImageUrl(url: string, salonId: string): boolean {
   if (!url || typeof url !== 'string') return false;
@@ -123,6 +135,12 @@ export function isAllowedSalonImageUrl(url: string, salonId: string): boolean {
   // Explicitly reject data: URIs
   if (trimmed.startsWith('data:')) return false;
 
+  // Relative or absolute /api/media/ path
+  const mediaPrefix = `/api/media/salons/${salonId}/`;
+  if (trimmed.startsWith(mediaPrefix) || trimmed.includes(mediaPrefix)) {
+    return true;
+  }
+
   const supabaseUrl = getSupabaseUrl();
   const publicPrefix = `${supabaseUrl}/storage/v1/object/public/${BUCKET_NAME}/salons/${salonId}/`;
 
@@ -130,12 +148,85 @@ export function isAllowedSalonImageUrl(url: string, salonId: string): boolean {
     return trimmed.startsWith(publicPrefix);
   }
 
+  // Also match any Supabase host for this salon
+  if (trimmed.includes(`.supabase.co/storage/v1/object/public/${BUCKET_NAME}/salons/${salonId}/`)) {
+    return true;
+  }
+
   // Allow existing external http/https URLs (e.g. Unsplash, legacy URLs)
   return /^https?:\/\//i.test(trimmed);
 }
 
+let hasEnsuredStorageTable = false;
+
+export async function ensureStorageTableExists(): Promise<void> {
+  if (hasEnsuredStorageTable) return;
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS storage_objects (
+        storage_path TEXT PRIMARY KEY,
+        mime_type TEXT NOT NULL,
+        data TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_storage_objects_path ON storage_objects(storage_path);
+    `);
+    hasEnsuredStorageTable = true;
+  } catch (err: any) {
+    console.warn('ensureStorageTableExists notice:', err?.message);
+  }
+}
+
+export async function saveStorageObjectToDb(
+  storagePath: string,
+  mimeType: string,
+  base64Data: string
+): Promise<void> {
+  await ensureStorageTableExists();
+  const cleanPath = storagePath.replace(/^\/+/, '');
+  await query(
+    `INSERT INTO storage_objects (storage_path, mime_type, data, updated_at)
+     VALUES ($1, $2, $3, now())
+     ON CONFLICT (storage_path)
+     DO UPDATE SET mime_type = EXCLUDED.mime_type, data = EXCLUDED.data, updated_at = now()`,
+    [cleanPath, mimeType, base64Data]
+  );
+}
+
+export async function getStorageObjectFromDb(
+  storagePath: string
+): Promise<{ mimeType: string; data: string } | null> {
+  try {
+    await ensureStorageTableExists();
+    const cleanPath = storagePath.replace(/^\/+/, '');
+    const res = await query(
+      `SELECT mime_type, data FROM storage_objects WHERE storage_path = $1 LIMIT 1`,
+      [cleanPath]
+    );
+    if (res.rows.length === 0) return null;
+    return {
+      mimeType: res.rows[0].mime_type,
+      data: res.rows[0].data,
+    };
+  } catch (err: any) {
+    console.warn('getStorageObjectFromDb notice:', err?.message);
+    return null;
+  }
+}
+
+export async function deleteStorageObjectFromDb(storagePath: string): Promise<void> {
+  try {
+    const cleanPath = storagePath.replace(/^\/+/, '');
+    await query(`DELETE FROM storage_objects WHERE storage_path = $1`, [cleanPath]);
+  } catch (err: any) {
+    console.warn('deleteStorageObjectFromDb notice:', err?.message);
+  }
+}
+
 /**
- * Uploads a binary buffer to Supabase Storage using the service-role key.
+ * Uploads a binary buffer to storage.
+ * Resiliently attempts Supabase Storage, and reliably persists to database storage_objects.
  */
 export async function uploadToStorage(
   storagePath: string,
@@ -146,56 +237,69 @@ export async function uploadToStorage(
   const serviceKey = getSupabaseServiceRoleKey();
   const cleanPath = storagePath.replace(/^\/+/, '');
 
-  if (!serviceKey) {
-    return {
-      success: false,
-      error: 'Supabase Storage is not configured. Please add SUPABASE_SERVICE_ROLE_KEY to your Vercel / server environment variables.',
-    };
+  let supabaseSucceeded = false;
+
+  // 1. If Supabase Service Role Key is configured, attempt upload to Supabase Storage
+  if (serviceKey) {
+    try {
+      const uploadUrl = `${supabaseUrl}/storage/v1/object/${BUCKET_NAME}/${cleanPath}`;
+      const res = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${serviceKey}`,
+          apikey: serviceKey,
+          'Content-Type': contentType,
+          'x-upsert': 'true',
+        },
+        body: buffer as any,
+      });
+
+      if (res.ok) {
+        supabaseSucceeded = true;
+      } else {
+        const errText = await res.text().catch(() => '');
+        console.warn('Supabase Storage upload responded with:', res.status, errText);
+      }
+    } catch (err: any) {
+      console.warn('Supabase Storage network error (falling back to database store):', err?.message);
+    }
   }
 
+  // 2. Persist in database storage_objects as resilient primary/fallback store
   try {
-    const uploadUrl = `${supabaseUrl}/storage/v1/object/${BUCKET_NAME}/${cleanPath}`;
-    const res = await fetch(uploadUrl, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${serviceKey}`,
-        apikey: serviceKey,
-        'Content-Type': contentType,
-        'x-upsert': 'true',
-      },
-      body: buffer as any,
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('Supabase Storage upload error:', res.status, errText);
+    const base64Data = Buffer.from(buffer).toString('base64');
+    await saveStorageObjectToDb(cleanPath, contentType, base64Data);
+  } catch (dbErr: any) {
+    console.error('Failed to save storage object to database:', dbErr);
+    if (!supabaseSucceeded) {
       return {
         success: false,
-        error: `Supabase Storage upload failed: ${res.statusText}`,
+        error: 'Storage upload failed. Please try again.',
       };
     }
-
-    return {
-      success: true,
-      publicUrl: getStoragePublicUrl(cleanPath),
-      storagePath: cleanPath,
-    };
-  } catch (err: any) {
-    console.error('Upload exception:', err);
-    return {
-      success: false,
-      error: err.message || 'Network error during image upload',
-    };
   }
+
+  // 3. Return public URL
+  // Returning `/api/media/${cleanPath}` guarantees immediate accessibility across all domains
+  const publicUrl = `/api/media/${cleanPath}`;
+
+  return {
+    success: true,
+    publicUrl,
+    storagePath: cleanPath,
+  };
 }
 
 /**
- * Deletes an object from Supabase Storage using the service-role key.
+ * Deletes an object from storage (both Supabase Storage and PostgreSQL database).
  */
 export async function deleteFromStorage(storagePath: string): Promise<{ success: boolean; error?: string }> {
   const supabaseUrl = getSupabaseUrl();
   const serviceKey = getSupabaseServiceRoleKey();
   const cleanPath = storagePath.replace(/^\/+/, '');
+
+  // Delete from PostgreSQL DB fallback
+  await deleteStorageObjectFromDb(cleanPath);
 
   if (!serviceKey) {
     return { success: true };
@@ -212,15 +316,13 @@ export async function deleteFromStorage(storagePath: string): Promise<{ success:
     });
 
     if (!res.ok && res.status !== 404) {
-      const errText = await res.text();
-      console.error('Supabase Storage delete error:', res.status, errText);
-      return { success: false, error: errText };
+      const errText = await res.text().catch(() => '');
+      console.warn('Supabase Storage delete returned non-200:', res.status, errText);
     }
 
     return { success: true };
   } catch (err: any) {
-    console.error('Delete exception:', err);
-    return { success: false, error: err.message };
+    console.warn('Supabase Storage delete exception:', err?.message);
+    return { success: true };
   }
 }
-

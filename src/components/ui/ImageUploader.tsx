@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Upload, RefreshCw, AlertCircle } from 'lucide-react';
-import { MAX_CLIENT_FILE_SIZE } from '@/lib/storage';
+import { Upload, RefreshCw, AlertCircle, Images } from 'lucide-react';
+import { MAX_CLIENT_FILE_SIZE, MAX_GALLERY_PHOTOS } from '@/lib/storage-constants';
 
 export interface ImageUploaderProps {
   value?: string | null;
@@ -14,6 +14,9 @@ export interface ImageUploaderProps {
   helperText?: string;
   className?: string;
   disabled?: boolean;
+  multiple?: boolean;
+  maxFiles?: number;
+  onMultipleUpload?: (items: Array<{ url: string; storagePath: string }>) => Promise<void> | void;
 }
 
 export default function ImageUploader({
@@ -26,6 +29,9 @@ export default function ImageUploader({
   helperText,
   className = '',
   disabled = false,
+  multiple = false,
+  maxFiles = MAX_GALLERY_PHOTOS,
+  onMultipleUpload,
 }: ImageUploaderProps) {
   const isLogo = type === 'logo' || mode === 'logo';
   const isAvatar = mode === 'avatar' && !isLogo;
@@ -132,20 +138,90 @@ export default function ImageUploader({
   }
 
   async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFiles = e.target.files;
+    if (!rawFiles || rawFiles.length === 0) return;
 
     setErrorMessage(null);
+    const validMimes = ['image/jpeg', 'image/png', 'image/webp'];
 
-    // Immediate size check before any processing: strictly reject >5 MB
+    // Handle multiple file upload (e.g. Gallery)
+    if (multiple) {
+      const filesArray = Array.from(rawFiles);
+      const limit = maxFiles && maxFiles > 0 ? maxFiles : MAX_GALLERY_PHOTOS;
+      const filesToProcess = filesArray.slice(0, limit);
+
+      // Validate each file
+      for (const f of filesToProcess) {
+        if (f.size > MAX_CLIENT_FILE_SIZE) {
+          setErrorMessage(`"${f.name}" exceeds 5MB limit (${(f.size / (1024 * 1024)).toFixed(1)}MB). Please choose a smaller photo.`);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+          return;
+        }
+        if (!validMimes.includes(f.type)) {
+          setErrorMessage(`"${f.name}" is not a valid format. Only JPG, PNG, and WebP are allowed.`);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+          return;
+        }
+      }
+
+      try {
+        setUploading(true);
+        const uploadedItems: Array<{ url: string; storagePath: string }> = [];
+
+        for (let i = 0; i < filesToProcess.length; i++) {
+          const file = filesToProcess[i];
+          setProgressText(`Compressing photo ${i + 1} of ${filesToProcess.length}...`);
+          const compressedBlob = await compressImage(file);
+
+          setProgressText(`Uploading photo ${i + 1} of ${filesToProcess.length} (${Math.round(compressedBlob.size / 1024)}KB)...`);
+
+          const formData = new FormData();
+          formData.append('file', compressedBlob, `upload-${Date.now()}-${i}.webp`);
+          formData.append('type', type);
+
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || `Failed to upload photo ${i + 1}.`);
+          }
+
+          if (data.url && data.storage_path) {
+            uploadedItems.push({ url: data.url, storagePath: data.storage_path });
+          }
+        }
+
+        if (uploadedItems.length > 0) {
+          if (onMultipleUpload) {
+            setProgressText('Saving photos...');
+            await onMultipleUpload(uploadedItems);
+          } else {
+            for (const item of uploadedItems) {
+              onChange(item.url, item.storagePath);
+            }
+          }
+        }
+      } catch (err: any) {
+        setErrorMessage(err.message || 'Image processing or upload failed');
+      } finally {
+        setUploading(false);
+        setProgressText(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    // Single file upload path (for logo, avatar, or default single upload)
+    const file = rawFiles[0];
     if (file.size > MAX_CLIENT_FILE_SIZE) {
       setErrorMessage(`Image exceeds 5MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please pick a smaller image.`);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
-    // MIME type check
-    const validMimes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!validMimes.includes(file.type)) {
       setErrorMessage('Only JPG, PNG, and WebP images are allowed.');
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -233,6 +309,8 @@ export default function ImageUploader({
     ? 'Upload Logo'
     : isAvatar
     ? 'Upload Photo'
+    : multiple
+    ? 'Click or tap to choose photo(s)'
     : 'Click to upload image';
 
   return (
@@ -246,6 +324,7 @@ export default function ImageUploader({
       <input
         ref={fileInputRef}
         type="file"
+        multiple={multiple}
         accept="image/jpeg,image/png,image/webp"
         onChange={handleFileSelected}
         disabled={disabled || uploading}
@@ -319,12 +398,16 @@ export default function ImageUploader({
               </div>
             ) : (
               <div className="flex flex-col items-center">
-                <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400 dark:text-neutral-500 group-hover:text-[#D4A77F]" />
+                {multiple ? (
+                  <Images className="w-5 h-5 text-neutral-400 dark:text-neutral-500 group-hover:text-[#D4A77F]" />
+                ) : (
+                  <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400 dark:text-neutral-500 group-hover:text-[#D4A77F]" />
+                )}
                 <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 mt-1 sm:mt-1.5">
                   {uploadPromptTitle}
                 </span>
                 <span className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                  JPG, PNG, WebP {isAvatar ? '' : '(max 5MB)'}
+                  JPG, PNG, WebP {multiple ? `(Hold Ctrl/Shift to pick multiple)` : isAvatar ? '' : '(max 5MB)'}
                 </span>
               </div>
             )}

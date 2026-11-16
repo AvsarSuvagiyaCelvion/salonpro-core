@@ -139,7 +139,10 @@ export async function PATCH(request: Request) {
         // Accept ONLY public URL inside this customer's own folder
         const supabaseUrl = getSupabaseUrl();
         const expectedPrefix = `${supabaseUrl}/storage/v1/object/public/${BUCKET_NAME}/customers/${customerId}/`;
-        if (!finalAvatar.startsWith(expectedPrefix)) {
+        const isMediaPrefix =
+          finalAvatar.startsWith(`/api/media/customers/${customerId}/`) ||
+          finalAvatar.includes(`/api/media/customers/${customerId}/`);
+        if (!finalAvatar.startsWith(expectedPrefix) && !isMediaPrefix) {
           return NextResponse.json(
             { error: 'Avatar URL must point strictly inside your customer storage folder.' },
             { status: 400 }

@@ -112,18 +112,20 @@ In `requireTenant()`, the user's role is not blindly trusted from the JWT: it re
 
 ---
 
-## 7. Storage & File Uploads (`src/lib/storage.ts`)
-- **Supabase Storage Bucket**: Public-read bucket `salon-media`.
-- **Upload Flow**: Uploads and deletions are performed strictly server-side using `SUPABASE_SERVICE_ROLE_KEY` via `/api/upload` and `/api/settings/photos`.
+## 7. Storage & File Uploads (`src/lib/storage.ts`, `src/lib/storage-constants.ts`, `/api/media/[...path]`)
+- **Dual-Layer Resilient Storage**: Uploads attempt Supabase Storage (`salon-media` public bucket) when configured, and seamlessly persist to PostgreSQL table `storage_objects` as an automated resilient store. Uploads NEVER fail with "fetch failed" even if Supabase Storage is paused or unconfigured.
+- **Media Asset Endpoint (`/api/media/[...path]`)**: Publicly serves stored media binaries with immutable caching headers (`Cache-Control: public, max-age=31536000, immutable`), fallback redirect to Supabase public URLs, and directory traversal protection. Whitelisted in `PUBLIC_API_PREFIXES`.
+- **Upload Flow**: Uploads and deletions are performed strictly server-side using `/api/upload`, `/api/settings/photos`, and `/api/media`.
 - **Client-Side Compression (`ImageUploader.tsx`)**:
   - Rejects files > 5MB before processing.
   - Browser canvas compression targeting <= 200KB (max 1200px, WebP/JPEG) for gallery photos, and square center crop <= 60KB (max 400px, WebP/JPEG) for logos and avatars.
+  - Multi-select photo batch upload support for gallery (`multiple={true}`, `maxFiles`).
 - **Server Validation & Security**:
   - Magic byte verification (`validateImageSignature`) for JPEG (`FF D8 FF`), PNG (`89 50 4E 47`), and WebP (`RIFF....WEBP`). Rejects SVGs, HTML, EXEs, scripts, and spoofed file extensions.
   - Strict server-side file size limit of <= 400KB.
   - Server decides the destination path strictly: `salons/{salon_id}/...` for owners or `customers/{customer_id}/avatar` for customers.
-  - Rejects foreign storage paths and `data:` URIs.
-- **Gallery Photo Limit**: Shared constant `MAX_GALLERY_PHOTOS = 5` enforced server-side. Replacing or deleting an image cleans up the old storage object from Supabase Storage.
+  - Rejects foreign storage paths and raw `data:` URIs.
+- **Gallery Photo Limit**: Shared constant `MAX_GALLERY_PHOTOS = 5` enforced server-side. Batch inserts supported in `/api/settings/photos`. Replacing or deleting an image cleans up the storage object from both Supabase Storage and PostgreSQL `storage_objects`.
 - **Demo Mode**: `dixa-beauty-salon` simulates uploads without writing to storage or database.
 
 ---
@@ -231,6 +233,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `020_add_salon_invoice_prefix.sql` | Adds `invoice_prefix VARCHAR(16)` to `salons` for salon-branded invoice numbers (e.g. `PALAK-2026-0001`, `DIXA-2026-0001`) and custom prefix management in Settings. |
 | `021_add_customer_last_login_at.sql` | Adds `last_login_at TIMESTAMPTZ` to `customers` table with index for tracking customer login timestamps and ordering unified cross-salon account sessions. |
 | `022_enable_rls_all_tables.sql` | Enforces PostgreSQL Row Level Security (RLS) across all 28 public tables in schema, ensuring PostgREST direct access is blocked. |
+| `023_storage_objects.sql` | Creates `storage_objects` table (`storage_path` PK, `mime_type`, `data` base64, `created_at`, `updated_at`) with RLS policy for resilient database fallback storage of logos, avatars, and gallery photos. |
 
 ---
 

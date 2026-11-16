@@ -41,43 +41,54 @@ export async function POST(request: Request) {
     const isDemo = auth.session.salonSlug === 'dixa-beauty-salon';
 
     const body = await request.json().catch(() => ({}));
-    const { url, storage_path } = body;
-
-    if (!url || !storage_path) {
+    let itemsToProcess: Array<{ url: string; storage_path: string }> = [];
+    if (Array.isArray(body.photos) && body.photos.length > 0) {
+      itemsToProcess = body.photos;
+    } else if (body.url && body.storage_path) {
+      itemsToProcess = [{ url: body.url, storage_path: body.storage_path }];
+    } else {
       return NextResponse.json(
-        { error: 'Both url and storage_path are required.' },
+        { error: 'Photo url and storage_path (or photos array) are required.' },
         { status: 400 }
       );
     }
 
-    // Security check: validate storage_path belongs strictly to this salon
-    if (!validateStoragePath(storage_path, `salons/${salonId}`)) {
-      return NextResponse.json(
-        { error: 'Forbidden: Storage path must belong to your salon folder.' },
-        { status: 403 }
-      );
-    }
-
-    // Security check: reject data: URIs or arbitrary foreign domains
-    if (!isAllowedSalonImageUrl(url, salonId)) {
-      return NextResponse.json(
-        { error: 'Invalid image URL. Must be stored in your salon media storage.' },
-        { status: 400 }
-      );
+    // Security check: validate each photo's storage_path and URL belongs strictly to this salon
+    for (const item of itemsToProcess) {
+      if (!item.url || !item.storage_path) {
+        return NextResponse.json(
+          { error: 'Each photo must include both url and storage_path.' },
+          { status: 400 }
+        );
+      }
+      if (!validateStoragePath(item.storage_path, `salons/${salonId}`)) {
+        return NextResponse.json(
+          { error: 'Forbidden: Storage path must belong to your salon folder.' },
+          { status: 403 }
+        );
+      }
+      if (!isAllowedSalonImageUrl(item.url, salonId)) {
+        return NextResponse.json(
+          { error: 'Invalid image URL. Must be stored in your salon media storage.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Demo salon: simulated add
     if (isDemo) {
+      const demoPhotos = itemsToProcess.map((item, idx) => ({
+        id: 'demo-photo-' + Date.now() + '-' + idx,
+        salon_id: salonId,
+        url: item.url,
+        storage_path: item.storage_path,
+        sort_order: idx,
+        created_at: new Date().toISOString(),
+      }));
       return NextResponse.json({
         success: true,
-        photo: {
-          id: 'demo-photo-' + Date.now(),
-          salon_id: salonId,
-          url,
-          storage_path,
-          sort_order: 0,
-          created_at: new Date().toISOString(),
-        },
+        photos: demoPhotos,
+        photo: demoPhotos[0],
       });
     }
 
@@ -87,24 +98,33 @@ export async function POST(request: Request) {
       [salonId]
     );
     const count = countRes.rows[0]?.count || 0;
-    if (count >= MAX_GALLERY_PHOTOS) {
+    const remainingSlots = MAX_GALLERY_PHOTOS - count;
+    if (remainingSlots <= 0) {
       return NextResponse.json(
         { error: `Maximum ${MAX_GALLERY_PHOTOS} gallery photos allowed per salon.` },
         { status: 400 }
       );
     }
 
-    const nextOrder = count;
-    const insertRes = await query(
-      `INSERT INTO salon_photos (salon_id, url, storage_path, sort_order)
-       VALUES ($1::uuid, $2::text, $3::text, $4::int)
-       RETURNING id, url, storage_path, sort_order, created_at`,
-      [salonId, url, storage_path, nextOrder]
-    );
+    const allowedItems = itemsToProcess.slice(0, remainingSlots);
+    const insertedPhotos = [];
+
+    for (let i = 0; i < allowedItems.length; i++) {
+      const item = allowedItems[i];
+      const nextOrder = count + i;
+      const insertRes = await query(
+        `INSERT INTO salon_photos (salon_id, url, storage_path, sort_order)
+         VALUES ($1::uuid, $2::text, $3::text, $4::int)
+         RETURNING id, url, storage_path, sort_order, created_at`,
+        [salonId, item.url, item.storage_path, nextOrder]
+      );
+      insertedPhotos.push(insertRes.rows[0]);
+    }
 
     return NextResponse.json({
       success: true,
-      photo: insertRes.rows[0],
+      photos: insertedPhotos,
+      photo: insertedPhotos[0],
     });
   } catch (error: any) {
     return serverError(error, 'src/app/api/settings/photos/route.ts');

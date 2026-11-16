@@ -29,7 +29,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import ImageUploader from '@/components/ui/ImageUploader';
-import { MAX_GALLERY_PHOTOS } from '@/lib/storage';
+import { MAX_GALLERY_PHOTOS } from '@/lib/storage-constants';
 
 const DAYS_OF_WEEK = [
   { day: 1, label: 'Mon' },
@@ -265,6 +265,29 @@ export default function SettingsPage() {
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Error adding photo to gallery');
+    }
+  }
+
+  async function handleAddGalleryPhotos(items: Array<{ url: string; storagePath: string }>) {
+    try {
+      const res = await fetch('/api/settings/photos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photos: items.map((it) => ({ url: it.url, storage_path: it.storagePath })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to save photos');
+      }
+      if (data.photos && Array.isArray(data.photos)) {
+        setGalleryPhotos((prev) => [...prev, ...data.photos]);
+      } else if (data.photo) {
+        setGalleryPhotos((prev) => [...prev, data.photo]);
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Error adding photos to gallery');
     }
   }
 
@@ -681,12 +704,15 @@ export default function SettingsPage() {
                     <ImageUploader
                       mode="default"
                       type="gallery"
+                      multiple={true}
+                      maxFiles={MAX_GALLERY_PHOTOS - galleryPhotos.length}
+                      onMultipleUpload={handleAddGalleryPhotos}
                       onChange={async (newUrl, storagePath) => {
                         if (!newUrl || !storagePath) return;
                         await handleAddGalleryPhoto(newUrl, storagePath);
                       }}
-                      label="Add Photo to Gallery"
-                      helperText="Upload a photo (JPG/PNG/WebP, max 5MB before compression). Automatically optimized up to 1200px."
+                      label={`Add Photos to Gallery (Multi-select enabled)`}
+                      helperText={`Select 1 or multiple photos (JPG/PNG/WebP, max 5MB each). Up to ${MAX_GALLERY_PHOTOS - galleryPhotos.length} more photo${MAX_GALLERY_PHOTOS - galleryPhotos.length === 1 ? '' : 's'} can be added.`}
                     />
                   </div>
                 ) : (

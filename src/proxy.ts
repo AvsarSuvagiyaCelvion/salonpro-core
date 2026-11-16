@@ -36,6 +36,7 @@ const PUBLIC_API_PREFIXES = [
   '/api/logout',
   '/api/customer/',
   '/api/upload',
+  '/api/media/',
   '/api/admin/auth',
   '/api/admin/logout',
   '/api/subscription/razorpay/webhook',

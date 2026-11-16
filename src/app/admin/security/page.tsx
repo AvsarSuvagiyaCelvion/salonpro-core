@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Lock, UserPlus, Users, Key, AlertCircle, CheckCircle2, X, Eye, EyeOff, Trash2, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, UserPlus, Users, Key, AlertCircle, CheckCircle2, X, Eye, EyeOff, Trash2, ArrowRight, QrCode, Building, Smartphone, Save, CreditCard } from 'lucide-react';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 interface AdminUser {
   id: string;
@@ -30,12 +31,27 @@ export default function AdminSecurityPage() {
   const [saving, setSaving] = useState(false);
   const [modalMessage, setModalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Platform Payment Settings State
+  const [platformSettings, setPlatformSettings] = useState({
+    platform_upi_id: '8320653782@okaxis',
+    platform_upi_number: '8320653782',
+    platform_account_name: 'Avsar Suvagiya',
+    platform_bank_name: 'State Bank of India',
+    platform_account_number: 'XXXXXX1234',
+    platform_ifsc_code: 'SBIN0001234',
+    platform_support_whatsapp: '918320653782',
+    platform_upi_qr_url: '',
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsSuccess, setSettingsSuccess] = useState(false);
+
   async function loadAdmins() {
     try {
       setLoading(true);
-      const [adminsRes, authRes] = await Promise.all([
+      const [adminsRes, authRes, settingsRes] = await Promise.all([
         fetch('/api/admin/admins'),
         fetch('/api/admin/auth'),
+        fetch('/api/admin/settings'),
       ]);
 
       if (authRes.ok) {
@@ -43,6 +59,13 @@ export default function AdminSecurityPage() {
         if (authData.loggedIn && authData.admin) {
           setIsSuperAdmin(authData.admin.role === 'super_admin');
           setCurrentAdminEmail(authData.admin.email || '');
+        }
+      }
+
+      if (settingsRes.ok) {
+        const settsData = await settingsRes.json();
+        if (settsData.settings) {
+          setPlatformSettings((prev) => ({ ...prev, ...settsData.settings }));
         }
       }
 
@@ -66,6 +89,29 @@ export default function AdminSecurityPage() {
   useEffect(() => {
     loadAdmins();
   }, []);
+
+  async function handleSavePlatformSettings(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      setSavingSettings(true);
+      setSettingsSuccess(false);
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(platformSettings),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update platform payment settings');
+      }
+      setSettingsSuccess(true);
+      setTimeout(() => setSettingsSuccess(false), 3000);
+    } catch (err: any) {
+      alert(err.message || 'Error updating settings');
+    } finally {
+      setSavingSettings(false);
+    }
+  }
 
   async function handleDeleteAdmin(id: string, email: string) {
     if (!window.confirm(`Revoke platform administrator access for ${email}? This action cannot be undone.`)) {
@@ -338,6 +384,189 @@ export default function AdminSecurityPage() {
           </table>
         </div>
       </div>
+
+      {/* ================= PLATFORM PAYMENT SETTINGS (SUPER ADMIN ONLY) ================= */}
+      {isSuperAdmin && (
+        <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 shadow-xs space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-[#FFFFFF] flex items-center gap-2">
+                <QrCode className="w-5 h-5 text-[#D4A77F]" />
+                <span>Platform Payment &amp; Direct Bank Settings</span>
+              </h2>
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-0.5">
+                Configure your official UPI ID, QR code, and bank details shown to salon owners on the subscription checkout modal.
+              </p>
+            </div>
+
+            {settingsSuccess && (
+              <span className="px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Saved Successfully!</span>
+              </span>
+            )}
+          </div>
+
+          <form onSubmit={handleSavePlatformSettings} className="space-y-5 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
+                  Platform UPI ID
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 8320653782@okaxis"
+                  value={platformSettings.platform_upi_id}
+                  onChange={(e) => setPlatformSettings({ ...platformSettings, platform_upi_id: e.target.value })}
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#D4A77F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
+                  PhonePe / GPay Number
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 8320653782"
+                  value={platformSettings.platform_upi_number}
+                  onChange={(e) => setPlatformSettings({ ...platformSettings, platform_upi_number: e.target.value })}
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#D4A77F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
+                  Support WhatsApp Number (With Country Code)
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 918320653782"
+                  value={platformSettings.platform_support_whatsapp}
+                  onChange={(e) => setPlatformSettings({ ...platformSettings, platform_support_whatsapp: e.target.value })}
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#D4A77F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
+                  Bank Account Holder Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Avsar Suvagiya"
+                  value={platformSettings.platform_account_name}
+                  onChange={(e) => setPlatformSettings({ ...platformSettings, platform_account_name: e.target.value })}
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#D4A77F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
+                  Bank Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. State Bank of India"
+                  value={platformSettings.platform_bank_name}
+                  onChange={(e) => setPlatformSettings({ ...platformSettings, platform_bank_name: e.target.value })}
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#D4A77F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
+                  Bank Account Number
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 123456789012"
+                  value={platformSettings.platform_account_number}
+                  onChange={(e) => setPlatformSettings({ ...platformSettings, platform_account_number: e.target.value })}
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#D4A77F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1">
+                  Bank IFSC Code
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. SBIN0001234"
+                  value={platformSettings.platform_ifsc_code}
+                  onChange={(e) => setPlatformSettings({ ...platformSettings, platform_ifsc_code: e.target.value.toUpperCase() })}
+                  className="w-full bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-xl px-3 py-2 font-mono uppercase text-xs focus:outline-none focus:border-[#D4A77F]"
+                />
+              </div>
+
+              {/* QR Image Upload */}
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-1.5">
+                  Platform Payment QR Code Image (GPay / PhonePe / BharatPe)
+                </label>
+                <div className="flex items-center gap-4">
+                  {platformSettings.platform_upi_qr_url ? (
+                    <div className="relative group shrink-0">
+                      <div className="w-20 h-20 bg-white p-1 rounded-xl border border-neutral-300 flex items-center justify-center overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={platformSettings.platform_upi_qr_url}
+                          alt="Platform QR"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPlatformSettings({ ...platformSettings, platform_upi_qr_url: '' })}
+                        className="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full p-1 shadow-md hover:bg-rose-600"
+                        title="Remove QR"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-[#10141F] flex items-center justify-center text-neutral-400 shrink-0">
+                      <QrCode className="w-6 h-6" />
+                    </div>
+                  )}
+
+                  <div className="flex-1">
+                    <ImageUploader
+                      value={platformSettings.platform_upi_qr_url || null}
+                      onChange={(url) => setPlatformSettings({ ...platformSettings, platform_upi_qr_url: url || '' })}
+                      type="logo"
+                      label="Upload QR Code"
+                      helperText="JPEG or PNG QR Code image (max 400KB)"
+                    />
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      Upload your high-res UPI payment QR code to show on checkout.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingSettings}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-black text-xs shadow-md transition-all cursor-pointer disabled:opacity-60"
+              >
+                <Save className="w-4 h-4" />
+                <span>{savingSettings ? 'Saving Details...' : 'Save Platform Payment Settings'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Modal: Add New Admin */}
       {isModalOpen && (

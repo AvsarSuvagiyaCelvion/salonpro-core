@@ -21,6 +21,11 @@ import {
   Award,
   ArrowRight,
   ChevronRight,
+  QrCode,
+  Building,
+  Smartphone,
+  Copy,
+  ExternalLink,
 } from 'lucide-react';
 
 function loadRazorpayScript(): Promise<boolean> {
@@ -47,6 +52,19 @@ export default function SalonSubscriptionPage() {
   const [celebrationData, setCelebrationData] = useState<any | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Direct Bank & UPI Payment State
+  const [showDirectPayModal, setShowDirectPayModal] = useState<{ plan: any; price: number } | null>(null);
+  const [platformPaymentDetails, setPlatformPaymentDetails] = useState<Record<string, string>>({
+    platform_upi_id: '8320653782@okaxis',
+    platform_upi_number: '8320653782',
+    platform_account_name: 'Avsar Suvagiya',
+    platform_bank_name: 'State Bank of India',
+    platform_account_number: 'XXXXXX1234',
+    platform_ifsc_code: 'SBIN0001234',
+    platform_support_whatsapp: '918320653782',
+  });
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
   // Auto-dismiss top notifications after 3 seconds and trigger global toast
   useEffect(() => {
     if (message) {
@@ -64,10 +82,11 @@ export default function SalonSubscriptionPage() {
   async function loadData() {
     try {
       setLoading(true);
-      const [subRes, plansRes, paymentsRes] = await Promise.all([
+      const [subRes, plansRes, paymentsRes, bankRes] = await Promise.all([
         fetch('/api/subscription'),
         fetch('/api/plans'),
         fetch('/api/subscription/payments'),
+        fetch('/api/subscription/bank-details'),
       ]);
 
       if (subRes.ok) {
@@ -83,6 +102,13 @@ export default function SalonSubscriptionPage() {
       if (paymentsRes.ok) {
         const payData = await paymentsRes.json();
         setPastPayments(payData.payments || []);
+      }
+
+      if (bankRes.ok) {
+        const bankData = await bankRes.json();
+        if (bankData.paymentDetails) {
+          setPlatformPaymentDetails(bankData.paymentDetails);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -698,36 +724,48 @@ export default function SalonSubscriptionPage() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleActivatePlan(plan.id)}
-                  disabled={Boolean(activatingPlanId) || (isCurrent && isActivePaid)}
-                  className={`w-full mt-6 py-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer ${
-                    isCurrent && isActivePaid
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 cursor-not-allowed'
-                      : isThisActivating
-                      ? 'bg-neutral-800 text-white cursor-wait opacity-80'
-                      : isPopular
-                      ? 'bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold shadow-[#D4A77F]/20'
-                      : 'bg-slate-900 hover:bg-slate-800 text-white'
-                  }`}
-                >
-                  {isThisActivating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-pink-400" />
-                      <span>Opening Gateway...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-4 h-4" />
-                      <span>
-                        {isCurrent && isActivePaid
-                          ? `Active Plan (Valid till ${validTillDate ? new Date(validTillDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''})`
-                          : `Pay with Razorpay (₹${Number(price).toLocaleString('en-IN')})`}
-                      </span>
-                    </>
-                  )}
-                </button>
+                <div className="mt-6 space-y-2">
+                  {/* Option A: Direct Bank / UPI (0% Fee) */}
+                  <button
+                    type="button"
+                    onClick={() => setShowDirectPayModal({ plan, price })}
+                    disabled={isCurrent && isActivePaid}
+                    className={`w-full py-2.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95 ${
+                      isCurrent && isActivePaid
+                        ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
+                        : 'bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12]'
+                    }`}
+                  >
+                    <QrCode className="w-4 h-4" />
+                    <span>Direct UPI / Bank Transfer (0% Fee)</span>
+                  </button>
+
+                  {/* Option B: Razorpay (Cards / NetBanking) */}
+                  <button
+                    type="button"
+                    onClick={() => handleActivatePlan(plan.id)}
+                    disabled={Boolean(activatingPlanId) || (isCurrent && isActivePaid)}
+                    className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 border shadow-xs cursor-pointer active:scale-95 ${
+                      isCurrent && isActivePaid
+                        ? 'border-neutral-200 dark:border-neutral-800 text-neutral-400 cursor-not-allowed'
+                        : isThisActivating
+                        ? 'bg-neutral-800 text-white cursor-wait opacity-80'
+                        : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-[#10141F] text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-[#1C2230]'
+                    }`}
+                  >
+                    {isThisActivating ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-pink-400" />
+                        <span>Opening Gateway...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-3.5 h-3.5 text-neutral-500" />
+                        <span>Pay via Razorpay / Card</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -912,6 +950,201 @@ export default function SalonSubscriptionPage() {
           )}
         </div>
       </div>
+
+      {/* ================= DIRECT BANK / UPI PAYMENT MODAL ================= */}
+      {showDirectPayModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in-50">
+          <div className="bg-white dark:bg-[#141926] rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-lg w-full my-auto overflow-hidden animate-in zoom-in-95">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-between bg-neutral-50/50 dark:bg-[#10141F]">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#8C5E2E] dark:text-[#D4A77F] px-2 py-0.5 rounded-full bg-[#D4A77F]/10 border border-[#D4A77F]/30">
+                  Zero Fee Payment
+                </span>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mt-1">
+                  Pay via Direct UPI or Bank Transfer
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowDirectPayModal(null)}
+                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-neutral-900 dark:hover:text-white flex items-center justify-center cursor-pointer transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 space-y-5 max-h-[75vh] overflow-y-auto touch-scroll text-xs">
+              {/* Plan Summary Card */}
+              <div className="p-3.5 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Selected Plan:</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white">
+                    {showDirectPayModal.plan.name} ({interval === 'yearly' ? 'Annual Billing' : 'Monthly Billing'})
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Payable Amount:</p>
+                  <p className="text-lg font-black text-[#8C5E2E] dark:text-[#D4A77F]">
+                    ₹{Number(showDirectPayModal.price).toLocaleString('en-IN')}
+                  </p>
+                </div>
+              </div>
+
+              {/* UPI Option */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200">
+                  <Smartphone className="w-4 h-4 text-[#8C5E2E] dark:text-[#D4A77F]" />
+                  <span>Option 1: Scan &amp; Pay with Any UPI App</span>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#10141F] flex flex-col sm:flex-row items-center gap-4">
+                  {platformPaymentDetails.platform_upi_qr_url ? (
+                    <div className="w-32 h-32 bg-white p-2 rounded-xl border border-neutral-200 shrink-0 shadow-xs flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={platformPaymentDetails.platform_upi_qr_url}
+                        alt="Platform Admin UPI QR Code"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 rounded-xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#141926] flex flex-col items-center justify-center text-center p-2 shrink-0">
+                      <QrCode className="w-10 h-10 text-[#D4A77F] mb-1" />
+                      <span className="text-[10px] text-neutral-400">UPI Instant</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-2 flex-1 w-full text-center sm:text-left">
+                    <div>
+                      <span className="text-[10px] text-neutral-400 block">Platform UPI ID:</span>
+                      <div className="flex items-center justify-center sm:justify-start gap-2 mt-0.5">
+                        <span className="font-mono font-black text-sm text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/10 px-2 py-0.5 rounded-lg">
+                          {platformPaymentDetails.platform_upi_id}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(platformPaymentDetails.platform_upi_id);
+                            setCopiedKey('upi');
+                            setTimeout(() => setCopiedKey(null), 2000);
+                          }}
+                          className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md cursor-pointer transition-colors"
+                          title="Copy UPI ID"
+                        >
+                          {copiedKey === 'upi' ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5 text-neutral-500" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-neutral-400 block">PhonePe / GPay Number:</span>
+                      <span className="font-mono font-bold text-xs text-slate-800 dark:text-slate-200">
+                        {platformPaymentDetails.platform_upi_number}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bank Transfer Details */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200">
+                  <Building className="w-4 h-4 text-[#8C5E2E] dark:text-[#D4A77F]" />
+                  <span>Option 2: Direct IMPS / NEFT Bank Transfer</span>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#10141F] space-y-2 text-xs">
+                  <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-[#2A2F3A]">
+                    <span className="text-neutral-500">Account Holder Name:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      {platformPaymentDetails.platform_account_name}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-[#2A2F3A]">
+                    <span className="text-neutral-500">Bank Name:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      {platformPaymentDetails.platform_bank_name}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-neutral-100 dark:border-[#2A2F3A]">
+                    <span className="text-neutral-500">Account Number:</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">
+                        {platformPaymentDetails.platform_account_number}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(platformPaymentDetails.platform_account_number);
+                          setCopiedKey('acc');
+                          setTimeout(() => setCopiedKey(null), 2000);
+                        }}
+                        className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md cursor-pointer"
+                        title="Copy Account Number"
+                      >
+                        {copiedKey === 'acc' ? (
+                          <Check className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3 h-3 text-neutral-500" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-neutral-500">IFSC Code:</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-bold text-slate-900 dark:text-white">
+                        {platformPaymentDetails.platform_ifsc_code}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(platformPaymentDetails.platform_ifsc_code);
+                          setCopiedKey('ifsc');
+                          setTimeout(() => setCopiedKey(null), 2000);
+                        }}
+                        className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md cursor-pointer"
+                        title="Copy IFSC Code"
+                      >
+                        {copiedKey === 'ifsc' ? (
+                          <Check className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3 h-3 text-neutral-500" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action: Send WhatsApp Confirmation */}
+              <div className="pt-2">
+                <a
+                  href={`https://wa.me/${platformPaymentDetails.platform_support_whatsapp || '918320653782'}?text=${encodeURIComponent(
+                    `Hi, I have completed direct payment of ₹${showDirectPayModal.price} for the ${showDirectPayModal.plan.name} (${interval}) on SalonPro. Please verify and activate my subscription!`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all active:scale-95"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>I Have Paid — Send Screenshot on WhatsApp</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+                <p className="text-[11px] text-center text-neutral-400 mt-2">
+                  Once our team confirms your transaction screenshot, your plan will be active within minutes!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

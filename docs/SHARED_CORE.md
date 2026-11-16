@@ -234,6 +234,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `021_add_customer_last_login_at.sql` | Adds `last_login_at TIMESTAMPTZ` to `customers` table with index for tracking customer login timestamps and ordering unified cross-salon account sessions. |
 | `022_enable_rls_all_tables.sql` | Enforces PostgreSQL Row Level Security (RLS) across all 28 public tables in schema, ensuring PostgREST direct access is blocked. |
 | `023_storage_objects.sql` | Creates `storage_objects` table (`storage_path` PK, `mime_type`, `data` base64, `created_at`, `updated_at`) with RLS policy for resilient database fallback storage of logos, avatars, and gallery photos. |
+| `024_upi_payment_settings.sql` | Adds `upi_id`, `upi_number`, `upi_qr_url` to `salons` for direct 0%-fee POS payments; creates `platform_settings` table for super admin direct UPI and bank transfer checkout. |
 
 ---
 

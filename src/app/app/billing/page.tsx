@@ -81,6 +81,28 @@ export default function BillingPage() {
   const [sendingWhatsapp, setSendingWhatsapp] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
 
+  // Salon UPI QR state for POS collection
+  const [salonUpiInfo, setSalonUpiInfo] = useState<{ upi_id?: string; upi_number?: string; upi_qr_url?: string } | null>(null);
+
+  useEffect(() => {
+    async function loadSalonUpi() {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.salon) {
+            setSalonUpiInfo({
+              upi_id: data.salon.upi_id || '',
+              upi_number: data.salon.upi_number || '',
+              upi_qr_url: data.salon.upi_qr_url || '',
+            });
+          }
+        }
+      } catch {}
+    }
+    loadSalonUpi();
+  }, []);
+
   async function handleDownloadPdfClick() {
     if (!whatsappInvoice) return;
     setDownloadingPdf(true);
@@ -559,6 +581,61 @@ export default function BillingPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Instant Salon UPI QR Code Banner when UPI is selected */}
+              {payMethod === 'upi' && (
+                <div className="p-3.5 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F]">
+                      ⚡ Instant Counter QR Scan (0% Fee)
+                    </span>
+                    {salonUpiInfo?.upi_id && (
+                      <span className="text-[11px] font-mono font-bold text-neutral-700 dark:text-neutral-200">
+                        {salonUpiInfo.upi_id}
+                      </span>
+                    )}
+                  </div>
+
+                  {salonUpiInfo?.upi_qr_url ? (
+                    <div className="flex flex-col sm:flex-row items-center gap-3 bg-white dark:bg-[#141926] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A]">
+                      <div className="w-28 h-28 bg-white p-1.5 rounded-lg border border-neutral-200 shrink-0 shadow-xs flex items-center justify-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={salonUpiInfo.upi_qr_url}
+                          alt="Salon Counter QR Code"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div className="text-center sm:text-left space-y-1">
+                        <p className="text-xs font-bold text-neutral-900 dark:text-white">
+                          Ask client to scan with GPay / PhonePe / Paytm
+                        </p>
+                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                          Amount to collect: <strong className="text-emerald-700 dark:text-emerald-400">₹{payAmount || paymentModalInvoice.due_amount}</strong>
+                        </p>
+                        {salonUpiInfo.upi_number && (
+                          <p className="text-[10px] text-neutral-500 font-mono">
+                            Direct Phone: {salonUpiInfo.upi_number}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ) : salonUpiInfo?.upi_id ? (
+                    <div className="bg-white dark:bg-[#141926] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] text-center space-y-1">
+                      <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                        Ask client to pay on Salon UPI ID:
+                      </p>
+                      <p className="text-sm font-mono font-extrabold text-[#D4A77F] select-all bg-[#D4A77F]/10 py-1 px-3 rounded-lg inline-block">
+                        {salonUpiInfo.upi_id}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 text-center py-1">
+                      💡 Tip: Upload your salon&apos;s GPay/PhonePe standee QR in <strong>Settings ➔ UPI & QR Payment</strong> to display it here!
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">

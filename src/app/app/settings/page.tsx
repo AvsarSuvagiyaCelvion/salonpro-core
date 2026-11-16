@@ -27,6 +27,9 @@ import {
   Loader2,
   Globe,
   CheckCircle2,
+  QrCode,
+  CreditCard,
+  Smartphone,
 } from 'lucide-react';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { MAX_GALLERY_PHOTOS } from '@/lib/storage-constants';
@@ -91,8 +94,13 @@ export default function SettingsPage() {
   const [sendReminders, setSendReminders] = useState(true);
   const [invoicePrefix, setInvoicePrefix] = useState('');
 
+  // Salon UPI & QR settings for POS billing
+  const [upiId, setUpiId] = useState('');
+  const [upiNumber, setUpiNumber] = useState('');
+  const [upiQrUrl, setUpiQrUrl] = useState<string | null>(null);
+
   // Active section tab
-  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'invoicing' | 'holidays'>('salon');
+  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'invoicing' | 'payments' | 'holidays'>('salon');
 
   // Holidays & Closures state
   const [holidaysList, setHolidaysList] = useState<any[]>([]);
@@ -219,6 +227,9 @@ export default function SettingsPage() {
           setCancelPolicyHours(s.cancel_policy_hours !== undefined && s.cancel_policy_hours !== null ? Number(s.cancel_policy_hours) : 2);
           setSendReminders(s.send_reminders ?? true);
           setInvoicePrefix(s.invoice_prefix || '');
+          setUpiId(s.upi_id || '');
+          setUpiNumber(s.upi_number || '');
+          setUpiQrUrl(s.upi_qr_url || null);
 
           if (typeof window !== 'undefined') {
             try {
@@ -358,6 +369,9 @@ export default function SettingsPage() {
         cancel_policy_hours: Number(cancelPolicyHours),
         send_reminders: sendReminders,
         invoice_prefix: invoicePrefix.trim().toUpperCase() || null,
+        upi_id: upiId.trim() || null,
+        upi_number: upiNumber.trim() || null,
+        upi_qr_url: upiQrUrl,
       };
 
       const res = await fetch('/api/settings', {
@@ -466,6 +480,7 @@ export default function SettingsPage() {
           { id: 'salon', label: 'Salon Details', icon: Store },
           { id: 'booking', label: 'Booking & Timings', icon: Calendar },
           { id: 'invoicing', label: 'Invoice & Receipts', icon: Receipt },
+          { id: 'payments', label: 'UPI & QR Payment', icon: QrCode },
           { id: 'holidays', label: 'Holidays & Closures', icon: Palmtree },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -986,6 +1001,130 @@ export default function SettingsPage() {
                 <li>Digital WhatsApp bills, PDF receipts, and client portal receipts will proudly display your customized salon prefix.</li>
                 <li>Changing your prefix affects only new invoices and will never modify or break previous bills.</li>
               </ul>
+            </div>
+          </div>
+        )}
+
+        {/* ================= SECTION: UPI & PAYMENT QR SETTINGS ================= */}
+        {activeSection === 'payments' && (
+          <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-6 transition-colors duration-200">
+            <div>
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <QrCode className="w-5 h-5 text-[#D4A77F]" />
+                <span>Salon UPI & Payment QR Settings</span>
+              </h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                Collect payments directly into your salon&apos;s bank account via GPay, PhonePe, Paytm, or BHIM UPI at 0% transaction fee.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {/* UPI ID */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-[#D4A77F]" />
+                  <span>Salon VPA / UPI ID</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. palaksalon@okaxis or 9825100001@paytm"
+                  value={upiId}
+                  onChange={(e) => setUpiId(e.target.value)}
+                  disabled={userRole === 'staff'}
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white font-mono text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F] placeholder:text-neutral-400 disabled:opacity-60"
+                />
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
+                  Shown to clients on counter POS bills and digital WhatsApp receipts for instant 1-tap payment.
+                </p>
+              </div>
+
+              {/* UPI Mobile Number */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1.5 flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-[#D4A77F]" />
+                  <span>GPay / PhonePe / Paytm Number</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 9825100001"
+                  maxLength={10}
+                  value={upiNumber}
+                  onChange={(e) => setUpiNumber(e.target.value.replace(/\D/g, ''))}
+                  disabled={userRole === 'staff'}
+                  className="w-full px-4 py-2.5 rounded-2xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white font-mono text-sm focus:outline-none focus:border-[#D4A77F] focus:ring-1 focus:ring-[#D4A77F] placeholder:text-neutral-400 disabled:opacity-60"
+                />
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
+                  Secondary payment mobile number for quick phone-to-phone UPI transfers.
+                </p>
+              </div>
+
+              {/* QR Code Image Upload */}
+              <div className="sm:col-span-2 pt-2 border-t border-neutral-100 dark:border-[#2A2F3A]">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-2 flex items-center gap-1.5">
+                  <QrCode className="w-4 h-4 text-[#D4A77F]" />
+                  <span>Salon Standee QR Code Photo</span>
+                </label>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                  {upiQrUrl ? (
+                    <div className="relative group shrink-0">
+                      <div className="w-32 h-32 rounded-2xl border-2 border-neutral-200 dark:border-[#2A2F3A] p-2 bg-white flex items-center justify-center overflow-hidden shadow-sm">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={upiQrUrl}
+                          alt="Salon UPI QR Code"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      {userRole !== 'staff' && (
+                        <button
+                          type="button"
+                          onClick={() => setUpiQrUrl(null)}
+                          className="absolute -top-2 -right-2 p-1.5 rounded-full bg-rose-500 text-white shadow-md hover:bg-rose-600 transition-all cursor-pointer"
+                          title="Remove QR code"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 flex flex-col items-center justify-center text-center p-3 bg-neutral-50 dark:bg-[#10141F] shrink-0">
+                      <QrCode className="w-8 h-8 text-neutral-400 mb-1" />
+                      <span className="text-[10px] text-neutral-400">No QR uploaded</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-2 flex-1">
+                    <p className="text-xs text-neutral-600 dark:text-neutral-300 font-medium">
+                      Upload your salon&apos;s printed standee QR code (GPay / PhonePe / Paytm / BharatPe standee photo or screenshot).
+                    </p>
+                    <p className="text-[11px] text-neutral-400 dark:text-neutral-500">
+                      When staff clicks <strong>UPI</strong> in POS checkout, this QR code pops up large on the screen so clients can scan directly from their mobile screen!
+                    </p>
+                    {userRole !== 'staff' && (
+                      <div className="pt-1">
+                        <ImageUploader
+                          value={upiQrUrl}
+                          onChange={(url) => setUpiQrUrl(url)}
+                          type="logo"
+                          label="Upload QR Code"
+                          helperText="Upload your printed standee QR photo (JPEG/PNG, max 400KB)"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Zero-fee notice card */}
+            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 text-xs space-y-1.5 text-emerald-900 dark:text-emerald-200">
+              <div className="font-bold flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>100% Direct Settlement • 0% Transaction Fees</span>
+              </div>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 leading-relaxed">
+                Money paid by your clients via this QR code goes directly into your bank account in real-time. Zero gateway charges, zero commission deductions, and zero payment hold.
+              </p>
             </div>
           </div>
         )}

@@ -33,6 +33,9 @@ export const DEMO_SALON = {
   subscription_status: 'active',
   subscription_ends_at: '2030-12-31T23:59:59.000Z',
   subscription_plan_id: 'pro',
+  upi_id: 'dixabeautysalon@okaxis',
+  upi_number: '9825100001',
+  upi_qr_url: null,
   custom_domain: null,
   custom_domain_verified: false,
 };

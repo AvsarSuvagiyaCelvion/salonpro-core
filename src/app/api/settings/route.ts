@@ -29,6 +29,7 @@ export async function GET(request: Request) {
               booking_enabled, open_time, close_time, slot_minutes, buffer_minutes,
               working_days, min_advance_hours, max_advance_days, send_reminders,
               cancel_policy_hours, invoice_prefix,
+              upi_id, upi_number, upi_qr_url,
               trial_ends_at, subscription_status, subscription_ends_at, subscription_plan_id
        FROM salons
        WHERE id = $1
@@ -107,6 +108,9 @@ async function handleUpdateSettings(request: Request) {
       send_reminders,
       cancel_policy_hours,
       invoice_prefix,
+      upi_id,
+      upi_number,
+      upi_qr_url,
     } = body;
 
     // 5.3 Validations on settings updates
@@ -317,8 +321,11 @@ async function handleUpdateSettings(request: Request) {
            send_reminders = COALESCE($14, send_reminders),
            custom_domain = CASE WHEN $15::boolean THEN $16::text ELSE custom_domain END,
            cancel_policy_hours = COALESCE($17::integer, cancel_policy_hours),
-           invoice_prefix = CASE WHEN $18::boolean THEN $19::text ELSE invoice_prefix END
-       WHERE id = $20::uuid
+           invoice_prefix = CASE WHEN $18::boolean THEN $19::text ELSE invoice_prefix END,
+           upi_id = CASE WHEN $20::boolean THEN $21::text ELSE upi_id END,
+           upi_number = CASE WHEN $22::boolean THEN $23::text ELSE upi_number END,
+           upi_qr_url = CASE WHEN $24::boolean THEN $25::text ELSE upi_qr_url END
+       WHERE id = $26::uuid
        RETURNING *`,
       [
         name,
@@ -340,6 +347,12 @@ async function handleUpdateSettings(request: Request) {
         parsedCancelPolicyHours,
         hasInvoicePrefixUpdate,
         parsedInvoicePrefix,
+        upi_id !== undefined,
+        upi_id ? String(upi_id).trim() : null,
+        upi_number !== undefined,
+        upi_number ? String(upi_number).trim() : null,
+        upi_qr_url !== undefined,
+        upi_qr_url ? String(upi_qr_url).trim() : null,
         salonId,
       ]
     );

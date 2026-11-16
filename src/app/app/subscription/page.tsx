@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { showToast } from '@/lib/toast';
+import { generateUpiQrDataUrl } from '@/lib/upi';
 import {
   CreditCard,
   CheckCircle2,
@@ -64,6 +65,29 @@ export default function SalonSubscriptionPage() {
     platform_support_whatsapp: '918320653782',
   });
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [dynamicPlatformQrUrl, setDynamicPlatformQrUrl] = useState<string | null>(null);
+
+  // Auto-generate dynamic amount-locked QR for the selected subscription plan
+  useEffect(() => {
+    async function updatePlanQr() {
+      if (showDirectPayModal && platformPaymentDetails.platform_upi_id) {
+        try {
+          const qrUrl = await generateUpiQrDataUrl({
+            upiId: platformPaymentDetails.platform_upi_id,
+            name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+            amount: showDirectPayModal.price,
+            note: `${showDirectPayModal.plan.name} Plan`,
+          });
+          setDynamicPlatformQrUrl(qrUrl);
+        } catch {
+          setDynamicPlatformQrUrl(null);
+        }
+      } else {
+        setDynamicPlatformQrUrl(null);
+      }
+    }
+    updatePlanQr();
+  }, [showDirectPayModal, platformPaymentDetails]);
 
   // Auto-dismiss top notifications after 3 seconds and trigger global toast
   useEffect(() => {
@@ -1000,11 +1024,11 @@ export default function SalonSubscriptionPage() {
                 </div>
 
                 <div className="p-4 rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#10141F] flex flex-col sm:flex-row items-center gap-4">
-                  {platformPaymentDetails.platform_upi_qr_url ? (
-                    <div className="w-32 h-32 bg-white p-2 rounded-xl border border-neutral-200 shrink-0 shadow-xs flex items-center justify-center">
+                  {dynamicPlatformQrUrl || platformPaymentDetails.platform_upi_qr_url ? (
+                    <div className="w-36 h-36 bg-white p-2 rounded-2xl border-2 border-emerald-500/40 shrink-0 shadow-sm flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={platformPaymentDetails.platform_upi_qr_url}
+                        src={dynamicPlatformQrUrl || platformPaymentDetails.platform_upi_qr_url || ''}
                         alt="Platform Admin UPI QR Code"
                         className="w-full h-full object-contain"
                       />
@@ -1017,6 +1041,9 @@ export default function SalonSubscriptionPage() {
                   )}
 
                   <div className="space-y-2 flex-1 w-full text-center sm:text-left">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 inline-block mb-1">
+                      Auto-Locked Amount: ₹{Number(showDirectPayModal.price).toLocaleString('en-IN')}
+                    </span>
                     <div>
                       <span className="text-[10px] text-neutral-400 block">Platform UPI ID:</span>
                       <div className="flex items-center justify-center sm:justify-start gap-2 mt-0.5">

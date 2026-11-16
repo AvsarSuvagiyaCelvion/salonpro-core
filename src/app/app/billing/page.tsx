@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { showToast } from '@/lib/toast';
 import { dispatchSmartWhatsAppBill, downloadInvoicePdf } from '@/lib/whatsapp-bill';
+import { generateUpiQrDataUrl } from '@/lib/upi';
 import {
   Receipt,
   Search,
@@ -82,7 +83,8 @@ export default function BillingPage() {
   const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   // Salon UPI QR state for POS collection
-  const [salonUpiInfo, setSalonUpiInfo] = useState<{ upi_id?: string; upi_number?: string; upi_qr_url?: string } | null>(null);
+  const [salonUpiInfo, setSalonUpiInfo] = useState<{ upi_id?: string; upi_number?: string; upi_qr_url?: string; name?: string } | null>(null);
+  const [dynamicUpiQrUrl, setDynamicUpiQrUrl] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadSalonUpi() {
@@ -95,6 +97,7 @@ export default function BillingPage() {
               upi_id: data.salon.upi_id || '',
               upi_number: data.salon.upi_number || '',
               upi_qr_url: data.salon.upi_qr_url || '',
+              name: data.salon.name || 'Salon',
             });
           }
         }
@@ -102,6 +105,29 @@ export default function BillingPage() {
     }
     loadSalonUpi();
   }, []);
+
+  // Generate dynamic amount-locked QR whenever paymentModal or payAmount changes
+  useEffect(() => {
+    async function updateDynamicQr() {
+      if (salonUpiInfo?.upi_id && paymentModalInvoice && payMethod === 'upi') {
+        const targetAmount = Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount);
+        try {
+          const qrDataUrl = await generateUpiQrDataUrl({
+            upiId: salonUpiInfo.upi_id,
+            name: salonUpiInfo.name || 'SalonPro',
+            amount: targetAmount,
+            note: `Bill ${paymentModalInvoice.number}`,
+          });
+          setDynamicUpiQrUrl(qrDataUrl);
+        } catch {
+          setDynamicUpiQrUrl(null);
+        }
+      } else {
+        setDynamicUpiQrUrl(null);
+      }
+    }
+    updateDynamicQr();
+  }, [salonUpiInfo, paymentModalInvoice, payMethod, payAmount]);
 
   async function handleDownloadPdfClick() {
     if (!whatsappInvoice) return;
@@ -586,8 +612,8 @@ export default function BillingPage() {
               {payMethod === 'upi' && (
                 <div className="p-3.5 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F]">
-                      ⚡ Instant Counter QR Scan (0% Fee)
+                    <span className="text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] flex items-center gap-1.5">
+                      <span>⚡ Instant Amount-Locked QR Scan (0% Fee)</span>
                     </span>
                     {salonUpiInfo?.upi_id && (
                       <span className="text-[11px] font-mono font-bold text-neutral-700 dark:text-neutral-200">
@@ -596,24 +622,27 @@ export default function BillingPage() {
                     )}
                   </div>
 
-                  {salonUpiInfo?.upi_qr_url ? (
+                  {dynamicUpiQrUrl || salonUpiInfo?.upi_qr_url ? (
                     <div className="flex flex-col sm:flex-row items-center gap-3 bg-white dark:bg-[#141926] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A]">
-                      <div className="w-28 h-28 bg-white p-1.5 rounded-lg border border-neutral-200 shrink-0 shadow-xs flex items-center justify-center">
+                      <div className="w-32 h-32 bg-white p-1.5 rounded-xl border-2 border-emerald-500/40 shrink-0 shadow-sm flex items-center justify-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={salonUpiInfo.upi_qr_url}
+                          src={dynamicUpiQrUrl || salonUpiInfo?.upi_qr_url || ''}
                           alt="Salon Counter QR Code"
                           className="w-full h-full object-contain"
                         />
                       </div>
                       <div className="text-center sm:text-left space-y-1">
-                        <p className="text-xs font-bold text-neutral-900 dark:text-white">
-                          Ask client to scan with GPay / PhonePe / Paytm
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300">
+                          Auto-Filled ₹{payAmount || paymentModalInvoice.due_amount}
+                        </span>
+                        <p className="text-xs font-bold text-neutral-900 dark:text-white pt-1">
+                          Client scans with GPay / PhonePe / Paytm
                         </p>
                         <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                          Amount to collect: <strong className="text-emerald-700 dark:text-emerald-400">₹{payAmount || paymentModalInvoice.due_amount}</strong>
+                          Exact amount <strong className="text-emerald-700 dark:text-emerald-400">₹{payAmount || paymentModalInvoice.due_amount}</strong> appears automatically on client&apos;s phone!
                         </p>
-                        {salonUpiInfo.upi_number && (
+                        {salonUpiInfo?.upi_number && (
                           <p className="text-[10px] text-neutral-500 font-mono">
                             Direct Phone: {salonUpiInfo.upi_number}
                           </p>
@@ -631,7 +660,7 @@ export default function BillingPage() {
                     </div>
                   ) : (
                     <div className="text-[11px] text-neutral-500 dark:text-neutral-400 text-center py-1">
-                      💡 Tip: Upload your salon&apos;s GPay/PhonePe standee QR in <strong>Settings ➔ UPI & QR Payment</strong> to display it here!
+                      💡 Tip: Add your salon&apos;s UPI ID in <strong>Settings ➔ UPI & QR Payment</strong> to display auto-amount QR here!
                     </div>
                   )}
                 </div>

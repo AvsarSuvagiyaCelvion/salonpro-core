@@ -464,12 +464,6 @@ export default function AdminSalonsPage() {
                     <Globe className="w-3.5 h-3.5 text-[#D4A77F] shrink-0" />
                     <span className="text-[#8C5E2E] dark:text-[#D4A77F] font-bold truncate">/{s.slug}</span>
                   </div>
-                  {s.custom_domain && (
-                    <div className="flex items-center gap-1.5 text-purple-700 dark:text-purple-300 font-semibold truncate">
-                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0"></span>
-                      <span className="truncate">{s.custom_domain}</span>
-                    </div>
-                  )}
                   {s.owner_email && (
                     <div className="flex items-center gap-1.5 text-[#6B7280] dark:text-[#A0A8B8] truncate text-[10px]">
                       <Mail className="w-3 h-3 text-[#9CA3AF] dark:text-[#747D8D] shrink-0" />
@@ -931,18 +925,6 @@ export default function AdminSalonsPage() {
                 <span className="text-[10px] text-[#9CA3AF] dark:text-[#747D8D] mt-0.5 block">
                   Leave empty for trial or perpetual access
                 </span>
-              </div>
-
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#1F2937] dark:text-[#FFFFFF]">
-                  <input
-                    type="checkbox"
-                    checked={customDomainVerified}
-                    onChange={(e) => setCustomDomainVerified(e.target.checked)}
-                    className="w-4 h-4 text-purple-600 rounded border-slate-300 dark:border-[#2A2F3A] focus:ring-purple-500"
-                  />
-                  <span>Custom Domain Verified (Unlocks DNS)</span>
-                </label>
               </div>
 
               <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-[#2A2F3A]">

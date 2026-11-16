@@ -810,7 +810,7 @@ export default function SalonSubscriptionPage() {
                   { label: 'Excel / CSV Data Export', key: 'export' },
                   { label: 'Promotional Coupons & Discounts', key: 'coupons' },
                   { label: 'Loyalty Reward Points', key: 'loyalty' },
-                  { label: 'Custom Domain Verification', key: 'custom_domain' },
+                  { label: 'Custom Salon Branding & Logo', key: 'logo_upload' },
                   { label: 'Multi-Branch Platform Management', key: 'multi_branch' },
                   { label: 'Dedicated Priority Support', key: 'priority_support' },
                 ].map((feat) => (

@@ -12,6 +12,8 @@ import {
   verifyAdminSessionToken,
 } from '@/lib/auth';
 import PrintReceiptButton from '@/components/receipt/PrintReceiptButton';
+import { generateUpiQrDataUrl, buildGPayUrl, buildPhonePeUrl, buildPaytmUrl, buildUpiPayUrl } from '@/lib/upi';
+import { QrCode, Smartphone } from 'lucide-react';
 
 export const metadata = {
   title: 'Invoice Receipt - SalonPro',
@@ -42,6 +44,7 @@ export default async function PublicBillPage({
   const invRes = await query(
     `SELECT i.*, 
             s.name as salon_name, s.address as salon_address, s.phone as salon_phone, s.logo_url as salon_logo_url,
+            s.upi_id as salon_upi_id, s.upi_number as salon_upi_number, s.upi_qr_url as salon_upi_qr_url,
             c.name as customer_name, c.mobile as customer_mobile
      FROM invoices i
      JOIN salons s ON i.salon_id = s.id
@@ -130,6 +133,22 @@ export default async function PublicBillPage({
 
   const status =
     dueAmount <= 0 ? 'PAID' : totalPaid > 0 ? 'PARTIAL' : 'PENDING';
+
+  // Pre-generate dynamic UPI payment QR and links if balance is due and salon has UPI configured
+  let clientUpiQrDataUrl: string | null = null;
+  const salonUpiId = invoice.salon_upi_id;
+  if (dueAmount > 0 && salonUpiId) {
+    try {
+      clientUpiQrDataUrl = await generateUpiQrDataUrl({
+        upiId: salonUpiId,
+        name: invoice.salon_name || 'Salon',
+        amount: dueAmount,
+        note: `Invoice ${invoice.number}`,
+      });
+    } catch {
+      clientUpiQrDataUrl = null;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-neutral-100 dark:bg-[#080B12] flex flex-col justify-start items-center print:bg-white print:p-0 transition-colors duration-200">
@@ -350,6 +369,90 @@ export default async function PublicBillPage({
                     <span>₹{dueAmount.toLocaleString('en-IN')}</span>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Direct 1-Tap UPI Payment Option for Outstanding Balance */}
+            {dueAmount > 0 && salonUpiId && (
+              <div className="mt-5 p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 space-y-3 print:hidden">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-[#8C5E2E] dark:text-[#D4A77F]">
+                    <QrCode className="w-4 h-4" />
+                    <span>Pay Balance Online (0% Fee)</span>
+                  </div>
+                  <span className="font-mono text-[11px] text-neutral-500 font-bold">
+                    UPI: {salonUpiId}
+                  </span>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-[#141926] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A]">
+                  {clientUpiQrDataUrl && (
+                    <div className="w-28 h-28 bg-white p-1 rounded-xl border border-neutral-200 shrink-0 shadow-xs flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={clientUpiQrDataUrl}
+                        alt="Pay Outstanding Balance QR"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5 flex-1 text-center sm:text-left w-full">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 inline-block">
+                      Exact Amount: ₹{dueAmount.toLocaleString('en-IN')}
+                    </span>
+                    <p className="text-xs font-bold text-neutral-900 dark:text-white">
+                      Scan or tap below to pay with any UPI App
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1">
+                      <a
+                        href={buildGPayUrl({
+                          upiId: salonUpiId,
+                          name: invoice.salon_name || 'Salon',
+                          amount: dueAmount,
+                          note: `Invoice ${invoice.number}`,
+                        })}
+                        className="px-2.5 py-1.5 rounded-lg bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] shadow-2xs"
+                      >
+                        <span className="text-blue-500 font-black">G</span>Pay
+                      </a>
+                      <a
+                        href={buildPhonePeUrl({
+                          upiId: salonUpiId,
+                          name: invoice.salon_name || 'Salon',
+                          amount: dueAmount,
+                          note: `Invoice ${invoice.number}`,
+                        })}
+                        className="px-2.5 py-1.5 rounded-lg bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] shadow-2xs"
+                      >
+                        <span className="text-purple-600 font-black">पे</span> PhonePe
+                      </a>
+                      <a
+                        href={buildPaytmUrl({
+                          upiId: salonUpiId,
+                          name: invoice.salon_name || 'Salon',
+                          amount: dueAmount,
+                          note: `Invoice ${invoice.number}`,
+                        })}
+                        className="px-2.5 py-1.5 rounded-lg bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] shadow-2xs"
+                      >
+                        <span className="text-sky-500 font-black">Pay</span>tm
+                      </a>
+                      <a
+                        href={buildUpiPayUrl({
+                          upiId: salonUpiId,
+                          name: invoice.salon_name || 'Salon',
+                          amount: dueAmount,
+                          note: `Invoice ${invoice.number}`,
+                        })}
+                        className="px-2.5 py-1.5 rounded-lg bg-[#D4A77F]/15 border border-[#D4A77F]/40 text-[#8C5E2E] dark:text-[#D4A77F] font-bold text-[11px] flex items-center justify-center gap-1 shadow-2xs"
+                      >
+                        <Smartphone className="w-3 h-3" />
+                        <span>Any UPI</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

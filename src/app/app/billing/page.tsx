@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { showToast } from '@/lib/toast';
 import { dispatchSmartWhatsAppBill, downloadInvoicePdf } from '@/lib/whatsapp-bill';
-import { generateUpiQrDataUrl } from '@/lib/upi';
+import { generateUpiQrDataUrl, buildGPayUrl, buildPhonePeUrl, buildPaytmUrl, buildUpiPayUrl } from '@/lib/upi';
 import {
   Receipt,
   Search,
@@ -23,6 +23,8 @@ import {
   Printer,
   Download,
   Loader2,
+  Smartphone,
+  ExternalLink,
 } from 'lucide-react';
 
 interface InvoiceItem {
@@ -661,6 +663,62 @@ export default function BillingPage() {
                   ) : (
                     <div className="text-[11px] text-neutral-500 dark:text-neutral-400 text-center py-1">
                       💡 Tip: Add your salon&apos;s UPI ID in <strong>Settings ➔ UPI & QR Payment</strong> to display auto-amount QR here!
+                    </div>
+                  )}
+
+                  {/* 1-Tap App Deep Link Buttons (for Mobile / Tablet POS checkout) */}
+                  {salonUpiInfo?.upi_id && (
+                    <div className="pt-2 border-t border-[#D4A77F]/20 space-y-1.5">
+                      <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 block">
+                        📱 Or Click to Open App Directly on Device:
+                      </span>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        <a
+                          href={buildGPayUrl({
+                            upiId: salonUpiInfo.upi_id,
+                            name: salonUpiInfo.name || 'Salon',
+                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
+                            note: `Bill ${paymentModalInvoice.number}`,
+                          })}
+                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
+                        >
+                          <span className="text-blue-500 font-black">G</span>Pay
+                        </a>
+                        <a
+                          href={buildPhonePeUrl({
+                            upiId: salonUpiInfo.upi_id,
+                            name: salonUpiInfo.name || 'Salon',
+                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
+                            note: `Bill ${paymentModalInvoice.number}`,
+                          })}
+                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
+                        >
+                          <span className="text-purple-600 font-black">पे</span> PhonePe
+                        </a>
+                        <a
+                          href={buildPaytmUrl({
+                            upiId: salonUpiInfo.upi_id,
+                            name: salonUpiInfo.name || 'Salon',
+                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
+                            note: `Bill ${paymentModalInvoice.number}`,
+                          })}
+                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
+                        >
+                          <span className="text-sky-500 font-black">Pay</span>tm
+                        </a>
+                        <a
+                          href={buildUpiPayUrl({
+                            upiId: salonUpiInfo.upi_id,
+                            name: salonUpiInfo.name || 'Salon',
+                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
+                            note: `Bill ${paymentModalInvoice.number}`,
+                          })}
+                          className="px-2.5 py-1.5 rounded-lg bg-[#D4A77F]/15 border border-[#D4A77F]/40 text-[#8C5E2E] dark:text-[#D4A77F] font-bold text-[11px] flex items-center justify-center gap-1 hover:bg-[#D4A77F]/25 transition-all shadow-2xs cursor-pointer"
+                        >
+                          <Smartphone className="w-3 h-3" />
+                          <span>Any UPI</span>
+                        </a>
+                      </div>
                     </div>
                   )}
                 </div>

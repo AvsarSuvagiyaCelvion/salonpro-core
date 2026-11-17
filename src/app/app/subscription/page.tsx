@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { showToast } from '@/lib/toast';
-import { generateUpiQrDataUrl } from '@/lib/upi';
+import { generateUpiQrDataUrl, buildGPayUrl, buildPhonePeUrl, buildPaytmUrl, buildUpiPayUrl } from '@/lib/upi';
 import {
   CreditCard,
   CheckCircle2,
@@ -1075,6 +1075,60 @@ export default function SalonSubscriptionPage() {
                         {platformPaymentDetails.platform_upi_number}
                       </span>
                     </div>
+                  </div>
+                </div>
+
+                {/* 1-Tap App Deep Link Buttons for Mobile/Tablet */}
+                <div className="p-3 rounded-2xl bg-neutral-50 dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] space-y-2">
+                  <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-200 block">
+                    ⚡ 1-Tap Open Payment App on Your Phone:
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <a
+                      href={buildGPayUrl({
+                        upiId: platformPaymentDetails.platform_upi_id,
+                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        amount: showDirectPayModal.price,
+                        note: `${showDirectPayModal.plan.name} Plan`,
+                      })}
+                      className="px-3 py-2 rounded-xl bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
+                    >
+                      <span className="text-blue-500 font-black">G</span>Pay
+                    </a>
+                    <a
+                      href={buildPhonePeUrl({
+                        upiId: platformPaymentDetails.platform_upi_id,
+                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        amount: showDirectPayModal.price,
+                        note: `${showDirectPayModal.plan.name} Plan`,
+                      })}
+                      className="px-3 py-2 rounded-xl bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
+                    >
+                      <span className="text-purple-600 font-black">पे</span> PhonePe
+                    </a>
+                    <a
+                      href={buildPaytmUrl({
+                        upiId: platformPaymentDetails.platform_upi_id,
+                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        amount: showDirectPayModal.price,
+                        note: `${showDirectPayModal.plan.name} Plan`,
+                      })}
+                      className="px-3 py-2 rounded-xl bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
+                    >
+                      <span className="text-sky-500 font-black">Pay</span>tm
+                    </a>
+                    <a
+                      href={buildUpiPayUrl({
+                        upiId: platformPaymentDetails.platform_upi_id,
+                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        amount: showDirectPayModal.price,
+                        note: `${showDirectPayModal.plan.name} Plan`,
+                      })}
+                      className="px-3 py-2 rounded-xl bg-[#D4A77F]/15 border border-[#D4A77F]/40 text-[#8C5E2E] dark:text-[#D4A77F] font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-[#D4A77F]/25 transition-all shadow-2xs cursor-pointer"
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Any UPI</span>
+                    </a>
                   </div>
                 </div>
               </div>

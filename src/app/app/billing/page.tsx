@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import ReportExportModal from '@/components/reports/ReportExportModal';
 import { showToast } from '@/lib/toast';
 import { dispatchSmartWhatsAppBill, downloadInvoicePdf } from '@/lib/whatsapp-bill';
 import { generateUpiQrDataUrl, buildGPayUrl, buildPhonePeUrl, buildPaytmUrl, buildUpiPayUrl } from '@/lib/upi';
@@ -82,6 +83,7 @@ export default function BillingPage() {
   // WhatsApp Preview Modal
   const [whatsappInvoice, setWhatsappInvoice] = useState<Invoice | null>(null);
   const [sendingWhatsapp, setSendingWhatsapp] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   // Salon UPI QR state for POS collection
@@ -287,6 +289,15 @@ export default function BillingPage() {
             Manage customer bills, settlements, and automated WhatsApp invoice receipts
           </p>
         </div>
+
+        <button
+          onClick={() => setExportModalOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-semibold text-xs shadow-sm transition-all shrink-0 cursor-pointer self-start sm:self-auto"
+          title="Export Invoices & Sales Register (CSV & PDF)"
+        >
+          <Download className="w-3.5 h-3.5 text-[#080B12]" />
+          <span>Export (CSV & PDF)</span>
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -1080,6 +1091,14 @@ export default function BillingPage() {
           </div>
         </div>
       )}
+
+      {/* Export Reports Modal */}
+      <ReportExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        role="owner"
+        salonName="SalonPro"
+      />
     </div>
   );
 }

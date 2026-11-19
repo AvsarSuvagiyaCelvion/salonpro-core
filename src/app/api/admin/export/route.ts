@@ -35,7 +35,8 @@ export async function GET(request: Request) {
         endDate = new Date(customEnd);
         endDate.setHours(23, 59, 59, 999);
       }
-    } else if (period === 'all') {
+    } else {
+      // 'all' or default
       startDate = new Date('2020-01-01T00:00:00Z');
       endDate = new Date('2099-12-31T23:59:59Z');
     }
@@ -45,6 +46,11 @@ export async function GET(request: Request) {
 
     // 1. SALONS MASTER DIRECTORY
     if (type === 'salons') {
+      const whereClause = period === 'all' 
+        ? '' 
+        : 'WHERE s.created_at >= $1 AND s.created_at <= $2';
+      const queryParams = period === 'all' ? [] : [startIso, endIso];
+
       const res = await query(
         `SELECT 
            s.name as salon_name,
@@ -52,50 +58,61 @@ export async function GET(request: Request) {
            u.full_name as owner_name,
            u.email as owner_email,
            COALESCE(s.phone, u.phone, '-') as phone,
-           s.city,
+           COALESCE(s.address, '-') as address,
            COALESCE(sp.name, s.plan, 'Free Trial') as plan_name,
            COALESCE(s.subscription_status, 'active') as status,
-           COUNT(DISTINCT st.id) as staff_count,
-           COUNT(DISTINCT c.id) as customer_count,
-           COUNT(DISTINCT a.id) as appointments_count,
-           COALESCE(SUM(i.total), 0)::numeric(12,2) as total_revenue,
+           COALESCE(st.cnt, 0) as staff_count,
+           COALESCE(c.cnt, 0) as customer_count,
+           COALESCE(a.cnt, 0) as appointments_count,
+           COALESCE(i.rev, 0)::numeric(12,2) as total_revenue,
            s.created_at
          FROM salons s
          LEFT JOIN subscription_plans sp ON s.subscription_plan_id = sp.id
          LEFT JOIN LATERAL (
            SELECT full_name, email, phone FROM users WHERE salon_id = s.id AND role = 'owner' LIMIT 1
          ) u ON true
-         LEFT JOIN staff st ON s.id = st.salon_id
-         LEFT JOIN customers c ON s.id = c.salon_id
-         LEFT JOIN appointments a ON s.id = a.salon_id
-         LEFT JOIN invoices i ON s.id = i.salon_id
-         WHERE s.created_at >= $1 AND s.created_at <= $2
-         GROUP BY s.id, s.name, s.slug, u.full_name, u.email, s.phone, u.phone, s.city, sp.name, s.plan, s.subscription_status, s.created_at
+         LEFT JOIN LATERAL (
+           SELECT count(*) as cnt FROM staff WHERE salon_id = s.id
+         ) st ON true
+         LEFT JOIN LATERAL (
+           SELECT count(*) as cnt FROM customers WHERE salon_id = s.id
+         ) c ON true
+         LEFT JOIN LATERAL (
+           SELECT count(*) as cnt FROM appointments WHERE salon_id = s.id
+         ) a ON true
+         LEFT JOIN LATERAL (
+           SELECT COALESCE(SUM(total), 0) as rev FROM invoices WHERE salon_id = s.id
+         ) i ON true
+         ${whereClause}
          ORDER BY s.created_at DESC`,
-        [startIso, endIso]
+        queryParams
       );
       return NextResponse.json({ success: true, data: res.rows });
     }
 
     // 2. SUBSCRIPTION PAYMENTS HISTORY
     if (type === 'subscriptions') {
+      const whereClause = period === 'all' 
+        ? '' 
+        : 'WHERE pay.created_at >= $1 AND pay.created_at <= $2';
+      const queryParams = period === 'all' ? [] : [startIso, endIso];
+
       const res = await query(
         `SELECT 
            s.name as salon_name,
            s.slug as salon_slug,
-           sp.name as plan_name,
-           sp.billing_interval,
+           COALESCE(sp.name, 'Pro Plan') as plan_name,
+           COALESCE(pay.billing_interval, sp.billing_interval, 'monthly') as billing_interval,
            pay.amount::numeric(10,2) as amount,
-           pay.razorpay_payment_id,
-           pay.razorpay_order_id,
+           COALESCE(pay.razorpay_payment_id, pay.razorpay_order_id, '-') as razorpay_payment_id,
            pay.status,
            pay.created_at
          FROM subscription_payments pay
          JOIN salons s ON pay.salon_id = s.id
-         JOIN subscription_plans sp ON pay.subscription_plan_id = sp.id
-         WHERE pay.created_at >= $1 AND pay.created_at <= $2
+         LEFT JOIN subscription_plans sp ON pay.plan_id = sp.id
+         ${whereClause}
          ORDER BY pay.created_at DESC`,
-        [startIso, endIso]
+        queryParams
       );
       return NextResponse.json({ success: true, data: res.rows });
     }
@@ -113,7 +130,7 @@ export async function GET(request: Request) {
         { metric: 'Total Registered Salons', value: salonsRes.rows[0]?.total_salons || 0 },
         { metric: 'Total Platform Clients', value: custRes.rows[0]?.total_customers || 0 },
         { metric: 'Total Appointments Booked', value: apptRes.rows[0]?.total_appointments || 0 },
-        { metric: 'Total Gross GMV Volume (₹)', value: revRes.rows[0]?.total_volume || 0 },
+        { metric: 'Total Gross GMV Volume (₹)', value: Number(revRes.rows[0]?.total_volume || 0) },
       ];
 
       return NextResponse.json({ success: true, data });
@@ -124,4 +141,3 @@ export async function GET(request: Request) {
     return serverError(error, 'src/app/api/admin/export/route.ts');
   }
 }
-

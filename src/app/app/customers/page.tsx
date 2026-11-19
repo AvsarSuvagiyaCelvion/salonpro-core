@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import ReportExportModal from '@/components/reports/ReportExportModal';
 import { showToast } from '@/lib/toast';
 import {
   Users,
@@ -29,6 +30,7 @@ import {
   Loader2,
   Key,
   Send,
+  Download,
 } from 'lucide-react';
 
 interface Customer {
@@ -98,6 +100,7 @@ export default function CustomersPage() {
   const [resetPinCustomer, setResetPinCustomer] = useState<Customer | null>(null);
   const [newPin, setNewPin] = useState('');
   const [savingPin, setSavingPin] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [pinSuccessData, setPinSuccessData] = useState<{ pin: string; customerName: string; customerMobile: string } | null>(null);
 
   function openResetPinModal(customer: Customer) {
@@ -325,7 +328,16 @@ export default function CustomersPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <button
+            onClick={() => setExportModalOpen(true)}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-white font-semibold text-xs shadow-xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            title="Export Clients Database (CSV & PDF)"
+          >
+            <Download className="w-4 h-4 text-[#D4A77F]" />
+            <span>Export (CSV & PDF)</span>
+          </button>
+
           <button
             onClick={openAddModal}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-2.5 px-4.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-md shadow-[#D4A77F]/20 transition-all cursor-pointer whitespace-nowrap active:scale-95"
@@ -970,6 +982,14 @@ export default function CustomersPage() {
           </div>
         </div>
       )}
+
+      {/* Export Reports Modal */}
+      <ReportExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        role="owner"
+        salonName="SalonPro"
+      />
     </div>
   );
 }

@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Loader2,
   AlertCircle,
+  BarChart3,
 } from 'lucide-react';
 import { exportToCSV, exportToPDF, ExportColumn, SummaryKPI } from '@/lib/export-utils';
 
@@ -163,17 +164,19 @@ export default function ReportExportModal({
       icon: Building2,
       description: 'Master list of registered salons, owner contacts, plans & total GMV',
       columns: [
-        { header: 'Salon Name', key: 'salon_name', width: 40 },
-        { header: 'Owner Name', key: 'owner_name', width: 32 },
-        { header: 'Owner Email', key: 'owner_email', width: 42 },
-        { header: 'Phone', key: 'phone', width: 28 },
-        { header: 'Plan', key: 'plan_name', width: 28 },
-        { header: 'Status', key: 'status', align: 'center', width: 20 },
-        { header: 'Staff', key: 'staff_count', align: 'center', width: 18 },
-        { header: 'Total GMV (₹)', key: 'total_revenue', align: 'right', width: 32, formatter: (v) => `₹${Number(v).toFixed(2)}` },
+        { header: 'Salon Name', key: 'salon_name', width: 38 },
+        { header: 'Owner Name', key: 'owner_name', width: 28 },
+        { header: 'Owner Email', key: 'owner_email', width: 40 },
+        { header: 'Phone', key: 'phone', width: 24 },
+        { header: 'Address', key: 'address', width: 32 },
+        { header: 'Plan', key: 'plan_name', width: 24 },
+        { header: 'Status', key: 'status', align: 'center', width: 18 },
+        { header: 'Staff', key: 'staff_count', align: 'center', width: 16 },
+        { header: 'Clients', key: 'customer_count', align: 'center', width: 16 },
+        { header: 'Total GMV (₹)', key: 'total_revenue', align: 'right', width: 30, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
       ],
       getKPIs: (data) => {
-        const totalGmv = data.reduce((sum, r) => sum + Number(r.total_revenue || 0), 0);
+        const totalGmv = data.reduce((sum, r) => sum + (Number(r.total_revenue) || 0), 0);
         return [
           { label: 'Total Salons', value: data.length },
           { label: 'Total Platform GMV', value: `₹${Math.round(totalGmv).toLocaleString('en-IN')}` },
@@ -189,7 +192,7 @@ export default function ReportExportModal({
         { header: 'Salon', key: 'salon_name', width: 38 },
         { header: 'Plan Name', key: 'plan_name', width: 28 },
         { header: 'Interval', key: 'billing_interval', width: 24 },
-        { header: 'Amount (₹)', key: 'amount', align: 'right', width: 28, formatter: (v) => `₹${Number(v).toFixed(2)}` },
+        { header: 'Amount (₹)', key: 'amount', align: 'right', width: 28, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
         { header: 'Payment ID', key: 'razorpay_payment_id', width: 45 },
         {
           header: 'Date',
@@ -200,15 +203,42 @@ export default function ReportExportModal({
         },
         { header: 'Status', key: 'status', align: 'center', width: 20 },
       ],
+      getKPIs: (data) => {
+        const totalPaid = data.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+        return [
+          { label: 'Total Payments', value: data.length },
+          { label: 'Total Billed Amount', value: `₹${Math.round(totalPaid).toLocaleString('en-IN')}` },
+        ];
+      },
+    },
+    {
+      id: 'overview',
+      label: 'Platform Overview',
+      icon: BarChart3,
+      description: 'Executive snapshot of platform salons, appointments, clients & GMV',
+      columns: [
+        { header: 'Platform Metric', key: 'metric', width: 55 },
+        { header: 'Metric Value', key: 'value', align: 'right', width: 45, formatter: (v) => typeof v === 'number' ? v.toLocaleString('en-IN') : String(v) },
+      ],
     },
   ];
 
   const reportsList = role === 'admin' ? adminReports : ownerReports;
 
   const [selectedReportId, setSelectedReportId] = useState<string>(reportsList[0].id);
-  const [period, setPeriod] = useState<PeriodType>('month');
+  const [period, setPeriod] = useState<PeriodType>(role === 'admin' ? 'all' : 'month');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+
+  useEffect(() => {
+    if (!reportsList.some((r) => r.id === selectedReportId)) {
+      setSelectedReportId(reportsList[0].id);
+    }
+  }, [role, reportsList, selectedReportId]);
+
+  useEffect(() => {
+    setPeriod(role === 'admin' ? 'all' : 'month');
+  }, [role]);
 
   useEffect(() => {
     const d = new Date();

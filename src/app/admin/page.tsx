@@ -18,9 +18,11 @@ import {
   Phone,
   Clock,
   ArrowRight,
+  Download,
 } from 'lucide-react';
 import AreaTrendChart from '@/components/charts/AreaTrendChart';
 import DonutDistributionChart from '@/components/charts/DonutDistributionChart';
+import ReportExportModal from '@/components/reports/ReportExportModal';
 
 interface Metrics {
   totalSalons: number;
@@ -95,6 +97,7 @@ export default function AdminOverviewPage() {
 
   // Add New Salon Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [newSalonName, setNewSalonName] = useState('');
   const [newSalonSlug, setNewSalonSlug] = useState('');
   const [newPhone, setNewPhone] = useState('');
@@ -184,16 +187,27 @@ export default function AdminOverviewPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setModalMessage(null);
-            setIsModalOpen(true);
-          }}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs sm:text-sm shadow-md shadow-[#D4A77F]/20 transition-all active:scale-95 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Register New Salon Branch</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => setExportModalOpen(true)}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-white font-semibold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+            title="Export Platform Reports (CSV & PDF)"
+          >
+            <Download className="w-4 h-4 text-[#D4A77F]" />
+            <span>Export (CSV & PDF)</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setModalMessage(null);
+              setIsModalOpen(true);
+            }}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs sm:text-sm shadow-md shadow-[#D4A77F]/20 transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Register New Salon Branch</span>
+          </button>
+        </div>
       </div>
 
       {/* 4 Primary Platform KPI Cards - Modern 2x2 on Mobile, 4-Cols on Desktop */}
@@ -542,6 +556,14 @@ export default function AdminOverviewPage() {
           </div>
         </div>
       )}
+
+      {/* Export Reports Modal */}
+      <ReportExportModal
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        role="admin"
+        salonName="SalonPro Master Governance"
+      />
     </div>
   );
 }

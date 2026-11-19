@@ -56,24 +56,29 @@ export default function ReportExportModal({
         {
           header: 'Date',
           key: 'created_at',
-          width: 32,
+          width: 28,
           formatter: (v) =>
             v ? new Date(v).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-',
         },
-        { header: 'Customer', key: 'customer_name', width: 36 },
-        { header: 'Mobile', key: 'customer_mobile', width: 28 },
-        { header: 'Total (₹)', key: 'total', align: 'right', width: 24, formatter: (v) => `₹${Number(v).toFixed(2)}` },
-        { header: 'Paid (₹)', key: 'paid_amount', align: 'right', width: 24, formatter: (v) => `₹${Number(v).toFixed(2)}` },
-        { header: 'Payment Mode', key: 'payment_method', width: 30 },
+        { header: 'Customer', key: 'customer_name', width: 34 },
+        { header: 'Mobile', key: 'customer_mobile', width: 26 },
+        { header: 'Subtotal (₹)', key: 'subtotal', align: 'right', width: 26, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+        { header: 'Tax (₹)', key: 'tax_amount', align: 'right', width: 20, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+        { header: 'Total (₹)', key: 'total', align: 'right', width: 26, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+        { header: 'Paid (₹)', key: 'paid_amount', align: 'right', width: 26, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+        { header: 'Due (₹)', key: 'due_amount', align: 'right', width: 22, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+        { header: 'Mode', key: 'payment_method', width: 22 },
         { header: 'Status', key: 'status', align: 'center', width: 20 },
       ],
       getKPIs: (data) => {
         const total = data.reduce((sum, r) => sum + Number(r.total || 0), 0);
         const paid = data.reduce((sum, r) => sum + Number(r.paid_amount || 0), 0);
+        const due = data.reduce((sum, r) => sum + Number(r.due_amount || 0), 0);
         return [
           { label: 'Total Invoices', value: data.length },
           { label: 'Total Billed', value: `₹${Math.round(total).toLocaleString('en-IN')}` },
           { label: 'Total Collected', value: `₹${Math.round(paid).toLocaleString('en-IN')}` },
+          { label: 'Total Outstanding', value: `₹${Math.round(due).toLocaleString('en-IN')}` },
         ];
       },
     },
@@ -140,6 +145,15 @@ export default function ReportExportModal({
         { header: 'Bookings', key: 'times_booked', align: 'center', width: 25 },
         { header: 'Revenue (₹)', key: 'total_revenue', align: 'right', width: 35, formatter: (v) => `₹${Number(v).toFixed(2)}` },
       ],
+      getKPIs: (data) => {
+        const totalRev = data.reduce((sum, r) => sum + (Number(r.total_revenue) || 0), 0);
+        const totalBookings = data.reduce((sum, r) => sum + (Number(r.times_booked) || 0), 0);
+        return [
+          { label: 'Active Services', value: data.length },
+          { label: 'Total Bookings', value: totalBookings },
+          { label: 'Service Revenue', value: `₹${Math.round(totalRev).toLocaleString('en-IN')}` },
+        ];
+      },
     },
     {
       id: 'products',
@@ -154,6 +168,43 @@ export default function ReportExportModal({
         { header: 'Units Sold', key: 'units_sold', align: 'center', width: 22 },
         { header: 'Sales Rev (₹)', key: 'total_revenue', align: 'right', width: 32, formatter: (v) => `₹${Number(v).toFixed(2)}` },
       ],
+      getKPIs: (data) => {
+        const totalRev = data.reduce((sum, r) => sum + (Number(r.total_revenue) || 0), 0);
+        const totalSold = data.reduce((sum, r) => sum + (Number(r.units_sold) || 0), 0);
+        return [
+          { label: 'Catalog SKUs', value: data.length },
+          { label: 'Units Sold', value: totalSold },
+          { label: 'Retail Sales', value: `₹${Math.round(totalRev).toLocaleString('en-IN')}` },
+        ];
+      },
+    },
+    {
+      id: 'appointments',
+      label: 'Appointments Log',
+      icon: Calendar,
+      description: 'Bookings timetable, clients, scheduled services, stylists & status',
+      columns: [
+        {
+          header: 'Date & Time',
+          key: 'starts_at',
+          width: 38,
+          formatter: (v) =>
+            v ? new Date(v).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-',
+        },
+        { header: 'Client', key: 'customer_name', width: 36 },
+        { header: 'Phone', key: 'customer_mobile', width: 28 },
+        { header: 'Service', key: 'service_name', width: 42 },
+        { header: 'Stylist', key: 'staff_name', width: 32 },
+        { header: 'Price (₹)', key: 'service_price', align: 'right', width: 26, formatter: (v) => `₹${(Number(v) || 0).toFixed(2)}` },
+        { header: 'Status', key: 'status', align: 'center', width: 22 },
+      ],
+      getKPIs: (data) => {
+        const totalValue = data.reduce((sum, r) => sum + (Number(r.service_price) || 0), 0);
+        return [
+          { label: 'Total Appointments', value: data.length },
+          { label: 'Estimated Value', value: `₹${Math.round(totalValue).toLocaleString('en-IN')}` },
+        ];
+      },
     },
   ];
 
@@ -313,7 +364,14 @@ export default function ReportExportModal({
 
   function handleDownloadCSV() {
     const filename = `${salonName.replace(/[^a-zA-Z0-9]/g, '_')}_${activeConfig.id}_${period}_${new Date().toISOString().split('T')[0]}`;
-    exportToCSV(filename, activeConfig.columns, fetchedData);
+    const kpis = activeConfig.getKPIs ? activeConfig.getKPIs(fetchedData) : undefined;
+    exportToCSV(filename, activeConfig.columns, fetchedData, {
+      title: activeConfig.label,
+      subtitle: activeConfig.description,
+      salonName,
+      dateRangeText: getDateRangeLabel(),
+      summaryKPIs: kpis,
+    });
   }
 
   async function handleDownloadPDF() {

@@ -98,7 +98,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | Component | File Path | Purpose |
 |---|---|---|
 | `SkeletonTable` | `src/components/ui/SkeletonTable.tsx` | Loading skeleton placeholder for tables in appointments, staff, and services. |
-| `ReportExportModal` | `src/components/reports/ReportExportModal.tsx` | Date range selector modal for exporting PDF/CSV reports. |
+| `ReportExportModal` | `src/components/reports/ReportExportModal.tsx` | Date range selector modal for exporting executive-grade PDF/CSV reports with metric cards, status badges, and grand total calculations. |
 | `AreaTrendChart` | `src/components/charts/AreaTrendChart.tsx` | SVG area chart showing revenue trends on dashboard. |
 | `BarComparisonChart` | `src/components/charts/BarComparisonChart.tsx` | Comparison bar chart for service categories in reports. |
 | `DonutDistributionChart` | `src/components/charts/DonutDistributionChart.tsx` | Visual distribution chart for payment modes (Cash, UPI, Card). |

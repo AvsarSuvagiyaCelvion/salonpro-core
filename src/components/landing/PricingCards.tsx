@@ -120,7 +120,7 @@ export default function PricingCards() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
           {plans.map((plan, index) => {
             const isPro = plan.slug === 'pro' || plan.is_popular;
             const monthlyPrice = Number(plan.price);
@@ -133,41 +133,42 @@ export default function PricingCards() {
             return (
               <motion.div
                 key={plan.id}
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
                 whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
+                viewport={{ once: true, margin: '-40px' }}
                 transition={{
-                  duration: 0.6,
-                  delay: shouldReduceMotion ? 0 : index * 0.15,
+                  duration: 0.5,
+                  delay: shouldReduceMotion ? 0 : index * 0.12,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 whileHover={
                   shouldReduceMotion
                     ? {}
                     : {
-                        y: isPro ? -10 : -6,
-                        transition: { duration: 0.25, ease: 'easeOut' },
+                        y: isPro ? -5 : -3,
+                        transition: { duration: 0.2, ease: 'easeOut' },
                       }
                 }
-                className={`rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 relative ${
+                className={`rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-7 flex flex-col justify-between transition-all duration-300 relative ${
                   isPro
-                    ? 'bg-[#10141F] text-white shadow-2xl border-2 border-[#D4A77F] scale-102 lg:-translate-y-2'
-                    : 'bg-white dark:bg-[#141926] text-[#1F2937] dark:text-[#FFFFFF] border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-sm hover:shadow-md'
+                    ? 'bg-[#10141F] text-white shadow-xl border-2 border-[#D4A77F] md:scale-[1.02] md:-translate-y-1.5'
+                    : 'bg-white dark:bg-[#141926] text-[#1F2937] dark:text-[#FFFFFF] border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-xs hover:shadow-md'
                 }`}
               >
                 {isPro && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#D4A77F] text-[#080B12] text-[11px] font-black uppercase tracking-wider py-1 px-4 rounded-full shadow-md whitespace-nowrap">
-                    Most Popular · Recommended
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#D4A77F] text-[#080B12] text-[10px] sm:text-[11px] font-bold tracking-wide py-0.5 sm:py-1 px-3 sm:px-3.5 rounded-full shadow-xs whitespace-nowrap flex items-center gap-1.5">
+                    <Sparkles className="w-3 h-3 text-[#080B12] shrink-0" />
+                    <span>Most Recommended</span>
                   </div>
                 )}
 
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className={`text-xl font-black ${isPro ? 'text-white' : 'text-[#1F2937] dark:text-[#FFFFFF]'}`}>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <h3 className={`text-lg sm:text-xl font-bold tracking-tight ${isPro ? 'text-white' : 'text-[#1F2937] dark:text-[#FFFFFF]'}`}>
                       {plan.name}
                     </h3>
                     <span
-                      className={`text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full ${
+                      className={`text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
                         isPro
                           ? 'bg-[#D4A77F]/20 text-[#D4A77F] border border-[#D4A77F]/40'
                           : 'bg-[#F3F4F6] dark:bg-[#1C2230] text-[#6B7280] dark:text-[#A0A8B8] border border-[#E5E7EB] dark:border-[#2A2F3A]'
@@ -177,44 +178,44 @@ export default function PricingCards() {
                     </span>
                   </div>
 
-                  <p className={`text-xs mb-6 min-h-[36px] ${isPro ? 'text-[#A0A8B8]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
+                  <p className={`text-xs mb-5 min-h-[32px] leading-relaxed ${isPro ? 'text-[#A0A8B8]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
                     {plan.description || 'Full salon cloud suite with automated scheduling & billing'}
                   </p>
 
                   {/* Price Display with Animated Rolling Number */}
-                  <div className={`mb-6 pb-6 border-b ${isPro ? 'border-[#2A2F3A]' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'}`}>
+                  <div className={`mb-5 pb-5 border-b ${isPro ? 'border-[#2A2F3A]' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'}`}>
                     <div className="flex items-baseline gap-1 overflow-hidden">
-                      <span className="text-2xl font-bold">₹</span>
+                      <span className="text-xl sm:text-2xl font-bold">₹</span>
                       <AnimatePresence mode="wait" initial={false}>
                         <motion.span
                           key={`${displayPrice}-${interval}`}
-                          initial={shouldReduceMotion ? false : { opacity: 0, y: 15 }}
+                          initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={shouldReduceMotion ? {} : { opacity: 0, y: -15 }}
-                          transition={{ duration: 0.3, ease: 'easeOut' }}
-                          className="text-4xl font-black tracking-tight tabular-nums inline-block"
+                          exit={shouldReduceMotion ? {} : { opacity: 0, y: -12 }}
+                          transition={{ duration: 0.25, ease: 'easeOut' }}
+                          className="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums inline-block"
                         >
                           {displayPrice.toLocaleString('en-IN')}
                         </motion.span>
                       </AnimatePresence>
-                      <span className={`text-xs ${isPro ? 'text-[#D4A77F]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
+                      <span className={`text-xs font-medium ${isPro ? 'text-[#D4A77F]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
                         / month
                       </span>
                     </div>
                     {interval === 'yearly' && (
-                      <div className={`text-[11px] font-semibold mt-1 ${isPro ? 'text-[#D4A77F]' : 'text-[#10B981]'}`}>
+                      <div className={`text-[10px] sm:text-[11px] font-semibold mt-1 ${isPro ? 'text-[#D4A77F]' : 'text-[#10B981]'}`}>
                         Billed ₹{yearlyPrice.toLocaleString('en-IN')} annually (2 months free)
                       </div>
                     )}
                     {interval === 'monthly' && (
-                      <div className={`text-[11px] mt-1 ${isPro ? 'text-[#A0A8B8]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
+                      <div className={`text-[10px] sm:text-[11px] mt-1 ${isPro ? 'text-[#A0A8B8]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
                         Billed monthly · Cancel anytime
                       </div>
                     )}
                   </div>
 
                   {/* Core Limits Summary */}
-                  <div className={`mb-5 p-3 rounded-2xl text-xs space-y-1.5 ${isPro ? 'bg-[#141926] border border-[#2A2F3A]' : 'bg-[#F3F4F6] dark:bg-[#1C2230]'}`}>
+                  <div className={`mb-4 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl text-xs space-y-1.5 ${isPro ? 'bg-[#141926] border border-[#2A2F3A]' : 'bg-[#F3F4F6] dark:bg-[#1C2230]'}`}>
                     <div className="flex items-center justify-between">
                       <span className={isPro ? 'text-[#A0A8B8]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}>Staff capacity:</span>
                       <strong className={isPro ? 'text-white' : 'text-[#1F2937] dark:text-[#FFFFFF]'}>{staffLimit}</strong>
@@ -230,21 +231,21 @@ export default function PricingCards() {
                   </div>
 
                   {/* Features List */}
-                  <div className="space-y-2.5 text-xs pb-6">
+                  <div className="space-y-2 text-xs pb-5">
                     {(Array.isArray(plan.features) ? plan.features : []).map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
-                        <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isPro ? 'text-[#D4A77F]' : 'text-[#10B981]'}`} />
-                        <span className={isPro ? 'text-[#E5E7EB]' : 'text-[#1F2937] dark:text-[#FFFFFF]'}>{feat}</span>
+                        <Check className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isPro ? 'text-[#D4A77F]' : 'text-[#10B981]'}`} />
+                        <span className={`text-[11px] sm:text-xs leading-normal ${isPro ? 'text-[#E5E7EB]' : 'text-[#1F2937] dark:text-[#FFFFFF]'}`}>{feat}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Action Button */}
-                <div className={`pt-4 border-t ${isPro ? 'border-[#2A2F3A]' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'}`}>
+                <div className={`pt-3.5 border-t ${isPro ? 'border-[#2A2F3A]' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'}`}>
                   <Link
                     href="/register-salon"
-                    className={`w-full py-3.5 px-4 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 ${
+                    className={`w-full py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 ${
                       isPro
                         ? 'bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] shadow-[#D4A77F]/20'
                         : 'bg-[#F3F4F6] dark:bg-[#1C2230] hover:bg-[#E5E7EB] dark:hover:bg-[#2A2F3A] text-[#1F2937] dark:text-[#FFFFFF] border border-[#E5E7EB] dark:border-[#2A2F3A]'
@@ -253,7 +254,7 @@ export default function PricingCards() {
                     <span>Start 7-Day Free Trial</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
-                  <p className={`text-center text-[10px] mt-2 ${isPro ? 'text-[#A0A8B8]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
+                  <p className={`text-center text-[10px] sm:text-[11px] mt-2 ${isPro ? 'text-[#A0A8B8]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
                     Includes 7 days of full Pro evaluation with ₹0 charged today.
                   </p>
                 </div>

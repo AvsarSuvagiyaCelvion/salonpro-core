@@ -201,6 +201,12 @@ async function computeSalonPlan(salonId: string): Promise<
 
   // 2. If trial expired and no active subscription -> Block ALL tenant APIs with HTTP 402
   if (isTrialExpired && s.subscription_status !== 'active') {
+    if (s.subscription_status === 'trial') {
+      query(
+        `UPDATE salons SET subscription_status = 'expired' WHERE id = $1 AND subscription_status = 'trial'`,
+        [s.id]
+      ).catch(() => {});
+    }
     return {
       plan: null,
       error: NextResponse.json(

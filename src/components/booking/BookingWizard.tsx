@@ -187,7 +187,8 @@ export default function BookingWizard({ slug }: { slug: string }) {
         setLoading(true);
         const res = await fetch(`/api/public/${slug}`);
         if (!res.ok) {
-          throw new Error('Salon not found or unavailable');
+          const errData = await res.json().catch(() => null);
+          throw new Error(errData?.error || 'Salon not found or unavailable');
         }
         const data = await res.json();
         setSalon(data.salon);

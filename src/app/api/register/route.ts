@@ -210,6 +210,42 @@ export async function POST(request: Request) {
     );
     const newUser = userRes.rows[0];
 
+    // Seed default staff member for the owner so billing and appointments work immediately
+    const staffRes = await client.query(
+      `INSERT INTO staff (
+        salon_id, name, role_title, service_commission_pct, product_commission_pct, active, show_online, created_at
+      ) VALUES (
+        $1, $2, 'Owner & Lead Stylist', 0, 0, true, true, NOW()
+      ) RETURNING id`,
+      [newSalon.id, cleanOwnerName]
+    );
+    const defaultStaffId = staffRes.rows[0]?.id;
+
+    // Seed 4 starter services so the new salon can test-drive POS billing & online booking right away
+    const starterServices = [
+      { name: 'Classic Haircut & Styling', category: 'Hair Care', desc: 'Precision haircut with hair wash and blowdry styling', min: 30, price: 350 },
+      { name: 'Deep Conditioning Hair Spa', category: 'Hair Care', desc: 'Nourishing cream bath treatment for scalp revitalization', min: 45, price: 850 },
+      { name: 'Beard Shaping & Trim', category: 'Grooming', desc: 'Custom beard grooming and hot towel razor line-up', min: 20, price: 200 },
+      { name: 'Hydra Glow Cleanse Facial', category: 'Skin Care', desc: 'Deep pore cleansing, exfoliation, and hydration mask', min: 45, price: 950 },
+    ];
+
+    for (const svc of starterServices) {
+      const sRes = await client.query(
+        `INSERT INTO services (
+          salon_id, name, category, description, duration_min, price, online_enabled, created_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, true, NOW()
+        ) RETURNING id`,
+        [newSalon.id, svc.name, svc.category, svc.desc, svc.min, svc.price]
+      );
+      if (defaultStaffId && sRes.rows[0]?.id) {
+        await client.query(
+          `INSERT INTO staff_services (staff_id, service_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+          [defaultStaffId, sRes.rows[0].id]
+        );
+      }
+    }
+
     await client.query('COMMIT');
     inTransaction = false;
     client.release();

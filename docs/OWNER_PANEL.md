@@ -41,7 +41,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | Endpoint | Methods | File Path | Auth Required | What It Does |
 |---|---|---|---|---|
 | `/api/login` | `POST` | `src/app/api/login/route.ts` | None | Authenticates salon owner/staff via email and password; sets `salonpro_session` cookie. |
-| `/api/register` | `POST` | `src/app/api/register/route.ts` | None | Provisions new salon, owner account, default services, and trial period. |
+| `/api/register` | `POST` | `src/app/api/register/route.ts` | None | Provisions new salon workspace on automated 7-day free trial, creates owner user, seeds default staff member and 4 starter services for instant POS testing, and signs JWT session. |
 | `/api/logout` | `POST` | `src/app/api/logout/route.ts` | `salonpro_session` | Clears `salonpro_session` cookie. |
 | `/api/demo/owner-login` | `GET`, `POST` | `src/app/api/demo/owner-login/route.ts` | None (Public Demo) | Logs user into demo salon workspace (`dixa-beauty-salon`) as owner without credentials. |
 | `/api/dashboard/stats` | `GET` | `src/app/api/dashboard/stats/route.ts` | `salonpro_session` | Returns analytical metrics (revenue, appointments, waiting clients, `totalProducts`, and `lowStockProducts`). |

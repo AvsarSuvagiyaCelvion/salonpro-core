@@ -238,26 +238,28 @@ export default function ReportsPage() {
       ? globalProductCommPct
       : st.productCommissionPct || 5;
 
-    const commission =
-      (st.servicesRevenue * svcPct) / 100 + (st.productsRevenue * prodPct) / 100;
+    const rawComm =
+      ((Number(st.servicesRevenue) || 0) * (Number(svcPct) || 0)) / 100 +
+      ((Number(st.productsRevenue) || 0) * (Number(prodPct) || 0)) / 100;
+    const commission = isNaN(rawComm) ? 0 : Math.round(rawComm);
 
     return {
       ...st,
       activeServicePct: svcPct,
       activeProductPct: prodPct,
-      calculatedCommission: Math.round(commission),
+      calculatedCommission: commission,
     };
   });
 
   const totalStaffCommissionPayout = staffRows.reduce(
-    (sum, st) => sum + st.calculatedCommission,
+    (sum, st) => sum + (Number(st.calculatedCommission) || 0),
     0
   );
-  const totalStaffRevenue = staffRows.reduce((sum, st) => sum + st.totalRevenue, 0);
-  const totalStaffSessions = staffRows.reduce((sum, st) => sum + st.sessions, 0);
+  const totalStaffRevenue = staffRows.reduce((sum, st) => sum + (Number(st.totalRevenue) || 0), 0);
+  const totalStaffSessions = staffRows.reduce((sum, st) => sum + (Number(st.sessions) || 0), 0);
 
-  const totalGrossRev = data?.overview.totalRevenue || 0;
-  const totalExp = data?.overview.totalExpenses || 0;
+  const totalGrossRev = Number(data?.overview?.totalRevenue) || 0;
+  const totalExp = Number(data?.overview?.totalExpenses) || 0;
   const netProfit = totalGrossRev - totalExp;
 
   return (
@@ -369,14 +371,14 @@ export default function ReportsPage() {
         <div className="bg-white dark:bg-[#141926] p-5 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
-              Gross Sales (આવક)
+              Gross Sales
             </span>
             <span className="p-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600">
               <TrendingUp className="w-3.5 h-3.5" />
             </span>
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white mt-2">
-            {loading ? '...' : `₹${totalGrossRev.toLocaleString('en-IN')}`}
+            {loading ? '...' : `₹${(totalGrossRev || 0).toLocaleString('en-IN')}`}
           </div>
           <p className="text-[11px] text-neutral-500 font-medium mt-1">
             Total settled client payments
@@ -387,14 +389,14 @@ export default function ReportsPage() {
         <div className="bg-white dark:bg-[#141926] p-5 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
-              Daily Expenses (ખર્ચા)
+              Daily Expenses
             </span>
             <span className="p-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600">
               <Receipt className="w-3.5 h-3.5" />
             </span>
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold text-amber-600 dark:text-amber-400 mt-2">
-            {loading ? '...' : `₹${totalExp.toLocaleString('en-IN')}`}
+            {loading ? '...' : `₹${(totalExp || 0).toLocaleString('en-IN')}`}
           </div>
           <p className="text-[11px] text-neutral-500 font-medium mt-1">
             Tea, laundry, supplies & petty cash
@@ -405,14 +407,14 @@ export default function ReportsPage() {
         <div className="bg-white dark:bg-[#141926] p-5 rounded-3xl border-2 border-emerald-500/40 dark:border-emerald-500/30 shadow-xs relative overflow-hidden">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-              Net Profit (ચોખ્ખો નફો)
+              Net Profit
             </span>
             <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
               In Hand
             </span>
           </div>
           <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-2">
-            {loading ? '...' : `₹${netProfit.toLocaleString('en-IN')}`}
+            {loading ? '...' : `₹${(netProfit || 0).toLocaleString('en-IN')}`}
           </div>
           <p className="text-[11px] text-neutral-500 font-medium mt-1">
             Gross Sales minus all recorded expenses
@@ -430,10 +432,10 @@ export default function ReportsPage() {
             </span>
           </div>
           <div className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white mt-2">
-            {loading ? '...' : data?.overview.totalSessions}
+            {loading ? '...' : (data?.overview?.totalSessions || 0)}
           </div>
           <p className="text-[11px] text-purple-600 dark:text-purple-400 font-semibold mt-1">
-            Avg ticket: ₹{data?.overview.avgSessionValue || 0}
+            Avg ticket: ₹{data?.overview?.avgSessionValue || 0}
           </p>
         </div>
       </div>
@@ -468,8 +470,8 @@ export default function ReportsPage() {
                   <div key={m.method} className="flex items-center justify-between text-xs py-1.5 border-b border-neutral-100 dark:border-[#2A2F3A]">
                     <span className="font-bold uppercase">{m.method}</span>
                     <div className="text-right">
-                      <strong className="text-sm">₹{m.amount.toLocaleString('en-IN')}</strong>
-                      <span className="text-[11px] text-neutral-400 ml-2">({m.percentage}%)</span>
+                      <strong className="text-sm">₹{(m.amount || 0).toLocaleString('en-IN')}</strong>
+                      <span className="text-[11px] text-neutral-400 ml-2">({m.percentage || 0}%)</span>
                     </div>
                   </div>
                 ))}
@@ -493,7 +495,7 @@ export default function ReportsPage() {
                       <span className="text-[11px] text-neutral-500">Service + Product Sales</span>
                     </div>
                     <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                      ₹{totalGrossRev.toLocaleString('en-IN')}
+                      ₹{(totalGrossRev || 0).toLocaleString('en-IN')}
                     </span>
                   </div>
 
@@ -503,7 +505,7 @@ export default function ReportsPage() {
                       <span className="text-[11px] text-neutral-500">Petty Cash & Salon Supplies</span>
                     </div>
                     <span className="text-xl font-black text-amber-600 dark:text-amber-400">
-                      -₹{totalExp.toLocaleString('en-IN')}
+                      -₹{(totalExp || 0).toLocaleString('en-IN')}
                     </span>
                   </div>
 
@@ -513,7 +515,7 @@ export default function ReportsPage() {
                       <span className="text-[11px] text-neutral-500">Actual Cash In Hand</span>
                     </div>
                     <span className="text-2xl font-black text-[#8C5E2E] dark:text-[#D4A77F]">
-                      ₹{netProfit.toLocaleString('en-IN')}
+                      ₹{(netProfit || 0).toLocaleString('en-IN')}
                     </span>
                   </div>
                 </div>
@@ -672,7 +674,7 @@ export default function ReportsPage() {
               <div className="text-right">
                 <span className="text-xs text-neutral-400 uppercase tracking-wider font-bold">Total Commission Payout:</span>
                 <div className="text-2xl font-black text-[#D4A77F]">
-                  ₹{totalStaffCommissionPayout.toLocaleString('en-IN')}
+                  ₹{(totalStaffCommissionPayout || 0).toLocaleString('en-IN')}
                 </div>
               </div>
             </div>
@@ -696,14 +698,14 @@ export default function ReportsPage() {
                         <strong className="text-neutral-900 dark:text-white font-semibold block">{st.name}</strong>
                         <span className="text-[10px] text-neutral-400">{st.roleTitle || 'Stylist'}</span>
                       </td>
-                      <td className="py-3 px-4 text-center font-bold">{st.sessions}</td>
-                      <td className="py-3 px-4 text-right font-medium">₹{st.servicesRevenue.toLocaleString('en-IN')}</td>
-                      <td className="py-3 px-4 text-right font-medium">₹{st.productsRevenue.toLocaleString('en-IN')}</td>
+                      <td className="py-3 px-4 text-center font-bold">{st.sessions || 0}</td>
+                      <td className="py-3 px-4 text-right font-medium">₹{(st.servicesRevenue || 0).toLocaleString('en-IN')}</td>
+                      <td className="py-3 px-4 text-right font-medium">₹{(st.productsRevenue || 0).toLocaleString('en-IN')}</td>
                       <td className="py-3 px-4 text-right font-bold text-neutral-900 dark:text-white">
-                        ₹{st.totalRevenue.toLocaleString('en-IN')}
+                        ₹{(st.totalRevenue || 0).toLocaleString('en-IN')}
                       </td>
                       <td className="py-3 px-4 text-right font-extrabold text-sm text-[#D4A77F]">
-                        ₹{st.calculatedCommission.toLocaleString('en-IN')}
+                        ₹{(st.calculatedCommission || 0).toLocaleString('en-IN')}
                       </td>
                     </tr>
                   ))}
@@ -791,7 +793,7 @@ export default function ReportsPage() {
                     onChange={(e) => setExpMode(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs font-medium focus:outline-none"
                   >
-                    <option value="cash">Cash (કાઉન્ટર કેશ)</option>
+                    <option value="cash">Cash (Counter Cash)</option>
                     <option value="upi">UPI (GPay / PhonePe)</option>
                     <option value="card">Card</option>
                     <option value="bank_transfer">Bank Transfer</option>

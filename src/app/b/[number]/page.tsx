@@ -120,16 +120,16 @@ export default async function PublicBillPage({
   );
   const payments = payRes.rows;
 
-  const totalPaid = payments.reduce((sum, p) => sum + Number(p.amount), 0);
-  const totalAmount = Number(invoice.total);
+  const totalPaid = payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const totalAmount = Number(invoice.total) || 0;
   const dueAmount = Math.max(0, totalAmount - totalPaid);
 
   // Inclusive GST calculation (18% total: 9% CGST + 9% SGST)
   // Tax = Total * 18 / 118
-  const totalTax = (totalAmount * 18) / 118;
+  const totalTax = totalAmount > 0 ? (totalAmount * 18) / 118 : 0;
   const cgst = totalTax / 2;
   const sgst = totalTax / 2;
-  const taxableSubtotal = totalAmount - totalTax;
+  const taxableSubtotal = Math.max(0, totalAmount - totalTax);
 
   const status =
     dueAmount <= 0 ? 'PAID' : totalPaid > 0 ? 'PARTIAL' : 'PENDING';

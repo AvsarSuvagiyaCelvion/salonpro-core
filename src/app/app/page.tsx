@@ -273,7 +273,7 @@ export default function DashboardPage() {
             {loading ? (
               <div className="h-7 w-20 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
-              `₹${data?.totalRevenue.toLocaleString('en-IN')}`
+              `₹${(Number(data?.totalRevenue) || 0).toLocaleString('en-IN')}`
             )}
           </div>
           <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
@@ -296,7 +296,7 @@ export default function DashboardPage() {
             {loading ? (
               <div className="h-7 w-12 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
-              data?.completedSessions
+              data?.completedSessions || 0
             )}
           </div>
           <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] font-medium truncate">
@@ -318,7 +318,7 @@ export default function DashboardPage() {
             {loading ? (
               <div className="h-7 w-12 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
-              data?.totalCustomers
+              data?.totalCustomers || 0
             )}
           </div>
           <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-[#6B7280] dark:text-[#A0A8B8] font-medium truncate">
@@ -340,7 +340,7 @@ export default function DashboardPage() {
             {loading ? (
               <div className="h-7 w-12 bg-[#F3F4F6] dark:bg-[#1C2230] animate-pulse rounded-lg" />
             ) : (
-              data?.activeStaff
+              data?.activeStaff || 0
             )}
           </div>
           <div className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1">
@@ -405,12 +405,12 @@ export default function DashboardPage() {
                 size={130}
                 thickness={16}
                 centerLabel="Revenue"
-                centerValue={`₹${(data.totalRevenue > 1000 ? Math.round(data.totalRevenue / 1000) + 'k' : data.totalRevenue)}`}
+                centerValue={`₹${((Number(data.totalRevenue) || 0) > 1000 ? Math.round((Number(data.totalRevenue) || 0) / 1000) + 'k' : (Number(data.totalRevenue) || 0))}`}
                 data={[
-                  { label: 'Hair & Styling', value: Math.max(1, Math.round(data.totalRevenue * 0.45)), color: '#D4A77F' },
-                  { label: 'Facial & Skin', value: Math.max(1, Math.round(data.totalRevenue * 0.25)), color: '#B8905F' },
-                  { label: 'Spa & Massage', value: Math.max(1, Math.round(data.totalRevenue * 0.18)), color: '#10B981' },
-                  { label: 'Retail Products', value: Math.max(1, Math.round(data.totalRevenue * 0.12)), color: '#F59E0B' },
+                  { label: 'Hair & Styling', value: Math.max(1, Math.round((Number(data.totalRevenue) || 0) * 0.45)), color: '#D4A77F' },
+                  { label: 'Facial & Skin', value: Math.max(1, Math.round((Number(data.totalRevenue) || 0) * 0.25)), color: '#B8905F' },
+                  { label: 'Spa & Massage', value: Math.max(1, Math.round((Number(data.totalRevenue) || 0) * 0.18)), color: '#10B981' },
+                  { label: 'Retail Products', value: Math.max(1, Math.round((Number(data.totalRevenue) || 0) * 0.12)), color: '#F59E0B' },
                 ]}
               />
             )}

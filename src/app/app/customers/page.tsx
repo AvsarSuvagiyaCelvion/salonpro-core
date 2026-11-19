@@ -455,7 +455,7 @@ export default function CustomersPage() {
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="font-bold text-sm text-[#1F2937] dark:text-white">
-                        ₹{Number(c.total_spent).toLocaleString('en-IN')}
+                        ₹{(Number(c.total_spent) || 0).toLocaleString('en-IN')}
                       </div>
                       <div className="text-[10px] text-neutral-400">
                         Invoiced total

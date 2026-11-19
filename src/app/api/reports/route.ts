@@ -15,6 +15,97 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || '30d';
 
+    // Static Demo Reports Showcase for Dixa Beauty Salon (Instant Sandbox Demo)
+    if (auth.session.salonSlug === 'dixa-beauty-salon') {
+      const demoStats = period === 'today'
+        ? {
+            totalRevenue: 14250,
+            totalExpenses: 1050,
+            netProfit: 13200,
+            expenseCount: 3,
+            totalSessions: 8,
+            avgSessionValue: 1781,
+            paymentMethods: [
+              { method: 'Cash', amount: 6400, count: 4, percentage: 44.9 },
+              { method: 'UPI', amount: 5850, count: 3, percentage: 41.1 },
+              { method: 'Card', amount: 2000, count: 1, percentage: 14.0 },
+            ],
+            paymentStatuses: {
+              paid: { count: 8, amount: 14250 },
+              partial: { count: 0, amount: 0 },
+              pending: { count: 0, amount: 0 },
+            },
+            staffReport: [
+              { id: 'demo-st-1', name: 'Priya Patel', roleTitle: 'Creative Master Stylist', sessions: 4, servicesRevenue: 6800, productsRevenue: 1200, totalRevenue: 8000, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 1140 },
+              { id: 'demo-st-2', name: 'Neha Shah', roleTitle: 'Senior Skin & Spa Specialist', sessions: 3, servicesRevenue: 4250, productsRevenue: 800, totalRevenue: 5050, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 718 },
+              { id: 'demo-st-3', name: 'Ananya Sharma', roleTitle: 'Celebrity Makeup & Nails', sessions: 1, servicesRevenue: 1200, productsRevenue: 0, totalRevenue: 1200, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 180 },
+            ],
+          }
+        : period === '7d'
+        ? {
+            totalRevenue: 48600,
+            totalExpenses: 2850,
+            netProfit: 45750,
+            expenseCount: 7,
+            totalSessions: 32,
+            avgSessionValue: 1519,
+            paymentMethods: [
+              { method: 'UPI', amount: 24300, count: 16, percentage: 50.0 },
+              { method: 'Cash', amount: 17500, count: 12, percentage: 36.0 },
+              { method: 'Card', amount: 6800, count: 4, percentage: 14.0 },
+            ],
+            paymentStatuses: {
+              paid: { count: 30, amount: 45600 },
+              partial: { count: 2, amount: 3000 },
+              pending: { count: 0, amount: 0 },
+            },
+            staffReport: [
+              { id: 'demo-st-1', name: 'Priya Patel', roleTitle: 'Creative Master Stylist', sessions: 16, servicesRevenue: 24000, productsRevenue: 3500, totalRevenue: 27500, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 3950 },
+              { id: 'demo-st-2', name: 'Neha Shah', roleTitle: 'Senior Skin & Spa Specialist', sessions: 11, servicesRevenue: 14500, productsRevenue: 2200, totalRevenue: 16700, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 2395 },
+              { id: 'demo-st-3', name: 'Ananya Sharma', roleTitle: 'Celebrity Makeup & Nails', sessions: 5, servicesRevenue: 4400, productsRevenue: 0, totalRevenue: 4400, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 660 },
+            ],
+          }
+        : {
+            totalRevenue: 184500,
+            totalExpenses: 11400,
+            netProfit: 173100,
+            expenseCount: 24,
+            totalSessions: 128,
+            avgSessionValue: 1441,
+            paymentMethods: [
+              { method: 'UPI', amount: 96000, count: 68, percentage: 52.0 },
+              { method: 'Cash', amount: 64500, count: 44, percentage: 35.0 },
+              { method: 'Card', amount: 24000, count: 16, percentage: 13.0 },
+            ],
+            paymentStatuses: {
+              paid: { count: 122, amount: 176500 },
+              partial: { count: 6, amount: 8000 },
+              pending: { count: 0, amount: 0 },
+            },
+            staffReport: [
+              { id: 'demo-st-1', name: 'Priya Patel', roleTitle: 'Creative Master Stylist', sessions: 64, servicesRevenue: 92000, productsRevenue: 14000, totalRevenue: 106000, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 15200 },
+              { id: 'demo-st-2', name: 'Neha Shah', roleTitle: 'Senior Skin & Spa Specialist', sessions: 44, servicesRevenue: 54000, productsRevenue: 8500, totalRevenue: 62500, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 8950 },
+              { id: 'demo-st-3', name: 'Ananya Sharma', roleTitle: 'Celebrity Makeup & Nails', sessions: 20, servicesRevenue: 16000, productsRevenue: 0, totalRevenue: 16000, serviceCommissionPct: 15, productCommissionPct: 10, commissionEarned: 2400 },
+            ],
+          };
+
+      return NextResponse.json({
+        period,
+        canViewCommission: true,
+        overview: {
+          totalRevenue: demoStats.totalRevenue,
+          totalExpenses: demoStats.totalExpenses,
+          netProfit: demoStats.netProfit,
+          expenseCount: demoStats.expenseCount,
+          totalSessions: demoStats.totalSessions,
+          avgSessionValue: demoStats.avgSessionValue,
+          paymentMethods: demoStats.paymentMethods,
+          paymentStatuses: demoStats.paymentStatuses,
+        },
+        staffReport: demoStats.staffReport,
+      });
+    }
+
     let days = 30;
     if (period === 'today') days = 1;
     else if (period === '7d') days = 7;
@@ -104,21 +195,22 @@ export async function GET(request: Request) {
           ),
     ]);
 
-    const totalRevenue = Number(revRes.rows[0]?.total_revenue || 0);
-    const totalSessions = Number(sessRes.rows[0]?.total_sessions || 0);
+    const totalRevenue = Number(revRes.rows[0]?.total_revenue) || 0;
+    const totalSessions = Number(sessRes.rows[0]?.total_sessions) || 0;
     const avgSessionValue = totalSessions > 0 ? Math.round(totalRevenue / totalSessions) : 0;
-    const totalExpenses = Number(expRes.rows[0]?.total_expenses || 0);
-    const expenseCount = Number(expRes.rows[0]?.expense_count || 0);
+    const totalExpenses = Number(expRes.rows[0]?.total_expenses) || 0;
+    const expenseCount = Number(expRes.rows[0]?.expense_count) || 0;
     const netProfit = totalRevenue - totalExpenses;
 
     const paymentMethods = methodRes.rows.map((r) => {
-      const amount = Number(r.total_amount);
+      const amount = Number(r.total_amount) || 0;
       const pct = totalRevenue > 0 ? ((amount / totalRevenue) * 100).toFixed(1) : '0';
+      const numPct = Number(pct);
       return {
-        method: r.method,
+        method: r.method || 'Other',
         amount,
-        count: Number(r.transaction_count),
-        percentage: Number(pct),
+        count: Number(r.transaction_count) || 0,
+        percentage: isNaN(numPct) ? 0 : numPct,
       };
     });
 
@@ -131,34 +223,35 @@ export async function GET(request: Request) {
     statusRes.rows.forEach((r) => {
       const s = r.status as 'paid' | 'partial' | 'pending';
       if (paymentStatuses[s]) {
-        paymentStatuses[s].count++;
-        paymentStatuses[s].amount += Number(r.total_value);
+        paymentStatuses[s].count = (paymentStatuses[s].count || 0) + 1;
+        paymentStatuses[s].amount = (paymentStatuses[s].amount || 0) + (Number(r.total_value) || 0);
       }
     });
 
     const canViewCommission = Boolean(auth.session.plan?.flags.commission_report);
 
     const staffReport = staffRes.rows.map((st) => {
-      const servicesRev = Number(st.services_revenue);
-      const productsRev = Number(st.products_revenue);
+      const servicesRev = Number(st.services_revenue) || 0;
+      const productsRev = Number(st.products_revenue) || 0;
       const totalRev = servicesRev + productsRev;
       const svcCommPct = canViewCommission ? (Number(st.service_commission_pct) || 10) : 0;
       const prodCommPct = canViewCommission ? (Number(st.product_commission_pct) || 5) : 0;
-      const commission = canViewCommission
+      const rawComm = canViewCommission
         ? (servicesRev * svcCommPct) / 100 + (productsRev * prodCommPct) / 100
         : 0;
+      const commission = isNaN(rawComm) ? 0 : Math.round(rawComm);
 
       return {
         id: st.id,
-        name: st.name,
+        name: st.name || 'Stylist',
         roleTitle: st.role_title,
-        sessions: Number(st.sessions),
+        sessions: Number(st.sessions) || 0,
         servicesRevenue: servicesRev,
         productsRevenue: productsRev,
         totalRevenue: totalRev,
         serviceCommissionPct: svcCommPct,
         productCommissionPct: prodCommPct,
-        commissionEarned: Math.round(commission),
+        commissionEarned: commission,
       };
     });
 

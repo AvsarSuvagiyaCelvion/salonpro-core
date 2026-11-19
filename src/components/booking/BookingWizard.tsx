@@ -743,15 +743,15 @@ export default function BookingWizard({ slug }: { slug: string }) {
             )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1F2937] dark:text-white">{salon.name}</h1>
-          {reviewsSummary.enabled && reviewsSummary.count > 0 && (
+          {reviewsSummary.enabled && (reviewsSummary.count || 0) > 0 && (
             <div className="flex items-center justify-center gap-1.5 mt-1.5">
               <div className="flex items-center text-amber-500 text-xs sm:text-sm">
                 <span>★</span>
-                <span className="font-extrabold text-[#1F2937] dark:text-white ml-1">{reviewsSummary.average.toFixed(1)}</span>
+                <span className="font-extrabold text-[#1F2937] dark:text-white ml-1">{(Number(reviewsSummary.average) || 0).toFixed(1)}</span>
               </div>
               <span className="text-[#9CA3AF] dark:text-neutral-500 text-xs">·</span>
               <span className="text-[#6B7280] dark:text-neutral-300 text-xs font-semibold">
-                ({reviewsSummary.count} {reviewsSummary.count === 1 ? 'review' : 'reviews'})
+                ({reviewsSummary.count || 0} {reviewsSummary.count === 1 ? 'review' : 'reviews'})
               </span>
             </div>
           )}
@@ -920,7 +920,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
                     <span>Client Experiences ({reviewsSummary.count})</span>
                   </h3>
                   <span className="text-xs text-[#6B7280] dark:text-neutral-400 font-medium">
-                    Average: <strong className="text-[#1F2937] dark:text-white">{reviewsSummary.average.toFixed(1)} / 5</strong>
+                    Average: <strong className="text-[#1F2937] dark:text-white">{(Number(reviewsSummary.average) || 0).toFixed(1)} / 5</strong>
                   </span>
                 </div>
 

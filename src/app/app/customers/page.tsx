@@ -152,6 +152,20 @@ export default function CustomersPage() {
     window.open(url, '_blank');
   }
 
+  function handleSendPromoWhatsApp(c: Customer) {
+    const rawMobile = c.mobile.replace(/[^0-9]/g, '');
+    const cleanMobile = rawMobile.length === 10 ? `91${rawMobile}` : rawMobile;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const portalUrl = `${origin}/portal`;
+    const message = `Hello ${c.name}! ✨ We miss having you at our salon!\n\nTreat yourself this week with a special *15% VIP Discount* on your next haircut, hair spa, or facial care session! 💇‍♀️💆‍♂️\n\nBook your preferred stylist online in 30 seconds:\n👉 ${portalUrl}\n\nWe look forward to welcoming you back! ✂️`;
+    const encoded = encodeURIComponent(message);
+    const isMobile = typeof navigator !== 'undefined' && /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent || '');
+    const url = isMobile
+      ? `https://api.whatsapp.com/send/?phone=${cleanMobile}&text=${encoded}`
+      : `https://web.whatsapp.com/send?phone=${cleanMobile}&text=${encoded}`;
+    window.open(url, '_blank');
+  }
+
   useEffect(() => {
     setPage(1);
   }, [search]);
@@ -459,6 +473,13 @@ export default function CustomersPage() {
                       </button>
                     </td>
                     <td className="py-3 px-4 text-right space-x-1">
+                      <button
+                        onClick={() => handleSendPromoWhatsApp(c)}
+                        className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer"
+                        title="Send 1-Click WhatsApp VIP Promo & Re-engagement"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      </button>
                       <button
                         onClick={() => openResetPinModal(c)}
                         className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg transition-colors cursor-pointer"

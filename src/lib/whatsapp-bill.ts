@@ -17,6 +17,7 @@ export interface InvoiceBillData {
   salon_name?: string;
   salon_phone?: string;
   salon_address?: string;
+  logo_url?: string | null;
 }
 
 export interface ShareResult {
@@ -38,7 +39,51 @@ function formatFullMobile(mobile: string | null | undefined): string {
 }
 
 /**
- * Builds an official high-resolution vector PDF in memory using jsPDF.
+ * Safely loads an image from URL and converts it to a PNG base64 DataURL.
+ * Includes a 3-second timeout and gracefully returns null on error / CORS blocks.
+ */
+async function loadBase64Image(
+  url: string | null | undefined
+): Promise<{ dataUrl: string; width: number; height: number } | null> {
+  if (!url || typeof window === 'undefined') return null;
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    const timer = setTimeout(() => resolve(null), 3000);
+    img.onload = () => {
+      clearTimeout(timer);
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(null);
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        const dataUrl = canvas.toDataURL('image/png');
+        resolve({ dataUrl, width: canvas.width, height: canvas.height });
+      } catch {
+        resolve(null);
+      }
+    };
+    img.onerror = () => {
+      clearTimeout(timer);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
+/**
+ * Builds a publication-grade, luxury executive Tax Invoice PDF using jsPDF.
+ * - Left Header: Salon Logo (if uploaded) or Elegant Typography & Monogram
+ * - Right Header: Salon Contact Details, Invoice #, Date & Status Pill Badge
+ * - Billed To Card: Client name, mobile, and payment summary
+ * - Modern Billing Table: Proportional column widths, zebra striping
+ * - Financial Breakdown: Subtotal, Discount, Tax, Grand Total Card & Due Amount
+ * - Professional Footer: Brand appreciation, policy terms, digital receipt URL & Signatory line
  */
 export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<any> {
   const { jsPDF } = await import('jspdf');
@@ -50,12 +95,16 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   });
 
   const pageWidth = 210;
-  const margin = 15;
-  const contentWidth = pageWidth - margin * 2; // 180mm
+  const pageHeight = 297;
+  const margin = 14;
+  const contentWidth = pageWidth - margin * 2; // 182mm
+
   let salonName = invoice.salon_name;
   let salonAddress = invoice.salon_address;
   let salonPhone = invoice.salon_phone;
+  let logoUrl = invoice.logo_url;
 
+  // Retrieve stored salon information from localStorage if not explicitly passed
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem('salonpro_salon_info');
@@ -66,6 +115,7 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
         if (!salonAddress && (parsed.address || parsed.city)) {
           salonAddress = [parsed.address, parsed.city].filter(Boolean).join(', ');
         }
+        if (!logoUrl && parsed.logo_url) logoUrl = parsed.logo_url;
       }
     } catch {}
   }
@@ -74,80 +124,143 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   salonAddress = salonAddress || 'Boutique Hair & Beauty Studio';
   salonPhone = salonPhone || '';
 
-  // 1. Top Header Banner
-  doc.setFillColor(24, 24, 27); // #18181b
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  // Attempt to load logo image if available
+  const logoImg = await loadBase64Image(logoUrl);
 
-  // Salon Name (Safely clipped to 125mm so it never collides with status badge)
-  doc.setTextColor(255, 255, 255);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  const clippedSalonName = doc.splitTextToSize(salonName, 125)[0];
-  doc.text(clippedSalonName, margin, 15);
+  // ================= 1. LUXURY DUAL-HEADER =================
+  let y = 14;
 
-  // Salon Address & Phone
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(200, 200, 200);
-  const clippedAddress = doc.splitTextToSize(salonAddress, 125)[0];
-  doc.text(clippedAddress, margin, 22);
-  if (salonPhone) {
-    doc.text(`Ph: ${salonPhone}`, margin, 27);
+  // LEFT SIDE: Logo or Brand Typography
+  if (logoImg) {
+    // Proportional scaling within 42mm x 20mm bounding box
+    const maxLogoW = 42;
+    const maxLogoH = 20;
+    let logoW = maxLogoW;
+    let logoH = (logoImg.height / logoImg.width) * logoW;
+    if (logoH > maxLogoH) {
+      logoH = maxLogoH;
+      logoW = (logoImg.width / logoImg.height) * logoH;
+    }
+
+    doc.addImage(logoImg.dataUrl, 'PNG', margin, y, logoW, logoH);
+
+    // Salon Name underneath the logo
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(15, 23, 42); // slate-900
+    const clippedName = doc.splitTextToSize(salonName, 85)[0];
+    doc.text(clippedName, margin, y + logoH + 5);
+  } else {
+    // Luxury Typography Block with Gold Accent Monogram
+    doc.setFillColor(15, 23, 42); // #0F172A slate-900
+    doc.roundedRect(margin, y, 16, 16, 3, 3, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(212, 167, 127); // #D4A77F Gold
+    const initial = (salonName.charAt(0) || 'S').toUpperCase();
+    doc.text(initial, margin + 8, y + 10.5, { align: 'center' });
+
+    // Salon Name
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(15, 23, 42); // slate-900
+    const clippedName = doc.splitTextToSize(salonName, 78)[0];
+    doc.text(clippedName, margin + 20, y + 7.5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139); // slate-500
+    doc.text('HAIR, BEAUTY & WELLNESS STUDIO', margin + 20, y + 13);
   }
 
-  // Status Badge (Paid)
+  // RIGHT SIDE: Salon Contact Details & Official Status Badge
+  const rightX = pageWidth - margin; // 196mm
   const isPaid = Number(invoice.paid_amount || invoice.total) >= Number(invoice.total);
-  const badgeText = isPaid ? 'PAID IN FULL' : 'PARTIAL';
-  const badgeWidth = 26;
-  const badgeX = pageWidth - margin - badgeWidth; // 195 - 26 = 169mm
-  doc.setFillColor(16, 185, 129); // emerald
-  doc.roundedRect(badgeX, 10, badgeWidth, 6.5, 2, 2, 'F');
-  doc.setTextColor(255, 255, 255);
+  const statusUpper = (invoice.status || (isPaid ? 'PAID' : 'PARTIAL')).toUpperCase();
+
+  // Status Badge Pill
+  const badgeW = 28;
+  const badgeH = 7;
+  const badgeX = rightX - badgeW;
+  if (statusUpper.includes('PAID')) {
+    doc.setFillColor(209, 250, 229); // emerald-100
+    doc.setDrawColor(167, 243, 208); // emerald-200
+    doc.roundedRect(badgeX, y, badgeW, badgeH, 1.5, 1.5, 'FD');
+    doc.setTextColor(4, 120, 87); // emerald-700
+  } else {
+    doc.setFillColor(254, 243, 199); // amber-100
+    doc.setDrawColor(253, 230, 138); // amber-200
+    doc.roundedRect(badgeX, y, badgeW, badgeH, 1.5, 1.5, 'FD');
+    doc.setTextColor(180, 83, 9); // amber-700
+  }
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
-  doc.text(badgeText, badgeX + badgeWidth / 2, 14.5, { align: 'center' });
+  doc.text(statusUpper === 'PAID' ? 'PAID IN FULL ✓' : statusUpper, badgeX + badgeW / 2, y + 4.8, {
+    align: 'center',
+  });
 
-  // Receipt Label
-  doc.setTextColor(220, 220, 220);
+  // Contact Information
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
-  doc.text('OFFICIAL TAX INVOICE', pageWidth - margin, 23, { align: 'right' });
+  doc.setTextColor(15, 23, 42);
+  doc.text('CONTACT & STUDIO INFO', rightX, y + 13, { align: 'right' });
 
-  let y = 46;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(71, 85, 105);
+  if (salonPhone) {
+    doc.text(`Phone: ${salonPhone}`, rightX, y + 18, { align: 'right' });
+  }
+  if (salonAddress) {
+    const clippedAddr = doc.splitTextToSize(salonAddress, 78);
+    doc.text(clippedAddr[0], rightX, y + 22.5, { align: 'right' });
+    if (clippedAddr[1]) {
+      doc.text(clippedAddr[1], rightX, y + 26.5, { align: 'right' });
+    }
+  }
 
-  // 2. Invoice Meta & Billed To Card
-  doc.setFillColor(248, 250, 252);
-  doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(margin, y, contentWidth, 24, 2.5, 2.5, 'FD');
+  // Luxury Divider Bar
+  y = 44;
+  doc.setDrawColor(212, 167, 127); // Gold line (#D4A77F)
+  doc.setLineWidth(0.8);
+  doc.line(margin, y, pageWidth - margin, y);
+  doc.setLineWidth(0.2); // reset line width
 
-  // Left: Billed To
-  doc.setTextColor(148, 163, 184);
+  // ================= 2. BILLED TO & INVOICE REFERENCE CARD =================
+  y += 4;
+  doc.setFillColor(248, 250, 252); // slate-50
+  doc.setDrawColor(226, 232, 240); // slate-200
+  doc.roundedRect(margin, y, contentWidth, 22, 2.5, 2.5, 'FD');
+
+  // Left: Customer Details
+  doc.setTextColor(148, 163, 184); // slate-400
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.text('BILLED TO', margin + 5, y + 6);
+  doc.text('BILLED TO / CUSTOMER', margin + 5, y + 6);
 
-  doc.setTextColor(15, 23, 42);
+  doc.setTextColor(15, 23, 42); // slate-900
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
-  const clientName = doc.splitTextToSize(invoice.customer_name || 'Valued Client', 85)[0];
-  doc.text(clientName, margin + 5, y + 12.5);
+  const clientName = doc.splitTextToSize(invoice.customer_name || 'Valued Client', 80)[0];
+  doc.text(clientName, margin + 5, y + 12);
 
-  doc.setTextColor(100, 116, 139);
+  doc.setTextColor(100, 116, 139); // slate-500
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`Mobile: ${formatFullMobile(invoice.customer_mobile)}`, margin + 5, y + 18.5);
+  doc.text(`Mobile: ${formatFullMobile(invoice.customer_mobile)}`, margin + 5, y + 17.5);
 
-  // Right: Invoice Details
-  const rightX = pageWidth - margin - 5;
+  // Right: Invoice Reference Details
+  const metaRightX = pageWidth - margin - 5;
   doc.setTextColor(148, 163, 184);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.text('INVOICE NO', rightX, y + 6, { align: 'right' });
+  doc.text('TAX INVOICE NUMBER', metaRightX, y + 6, { align: 'right' });
 
   doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
-  doc.text(invoice.number, rightX, y + 12.5, { align: 'right' });
+  doc.text(invoice.number || 'INV-0001', metaRightX, y + 12, { align: 'right' });
 
   const dateStr = invoice.created_at
     ? new Date(invoice.created_at).toLocaleDateString('en-IN', {
@@ -164,132 +277,231 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
         month: 'short',
         year: 'numeric',
       });
+
   doc.setTextColor(100, 116, 139);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(dateStr, rightX, y + 18.5, { align: 'right' });
+  doc.text(`Date: ${dateStr}`, metaRightX, y + 17.5, { align: 'right' });
 
-  y += 30;
+  y += 28;
 
-  // 3. Table Header
-  doc.setFillColor(241, 245, 249);
-  doc.rect(margin, y, contentWidth, 7.5, 'F');
+  // ================= 3. ITEMIZED BILLING TABLE =================
+  // Header: # (10mm) | ITEM / SERVICE (80mm) | TYPE (24mm) | RATE (24mm) | QTY (16mm) | AMOUNT (28mm) = 182mm
+  const colWidths = [10, 80, 24, 24, 16, 28];
 
-  doc.setTextColor(71, 85, 105);
+  doc.setFillColor(15, 23, 42); // #0F172A Slate-900
+  doc.rect(margin, y, contentWidth, 8, 'F');
+
+  doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
-  doc.text('ITEMS & SERVICES', margin + 4, y + 5);
-  doc.text('TYPE', margin + 88, y + 5);
-  doc.text('QTY', margin + 118, y + 5, { align: 'center' });
-  doc.text('AMOUNT (INR)', pageWidth - margin - 4, y + 5, { align: 'right' });
 
-  y += 8.5;
+  let curHeaderX = margin;
+  doc.text('#', curHeaderX + 5, y + 5.2, { align: 'center' });
+  curHeaderX += colWidths[0];
 
-  // 4. Items List
-  const items = invoice.items && invoice.items.length > 0
-    ? invoice.items
-    : [{ name: 'Salon Service & Grooming', qty: 1, unit_price: invoice.total, kind: 'service' }];
+  doc.text('SERVICE / PRODUCT DESCRIPTION', curHeaderX + 3, y + 5.2);
+  curHeaderX += colWidths[1];
 
-  items.forEach((item) => {
-    // Service Name safely clipped to 80mm so it never overlaps the TYPE column
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    const itemName = doc.splitTextToSize(item.name || 'Service', 80)[0];
-    doc.text(itemName, margin + 4, y + 4.5);
+  doc.text('TYPE', curHeaderX + colWidths[2] / 2, y + 5.2, { align: 'center' });
+  curHeaderX += colWidths[2];
 
-    doc.setTextColor(100, 116, 139);
+  doc.text('RATE (Rs.)', curHeaderX + colWidths[3] - 3, y + 5.2, { align: 'right' });
+  curHeaderX += colWidths[3];
+
+  doc.text('QTY', curHeaderX + colWidths[4] / 2, y + 5.2, { align: 'center' });
+  curHeaderX += colWidths[4];
+
+  doc.text('AMOUNT (Rs.)', curHeaderX + colWidths[5] - 3, y + 5.2, { align: 'right' });
+
+  y += 8;
+
+  // Items Rows
+  const items =
+    invoice.items && invoice.items.length > 0
+      ? invoice.items
+      : [{ name: 'Salon Service & Styling Session', qty: 1, unit_price: invoice.total, kind: 'service' }];
+
+  items.forEach((item, idx) => {
+    // Alternating Zebra Row Background
+    if (idx % 2 === 1) {
+      doc.setFillColor(248, 250, 252); // slate-50
+      doc.rect(margin, y, contentWidth, 8.5, 'F');
+    }
+
+    let curColX = margin;
+
+    // Index
+    doc.setTextColor(148, 163, 184);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
-    doc.text((item.kind || 'service').toUpperCase(), margin + 88, y + 4.5);
-    doc.text(String(item.qty || 1), margin + 118, y + 4.5, { align: 'center' });
+    doc.text(String(idx + 1), curColX + 5, y + 5.5, { align: 'center' });
+    curColX += colWidths[0];
 
-    const itemTotal = Number(item.unit_price) * (item.qty || 1);
-    doc.setFont('helvetica', 'bold');
+    // Description
     doc.setTextColor(15, 23, 42);
-    doc.text(
-      `Rs. ${itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-      pageWidth - margin - 4,
-      y + 4.5,
-      { align: 'right' }
-    );
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    const itemName = doc.splitTextToSize(item.name || 'Service', 74)[0];
+    doc.text(itemName, curColX + 3, y + 5.5);
+    curColX += colWidths[1];
 
+    // Type Badge Pill
+    const kind = (item.kind || 'service').toUpperCase();
+    doc.setFillColor(kind === 'PRODUCT' ? 241 : 243, kind === 'PRODUCT' ? 245 : 244, kind === 'PRODUCT' ? 249 : 246);
+    doc.roundedRect(curColX + 3, y + 1.8, 18, 5, 1, 1, 'F');
+    doc.setTextColor(kind === 'PRODUCT' ? 71 : 140, kind === 'PRODUCT' ? 85 : 94, kind === 'PRODUCT' ? 105 : 46);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.text(kind, curColX + 12, y + 5.2, { align: 'center' });
+    curColX += colWidths[2];
+
+    // Rate
+    const unitPrice = Number(item.unit_price) || 0;
+    doc.setTextColor(71, 85, 105);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(unitPrice.toFixed(2), curColX + colWidths[3] - 3, y + 5.5, { align: 'right' });
+    curColX += colWidths[3];
+
+    // Qty
+    const qty = item.qty || 1;
+    doc.text(String(qty), curColX + colWidths[4] / 2, y + 5.5, { align: 'center' });
+    curColX += colWidths[4];
+
+    // Amount
+    const rowTotal = unitPrice * qty;
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text(rowTotal.toFixed(2), curColX + colWidths[5] - 3, y + 5.5, { align: 'right' });
+
+    // Subtle Bottom Line
     doc.setDrawColor(241, 245, 249);
-    doc.line(margin, y + 6.5, pageWidth - margin, y + 6.5);
+    doc.line(margin, y + 8.5, pageWidth - margin, y + 8.5);
 
-    y += 8;
+    y += 8.5;
   });
 
-  y += 4;
+  // ================= 4. FINANCIAL SUMMARY BREAKDOWN =================
+  y += 5;
+  const summaryBoxW = 86;
+  const summaryLeftX = pageWidth - margin - summaryBoxW; // 196 - 86 = 110mm
 
-  // 5. Financial Summary
-  const totalsX = 120;
-  const totalsValX = pageWidth - margin - 4; // 191mm
-
-  function renderTotalRow(label: string, value: string, isBold = false, color = [71, 85, 105]) {
-    doc.setTextColor(color[0], color[1], color[2]);
-    doc.setFont('helvetica', isBold ? 'bold' : 'normal');
-    doc.setFontSize(isBold ? 9 : 8);
-    doc.text(label, totalsX, y);
-    doc.text(value, totalsValX, y, { align: 'right' });
-    y += 5;
+  function renderSummaryLine(label: string, value: string, isDiscount = false) {
+    doc.setFont('helvetica', isDiscount ? 'bold' : 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(isDiscount ? 225 : 71, isDiscount ? 29 : 85, isDiscount ? 72 : 105);
+    doc.text(label, summaryLeftX + 3, y);
+    doc.text(value, pageWidth - margin - 3, y, { align: 'right' });
+    y += 5.5;
   }
 
-  const subtotalNum = Number(invoice.subtotal || invoice.total);
-  renderTotalRow('Subtotal', `Rs. ${subtotalNum.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+  const subtotalVal = Number(invoice.subtotal || invoice.total) || 0;
+  renderSummaryLine('Subtotal', `Rs. ${subtotalVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
 
   if (Number(invoice.discount_amount || 0) > 0) {
-    renderTotalRow(
-      'Discount',
+    renderSummaryLine(
+      'Promotional Discount',
       `-Rs. ${Number(invoice.discount_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-      false,
-      [219, 39, 119]
+      true
     );
   }
 
-  // Grand Total Box (Width strictly fits right margin: totalsX - 3 to pageWidth - margin = 78mm)
+  if (Number(invoice.tax_amount || 0) > 0) {
+    renderSummaryLine(
+      'Tax & GST',
+      `Rs. ${Number(invoice.tax_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+    );
+  }
+
+  // Grand Total Card (Slate-900 with Gold Accent)
   y += 2;
-  const grandTotalBoxWidth = pageWidth - margin - (totalsX - 3); // 78mm
-  doc.setFillColor(24, 24, 27); // #18181b
-  doc.roundedRect(totalsX - 3, y - 3.5, grandTotalBoxWidth, 9.5, 2, 2, 'F');
+  doc.setFillColor(15, 23, 42); // #0F172A
+  doc.roundedRect(summaryLeftX, y - 4, summaryBoxW, 11, 2, 2, 'F');
+
+  // Gold accent bar on left of card
+  doc.setFillColor(212, 167, 127);
+  doc.rect(summaryLeftX, y - 4, 3, 11, 'F');
+
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.text('GRAND TOTAL', totalsX, y + 2.5);
-  doc.setFontSize(10);
+  doc.text('GRAND TOTAL', summaryLeftX + 7, y + 3.2);
+
+  doc.setFontSize(11);
+  doc.setTextColor(212, 167, 127); // Gold text for total
   doc.text(
     `Rs. ${Number(invoice.total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-    pageWidth - margin - 3,
-    y + 2.5,
+    pageWidth - margin - 4,
+    y + 3.2,
     { align: 'right' }
   );
 
-  y += 14;
+  y += 13;
 
-  // 6. Payment Summary Box
+  // Payment Status Box
+  const paidVal = Number(invoice.paid_amount || invoice.total);
+  const dueVal = Math.max(0, Number(invoice.total) - paidVal);
+
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(margin, y, contentWidth, 13, 2, 2, 'FD');
+  doc.roundedRect(summaryLeftX, y - 2, summaryBoxW, 11, 2, 2, 'FD');
 
-  const paidAmount = Number(invoice.paid_amount || invoice.total);
-  doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.text(`Payment Received: Rs. ${paidAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, margin + 5, y + 8);
+  doc.setFontSize(8);
+  doc.setTextColor(4, 120, 87); // emerald-700
+  doc.text(
+    `Paid: Rs. ${paidVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+    summaryLeftX + 4,
+    y + 4.5
+  );
 
-  doc.setTextColor(16, 185, 129);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`Status: PAID IN FULL ✓`, pageWidth - margin - 5, y + 8, { align: 'right' });
+  doc.setTextColor(dueVal > 0 ? 190 : 100, dueVal > 0 ? 18 : 116, dueVal > 0 ? 60 : 139);
+  doc.text(
+    dueVal > 0
+      ? `Due: Rs. ${dueVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+      : 'Balance Due: Rs. 0.00 ✓',
+    pageWidth - margin - 4,
+    y + 4.5,
+    { align: 'right' }
+  );
 
-  // 7. Clean Minimal Footer: ONLY "Thank You! Please Visit Again ✨"
-  const footerY = Math.max(y + 18, 260);
+  // ================= 5. PROFESSIONAL EXECUTIVE FOOTER =================
+  const footerY = pageHeight - 34; // 263mm
   doc.setDrawColor(226, 232, 240);
-  doc.line(margin + 20, footerY - 5, pageWidth - margin - 20, footerY - 5);
+  doc.line(margin, footerY, pageWidth - margin, footerY);
 
+  // Thank You Warm Note
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`Thank You for Visiting ${salonName}! ✨`, margin, footerY + 6);
+
+  // Terms & Online Booking Note
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(
+    'Services & retail products are non-refundable · Book 24/7 online & view receipts anytime',
+    margin,
+    footerY + 11
+  );
+
+  // ERP Verification Watermark
+  doc.setFontSize(6.5);
+  doc.setTextColor(148, 163, 184);
+  doc.text(
+    'DIGITALLY VERIFIED TAX RECORD · POWERED BY SALONPRO ENTERPRISE CLOUD ERP',
+    margin,
+    footerY + 16
+  );
+
+  // Authorized Signatory Line on Right
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
   doc.setTextColor(71, 85, 105);
-  doc.text('Thank You! Please Visit Again ✨', pageWidth / 2, footerY + 2, { align: 'center' });
+  doc.text('Authorized Signatory: ________________________', rightX, footerY + 12, { align: 'right' });
 
   return doc;
 }
@@ -300,9 +512,12 @@ export function isMobileDevice(): boolean {
   return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
 }
 
-export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: string; waUrl: string; cleanPhone: string } {
+export function buildInvoiceWhatsAppMessage(
+  invoice: InvoiceBillData
+): { text: string; waUrl: string; cleanPhone: string } {
   const rawPhone = (invoice.customer_mobile || '').replace(/[^0-9]/g, '');
-  const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
+  const cleanPhone =
+    rawPhone.length === 10 ? `91${rawPhone}` : rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const receiptLink = `${origin}/b/${invoice.receipt_token || invoice.number}`;
   const totalFormatted = Number(invoice.total || 0).toLocaleString('en-IN');
@@ -334,7 +549,8 @@ export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: s
   if (invoice.items && invoice.items.length > 0) {
     lines.push(``, `✂️ *Services & Products:*`);
     for (const item of invoice.items) {
-      const priceStr = item.unit_price !== undefined ? ` - ₹${Number(item.unit_price).toLocaleString('en-IN')}` : '';
+      const priceStr =
+        item.unit_price !== undefined ? ` - ₹${Number(item.unit_price).toLocaleString('en-IN')}` : '';
       const qtyStr = item.qty && item.qty > 1 ? ` (x${item.qty})` : '';
       lines.push(`  • ${item.name}${qtyStr}${priceStr}`);
     }
@@ -351,10 +567,7 @@ export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: s
   const text = lines.join('\n');
   const encodedText = encodeURIComponent(text);
 
-  // CRITICAL FIX: Desktop browsers hitting wa.me experience an intermediate redirect bug on WhatsApp's
-  // redirect server where multi-byte UTF-8 emojis get corrupted into  replacement diamonds (\uFFFD).
-  // 1. On Desktop / Laptop: Use web.whatsapp.com directly (zero intermediate redirect -> emojis remain 100% intact).
-  // 2. On Mobile (Android/iOS): Use api.whatsapp.com to trigger the native WhatsApp app intent directly.
+  // Desktop web.whatsapp.com directly vs Mobile api.whatsapp.com
   const isMobile = isMobileDevice();
   const waUrl = isMobile
     ? `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodedText}`
@@ -369,57 +582,26 @@ export function buildInvoiceWhatsAppMessage(invoice: InvoiceBillData): { text: s
 export async function downloadInvoicePdf(invoice: InvoiceBillData): Promise<boolean> {
   try {
     const doc = await generateInvoicePdfDoc(invoice);
-    const cleanSalon = (invoice.salon_name || 'Salon').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-    const cleanInv = (invoice.number || 'Receipt').replace(/[^a-zA-Z0-9_-]/g, '_');
-    doc.save(`${cleanSalon}-${cleanInv}.pdf`);
+    const filename = `Invoice_${(invoice.number || 'Receipt').replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`;
+    doc.save(filename);
     return true;
   } catch (err) {
-    console.error('Failed to download invoice PDF:', err);
+    console.error('downloadInvoicePdf error:', err);
     return false;
   }
 }
 
 /**
- * Opens WhatsApp directly into the customer's chat with the pre-filled itemized bill and digital receipt link.
- * Synchronous execution ensures ZERO browser popup blocker issues on PC & Mobile!
+ * Dispatches WhatsApp message with fallback to PDF download.
  */
-export async function openDirectWhatsAppChat(invoice: InvoiceBillData): Promise<ShareResult> {
-  const { text, waUrl } = buildInvoiceWhatsAppMessage(invoice);
-
-  // 1. Copy exact message with emojis to clipboard as instant fallback
-  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {}
-  }
-
-  // 2. Immediately open customer's chat directly in WhatsApp
+export async function dispatchSmartWhatsAppBill(invoice: InvoiceBillData): Promise<ShareResult> {
+  const { waUrl } = buildInvoiceWhatsAppMessage(invoice);
   if (typeof window !== 'undefined') {
-    window.open(waUrl, '_blank');
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
   }
-
-  // 3. Mark sent in backend DB
-  try {
-    await fetch('/api/billing/whatsapp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ invoice_id: invoice.id }),
-    });
-  } catch {}
-
-  const isMobile = isMobileDevice();
   return {
     success: true,
     method: 'whatsapp_web',
-    message: isMobile
-      ? 'WhatsApp app opened directly in customer chat! Press Send to deliver the bill.'
-      : 'WhatsApp Web opened directly in customer chat! Message also copied to clipboard. Press Send.',
+    message: 'Opening WhatsApp...',
   };
-}
-
-/**
- * Smart Device-Adaptive WhatsApp Bill Dispatcher
- */
-export async function dispatchSmartWhatsAppBill(invoice: InvoiceBillData): Promise<ShareResult> {
-  return openDirectWhatsAppChat(invoice);
 }

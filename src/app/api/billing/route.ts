@@ -34,6 +34,7 @@ export async function GET(request: Request) {
       SELECT i.id, i.number, i.receipt_token, i.session_id, i.subtotal, i.discount_type, 
               i.discount_value, i.discount_amount, i.tax_rate, i.tax_amount, i.total, i.whatsapp_sent, i.created_at,
               c.id as customer_id, c.name as customer_name, c.mobile as customer_mobile,
+              s.name as salon_name, s.phone as salon_phone, s.address as salon_address, s.logo_url,
               COALESCE(SUM(p.amount), 0)::numeric(10,2) as paid_amount,
               (i.total - COALESCE(SUM(p.amount), 0))::numeric(10,2) as due_amount,
               CASE 
@@ -44,6 +45,7 @@ export async function GET(request: Request) {
               COUNT(*) OVER() as full_count
       FROM invoices i
       JOIN customers c ON i.customer_id = c.id
+      JOIN salons s ON i.salon_id = s.id
       LEFT JOIN payments p ON i.id = p.invoice_id
       WHERE i.salon_id = $1
     `;
@@ -56,7 +58,7 @@ export async function GET(request: Request) {
       idx++;
     }
 
-    baseSql += ` GROUP BY i.id, c.id `;
+    baseSql += ` GROUP BY i.id, c.id, s.id `;
 
     if (statusFilter === 'paid') {
       baseSql += ` HAVING (i.total - COALESCE(SUM(p.amount), 0)) <= 0 `;

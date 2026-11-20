@@ -470,6 +470,7 @@ export default async function PublicBillPage({
                 name: invoice.salon_name,
                 address: invoice.salon_address,
                 phone: invoice.salon_phone,
+                logo_url: invoice.salon_logo_url,
               }}
               invoice={{
                 number: invoice.number,

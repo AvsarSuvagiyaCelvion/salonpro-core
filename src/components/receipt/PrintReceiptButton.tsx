@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Download, Printer, Loader2, Check } from 'lucide-react';
+import { generateInvoicePdfDoc } from '@/lib/whatsapp-bill';
 
 export interface InvoiceItem {
   name: string;
@@ -21,6 +22,7 @@ export interface PrintReceiptButtonProps {
     name: string;
     address?: string | null;
     phone?: string | null;
+    logo_url?: string | null;
   };
   invoice: {
     number: string;
@@ -39,18 +41,6 @@ export interface PrintReceiptButtonProps {
   status: 'PAID' | 'PARTIAL' | 'PENDING';
 }
 
-function formatFullMobile(mobile: string | null | undefined): string {
-  if (!mobile) return 'N/A';
-  const digits = mobile.replace(/\D/g, '');
-  if (digits.length === 10) {
-    return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
-  } else if (digits.length === 12 && digits.startsWith('91')) {
-    const ten = digits.slice(2);
-    return `+91 ${ten.slice(0, 5)} ${ten.slice(5)}`;
-  }
-  return mobile;
-}
-
 export default function PrintReceiptButton({
   salon,
   invoice,
@@ -64,260 +54,37 @@ export default function PrintReceiptButton({
   const [downloading, setDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
-  // 1. Direct PDF Vector Document Download (Zero Print Menu)
+  // 1. Direct PDF Vector Document Download using unified publication-grade engine
   async function handleDownloadPdf() {
     if (downloading) return;
     setDownloading(true);
 
     try {
-      const { jsPDF } = await import('jspdf');
-
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
+      const totalPaid = (payments || []).reduce((s, p) => s + Number(p.amount || 0), 0);
+      const doc = await generateInvoicePdfDoc({
+        id: invoice.number,
+        number: invoice.number,
+        customer_name: invoice.customer_name,
+        customer_mobile: invoice.customer_mobile || '',
+        subtotal: invoice.subtotal,
+        discount_amount: invoice.discount_amount,
+        tax_amount: (cgst || 0) + (sgst || 0),
+        total: invoice.total,
+        paid_amount: status === 'PAID' ? invoice.total : totalPaid,
+        status,
+        created_at: invoice.created_at,
+        items: (items || []).map((it) => ({
+          name: it.name,
+          qty: it.qty || 1,
+          unit_price: it.unit_price,
+          kind: it.kind || 'service',
+        })),
+        salon_name: salon.name,
+        salon_phone: salon.phone || '',
+        salon_address: salon.address || '',
+        logo_url: salon.logo_url,
       });
 
-      const pageWidth = 210;
-      const margin = 15;
-      const contentWidth = pageWidth - margin * 2;
-
-      // 1. Top Header Banner
-      doc.setFillColor(24, 24, 27); // #18181b
-      doc.rect(0, 0, pageWidth, 42, 'F');
-
-      // Salon Name
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
-      const salonTitle = doc.splitTextToSize(salon.name || 'Salon Receipt', 125)[0];
-      doc.text(salonTitle, margin, 16);
-
-      // Salon Address & Phone
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(200, 200, 200);
-      const salonAddr = doc.splitTextToSize(salon.address || 'Boutique Salon & Spa', 125)[0];
-      doc.text(salonAddr, margin, 23);
-      if (salon.phone) {
-        doc.text(`Ph: ${salon.phone}`, margin, 28);
-      }
-
-      // Status Badge
-      const badgeText = (status || 'PAID').toUpperCase();
-      const badgeWidth = 24;
-      const badgeX = pageWidth - margin - badgeWidth;
-      if (status === 'PAID') {
-        doc.setFillColor(16, 185, 129); // emerald
-      } else if (status === 'PARTIAL') {
-        doc.setFillColor(245, 158, 11); // amber
-      } else {
-        doc.setFillColor(244, 63, 94); // rose
-      }
-      doc.roundedRect(badgeX, 10, badgeWidth, 7, 2, 2, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.text(badgeText, badgeX + badgeWidth / 2, 14.8, { align: 'center' });
-
-      // Receipt Label
-      doc.setTextColor(220, 220, 220);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.text('OFFICIAL TAX INVOICE', pageWidth - margin, 24, { align: 'right' });
-
-      let y = 50;
-
-      // 2. Invoice Meta & Billed To Card
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(226, 232, 240);
-      doc.roundedRect(margin, y, contentWidth, 26, 3, 3, 'FD');
-
-      // Left: Billed To
-      doc.setTextColor(148, 163, 184);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.text('BILLED TO', margin + 6, y + 7);
-
-      doc.setTextColor(15, 23, 42);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      const custName = doc.splitTextToSize(invoice.customer_name || 'Walk-in Client', 85)[0];
-      doc.text(custName, margin + 6, y + 14);
-
-      doc.setTextColor(100, 116, 139);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.text(`Mobile: ${formatFullMobile(invoice.customer_mobile)}`, margin + 6, y + 20);
-
-      // Right: Invoice Details
-      const rightX = pageWidth - margin - 6;
-      doc.setTextColor(148, 163, 184);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.text('INVOICE NO', rightX, y + 7, { align: 'right' });
-
-      doc.setTextColor(212, 167, 127); // #D4A77F
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.text(invoice.number, rightX, y + 14, { align: 'right' });
-
-      const dateStr = new Date(invoice.created_at).toLocaleDateString('en-IN', {
-        timeZone: 'Asia/Kolkata',
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      doc.setTextColor(100, 116, 139);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.text(dateStr, rightX, y + 20, { align: 'right' });
-
-      y += 34;
-
-      // 3. Table Header
-      doc.setFillColor(241, 245, 249);
-      doc.rect(margin, y, contentWidth, 8, 'F');
-
-      doc.setTextColor(71, 85, 105);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.text('ITEMS & SERVICES', margin + 4, y + 5.5);
-      doc.text('TYPE', margin + 95, y + 5.5);
-      doc.text('QTY', margin + 125, y + 5.5, { align: 'center' });
-      doc.text('AMOUNT (INR)', pageWidth - margin - 4, y + 5.5, { align: 'right' });
-
-      y += 9;
-
-      // 4. Items List
-      (items || []).forEach((item) => {
-        doc.setTextColor(15, 23, 42);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
-        const itemName = doc.splitTextToSize(item.name || 'Service', 80)[0];
-        doc.text(itemName, margin + 4, y + 4.5);
-
-        doc.setTextColor(100, 116, 139);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.text((item.kind || 'service').toUpperCase(), margin + 95, y + 4.5);
-        doc.text(String(item.qty || 1), margin + 125, y + 4.5, { align: 'center' });
-
-        const itemTotal = Number(item.unit_price) * (item.qty || 1);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(15, 23, 42);
-        doc.text(
-          `Rs. ${itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-          pageWidth - margin - 4,
-          y + 4.5,
-          { align: 'right' }
-        );
-
-        doc.setDrawColor(241, 245, 249);
-        doc.line(margin, y + 7, pageWidth - margin, y + 7);
-
-        y += 9;
-      });
-
-      y += 4;
-
-      // 5. Financial Summary
-      const totalsX = 120;
-      const totalsValX = pageWidth - margin - 4;
-
-      function renderTotalRow(label: string, value: string, isBold = false, color = [71, 85, 105]) {
-        doc.setTextColor(color[0], color[1], color[2]);
-        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
-        doc.setFontSize(isBold ? 9.5 : 8.5);
-        doc.text(label, totalsX, y);
-        doc.text(value, totalsValX, y, { align: 'right' });
-        y += 5.5;
-      }
-
-      renderTotalRow(
-        'Subtotal',
-        `Rs. ${Number(invoice.subtotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
-      );
-      if (Number(invoice.discount_amount) > 0) {
-        renderTotalRow(
-          'Discount',
-          `-Rs. ${Number(invoice.discount_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-          false,
-          [219, 39, 119]
-        );
-      }
-      if (taxableSubtotal > 0) {
-        renderTotalRow('Taxable Value', `Rs. ${Number(taxableSubtotal).toFixed(2)}`);
-      }
-      if (cgst > 0) {
-        renderTotalRow('CGST (9%)', `Rs. ${Number(cgst).toFixed(2)}`);
-      }
-      if (sgst > 0) {
-        renderTotalRow('SGST (9%)', `Rs. ${Number(sgst).toFixed(2)}`);
-      }
-
-      // Grand Total Box (Width strictly fits right margin: totalsX - 3 to pageWidth - margin = 78mm)
-      y += 2;
-      const grandTotalBoxWidth = pageWidth - margin - (totalsX - 3); // 78mm
-      doc.setFillColor(38, 22, 48); // #261630
-      doc.roundedRect(totalsX - 3, y - 3.5, grandTotalBoxWidth, 9.5, 2, 2, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.text('GRAND TOTAL', totalsX, y + 2.5);
-      doc.setFontSize(10);
-      doc.text(
-        `Rs. ${Number(invoice.total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-        pageWidth - margin - 3,
-        y + 2.5,
-        { align: 'right' }
-      );
-
-      y += 16;
-
-      // 6. Payment Summary Box
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(226, 232, 240);
-      doc.roundedRect(margin, y, contentWidth, 16, 2, 2, 'FD');
-
-      doc.setTextColor(100, 116, 139);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.text('PAYMENT SUMMARY', margin + 4, y + 5);
-
-      const payStr =
-        (payments || [])
-          .map((p) => `${p.method.toUpperCase()}: Rs. ${Number(p.amount).toLocaleString('en-IN')}`)
-          .join(' | ') || 'No payment recorded';
-      doc.setTextColor(15, 23, 42);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      const paySummaryText = doc.splitTextToSize(payStr, 115)[0];
-      doc.text(paySummaryText, margin + 4, y + 11);
-
-      const totalPaid = (payments || []).reduce((s, p) => s + Number(p.amount), 0);
-      doc.setTextColor(16, 185, 129);
-      doc.setFont('helvetica', 'bold');
-      doc.text(
-        `Total Paid: Rs. ${totalPaid.toLocaleString('en-IN')}`,
-        pageWidth - margin - 4,
-        y + 11,
-        { align: 'right' }
-      );
-
-      // 7. Clean Minimal Footer: ONLY "Thank You! Please Visit Again ✨"
-      const footerY = Math.max(y + 18, 265);
-      doc.setDrawColor(226, 232, 240);
-      doc.line(margin + 20, footerY - 5, pageWidth - margin - 20, footerY - 5);
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(71, 85, 105);
-      doc.text('Thank You! Please Visit Again ✨', pageWidth / 2, footerY + 2, { align: 'center' });
-
-      // Direct Browser File Download: Name with salon name and invoice number instead of generic "Invoice-INV-..."
       const cleanSalonName = (salon.name || 'Salon')
         .trim()
         .replace(/[^a-zA-Z0-9_-]/g, '_')
@@ -329,7 +96,10 @@ export default function PrintReceiptButton({
       setTimeout(() => setDownloadSuccess(false), 3000);
     } catch (err) {
       console.error('Failed to generate PDF:', err);
-      alert('Unable to generate PDF directly. Please use the Print Receipt button to save as PDF.');
+      // Fallback to hardware print dialog
+      if (typeof window !== 'undefined') {
+        window.print();
+      }
     } finally {
       setDownloading(false);
     }

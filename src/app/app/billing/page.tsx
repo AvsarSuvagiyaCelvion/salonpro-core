@@ -149,6 +149,10 @@ export default function BillingPage() {
         paid_amount: whatsappInvoice.paid_amount,
         created_at: whatsappInvoice.created_at,
         items: whatsappInvoice.items,
+        salon_name: (whatsappInvoice as any).salon_name,
+        salon_phone: (whatsappInvoice as any).salon_phone,
+        salon_address: (whatsappInvoice as any).salon_address,
+        logo_url: (whatsappInvoice as any).logo_url,
       });
       if (ok) {
         showToast('Official PDF Invoice downloaded to your device!', 'success');

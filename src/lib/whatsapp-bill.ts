@@ -39,12 +39,13 @@ function formatFullMobile(mobile: string | null | undefined): string {
 }
 
 /**
- * Safely loads an image from URL and converts it to a PNG base64 DataURL.
- * Includes a 3-second timeout and gracefully returns null on error / CORS blocks.
+ * Loads an image from URL and clips it into a 100% perfect CIRCLE in canvas.
+ * Handles rectangular / portrait / landscape images with center square crop.
+ * Returns a PNG dataUrl ready for jsPDF with a 3-second timeout guard.
  */
-async function loadBase64Image(
+async function loadCircularBase64Image(
   url: string | null | undefined
-): Promise<{ dataUrl: string; width: number; height: number } | null> {
+): Promise<{ dataUrl: string; size: number } | null> {
   if (!url || typeof window === 'undefined') return null;
   return new Promise((resolve) => {
     const img = new Image();
@@ -53,17 +54,31 @@ async function loadBase64Image(
     img.onload = () => {
       clearTimeout(timer);
       try {
+        const nw = img.naturalWidth || img.width;
+        const nh = img.naturalHeight || img.height;
+        const size = Math.min(nw, nh);
         const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
+        canvas.width = size;
+        canvas.height = size;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
           resolve(null);
           return;
         }
-        ctx.drawImage(img, 0, 0);
+
+        // Circular clipping mask
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        // Draw center-cropped square into the circle
+        const sx = (nw - size) / 2;
+        const sy = (nh - size) / 2;
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+
         const dataUrl = canvas.toDataURL('image/png');
-        resolve({ dataUrl, width: canvas.width, height: canvas.height });
+        resolve({ dataUrl, size });
       } catch {
         resolve(null);
       }
@@ -77,13 +92,14 @@ async function loadBase64Image(
 }
 
 /**
- * Builds a publication-grade, luxury executive Tax Invoice PDF using jsPDF.
- * - Left Header: Salon Logo (if uploaded) or Elegant Typography & Monogram
- * - Right Header: Salon Contact Details, Invoice #, Date & Status Pill Badge
- * - Billed To Card: Client name, mobile, and payment summary
- * - Modern Billing Table: Proportional column widths, zebra striping
- * - Financial Breakdown: Subtotal, Discount, Tax, Grand Total Card & Due Amount
- * - Professional Footer: Brand appreciation, policy terms, digital receipt URL & Signatory line
+ * Builds a luxury, world-class Tax Invoice PDF for salon customers.
+ * - Circular logo with subtle gold ring (or elegant circular monogram if no logo)
+ * - Salon Name positioned gracefully next to the circular avatar
+ * - Right Header: Status Pill Badge and Salon Contact Details strictly inside printable margins
+ * - Billed To Card: Client Name, Mobile, Invoice # and Date
+ * - Itemized Billing Table: 100% proportional grid with soft zebra striping
+ * - Financial Breakdown: Grand Total card and Payment details with zero overflow
+ * - Warm Boutique Footer: Pure customer appreciation note without ERP jargon or signatory lines
  */
 export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<any> {
   const { jsPDF } = await import('jspdf');
@@ -96,8 +112,9 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
 
   const pageWidth = 210;
   const pageHeight = 297;
-  const margin = 14;
-  const contentWidth = pageWidth - margin * 2; // 182mm
+  const margin = 18; // 18mm standard luxury margin
+  const contentWidth = pageWidth - margin * 2; // 174mm
+  const rightX = pageWidth - margin; // 192mm
 
   let salonName = invoice.salon_name;
   let salonAddress = invoice.salon_address;
@@ -124,143 +141,151 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   salonAddress = salonAddress || 'Boutique Hair & Beauty Studio';
   salonPhone = salonPhone || '';
 
-  // Attempt to load logo image if available
-  const logoImg = await loadBase64Image(logoUrl);
+  // Attempt to load circular logo image
+  const circularLogo = await loadCircularBase64Image(logoUrl);
 
-  // ================= 1. LUXURY DUAL-HEADER =================
-  let y = 14;
+  // ================= 1. HEADER =================
+  let y = 16;
+  const logoDiameter = 22; // 22mm diameter circle
 
-  // LEFT SIDE: Logo or Brand Typography
-  if (logoImg) {
-    // Proportional scaling within 42mm x 20mm bounding box
-    const maxLogoW = 42;
-    const maxLogoH = 20;
-    let logoW = maxLogoW;
-    let logoH = (logoImg.height / logoImg.width) * logoW;
-    if (logoH > maxLogoH) {
-      logoH = maxLogoH;
-      logoW = (logoImg.width / logoImg.height) * logoH;
-    }
+  // LEFT SIDE: Circular Logo or Monogram Circle
+  if (circularLogo) {
+    doc.addImage(circularLogo.dataUrl, 'PNG', margin, y, logoDiameter, logoDiameter);
 
-    doc.addImage(logoImg.dataUrl, 'PNG', margin, y, logoW, logoH);
+    // Subtle Gold Border Ring
+    doc.setDrawColor(212, 167, 127); // #D4A77F Gold
+    doc.setLineWidth(0.5);
+    doc.circle(margin + logoDiameter / 2, y + logoDiameter / 2, logoDiameter / 2 + 0.3);
+    doc.setLineWidth(0.2); // reset
 
-    // Salon Name underneath the logo
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(15, 23, 42); // slate-900
-    const clippedName = doc.splitTextToSize(salonName, 85)[0];
-    doc.text(clippedName, margin, y + logoH + 5);
-  } else {
-    // Luxury Typography Block with Gold Accent Monogram
-    doc.setFillColor(15, 23, 42); // #0F172A slate-900
-    doc.roundedRect(margin, y, 16, 16, 3, 3, 'F');
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(212, 167, 127); // #D4A77F Gold
-    const initial = (salonName.charAt(0) || 'S').toUpperCase();
-    doc.text(initial, margin + 8, y + 10.5, { align: 'center' });
-
-    // Salon Name
+    // Salon Name next to the circle
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(15);
     doc.setTextColor(15, 23, 42); // slate-900
-    const clippedName = doc.splitTextToSize(salonName, 78)[0];
-    doc.text(clippedName, margin + 20, y + 7.5);
+    const clippedName = doc.splitTextToSize(salonName, 72)[0];
+    doc.text(clippedName, margin + logoDiameter + 5, y + 9.5);
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139); // slate-500
-    doc.text('HAIR, BEAUTY & WELLNESS STUDIO', margin + 20, y + 13);
+    doc.text('HAIR, BEAUTY & WELLNESS STUDIO', margin + logoDiameter + 5, y + 15);
+  } else {
+    // Luxury Circular Monogram Badge
+    doc.setFillColor(15, 23, 42); // #0F172A
+    doc.circle(margin + logoDiameter / 2, y + logoDiameter / 2, logoDiameter / 2, 'F');
+
+    doc.setDrawColor(212, 167, 127);
+    doc.setLineWidth(0.5);
+    doc.circle(margin + logoDiameter / 2, y + logoDiameter / 2, logoDiameter / 2 + 0.3);
+    doc.setLineWidth(0.2);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(212, 167, 127); // Gold initial
+    const initial = (salonName.charAt(0) || 'S').toUpperCase();
+    doc.text(initial, margin + logoDiameter / 2, y + logoDiameter / 2 + 3.8, { align: 'center' });
+
+    // Salon Name next to the circle
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(15, 23, 42);
+    const clippedName = doc.splitTextToSize(salonName, 72)[0];
+    doc.text(clippedName, margin + logoDiameter + 5, y + 9.5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text('HAIR, BEAUTY & WELLNESS STUDIO', margin + logoDiameter + 5, y + 15);
   }
 
-  // RIGHT SIDE: Salon Contact Details & Official Status Badge
-  const rightX = pageWidth - margin; // 196mm
+  // RIGHT SIDE: Status Badge & Salon Contact Details
   const isPaid = Number(invoice.paid_amount || invoice.total) >= Number(invoice.total);
   const statusUpper = (invoice.status || (isPaid ? 'PAID' : 'PARTIAL')).toUpperCase();
 
-  // Status Badge Pill
+  // Status Badge Pill strictly anchored to rightX
   const badgeW = 28;
-  const badgeH = 7;
-  const badgeX = rightX - badgeW;
+  const badgeH = 6.5;
+  const badgeX = rightX - badgeW; // 192 - 28 = 164mm (never overflows!)
+
   if (statusUpper.includes('PAID')) {
-    doc.setFillColor(209, 250, 229); // emerald-100
+    doc.setFillColor(236, 253, 245); // emerald-50
     doc.setDrawColor(167, 243, 208); // emerald-200
     doc.roundedRect(badgeX, y, badgeW, badgeH, 1.5, 1.5, 'FD');
-    doc.setTextColor(4, 120, 87); // emerald-700
+    doc.setTextColor(5, 150, 105); // emerald-600
   } else {
     doc.setFillColor(254, 243, 199); // amber-100
     doc.setDrawColor(253, 230, 138); // amber-200
     doc.roundedRect(badgeX, y, badgeW, badgeH, 1.5, 1.5, 'FD');
     doc.setTextColor(180, 83, 9); // amber-700
   }
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
-  doc.text(statusUpper === 'PAID' ? 'PAID IN FULL ✓' : statusUpper, badgeX + badgeW / 2, y + 4.8, {
+  doc.text(statusUpper === 'PAID' ? 'PAID IN FULL ✓' : statusUpper, badgeX + badgeW / 2, y + 4.5, {
     align: 'center',
   });
 
-  // Contact Information
+  // Salon Contact Details
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(15, 23, 42);
-  doc.text('CONTACT & STUDIO INFO', rightX, y + 13, { align: 'right' });
+  doc.text('CONTACT & STUDIO INFO', rightX, y + 12.5, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(71, 85, 105);
   if (salonPhone) {
-    doc.text(`Phone: ${salonPhone}`, rightX, y + 18, { align: 'right' });
+    doc.text(`Phone: ${salonPhone}`, rightX, y + 17, { align: 'right' });
   }
   if (salonAddress) {
-    const clippedAddr = doc.splitTextToSize(salonAddress, 78);
-    doc.text(clippedAddr[0], rightX, y + 22.5, { align: 'right' });
+    const clippedAddr = doc.splitTextToSize(salonAddress, 70);
+    doc.text(clippedAddr[0], rightX, y + 21, { align: 'right' });
     if (clippedAddr[1]) {
-      doc.text(clippedAddr[1], rightX, y + 26.5, { align: 'right' });
+      doc.text(clippedAddr[1], rightX, y + 25, { align: 'right' });
     }
   }
 
-  // Luxury Divider Bar
+  // Refined Gold Accent Divider Line
   y = 44;
   doc.setDrawColor(212, 167, 127); // Gold line (#D4A77F)
-  doc.setLineWidth(0.8);
-  doc.line(margin, y, pageWidth - margin, y);
-  doc.setLineWidth(0.2); // reset line width
+  doc.setLineWidth(0.6);
+  doc.line(margin, y, rightX, y);
+  doc.setLineWidth(0.2); // reset
 
   // ================= 2. BILLED TO & INVOICE REFERENCE CARD =================
   y += 4;
   doc.setFillColor(248, 250, 252); // slate-50
   doc.setDrawColor(226, 232, 240); // slate-200
-  doc.roundedRect(margin, y, contentWidth, 22, 2.5, 2.5, 'FD');
+  doc.roundedRect(margin, y, contentWidth, 21, 2.5, 2.5, 'FD');
 
   // Left: Customer Details
   doc.setTextColor(148, 163, 184); // slate-400
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.text('BILLED TO / CUSTOMER', margin + 5, y + 6);
+  doc.text('BILLED TO / CUSTOMER', margin + 5, y + 5.5);
 
   doc.setTextColor(15, 23, 42); // slate-900
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
-  const clientName = doc.splitTextToSize(invoice.customer_name || 'Valued Client', 80)[0];
-  doc.text(clientName, margin + 5, y + 12);
+  const clientName = doc.splitTextToSize(invoice.customer_name || 'Valued Client', 75)[0];
+  doc.text(clientName, margin + 5, y + 11.5);
 
   doc.setTextColor(100, 116, 139); // slate-500
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`Mobile: ${formatFullMobile(invoice.customer_mobile)}`, margin + 5, y + 17.5);
+  doc.text(`Mobile: ${formatFullMobile(invoice.customer_mobile)}`, margin + 5, y + 17);
 
   // Right: Invoice Reference Details
-  const metaRightX = pageWidth - margin - 5;
+  const metaRightX = rightX - 5;
   doc.setTextColor(148, 163, 184);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.text('TAX INVOICE NUMBER', metaRightX, y + 6, { align: 'right' });
+  doc.text('TAX INVOICE NUMBER', metaRightX, y + 5.5, { align: 'right' });
 
   doc.setTextColor(15, 23, 42);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10.5);
-  doc.text(invoice.number || 'INV-0001', metaRightX, y + 12, { align: 'right' });
+  doc.text(invoice.number || 'INV-0001', metaRightX, y + 11.5, { align: 'right' });
 
   const dateStr = invoice.created_at
     ? new Date(invoice.created_at).toLocaleDateString('en-IN', {
@@ -281,13 +306,14 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   doc.setTextColor(100, 116, 139);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(`Date: ${dateStr}`, metaRightX, y + 17.5, { align: 'right' });
+  doc.text(`Date: ${dateStr}`, metaRightX, y + 17, { align: 'right' });
 
-  y += 28;
+  y += 27;
 
   // ================= 3. ITEMIZED BILLING TABLE =================
-  // Header: # (10mm) | ITEM / SERVICE (80mm) | TYPE (24mm) | RATE (24mm) | QTY (16mm) | AMOUNT (28mm) = 182mm
-  const colWidths = [10, 80, 24, 24, 16, 28];
+  // Proportional Column Layout totaling EXACTLY contentWidth (174mm):
+  // # (10mm) | DESCRIPTION (76mm) | TYPE (24mm) | RATE (26mm) | QTY (14mm) | AMOUNT (24mm) = 174mm
+  const colWidths = [10, 76, 24, 26, 14, 24];
 
   doc.setFillColor(15, 23, 42); // #0F172A Slate-900
   doc.rect(margin, y, contentWidth, 8, 'F');
@@ -323,9 +349,9 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
       : [{ name: 'Salon Service & Styling Session', qty: 1, unit_price: invoice.total, kind: 'service' }];
 
   items.forEach((item, idx) => {
-    // Alternating Zebra Row Background
+    // Alternating Soft Zebra Row Background
     if (idx % 2 === 1) {
-      doc.setFillColor(248, 250, 252); // slate-50
+      doc.setFillColor(248, 250, 252);
       doc.rect(margin, y, contentWidth, 8.5, 'F');
     }
 
@@ -342,7 +368,7 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
     doc.setTextColor(15, 23, 42);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
-    const itemName = doc.splitTextToSize(item.name || 'Service', 74)[0];
+    const itemName = doc.splitTextToSize(item.name || 'Service', 70)[0];
     doc.text(itemName, curColX + 3, y + 5.5);
     curColX += colWidths[1];
 
@@ -378,22 +404,22 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
 
     // Subtle Bottom Line
     doc.setDrawColor(241, 245, 249);
-    doc.line(margin, y + 8.5, pageWidth - margin, y + 8.5);
+    doc.line(margin, y + 8.5, rightX, y + 8.5);
 
     y += 8.5;
   });
 
   // ================= 4. FINANCIAL SUMMARY BREAKDOWN =================
   y += 5;
-  const summaryBoxW = 86;
-  const summaryLeftX = pageWidth - margin - summaryBoxW; // 196 - 86 = 110mm
+  const summaryBoxW = 92; // 92mm width ensures ample breathing room for numbers
+  const summaryLeftX = rightX - summaryBoxW; // 192 - 92 = 100mm
 
   function renderSummaryLine(label: string, value: string, isDiscount = false) {
     doc.setFont('helvetica', isDiscount ? 'bold' : 'normal');
     doc.setFontSize(8);
-    doc.setTextColor(isDiscount ? 225 : 71, isDiscount ? 29 : 85, isDiscount ? 72 : 105);
+    doc.setTextColor(isDiscount ? 190 : 71, isDiscount ? 18 : 85, isDiscount ? 60 : 105);
     doc.text(label, summaryLeftX + 3, y);
-    doc.text(value, pageWidth - margin - 3, y, { align: 'right' });
+    doc.text(value, rightX - 3, y, { align: 'right' });
     y += 5.5;
   }
 
@@ -415,7 +441,7 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
     );
   }
 
-  // Grand Total Card (Slate-900 with Gold Accent)
+  // Grand Total Card (Slate-900 with Gold Accent Strip)
   y += 2;
   doc.setFillColor(15, 23, 42); // #0F172A
   doc.roundedRect(summaryLeftX, y - 4, summaryBoxW, 11, 2, 2, 'F');
@@ -433,75 +459,68 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   doc.setTextColor(212, 167, 127); // Gold text for total
   doc.text(
     `Rs. ${Number(invoice.total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-    pageWidth - margin - 4,
+    rightX - 5,
     y + 3.2,
     { align: 'right' }
   );
 
   y += 13;
 
-  // Payment Status Box
+  // Payment Status Box strictly inside rightX
   const paidVal = Number(invoice.paid_amount || invoice.total);
   const dueVal = Math.max(0, Number(invoice.total) - paidVal);
 
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(summaryLeftX, y - 2, summaryBoxW, 11, 2, 2, 'FD');
+  doc.roundedRect(summaryLeftX, y - 2, summaryBoxW, 9.5, 2, 2, 'FD');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.setTextColor(4, 120, 87); // emerald-700
   doc.text(
     `Paid: Rs. ${paidVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-    summaryLeftX + 4,
-    y + 4.5
+    summaryLeftX + 5,
+    y + 4.2
   );
 
   doc.setTextColor(dueVal > 0 ? 190 : 100, dueVal > 0 ? 18 : 116, dueVal > 0 ? 60 : 139);
   doc.text(
     dueVal > 0
-      ? `Due: Rs. ${dueVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+      ? `Balance Due: Rs. ${dueVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
       : 'Balance Due: Rs. 0.00 ✓',
-    pageWidth - margin - 4,
-    y + 4.5,
+    rightX - 5,
+    y + 4.2,
     { align: 'right' }
   );
 
-  // ================= 5. PROFESSIONAL EXECUTIVE FOOTER =================
-  const footerY = pageHeight - 34; // 263mm
+  // ================= 5. CLEAN LUXURY CUSTOMER FOOTER =================
+  // Pure appreciation and contact info, zero ERP jargon, zero signatory lines
+  const footerY = Math.max(y + 25, pageHeight - 25);
   doc.setDrawColor(226, 232, 240);
-  doc.line(margin, footerY, pageWidth - margin, footerY);
+  doc.line(margin + 20, footerY - 5, rightX - 20, footerY - 5);
 
-  // Thank You Warm Note
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(15, 23, 42);
-  doc.text(`Thank You for Visiting ${salonName}! ✨`, margin, footerY + 6);
+  doc.text(`Thank You for Visiting ${salonName}! ✨`, pageWidth / 2, footerY + 2, { align: 'center' });
 
-  // Terms & Online Booking Note
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
+  doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
   doc.text(
-    'Services & retail products are non-refundable · Book 24/7 online & view receipts anytime',
-    margin,
-    footerY + 11
+    'We hope you loved your experience and look forward to seeing you again.',
+    pageWidth / 2,
+    footerY + 7,
+    { align: 'center' }
   );
 
-  // ERP Verification Watermark
-  doc.setFontSize(6.5);
-  doc.setTextColor(148, 163, 184);
-  doc.text(
-    'DIGITALLY VERIFIED TAX RECORD · POWERED BY SALONPRO ENTERPRISE CLOUD ERP',
-    margin,
-    footerY + 16
-  );
-
-  // Authorized Signatory Line on Right
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(71, 85, 105);
-  doc.text('Authorized Signatory: ________________________', rightX, footerY + 12, { align: 'right' });
+  if (salonPhone) {
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text(`For appointments & queries: ${salonPhone}`, pageWidth / 2, footerY + 11.5, {
+      align: 'center',
+    });
+  }
 
   return doc;
 }

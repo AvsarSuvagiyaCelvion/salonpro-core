@@ -18,6 +18,7 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 | `/admin` | `src/app/admin/page.tsx` | Platform overview dashboard: total salons, active tenants, MRR, total platform appointments, and recent signups. | KPI metric cards |
 | `/admin/salons` | `src/app/admin/salons/page.tsx` | Tenant directory: search, inspect salon details, toggle active/inactive status, manually change plan, and verify custom domains. | Salons table & edit modal |
 | `/admin/owners` | `src/app/admin/owners/page.tsx` | Owner accounts directory: inspect registered tenant owners, contact emails, mobile numbers, and linked salon workspaces. | Owners table |
+| `/admin/broadcast` | `src/app/admin/broadcast/page.tsx` | WhatsApp Broadcast Hub: sends platform-wide notifications and renewal reminders to registered salon partners with segmentation filters. | Broadcast composer, Salons selector table, History |
 | `/admin/plans` | `src/app/admin/plans/page.tsx` | SaaS plan editor: configure Basic, Pro, and Premium plans, monthly prices, staff/service limits, and feature flags. | Plan cards & feature toggles |
 | `/admin/analytics` | `src/app/admin/analytics/page.tsx` | SaaS business intelligence: MRR trend charts, plan distribution, and platform growth metrics. | `AreaTrendChart`, `DonutDistributionChart` |
 | `/admin/security` | `src/app/admin/security/page.tsx` | Platform security console: manage super admin team accounts, review authentication rate-limiting locks, and audit events. | Security table & invite modal |
@@ -37,6 +38,7 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 | `/api/admin/plans/[id]` | `PATCH`, `DELETE` | `src/app/api/admin/plans/[id]/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Updates plan limits, pricing, and feature flags. |
 | `/api/admin/admins` | `GET`, `POST`, `DELETE` | `src/app/api/admin/admins/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Manages platform administrator accounts in `platform_admins`. |
 | `/api/admin/export` | `GET` | `src/app/api/admin/export/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Exports platform-wide salons directories, SaaS subscription payments, and executive platform overview snapshots as CSV & PDF. Accessible from `/admin`, `/admin/salons`, and `/admin/analytics`. |
+| `/api/admin/broadcast` | `GET`, `POST` | `src/app/api/admin/broadcast/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Lists registered salons and past admin broadcasts; dispatches bulk WhatsApp broadcasts to filtered salon partners. |
 | `/api/admin/impersonate` | `POST` | `src/app/api/admin/impersonate/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Mints temporary tenant JWT session for any salon owner account and sets impersonation cookie so super admin can log in without password for support. |
 | `/api/admin/exit-impersonation` | `POST` | `src/app/api/admin/exit-impersonation/route.ts` | None / Authenticated | Clears impersonation and tenant session cookies, returning super admin back to `/admin/salons`. |
 

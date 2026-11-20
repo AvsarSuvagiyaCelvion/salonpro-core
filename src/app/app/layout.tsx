@@ -29,6 +29,7 @@ import {
   Zap,
   Lock,
   Star,
+  MessageSquare,
 } from 'lucide-react';
 
 interface NavItem {
@@ -50,6 +51,7 @@ const navItems: NavItem[] = [
   { name: 'Services', href: '/app/services', icon: Scissors },
   { name: 'Products', href: '/app/products', icon: Package },
   { name: 'Memberships & packages', href: '/app/memberships', icon: Award, requiredFlag: 'memberships', requiredPlanName: 'Pro' },
+  { name: 'Marketing & WhatsApp', href: '/app/marketing', icon: MessageSquare },
   { name: 'Reports', href: '/app/reports', icon: BarChart3 },
   { name: 'Subscription & Plans', href: '/app/subscription', icon: CreditCard },
   { name: 'Settings', href: '/app/settings', icon: Settings },

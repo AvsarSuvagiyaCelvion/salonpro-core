@@ -236,6 +236,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `023_storage_objects.sql` | Creates `storage_objects` table (`storage_path` PK, `mime_type`, `data` base64, `created_at`, `updated_at`) with RLS policy for resilient database fallback storage of logos, avatars, and gallery photos. |
 | `024_upi_payment_settings.sql` | Adds `upi_id`, `upi_number`, `upi_qr_url` to `salons` for direct 0%-fee POS payments; creates `platform_settings` table for super admin direct UPI and bank transfer checkout. |
 | `025_salon_daily_expenses.sql` | Creates `expenses` table (`id`, `salon_id`, `title`, `category`, `amount`, `payment_mode`, `notes`, `expense_date`, `created_at`) with indexes for tracking daily petty cash outflows and calculating real-time daily Net Profit (Gross Sales - Expenses). |
+| `026_whatsapp_bulk_and_wallets.sql` | Creates `salon_wallets` (at-cost prepaid credits), `whatsapp_campaigns` (campaign audit logs), and `whatsapp_campaign_recipients` with RLS and indexes for owner marketing and admin platform broadcasts. |
 
 ---
 

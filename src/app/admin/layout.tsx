@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   ChevronRight,
   CreditCard,
+  MessageSquare,
 } from 'lucide-react';
 import ThemeToggle from '@/components/landing/ThemeToggle';
 
@@ -84,6 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/salons', label: 'Salons Directory', icon: Building2 },
     { href: '/admin/plans', label: 'Subscription Plans', icon: CreditCard },
     { href: '/admin/owners', label: 'Owners & Staff', icon: Users },
+    { href: '/admin/broadcast', label: 'WhatsApp Broadcast', icon: MessageSquare },
     { href: '/admin/analytics', label: 'Platform Analytics', icon: BarChart3 },
     ...(isSuperAdmin
       ? [{ href: '/admin/security', label: 'Admins & Security', icon: ShieldCheck }]

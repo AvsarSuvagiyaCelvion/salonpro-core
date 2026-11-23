@@ -30,6 +30,11 @@ import {
   QrCode,
   CreditCard,
   Smartphone,
+  KeyRound,
+  Eye,
+  EyeOff,
+  Lock,
+  ShieldCheck,
 } from 'lucide-react';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { MAX_GALLERY_PHOTOS } from '@/lib/storage-constants';
@@ -100,7 +105,75 @@ export default function SettingsPage() {
   const [upiQrUrl, setUpiQrUrl] = useState<string | null>(null);
 
   // Active section tab
-  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'invoicing' | 'payments' | 'holidays'>('salon');
+  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'invoicing' | 'payments' | 'holidays' | 'security'>('salon');
+
+  // Security & Password change state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    if (passwordMessage) {
+      showToast(passwordMessage.text, passwordMessage.type);
+      const timer = setTimeout(() => setPasswordMessage(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [passwordMessage]);
+
+  async function handlePasswordChange(e: React.FormEvent) {
+    e.preventDefault();
+    const cleanCurr = currentPassword.trim();
+    const cleanNew = newPassword.trim();
+    const cleanConf = confirmPassword.trim();
+
+    if (!cleanCurr) {
+      setPasswordMessage({ type: 'error', text: 'Please enter your current or temporary password.' });
+      return;
+    }
+    if (cleanNew.length < 6) {
+      setPasswordMessage({ type: 'error', text: 'New password must be at least 6 characters long.' });
+      return;
+    }
+    if (cleanNew === cleanCurr) {
+      setPasswordMessage({ type: 'error', text: 'New password must be different from your current password.' });
+      return;
+    }
+    if (cleanNew !== cleanConf) {
+      setPasswordMessage({ type: 'error', text: 'New password and confirm password do not match.' });
+      return;
+    }
+
+    setUpdatingPassword(true);
+    setPasswordMessage(null);
+    try {
+      const res = await fetch('/api/settings/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: cleanCurr,
+          newPassword: cleanNew,
+          confirmPassword: cleanConf,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update password');
+      }
+      setPasswordMessage({ type: 'success', text: data.message || 'Password updated successfully!' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordMessage({ type: 'error', text: err.message || 'Failed to update password' });
+    } finally {
+      setUpdatingPassword(false);
+    }
+  }
 
   // Holidays & Closures state
   const [holidaysList, setHolidaysList] = useState<any[]>([]);
@@ -482,6 +555,7 @@ export default function SettingsPage() {
           { id: 'invoicing', label: 'Invoice & Receipts', icon: Receipt },
           { id: 'payments', label: 'UPI & QR Payment', icon: QrCode },
           { id: 'holidays', label: 'Holidays & Closures', icon: Palmtree },
+          { id: 'security', label: 'Security & Password', icon: KeyRound },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSection === tab.id;
@@ -1399,8 +1473,152 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {/* ================= SECTION: SECURITY & PASSWORD ================= */}
+        {activeSection === 'security' && (
+          <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-6 transition-colors duration-200">
+            <div>
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <KeyRound className="w-5 h-5 text-[#D4A77F]" />
+                <span>Security & Login Password</span>
+              </h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                Update your account password or replace a temporary password provided by support
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 text-xs text-neutral-800 dark:text-neutral-200 flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 text-[#D4A77F] shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-[#1F2937] dark:text-white mb-0.5">Forgot Password Recovery</p>
+                <p className="text-neutral-600 dark:text-neutral-300 text-[11px] leading-relaxed">
+                  If you forgot your password and received a temporary password from your platform administrator, sign in and use this form to set your new private password immediately.
+                </p>
+              </div>
+            </div>
+
+            {passwordMessage && (
+              <div
+                className={`p-4 rounded-2xl border text-xs sm:text-sm flex items-center gap-2 font-medium ${
+                  passwordMessage.type === 'success'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
+                }`}
+              >
+                {passwordMessage.type === 'success' ? (
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                )}
+                <span>{passwordMessage.text}</span>
+              </div>
+            )}
+
+            <div className="space-y-4 max-w-lg">
+              {/* Current Password */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  Current / Temporary Password <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Enter current or temporary password"
+                    className="w-full bg-neutral-50 dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] rounded-2xl pl-4 pr-11 py-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors p-1 cursor-pointer"
+                    aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* New Password */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  New Password <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Minimum 6 characters"
+                    className="w-full bg-neutral-50 dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] rounded-2xl pl-4 pr-11 py-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors p-1 cursor-pointer"
+                    aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm New Password */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  Confirm New Password <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter new password"
+                    className="w-full bg-neutral-50 dark:bg-[#10141F] border border-neutral-200 dark:border-[#2A2F3A] rounded-2xl pl-4 pr-11 py-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#D4A77F] transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-white transition-colors p-1 cursor-pointer"
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handlePasswordChange}
+                  disabled={updatingPassword || !currentPassword || !newPassword || !confirmPassword}
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] disabled:opacity-50 disabled:cursor-not-allowed text-[#080B12] font-black text-sm shadow-lg shadow-[#D4A77F]/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {updatingPassword ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-[#080B12]" />
+                  ) : (
+                    <ShieldCheck className="w-4 h-4 text-[#080B12]" />
+                  )}
+                  <span>{updatingPassword ? 'Updating Password...' : 'Update Password'}</span>
+                </button>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/30 text-[11px] text-amber-800 dark:text-amber-300">
+                <div className="font-bold mb-0.5 flex items-center gap-1">
+                  <Lock className="w-3 h-3" /> Brute-Force Rate Limiting Active
+                </div>
+                5 consecutive failed password attempts will lock your account for 15 minutes to protect your workspace from unauthorized access.
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Submit Actions for Salon and Booking Tabs */}
-        {activeSection !== 'holidays' && (
+        {activeSection !== 'holidays' && activeSection !== 'security' && (
           <div className="flex justify-end pt-4">
             <button
               type="submit"

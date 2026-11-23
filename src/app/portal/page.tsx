@@ -153,6 +153,7 @@ export default function CustomerPortalPage() {
   const [authConfirmPin, setAuthConfirmPin] = useState('');
   const [showAuthPin, setShowAuthPin] = useState(false);
   const [showAuthConfirmPin, setShowAuthConfirmPin] = useState(false);
+  const [showForgotPinNotice, setShowForgotPinNotice] = useState(false);
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [lastSalonSlug, setLastSalonSlug] = useState<string | null>(null);
@@ -941,7 +942,39 @@ export default function CustomerPortalPage() {
                     {showAuthPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {authMode === 'login' && (
+                  <div className="flex justify-end pt-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPinNotice(!showForgotPinNotice)}
+                      className="text-[11px] font-semibold text-neutral-500 hover:text-[#D4A77F] dark:text-neutral-400 dark:hover:text-[#D4A77F] transition-colors cursor-pointer"
+                    >
+                      Forgot Security PIN?
+                    </button>
+                  </div>
+                )}
               </div>
+
+              {showForgotPinNotice && authMode === 'login' && (
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-200 space-y-1.5">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      Forgot PIN Assistance
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPinNotice(false)}
+                      className="text-amber-600 dark:text-amber-400 hover:text-amber-800 text-xs cursor-pointer font-black"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                    If you forgot your PIN, please contact the salon reception or our support team on WhatsApp to receive a temporary reset PIN. Once logged in, you can update your PIN anytime under your Profile.
+                  </p>
+                </div>
+              )}
 
               {authMode === 'signup' && (
                 <div>

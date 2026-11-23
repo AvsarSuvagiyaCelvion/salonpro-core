@@ -19,17 +19,25 @@ import {
   Phone,
   FileText,
   DollarSign,
-  TrendingUp,
   Eye,
   Printer,
   Download,
   Loader2,
   Smartphone,
-  ExternalLink,
+  Plus,
+  Trash2,
+  User,
+  Scissors,
+  Package,
+  ArrowRight,
+  ShieldCheck,
+  QrCode,
 } from 'lucide-react';
 
 interface InvoiceItem {
+  id?: string;
   name: string;
+  kind?: string;
   qty: number;
   unit_price: string | number;
 }
@@ -42,6 +50,7 @@ interface Invoice {
   customer_mobile: string;
   subtotal: string | number;
   discount_amount: string | number;
+  tax_amount?: string | number;
   total: string | number;
   paid_amount: string | number;
   due_amount: string | number;
@@ -51,6 +60,26 @@ interface Invoice {
   items: InvoiceItem[];
 }
 
+interface ServiceOption {
+  id: string;
+  name: string;
+  price: number;
+  category?: string;
+}
+
+interface ProductOption {
+  id: string;
+  name: string;
+  price: number;
+  stock?: number;
+}
+
+interface CustomerOption {
+  id: string;
+  name: string;
+  mobile: string;
+}
+
 export default function BillingPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,21 +87,12 @@ export default function BillingPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'partial' | 'paid'>('all');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // Auto-dismiss notification after 3 seconds and trigger global toast
-  useEffect(() => {
-    if (message) {
-      showToast(message.text, message.type);
-      const timer = setTimeout(() => setMessage(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
-
   // Pagination
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  // Payment Modal
+  // Settlement Payment Modal
   const [paymentModalInvoice, setPaymentModalInvoice] = useState<Invoice | null>(null);
   const [payMethod, setPayMethod] = useState<'cash' | 'upi' | 'card' | 'online'>('upi');
   const [payAmount, setPayAmount] = useState('');
@@ -86,39 +106,111 @@ export default function BillingPage() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
 
-  // Salon UPI QR state for POS collection
-  const [salonUpiInfo, setSalonUpiInfo] = useState<{ upi_id?: string; upi_number?: string; upi_qr_url?: string; name?: string } | null>(null);
+  // Full Minimalist Invoice View Modal
+  const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
+
+  // Salon UPI & Branding Info
+  const [salonInfo, setSalonInfo] = useState<{
+    upi_id?: string;
+    upi_number?: string;
+    upi_qr_url?: string;
+    name?: string;
+    phone?: string;
+    address?: string;
+    logo_url?: string;
+  } | null>(null);
   const [dynamicUpiQrUrl, setDynamicUpiQrUrl] = useState<string | null>(null);
 
+  // ================= NEW INVOICE POS CREATOR STATE =================
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [catalogServices, setCatalogServices] = useState<ServiceOption[]>([]);
+  const [catalogProducts, setCatalogProducts] = useState<ProductOption[]>([]);
+  const [existingCustomers, setExistingCustomers] = useState<CustomerOption[]>([]);
+
+  // POS Form
+  const [posCustomerName, setPosCustomerName] = useState('');
+  const [posCustomerMobile, setPosCustomerMobile] = useState('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [posItems, setPosItems] = useState<InvoiceItem[]>([
+    { name: '', kind: 'service', qty: 1, unit_price: '' },
+  ]);
+  const [posDiscountType, setPosDiscountType] = useState<'none' | 'percent' | 'fixed'>('none');
+  const [posDiscountValue, setPosDiscountValue] = useState<string>('0');
+  const [posTaxRate, setPosTaxRate] = useState<number>(18); // Default 18% GST (9% CGST + 9% SGST)
+  const [posPaymentMethod, setPosPaymentMethod] = useState<'cash' | 'upi' | 'card'>('cash');
+  const [posPaidAmount, setPosPaidAmount] = useState<string>('');
+  const [posPaymentRef, setPosPaymentRef] = useState<string>('');
+  const [creatingInvoice, setCreatingInvoice] = useState(false);
+
+  // Auto-dismiss notification after 3 seconds
   useEffect(() => {
-    async function loadSalonUpi() {
+    if (message) {
+      showToast(message.text, message.type);
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    async function loadSalonSettings() {
       try {
         const res = await fetch('/api/settings');
         if (res.ok) {
           const data = await res.json();
           if (data.salon) {
-            setSalonUpiInfo({
+            setSalonInfo({
               upi_id: data.salon.upi_id || '',
               upi_number: data.salon.upi_number || '',
               upi_qr_url: data.salon.upi_qr_url || '',
               name: data.salon.name || 'Salon',
+              phone: data.salon.phone || '',
+              address: data.salon.address || '',
+              logo_url: data.salon.logo_url || '',
             });
           }
         }
       } catch {}
     }
-    loadSalonUpi();
+    loadSalonSettings();
   }, []);
 
-  // Generate dynamic amount-locked QR whenever paymentModal or payAmount changes
+  // Fetch catalog services, products, and customers when create modal opens
+  useEffect(() => {
+    if (createModalOpen) {
+      async function loadCatalog() {
+        try {
+          const [servRes, prodRes, custRes] = await Promise.all([
+            fetch('/api/services'),
+            fetch('/api/products'),
+            fetch('/api/customers'),
+          ]);
+          if (servRes.ok) {
+            const d = await servRes.json();
+            setCatalogServices(d.services || []);
+          }
+          if (prodRes.ok) {
+            const d = await prodRes.json();
+            setCatalogProducts(d.products || []);
+          }
+          if (custRes.ok) {
+            const d = await custRes.json();
+            setExistingCustomers(d.customers || []);
+          }
+        } catch {}
+      }
+      loadCatalog();
+    }
+  }, [createModalOpen]);
+
+  // Generate dynamic QR for payment modal
   useEffect(() => {
     async function updateDynamicQr() {
-      if (salonUpiInfo?.upi_id && paymentModalInvoice && payMethod === 'upi') {
+      if (salonInfo?.upi_id && paymentModalInvoice && payMethod === 'upi') {
         const targetAmount = Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount);
         try {
           const qrDataUrl = await generateUpiQrDataUrl({
-            upiId: salonUpiInfo.upi_id,
-            name: salonUpiInfo.name || 'SalonPro',
+            upiId: salonInfo.upi_id,
+            name: salonInfo.name || 'Salon',
             amount: targetAmount,
             note: `Bill ${paymentModalInvoice.number}`,
           });
@@ -131,43 +223,7 @@ export default function BillingPage() {
       }
     }
     updateDynamicQr();
-  }, [salonUpiInfo, paymentModalInvoice, payMethod, payAmount]);
-
-  async function handleDownloadPdfClick() {
-    if (!whatsappInvoice) return;
-    setDownloadingPdf(true);
-    try {
-      const ok = await downloadInvoicePdf({
-        id: whatsappInvoice.id,
-        number: whatsappInvoice.number,
-        receipt_token: whatsappInvoice.receipt_token,
-        customer_name: whatsappInvoice.customer_name,
-        customer_mobile: whatsappInvoice.customer_mobile,
-        subtotal: whatsappInvoice.subtotal,
-        discount_amount: whatsappInvoice.discount_amount,
-        total: whatsappInvoice.total,
-        paid_amount: whatsappInvoice.paid_amount,
-        created_at: whatsappInvoice.created_at,
-        items: whatsappInvoice.items,
-        salon_name: (whatsappInvoice as any).salon_name,
-        salon_phone: (whatsappInvoice as any).salon_phone,
-        salon_address: (whatsappInvoice as any).salon_address,
-        logo_url: (whatsappInvoice as any).logo_url,
-      });
-      if (ok) {
-        showToast('Official PDF Invoice downloaded to your device!', 'success');
-      } else {
-        window.open(`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`, '_blank');
-      }
-    } catch {
-      window.open(`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`, '_blank');
-    } finally {
-      setDownloadingPdf(false);
-    }
-  }
-
-  // Full Receipt View Modal
-  const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
+  }, [salonInfo, paymentModalInvoice, payMethod, payAmount]);
 
   useEffect(() => {
     setPage(1);
@@ -203,6 +259,117 @@ export default function BillingPage() {
     }
   }
 
+  // POS Calculations
+  const posSubtotal = posItems.reduce((acc, item) => {
+    const qty = Math.max(1, item.qty || 1);
+    const price = Math.max(0, parseFloat(String(item.unit_price)) || 0);
+    return acc + qty * price;
+  }, 0);
+
+  let posDiscountAmount = 0;
+  const numDiscVal = Math.max(0, parseFloat(posDiscountValue) || 0);
+  if (posDiscountType === 'percent') {
+    posDiscountAmount = (posSubtotal * Math.min(100, numDiscVal)) / 100;
+  } else if (posDiscountType === 'fixed') {
+    posDiscountAmount = Math.min(posSubtotal, numDiscVal);
+  }
+
+  const posTaxableSubtotal = Math.max(0, posSubtotal - posDiscountAmount);
+  const posTaxAmount = (posTaxableSubtotal * (posTaxRate || 0)) / 100;
+  const posGrandTotal = Math.round((posTaxableSubtotal + posTaxAmount) * 100) / 100;
+
+  // Sync paid amount default
+  useEffect(() => {
+    if (posGrandTotal > 0 && !posPaidAmount) {
+      setPosPaidAmount(posGrandTotal.toFixed(2));
+    }
+  }, [posGrandTotal, posPaidAmount]);
+
+  function handleAddPosItem(type: 'service' | 'product', refItem?: any) {
+    if (refItem) {
+      setPosItems((prev) => [
+        ...prev.filter((it) => it.name.trim() !== ''),
+        {
+          id: refItem.id,
+          name: refItem.name,
+          kind: type,
+          qty: 1,
+          unit_price: refItem.price,
+        },
+      ]);
+    } else {
+      setPosItems((prev) => [
+        ...prev,
+        { name: '', kind: type, qty: 1, unit_price: '' },
+      ]);
+    }
+  }
+
+  function handleRemovePosItem(index: number) {
+    setPosItems((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : [{ name: '', kind: 'service', qty: 1, unit_price: '' }]));
+  }
+
+  function handleUpdatePosItem(index: number, field: keyof InvoiceItem, value: any) {
+    setPosItems((prev) =>
+      prev.map((it, i) => (i === index ? { ...it, [field]: value } : it))
+    );
+  }
+
+  async function handleCreateInvoiceSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const validItems = posItems.filter(
+      (it) => it.name.trim() !== '' && Number(it.unit_price) >= 0
+    );
+
+    if (validItems.length === 0) {
+      setMessage({ type: 'error', text: 'Please add at least one line item with a valid price.' });
+      return;
+    }
+
+    setCreatingInvoice(true);
+    try {
+      const res = await fetch('/api/billing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: selectedCustomerId,
+          customerName: posCustomerName.trim() || 'Valued Client',
+          customerMobile: posCustomerMobile.trim(),
+          items: validItems,
+          discountType: posDiscountType,
+          discountValue: numDiscVal,
+          taxRate: posTaxRate,
+          paymentMethod: posPaymentMethod,
+          paidAmount: parseFloat(posPaidAmount) || 0,
+          paymentReference: posPaymentRef.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create invoice');
+
+      setMessage({ type: 'success', text: `Invoice ${data.invoice.number} created successfully!` });
+      setCreateModalOpen(false);
+      // Reset form
+      setPosCustomerName('');
+      setPosCustomerMobile('');
+      setSelectedCustomerId(null);
+      setPosItems([{ name: '', kind: 'service', qty: 1, unit_price: '' }]);
+      setPosDiscountType('none');
+      setPosDiscountValue('0');
+      setPosPaidAmount('');
+      setPosPaymentRef('');
+
+      await fetchInvoices();
+      // Instantly open the view modal for immediate preview/print
+      setViewInvoice(data.invoice);
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Error creating invoice' });
+    } finally {
+      setCreatingInvoice(false);
+    }
+  }
+
   async function handleProcessPayment(e: React.FormEvent) {
     e.preventDefault();
     if (!paymentModalInvoice) return;
@@ -227,10 +394,11 @@ export default function BillingPage() {
       const updated = {
         ...paymentModalInvoice,
         paid_amount: (Number(paymentModalInvoice.paid_amount || 0) + parseFloat(payAmount)).toString(),
+        due_amount: Math.max(0, Number(paymentModalInvoice.due_amount) - parseFloat(payAmount)).toString(),
       };
       setPaymentModalInvoice(null);
       setWhatsappInvoice(updated);
-      setMessage({ type: 'success', text: 'Payment recorded! Ready to send WhatsApp receipt & bill.' });
+      setMessage({ type: 'success', text: 'Payment recorded! Ready to dispatch WhatsApp bill.' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
     } finally {
@@ -250,10 +418,16 @@ export default function BillingPage() {
           customer_mobile: whatsappInvoice.customer_mobile,
           subtotal: whatsappInvoice.subtotal,
           discount_amount: whatsappInvoice.discount_amount,
+          tax_amount: whatsappInvoice.tax_amount,
           total: whatsappInvoice.total,
           paid_amount: whatsappInvoice.paid_amount,
           created_at: whatsappInvoice.created_at,
           items: whatsappInvoice.items,
+          salon_name: salonInfo?.name,
+          salon_phone: salonInfo?.phone,
+          salon_address: salonInfo?.address,
+          salon_upi_id: salonInfo?.upi_id,
+          logo_url: salonInfo?.logo_url,
         });
 
         if (shareResult.success) {
@@ -276,107 +450,127 @@ export default function BillingPage() {
     }
   }
 
+  async function handleDownloadPdfClick(inv: Invoice) {
+    setDownloadingPdf(true);
+    try {
+      const ok = await downloadInvoicePdf({
+        id: inv.id,
+        number: inv.number,
+        receipt_token: inv.receipt_token,
+        customer_name: inv.customer_name,
+        customer_mobile: inv.customer_mobile,
+        subtotal: inv.subtotal,
+        discount_amount: inv.discount_amount,
+        tax_amount: inv.tax_amount,
+        total: inv.total,
+        paid_amount: inv.paid_amount,
+        created_at: inv.created_at,
+        items: inv.items,
+        salon_name: salonInfo?.name,
+        salon_phone: salonInfo?.phone,
+        salon_address: salonInfo?.address,
+        salon_upi_id: salonInfo?.upi_id,
+        logo_url: salonInfo?.logo_url,
+      });
+      if (ok) {
+        showToast('Minimalist A4 PDF Invoice downloaded successfully!', 'success');
+      } else {
+        window.open(`/b/${inv.receipt_token || inv.number}`, '_blank');
+      }
+    } catch {
+      window.open(`/b/${inv.receipt_token || inv.number}`, '_blank');
+    } finally {
+      setDownloadingPdf(false);
+    }
+  }
+
   // Summary Metrics
   const totalBilled = invoices.reduce((acc, i) => acc + Number(i.total), 0);
   const totalCollected = invoices.reduce((acc, i) => acc + Number(i.paid_amount), 0);
   const totalDue = invoices.reduce((acc, i) => acc + Number(i.due_amount), 0);
 
   return (
-    <div className="space-y-6">
-      {/* Page Title */}
+    <div className="space-y-6 font-sans">
+      {/* ================= PAGE TITLE & ACTION BUTTONS ================= */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
             Billing & Invoices
           </h1>
-          <p className="text-sm text-neutral-500 mt-0.5">
-            Manage customer bills, settlements, and automated WhatsApp invoice receipts
+          <p className="text-xs text-neutral-500 mt-1">
+            Minimalist POS invoicing, settlements, and verified commercial A4 tax receipts
           </p>
         </div>
 
-        <button
-          onClick={() => setExportModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-semibold text-xs shadow-sm transition-all shrink-0 cursor-pointer self-start sm:self-auto"
-          title="Export Invoices & Sales Register (CSV & PDF)"
-        >
-          <Download className="w-3.5 h-3.5 text-[#080B12]" />
-          <span>Export (CSV & PDF)</span>
-        </button>
-      </div>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setExportModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export Register</span>
+          </button>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-[#141926] p-4.5 rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
-            Total Invoiced
-          </span>
-          <div className="text-2xl font-black text-[#1F2937] dark:text-white mt-1">
-            ₹{totalBilled.toLocaleString('en-IN')}
-          </div>
-          <div className="text-xs text-neutral-500 dark:text-[#747D8D] mt-1">
-            Across {invoices.length} invoices
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#141926] p-4.5 rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
-            Collected Revenue
-          </span>
-          <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400 mt-1">
-            ₹{totalCollected.toLocaleString('en-IN')}
-          </div>
-          <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1 flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Settled payments</span>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#141926] p-4.5 rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-[#A0A8B8]">
-            Pending / Due
-          </span>
-          <div className="text-2xl font-black text-red-600 dark:text-red-400 mt-1">
-            ₹{totalDue.toLocaleString('en-IN')}
-          </div>
-          <div className="text-xs text-neutral-500 dark:text-[#747D8D] mt-1">
-            Uncollected balance
-          </div>
-        </div>
-      </div>
-
-      {/* Alert Banner */}
-      {message && (
-        <div
-          className={`p-3.5 rounded-xl border flex items-center justify-between text-xs font-medium animate-in fade-in ${
-            message.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-              : 'bg-red-50 text-red-800 border-red-200'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {message.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            ) : (
-              <AlertCircle className="w-4 h-4 text-red-600" />
-            )}
-            <span>{message.text}</span>
-          </div>
-          <button onClick={() => setMessage(null)} className="cursor-pointer text-neutral-400 hover:text-neutral-700">
-            <X className="w-4 h-4" />
+          <button
+            onClick={() => setCreateModalOpen(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 text-xs font-black shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create New Invoice</span>
           </button>
         </div>
-      )}
+      </div>
 
-      {/* Search & Status Filter Bar */}
+      {/* ================= EXECUTIVE KPI CARDS (B&W Minimalist) ================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xs space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            Total Invoiced
+          </span>
+          <div className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white font-mono">
+            ₹{totalBilled.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </div>
+          <div className="text-xs text-neutral-400 font-mono">
+            Across {invoices.length} transactions
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xs space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            Collected Revenue
+          </span>
+          <div className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white font-mono">
+            ₹{totalCollected.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </div>
+          <div className="text-xs text-neutral-500 flex items-center gap-1 font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-900 dark:text-white" />
+            <span>Fully settled &amp; authorized</span>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xs space-y-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+            Pending / Due Balance
+          </span>
+          <div className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white font-mono">
+            ₹{totalDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </div>
+          <div className="text-xs text-neutral-400 font-mono">
+            Awaiting client settlement
+          </div>
+        </div>
+      </div>
+
+      {/* ================= SEARCH & STATUS FILTER ================= */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search invoice number, client name or phone..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-xs text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:border-[#D4A77F]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#111111] text-xs text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 dark:focus:border-white transition-colors"
           />
         </div>
 
@@ -385,32 +579,36 @@ export default function BillingPage() {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize whitespace-nowrap transition-colors cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold capitalize whitespace-nowrap transition-colors cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-[#10141F] dark:bg-[#D4A77F] text-white dark:text-[#080B12] shadow-xs'
-                  : 'bg-white dark:bg-[#141926] border border-neutral-200 dark:border-[#2A2F3A] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
+                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xs'
+                  : 'bg-white dark:bg-[#111111] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800'
               }`}
             >
-              {st}
+              {st === 'all' ? 'All Invoices' : st}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Invoices Table Card */}
-      <div className="bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200/80 dark:border-[#2A2F3A] shadow-xs overflow-hidden">
+      {/* ================= INVOICE REGISTER TABLE ================= */}
+      <div className="bg-white dark:bg-[#111111] rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xs overflow-hidden">
         {loading ? (
           <div className="p-4">
             <SkeletonTable rows={6} columns={8} />
           </div>
         ) : invoices.length === 0 ? (
-          <div className="p-12 text-center text-neutral-400 text-sm">
-            No invoices found matching your filter criteria.
+          <div className="p-16 text-center text-neutral-400 text-sm">
+            <Receipt className="w-10 h-10 mx-auto mb-2 opacity-40" />
+            <p className="font-semibold text-neutral-800 dark:text-neutral-200">No invoices found</p>
+            <p className="text-xs text-neutral-400 mt-1">
+              Click &quot;Create New Invoice&quot; to generate your first commercial tax bill.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50/70 dark:bg-[#10141F] border-b border-neutral-200/80 dark:border-[#2A2F3A] text-neutral-500 dark:text-[#A0A8B8] font-semibold uppercase tracking-wider">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3 px-4">Invoice #</th>
                   <th className="py-3 px-4">Client</th>
@@ -418,387 +616,488 @@ export default function BillingPage() {
                   <th className="py-3 px-4 text-right">Total</th>
                   <th className="py-3 px-4 text-right">Paid</th>
                   <th className="py-3 px-4 text-right">Due</th>
-                  <th className="py-3 px-4 text-center">Payment Status</th>
+                  <th className="py-3 px-4 text-center">Status</th>
                   <th className="py-3 px-4 text-center">WhatsApp</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-[#2A2F3A]">
+              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
                 {invoices.map((inv) => {
                   const isPaid = inv.status === 'paid';
+                  const isPartial = inv.status === 'partial';
 
                   return (
-                    <tr key={inv.id} className="hover:bg-[#D4A77F]/10 dark:hover:bg-[#1C2230]/60 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-[#D4A77F]">
+                    <tr
+                      key={inv.id}
+                      className="hover:bg-neutral-50/80 dark:hover:bg-neutral-800/40 transition-colors"
+                    >
+                      <td className="py-3.5 px-4 font-mono font-bold text-neutral-900 dark:text-white">
                         {inv.number}
                       </td>
-                      <td className="py-3 px-4">
-                        <div className="font-semibold text-neutral-800 dark:text-neutral-100">
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-neutral-900 dark:text-white">
                           {inv.customer_name}
                         </div>
-                        <div className="text-[11px] text-neutral-500 dark:text-[#A0A8B8] flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          <span>+91 {inv.customer_mobile}</span>
+                        <div className="text-[11px] text-neutral-400 font-mono mt-0.5">
+                          +91 {inv.customer_mobile}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-neutral-500 whitespace-nowrap">
-                        <div className="font-semibold text-neutral-800 dark:text-neutral-200 text-xs">
-                          {new Date(inv.created_at).toLocaleDateString('en-IN', {
-                            timeZone: 'Asia/Kolkata',
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </div>
-                        <div className="text-[11px] text-neutral-500 dark:text-[#A0A8B8] font-mono">
-                          {new Date(inv.created_at).toLocaleTimeString('en-IN', {
-                            timeZone: 'Asia/Kolkata',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </div>
+                      <td className="py-3.5 px-4 text-neutral-500 whitespace-nowrap font-mono text-[11px]">
+                        {new Date(inv.created_at).toLocaleDateString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
                       </td>
-                      <td className="py-3 px-4 text-right font-bold text-neutral-900 dark:text-white">
-                        ₹{Number(inv.total).toLocaleString('en-IN')}
+                      <td className="py-3.5 px-4 text-right font-mono font-bold text-neutral-900 dark:text-white">
+                        ₹{Number(inv.total).toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 text-right font-medium text-emerald-700 dark:text-emerald-400">
-                        ₹{Number(inv.paid_amount).toLocaleString('en-IN')}
+                      <td className="py-3.5 px-4 text-right font-mono text-neutral-700 dark:text-neutral-300">
+                        ₹{Number(inv.paid_amount).toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 text-right font-bold text-red-600 dark:text-red-400">
-                        {Number(inv.due_amount) > 0 ? `₹${Number(inv.due_amount).toLocaleString('en-IN')}` : '₹0'}
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase ${
-                            isPaid
-                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
-                              : inv.status === 'partial'
-                              ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40'
-                              : 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800/40'
-                          }`}
-                        >
-                          {isPaid && <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
-                          <span>{inv.status}</span>
-                        </span>
-                      </td>
-                      {/* WhatsApp status column with blue ticks indicator */}
-                      <td className="py-3 px-4 text-center">
-                        {inv.whatsapp_sent ? (
-                          <span
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40 cursor-pointer"
-                            onClick={() => setWhatsappInvoice(inv)}
-                            title="Sent on WhatsApp - Click to view preview"
-                          >
-                            <span className="text-blue-500 font-extrabold text-xs tracking-tighter">✓✓</span>
-                            <span>Sent</span>
+                      <td className="py-3.5 px-4 text-right font-mono font-bold">
+                        {Number(inv.due_amount) > 0 ? (
+                          <span className="text-neutral-900 dark:text-white">
+                            ₹{Number(inv.due_amount).toFixed(2)}
                           </span>
                         ) : (
-                          <span className="text-[11px] text-neutral-500 dark:text-[#A0A8B8]">
-                            Not Sent
-                          </span>
+                          <span className="text-neutral-400 font-normal">₹0.00</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
-                        <button
-                          onClick={() => setViewInvoice(inv)}
-                          className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-[#D4A77F] dark:hover:text-[#D4A77F] hover:bg-[#D4A77F]/10 rounded-lg inline-flex items-center cursor-pointer transition-colors"
-                          title="View Full Bill Receipt"
+                      <td className="py-3.5 px-4 text-center">
+                        <span
+                          className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
+                            isPaid
+                              ? 'border-neutral-900 dark:border-white text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800'
+                              : isPartial
+                              ? 'border-neutral-400 text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900'
+                              : 'border-neutral-300 text-neutral-500 bg-transparent'
+                          }`}
                         >
-                          <Eye className="w-3.5 h-3.5" />
+                          {inv.status}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        <button
+                          onClick={() => setWhatsappInvoice(inv)}
+                          className={`p-1.5 rounded-lg border text-xs font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer ${
+                            inv.whatsapp_sent
+                              ? 'border-neutral-300 text-neutral-800 dark:text-neutral-200'
+                              : 'border-neutral-200 text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                          }`}
+                          title="Preview or dispatch WhatsApp bill"
+                        >
+                          <Send className="w-3 h-3" />
+                          <span>{inv.whatsapp_sent ? 'Sent ✓✓' : 'Send'}</span>
                         </button>
-
-                        {!isPaid && (
+                      </td>
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
-                            onClick={() => {
-                              setPaymentModalInvoice(inv);
-                              setPayAmount(inv.due_amount.toString());
-                              setPayMethod('upi');
-                              setPayRef('');
-                              setPayNotes('');
-                            }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs cursor-pointer transition-colors"
+                            onClick={() => setViewInvoice(inv)}
+                            className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer"
+                            title="View A4 Minimalist Tax Invoice"
                           >
-                            <CreditCard className="w-3 h-3" />
-                            <span>Add Payment</span>
+                            <Eye className="w-4 h-4" />
                           </button>
-                        )}
-
-                        {isPaid && (
                           <button
-                            onClick={() => setWhatsappInvoice(inv)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs border border-emerald-300 dark:border-emerald-800/60 shadow-2xs cursor-pointer transition-colors"
+                            onClick={() => handleDownloadPdfClick(inv)}
+                            className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors cursor-pointer"
+                            title="Download A4 PDF Invoice"
                           >
-                            <Send className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                            <span>Send on WhatsApp</span>
+                            <Download className="w-4 h-4" />
                           </button>
-                        )}
+                          {!isPaid && (
+                            <button
+                              onClick={() => {
+                                setPaymentModalInvoice(inv);
+                                setPayAmount(String(inv.due_amount));
+                                setPayRef('');
+                                setPayNotes('');
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 text-[11px] font-bold hover:bg-neutral-800 transition-all cursor-pointer shadow-2xs"
+                            >
+                              Settle
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-100 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#10141F]">
-                <p className="text-xs text-neutral-600 dark:text-neutral-400">
-                  Showing page <span className="font-semibold text-neutral-900 dark:text-white">{page}</span> of{' '}
-                  <span className="font-semibold text-neutral-900 dark:text-white">{totalPages}</span> ({totalRecords} invoices)
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1 || loading}
-                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 dark:border-[#2A2F3A] bg-white dark:bg-[#141926] text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#1C2230] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page >= totalPages || loading}
-                    className="px-3 py-1.5 text-xs font-medium rounded-lg border border-neutral-200 dark:border-[#2A2F3A] bg-white dark:bg-[#141926] text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#1C2230] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
 
-      {/* ================= PAYMENT MODAL ================= */}
-      {paymentModalInvoice && (
+      {/* ================= MODAL 1: CREATE NEW INVOICE POS ================= */}
+      {createModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
-          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-md w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
-              <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-emerald-600" />
-                <span>Process Payment ({paymentModalInvoice.number})</span>
-              </h2>
+          <div className="relative bg-white dark:bg-[#111111] rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl max-w-4xl w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[92vh] overflow-hidden animate-in zoom-in-95">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-5 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+              <div>
+                <h2 className="text-base font-bold text-neutral-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                  <Receipt className="w-4 h-4" />
+                  <span>New Commercial Tax Invoice (POS)</span>
+                </h2>
+                <p className="text-xs text-neutral-400 mt-0.5">
+                  Generate instant itemized invoice with A4 PDF and digital receipt
+                </p>
+              </div>
               <button
-                onClick={() => setPaymentModalInvoice(null)}
-                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
+                onClick={() => setCreateModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-white p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleProcessPayment} className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 touch-scroll">
-              <div className="bg-neutral-50 dark:bg-[#10141F] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] text-xs space-y-1">
-                <div className="flex justify-between text-neutral-600 dark:text-neutral-400">
-                  <span>Client:</span>
-                  <span className="font-semibold text-neutral-800 dark:text-neutral-100">{paymentModalInvoice.customer_name}</span>
+            {/* Modal Form Body */}
+            <form onSubmit={handleCreateInvoiceSubmit} className="flex-1 overflow-y-auto touch-scroll p-5 sm:p-6 space-y-6">
+              {/* Customer Selector & Quick Info */}
+              <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5" />
+                    <span>Customer Details</span>
+                  </span>
+                  {existingCustomers.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        const cid = e.target.value;
+                        if (!cid) {
+                          setSelectedCustomerId(null);
+                          return;
+                        }
+                        const found = existingCustomers.find((c) => c.id === cid);
+                        if (found) {
+                          setSelectedCustomerId(found.id);
+                          setPosCustomerName(found.name);
+                          setPosCustomerMobile(found.mobile);
+                        }
+                      }}
+                      className="text-xs rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                    >
+                      <option value="">Quick Select Existing Client...</option>
+                      {existingCustomers.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} (+91 {c.mobile})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
-                <div className="flex justify-between text-neutral-600 dark:text-neutral-400">
-                  <span>Total Amount:</span>
-                  <span className="font-semibold text-neutral-800 dark:text-neutral-100">₹{paymentModalInvoice.total}</span>
-                </div>
-                <div className="flex justify-between text-neutral-600 dark:text-neutral-400">
-                  <span>Already Paid:</span>
-                  <span className="font-semibold text-emerald-700 dark:text-emerald-400">₹{paymentModalInvoice.paid_amount}</span>
-                </div>
-                <div className="flex justify-between text-neutral-600 dark:text-neutral-400 pt-1 border-t border-neutral-200 dark:border-[#2A2F3A]">
-                  <span className="font-bold text-neutral-700 dark:text-neutral-300">Remaining Due:</span>
-                  <span className="font-black text-red-600 dark:text-red-400 text-sm">₹{paymentModalInvoice.due_amount}</span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-neutral-600 dark:text-neutral-400 mb-1">
+                      Customer Full Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={posCustomerName}
+                      onChange={(e) => setPosCustomerName(e.target.value)}
+                      placeholder="e.g. Priya Sharma"
+                      className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-neutral-600 dark:text-neutral-400 mb-1">
+                      Mobile Number (for WhatsApp Receipt)
+                    </label>
+                    <input
+                      type="tel"
+                      value={posCustomerMobile}
+                      onChange={(e) => setPosCustomerMobile(e.target.value)}
+                      placeholder="10-digit mobile number"
+                      maxLength={10}
+                      className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Payment Method *
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(['upi', 'cash', 'card', 'online'] as const).map((m) => (
+              {/* Line Items Table */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center gap-1.5">
+                    <Scissors className="w-3.5 h-3.5" />
+                    <span>Bill Items (Services &amp; Retail Products)</span>
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    {/* Add from Services Dropdown */}
+                    {catalogServices.length > 0 && (
+                      <select
+                        onChange={(e) => {
+                          const sid = e.target.value;
+                          if (!sid) return;
+                          const serv = catalogServices.find((s) => s.id === sid);
+                          if (serv) handleAddPosItem('service', serv);
+                          e.target.value = '';
+                        }}
+                        className="text-xs rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                      >
+                        <option value="">+ Add Salon Service...</option>
+                        {catalogServices.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name} (₹{s.price})
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    {/* Add from Retail Products Dropdown */}
+                    {catalogProducts.length > 0 && (
+                      <select
+                        onChange={(e) => {
+                          const pid = e.target.value;
+                          if (!pid) return;
+                          const prod = catalogProducts.find((p) => p.id === pid);
+                          if (prod) handleAddPosItem('product', prod);
+                          e.target.value = '';
+                        }}
+                        className="text-xs rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-neutral-800 dark:text-neutral-200 cursor-pointer"
+                      >
+                        <option value="">+ Add Retail Product...</option>
+                        {catalogProducts.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} (₹{p.price})
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
                     <button
-                      key={m}
                       type="button"
-                      onClick={() => setPayMethod(m)}
-                      className={`py-2 text-xs font-semibold uppercase rounded-xl border transition-all cursor-pointer ${
-                        payMethod === m
-                          ? 'border-[#D4A77F] bg-[#D4A77F]/10 text-[#D4A77F] shadow-xs'
-                          : 'border-neutral-200 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-[#1C2230]'
-                      }`}
+                      onClick={() => handleAddPosItem('service')}
+                      className="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-xs font-bold cursor-pointer"
                     >
-                      {m}
+                      + Custom Item
                     </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {posItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 bg-neutral-50 dark:bg-[#161616] p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800"
+                    >
+                      <span className="font-mono text-xs text-neutral-400 w-6 text-center">
+                        {idx + 1}
+                      </span>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          required
+                          value={item.name}
+                          onChange={(e) => handleUpdatePosItem(idx, 'name', e.target.value)}
+                          placeholder="Service / Product Description"
+                          className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-2.5 py-1.5 text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900"
+                        />
+                      </div>
+                      <select
+                        value={item.kind || 'service'}
+                        onChange={(e) => handleUpdatePosItem(idx, 'kind', e.target.value)}
+                        className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2 py-1.5 text-xs text-neutral-700 dark:text-neutral-300"
+                      >
+                        <option value="service">Service</option>
+                        <option value="product">Product</option>
+                      </select>
+                      <div className="w-16">
+                        <input
+                          type="number"
+                          min={1}
+                          required
+                          value={item.qty}
+                          onChange={(e) => handleUpdatePosItem(idx, 'qty', parseInt(e.target.value, 10) || 1)}
+                          className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-2 py-1.5 text-xs font-mono text-center text-neutral-900 dark:text-white"
+                          title="Quantity"
+                        />
+                      </div>
+                      <div className="w-24">
+                        <input
+                          type="number"
+                          step="0.01"
+                          min={0}
+                          required
+                          value={item.unit_price}
+                          onChange={(e) => handleUpdatePosItem(idx, 'unit_price', e.target.value)}
+                          placeholder="Price"
+                          className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-2 py-1.5 text-xs font-mono text-right text-neutral-900 dark:text-white"
+                          title="Unit Price"
+                        />
+                      </div>
+                      <div className="w-24 text-right font-mono font-bold text-xs text-neutral-900 dark:text-white px-2">
+                        ₹{(Math.max(1, item.qty || 1) * Math.max(0, parseFloat(String(item.unit_price)) || 0)).toFixed(2)}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePosItem(idx)}
+                        className="text-neutral-400 hover:text-rose-500 p-1 cursor-pointer"
+                        title="Remove Item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Instant Salon UPI QR Code Banner when UPI is selected */}
-              {payMethod === 'upi' && (
-                <div className="p-3.5 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#8C5E2E] dark:text-[#D4A77F] flex items-center gap-1.5">
-                      <span>⚡ Instant Amount-Locked QR Scan (0% Fee)</span>
-                    </span>
-                    {salonUpiInfo?.upi_id && (
-                      <span className="text-[11px] font-mono font-bold text-neutral-700 dark:text-neutral-200">
-                        {salonUpiInfo.upi_id}
-                      </span>
+              {/* Discounts & Taxes */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 text-xs">
+                {/* Discount */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-neutral-700 dark:text-neutral-300 block">
+                    Special Discount
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      value={posDiscountType}
+                      onChange={(e) => setPosDiscountType(e.target.value as any)}
+                      className="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2.5 py-1.5 text-xs text-neutral-800 dark:text-neutral-200"
+                    >
+                      <option value="none">No Discount</option>
+                      <option value="fixed">Fixed Flat (₹)</option>
+                      <option value="percent">Percentage (%)</option>
+                    </select>
+                    {posDiscountType !== 'none' && (
+                      <input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={posDiscountValue}
+                        onChange={(e) => setPosDiscountValue(e.target.value)}
+                        placeholder="Value"
+                        className="flex-1 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-1.5 text-xs font-mono text-neutral-900 dark:text-white"
+                      />
                     )}
                   </div>
+                </div>
 
-                  {dynamicUpiQrUrl || salonUpiInfo?.upi_qr_url ? (
-                    <div className="flex flex-col sm:flex-row items-center gap-3 bg-white dark:bg-[#141926] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A]">
-                      <div className="w-32 h-32 bg-white p-1.5 rounded-xl border-2 border-emerald-500/40 shrink-0 shadow-sm flex items-center justify-center">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={dynamicUpiQrUrl || salonUpiInfo?.upi_qr_url || ''}
-                          alt="Salon Counter QR Code"
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <div className="text-center sm:text-left space-y-1">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300">
-                          Auto-Filled ₹{payAmount || paymentModalInvoice.due_amount}
-                        </span>
-                        <p className="text-xs font-bold text-neutral-900 dark:text-white pt-1">
-                          Client scans with GPay / PhonePe / Paytm
-                        </p>
-                        <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                          Exact amount <strong className="text-emerald-700 dark:text-emerald-400">₹{payAmount || paymentModalInvoice.due_amount}</strong> appears automatically on client&apos;s phone!
-                        </p>
-                        {salonUpiInfo?.upi_number && (
-                          <p className="text-[10px] text-neutral-500 font-mono">
-                            Direct Phone: {salonUpiInfo.upi_number}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ) : salonUpiInfo?.upi_id ? (
-                    <div className="bg-white dark:bg-[#141926] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] text-center space-y-1">
-                      <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
-                        Ask client to pay on Salon UPI ID:
-                      </p>
-                      <p className="text-sm font-mono font-extrabold text-[#D4A77F] select-all bg-[#D4A77F]/10 py-1 px-3 rounded-lg inline-block">
-                        {salonUpiInfo.upi_id}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 text-center py-1">
-                      💡 Tip: Add your salon&apos;s UPI ID in <strong>Settings ➔ UPI & QR Payment</strong> to display auto-amount QR here!
-                    </div>
+                {/* Tax / GST Rate */}
+                <div className="space-y-1.5">
+                  <label className="font-bold text-neutral-700 dark:text-neutral-300 block">
+                    Applicable GST / Tax Rate
+                  </label>
+                  <div className="flex gap-2">
+                    {[
+                      { rate: 0, label: '0% (Exempt)' },
+                      { rate: 5, label: '5% GST' },
+                      { rate: 18, label: '18% GST (9% CGST + 9% SGST)' },
+                    ].map((t) => (
+                      <button
+                        key={t.rate}
+                        type="button"
+                        onClick={() => setPosTaxRate(t.rate)}
+                        className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-colors cursor-pointer border ${
+                          posTaxRate === t.rate
+                            ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900'
+                            : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800'
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Settlement & Grand Total Box */}
+              <div className="p-4 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 space-y-3">
+                <div className="flex justify-between items-baseline text-xs">
+                  <span className="text-neutral-300 dark:text-neutral-600">Subtotal: ₹{posSubtotal.toFixed(2)}</span>
+                  {posDiscountAmount > 0 && (
+                    <span className="text-neutral-300 dark:text-neutral-600">
+                      Discount: -₹{posDiscountAmount.toFixed(2)}
+                    </span>
                   )}
-
-                  {/* 1-Tap App Deep Link Buttons (for Mobile / Tablet POS checkout) */}
-                  {salonUpiInfo?.upi_id && (
-                    <div className="pt-2 border-t border-[#D4A77F]/20 space-y-1.5">
-                      <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 block">
-                        📱 Or Click to Open App Directly on Device:
-                      </span>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                        <a
-                          href={buildGPayUrl({
-                            upiId: salonUpiInfo.upi_id,
-                            name: salonUpiInfo.name || 'Salon',
-                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
-                            note: `Bill ${paymentModalInvoice.number}`,
-                          })}
-                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
-                        >
-                          <span className="text-blue-500 font-black">G</span>Pay
-                        </a>
-                        <a
-                          href={buildPhonePeUrl({
-                            upiId: salonUpiInfo.upi_id,
-                            name: salonUpiInfo.name || 'Salon',
-                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
-                            note: `Bill ${paymentModalInvoice.number}`,
-                          })}
-                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
-                        >
-                          <span className="text-purple-600 font-black">पे</span> PhonePe
-                        </a>
-                        <a
-                          href={buildPaytmUrl({
-                            upiId: salonUpiInfo.upi_id,
-                            name: salonUpiInfo.name || 'Salon',
-                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
-                            note: `Bill ${paymentModalInvoice.number}`,
-                          })}
-                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer"
-                        >
-                          <span className="text-sky-500 font-black">Pay</span>tm
-                        </a>
-                        <a
-                          href={buildUpiPayUrl({
-                            upiId: salonUpiInfo.upi_id,
-                            name: salonUpiInfo.name || 'Salon',
-                            amount: Number(payAmount) > 0 ? Number(payAmount) : Number(paymentModalInvoice.due_amount),
-                            note: `Bill ${paymentModalInvoice.number}`,
-                          })}
-                          className="px-2.5 py-1.5 rounded-lg bg-[#D4A77F]/15 border border-[#D4A77F]/40 text-[#8C5E2E] dark:text-[#D4A77F] font-bold text-[11px] flex items-center justify-center gap-1 hover:bg-[#D4A77F]/25 transition-all shadow-2xs cursor-pointer"
-                        >
-                          <Smartphone className="w-3 h-3" />
-                          <span>Any UPI</span>
-                        </a>
-                      </div>
-                    </div>
+                  {posTaxAmount > 0 && (
+                    <span className="text-neutral-300 dark:text-neutral-600">Tax: ₹{posTaxAmount.toFixed(2)}</span>
                   )}
                 </div>
-              )}
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Payment Amount (₹) *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  required
-                  value={payAmount}
-                  onChange={(e) => setPayAmount(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white focus:border-[#D4A77F] outline-none font-bold text-sm"
-                />
+                <div className="flex justify-between items-center pt-2 border-t border-white/20 dark:border-black/20">
+                  <span className="text-sm font-bold uppercase tracking-wider">Grand Total Amount</span>
+                  <span className="text-2xl font-black font-mono">₹{posGrandTotal.toFixed(2)}</span>
+                </div>
+
+                {/* Payment Breakdown Inside Modal */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10 dark:border-black/10 text-xs text-neutral-900 dark:text-white">
+                  <div>
+                    <label className="block text-[11px] font-bold text-neutral-300 dark:text-neutral-600 mb-1">
+                      Payment Mode
+                    </label>
+                    <select
+                      value={posPaymentMethod}
+                      onChange={(e) => setPosPaymentMethod(e.target.value as any)}
+                      className="w-full rounded-xl border border-white/30 dark:border-black/30 bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 px-3 py-2 text-xs font-semibold cursor-pointer"
+                    >
+                      <option value="cash">Cash Settlement</option>
+                      <option value="upi">UPI / QR Code</option>
+                      <option value="card">Credit / Debit Card</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-neutral-300 dark:text-neutral-600 mb-1">
+                      Amount Paid Now
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      value={posPaidAmount}
+                      onChange={(e) => setPosPaidAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full rounded-xl border border-white/30 dark:border-black/30 bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 px-3 py-2 text-xs font-mono font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-neutral-300 dark:text-neutral-600 mb-1">
+                      Payment Ref / Note (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={posPaymentRef}
+                      onChange={(e) => setPosPaymentRef(e.target.value)}
+                      placeholder="e.g. UPI Ref / Cashier"
+                      className="w-full rounded-xl border border-white/30 dark:border-black/30 bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 px-3 py-2 text-xs"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Reference / Transaction ID (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. UPI/12345678 or Card auth code"
-                  value={payRef}
-                  onChange={(e) => setPayRef(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
-                  Internal Notes
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Settled at counter"
-                  value={payNotes}
-                  onChange={(e) => setPayNotes(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-neutral-300 dark:border-[#2A2F3A] bg-white dark:bg-[#10141F] text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:border-[#D4A77F] outline-none"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100 dark:border-[#2A2F3A]">
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setPaymentModalInvoice(null)}
-                  className="px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-[#1C2230] rounded-xl cursor-pointer"
+                  onClick={() => setCreateModalOpen(false)}
+                  className="px-5 py-3 rounded-xl border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-bold cursor-pointer hover:bg-neutral-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={paying}
-                  className="px-4 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 transition-all"
+                  disabled={creatingInvoice || posGrandTotal <= 0}
+                  className="px-8 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:text-neutral-900 text-xs font-black shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-2"
                 >
-                  {paying ? (
+                  {creatingInvoice ? (
                     <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Recording...</span>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Generating Invoice...</span>
                     </>
                   ) : (
-                    'Record Payment'
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Generate &amp; Preview Invoice</span>
+                    </>
                   )}
                 </button>
               </div>
@@ -807,302 +1106,351 @@ export default function BillingPage() {
         </div>
       )}
 
-      {/* ================= WHATSAPP PREVIEW MODAL ================= */}
+      {/* ================= MODAL 2: PAYMENT SETTLEMENT ================= */}
+      {paymentModalInvoice && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#111111] rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl max-w-md w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+              <div>
+                <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
+                  Settle Balance Payment
+                </h3>
+                <p className="text-xs text-neutral-400 mt-0.5">
+                  Invoice {paymentModalInvoice.number} · {paymentModalInvoice.customer_name}
+                </p>
+              </div>
+              <button
+                onClick={() => setPaymentModalInvoice(null)}
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-white cursor-pointer p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleProcessPayment} className="p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto touch-scroll">
+              <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 flex justify-between items-center text-xs">
+                <div>
+                  <span className="text-neutral-400 block text-[10px] uppercase font-bold">Outstanding Balance</span>
+                  <span className="text-xl font-black font-mono text-neutral-900 dark:text-white">
+                    ₹{Number(paymentModalInvoice.due_amount).toFixed(2)}
+                  </span>
+                </div>
+                <div className="text-right text-neutral-400 font-mono text-[11px]">
+                  Total: ₹{Number(paymentModalInvoice.total).toFixed(2)}
+                </div>
+              </div>
+
+              {/* Payment Method Selector */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  Select Payment Method
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'upi', label: 'UPI / QR' },
+                    { id: 'cash', label: 'Cash' },
+                    { id: 'card', label: 'Card' },
+                  ].map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setPayMethod(m.id as any)}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold transition-colors cursor-pointer border ${
+                        payMethod === m.id
+                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900'
+                          : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300'
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dynamic QR Display if UPI */}
+              {payMethod === 'upi' && dynamicUpiQrUrl && (
+                <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 flex items-center gap-3">
+                  <div className="w-20 h-20 bg-white p-1 rounded-lg border border-neutral-300 shrink-0 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={dynamicUpiQrUrl} alt="UPI QR" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="text-xs space-y-0.5">
+                    <p className="font-bold text-neutral-900 dark:text-white">Scan with any UPI App</p>
+                    <p className="font-mono text-[11px] text-neutral-500">UPI: {salonInfo?.upi_id}</p>
+                    <p className="text-[10px] text-neutral-400">Locked to ₹{payAmount || paymentModalInvoice.due_amount}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Amount Input */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  Amount Received (₹) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  required
+                  min="0.01"
+                  max={Number(paymentModalInvoice.due_amount)}
+                  value={payAmount}
+                  onChange={(e) => setPayAmount(e.target.value)}
+                  className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-sm font-mono font-bold text-neutral-900 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1.5">
+                  Transaction Reference (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={payRef}
+                  onChange={(e) => setPayRef(e.target.value)}
+                  placeholder="e.g. UPI Txn ID / Card Approval"
+                  className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-xs text-neutral-900 dark:text-white"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={paying || !payAmount || parseFloat(payAmount) <= 0}
+                  className="w-full py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:text-neutral-900 text-xs font-black shadow-md cursor-pointer disabled:opacity-50"
+                >
+                  {paying ? 'Recording Payment...' : 'Confirm Settlement'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL 3: FULL MINIMALIST INVOICE PREVIEW ================= */}
+      {viewInvoice && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
+          <div className="relative bg-white dark:bg-[#111111] rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl max-w-2xl w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[92vh] overflow-hidden animate-in zoom-in-95">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
+              <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                Official Commercial Invoice Preview
+              </span>
+              <button
+                onClick={() => setViewInvoice(null)}
+                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-white cursor-pointer p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Document Body */}
+            <div className="p-6 space-y-6 flex-1 overflow-y-auto touch-scroll text-xs">
+              {/* Header */}
+              <div className="flex justify-between items-start pb-4 border-b border-neutral-900 dark:border-white">
+                <div>
+                  <h3 className="text-xl font-black text-neutral-900 dark:text-white uppercase tracking-tight">
+                    {salonInfo?.name || 'Salon Studio'}
+                  </h3>
+                  <p className="text-neutral-500 text-[11px] max-w-xs">{salonInfo?.address || 'Premium Salon & Spa'}</p>
+                  {salonInfo?.phone && <p className="text-neutral-500 font-mono text-[11px]">Tel: {salonInfo.phone}</p>}
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-black text-neutral-900 dark:text-white block">TAX INVOICE</span>
+                  <span className="font-mono font-bold text-neutral-900 dark:text-white block">{viewInvoice.number}</span>
+                  <span className="text-neutral-400 text-[11px]">
+                    {new Date(viewInvoice.created_at).toLocaleDateString('en-IN', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Customer Box */}
+              <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-neutral-400 block">Billed To</span>
+                  <span className="font-bold text-neutral-900 dark:text-white text-sm">{viewInvoice.customer_name}</span>
+                  <span className="block font-mono text-neutral-500 text-xs">+91 {viewInvoice.customer_mobile}</span>
+                </div>
+                <div className="text-right">
+                  <span className="inline-block px-2.5 py-1 rounded border border-neutral-900 dark:border-white font-bold text-[10px] uppercase tracking-wider">
+                    {viewInvoice.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-2">
+                <div className="flex justify-between font-bold text-[11px] uppercase tracking-wider border-b border-neutral-200 dark:border-neutral-800 pb-1.5 text-neutral-400">
+                  <span>Description</span>
+                  <span>Amount</span>
+                </div>
+                {viewInvoice.items && viewInvoice.items.length > 0 ? (
+                  viewInvoice.items.map((it, idx) => (
+                    <div key={idx} className="flex justify-between items-center py-1">
+                      <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                        {it.name} {it.qty > 1 ? `(x${it.qty})` : ''}
+                      </span>
+                      <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                        ₹{(Number(it.unit_price) * (it.qty || 1)).toFixed(2)}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex justify-between py-1 font-semibold text-neutral-800 dark:text-neutral-200">
+                    <span>Salon Service &amp; Styling Session</span>
+                    <span className="font-mono font-bold">₹{Number(viewInvoice.total).toFixed(2)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Totals Summary */}
+              <div className="pt-3 border-t border-neutral-200 dark:border-neutral-800 space-y-1.5 text-right font-mono">
+                <div className="flex justify-between text-neutral-500">
+                  <span>Subtotal:</span>
+                  <span>₹{Number(viewInvoice.subtotal).toFixed(2)}</span>
+                </div>
+                {Number(viewInvoice.discount_amount) > 0 && (
+                  <div className="flex justify-between font-bold text-neutral-900 dark:text-white">
+                    <span>Discount:</span>
+                    <span>- ₹{Number(viewInvoice.discount_amount).toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center text-sm font-bold bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 p-2.5 rounded-lg mt-2">
+                  <span>GRAND TOTAL</span>
+                  <span>₹{Number(viewInvoice.total).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs pt-1">
+                  <span className="text-neutral-500 font-sans">Paid:</span>
+                  <span className="font-bold text-neutral-900 dark:text-white">
+                    ₹{Number(viewInvoice.paid_amount).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs font-bold">
+                  <span className="font-sans">Balance Due:</span>
+                  <span>₹{Number(viewInvoice.due_amount).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="p-4 sm:p-5 border-t border-neutral-200 dark:border-neutral-800 flex flex-wrap gap-2 justify-end shrink-0 bg-neutral-50 dark:bg-[#161616]">
+              <button
+                type="button"
+                onClick={() => handleDownloadPdfClick(viewInvoice)}
+                disabled={downloadingPdf}
+                className="px-4 py-2.5 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{downloadingPdf ? 'Saving...' : 'Download A4 PDF'}</span>
+              </button>
+
+              <a
+                href={`/b/${viewInvoice.receipt_token || viewInvoice.number}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-neutral-50"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Invoice ↗</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const targetInv = viewInvoice;
+                  setViewInvoice(null);
+                  setWhatsappInvoice(targetInv);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-neutral-800 text-white hover:bg-neutral-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Send WhatsApp</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL 4: WHATSAPP PREVIEW MODAL ================= */}
       {whatsappInvoice && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
-          <div className="relative bg-[#e5ddd5] dark:bg-[#0B141A] rounded-2xl border border-neutral-300 dark:border-[#222E35] shadow-2xl max-w-sm w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
-            {/* WhatsApp Header */}
-            <div className="bg-[#075e54] text-white p-3.5 flex items-center justify-between shrink-0 shadow-xs">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-emerald-700 flex items-center justify-center text-xs font-bold ring-1 ring-white/30">
-                  SP
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold leading-tight">Salon Operating System</h3>
-                  <p className="text-[10px] text-emerald-200">
-                    Recipient: +91 {whatsappInvoice.customer_mobile}
-                  </p>
-                </div>
+          <div className="relative bg-white dark:bg-[#111111] rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl max-w-sm w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+            <div className="bg-neutral-900 text-white p-4 flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-xs font-bold leading-tight">Digital WhatsApp Dispatch</h3>
+                <p className="text-[10px] text-neutral-400">Recipient: +91 {whatsappInvoice.customer_mobile}</p>
               </div>
               <button
                 onClick={() => setWhatsappInvoice(null)}
-                className="text-emerald-100 hover:text-white cursor-pointer"
+                className="text-neutral-400 hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Chat Body */}
-            <div className="p-3 sm:p-4 space-y-3 overflow-y-auto flex-1 touch-scroll">
-              <div className="bg-white dark:bg-[#1F2C34] rounded-xl p-3.5 shadow-xs text-xs space-y-2 border border-neutral-200/50 dark:border-[#2A3942]">
-                <p className="font-bold text-[#075e54] dark:text-[#25D366] text-sm">
-                  ✨ Salon Bill Receipt
-                </p>
-                <p className="text-neutral-700 dark:text-neutral-200 text-xs">
-                  Dear <strong>{whatsappInvoice.customer_name}</strong>, thank you for your visit today!
-                </p>
-
-                <div className="bg-neutral-50 dark:bg-[#111B21] p-2.5 rounded-lg text-xs space-y-1.5 font-mono text-neutral-600 dark:text-neutral-300 border border-neutral-200/60 dark:border-[#2A3942]">
-                  <div className="flex justify-between">
-                    <span>Invoice #:</span>
-                    <span className="font-bold text-neutral-900 dark:text-white">{whatsappInvoice.number}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Date:</span>
-                    <span>{new Date(whatsappInvoice.created_at).toLocaleDateString('en-IN')}</span>
-                  </div>
-
-                  {whatsappInvoice.items && whatsappInvoice.items.length > 0 && (
-                    <div className="py-1 border-t border-b border-neutral-200/80 dark:border-[#2A3942] space-y-1 my-1">
-                      {whatsappInvoice.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between text-[11px]">
-                          <span>
-                            {item.name} {item.qty > 1 ? `x${item.qty}` : ''}
-                          </span>
-                          <span>₹{Number(item.unit_price) * Number(item.qty)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="flex justify-between text-neutral-900 dark:text-white font-bold text-xs pt-0.5">
-                    <span>Total Amount:</span>
-                    <span className="text-[#D4A77F]">₹{whatsappInvoice.total}</span>
-                  </div>
-                  <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-semibold text-[11px]">
-                    <span>Payment Received:</span>
-                    <span>₹{whatsappInvoice.paid_amount}</span>
-                  </div>
+            <div className="p-4 space-y-3 overflow-y-auto flex-1 touch-scroll text-xs">
+              <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 space-y-2 font-mono">
+                <div className="flex justify-between font-bold text-neutral-900 dark:text-white">
+                  <span>Invoice: {whatsappInvoice.number}</span>
+                  <span>₹{whatsappInvoice.total}</span>
                 </div>
-
-                <p className="text-[11px] text-neutral-600 dark:text-neutral-300 text-center pt-1 font-sans">
-                  &quot;Thank you for your visit!&quot; 💖
-                </p>
-
-                <div className="text-right text-[10px] text-neutral-400 flex items-center justify-end gap-1 pt-1">
-                  <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  <span className={whatsappInvoice.whatsapp_sent ? 'text-blue-500 font-black' : 'text-neutral-400'}>
-                    ✓✓
-                  </span>
+                <div className="flex justify-between text-neutral-500 text-[11px]">
+                  <span>Client:</span>
+                  <span>{whatsappInvoice.customer_name}</span>
+                </div>
+                <div className="flex justify-between text-neutral-500 text-[11px]">
+                  <span>Status:</span>
+                  <span className="uppercase font-bold">{whatsappInvoice.status}</span>
                 </div>
               </div>
 
-              <div className="p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/40 text-[10px] text-emerald-800 dark:text-emerald-300">
-                ⚡ <strong>Instant WhatsApp Dispatch:</strong> Opens WhatsApp directly into customer (+91 {whatsappInvoice.customer_mobile}) chat with itemized tax invoice &amp; PDF link.
-              </div>
+              <button
+                type="button"
+                onClick={() => handleMarkWhatsappSent(whatsappInvoice.id)}
+                disabled={sendingWhatsapp}
+                className="w-full py-3 px-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {sendingWhatsapp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                <span>{sendingWhatsapp ? 'Opening WhatsApp...' : 'Send Bill on WhatsApp ➔'}</span>
+              </button>
 
-              {/* Direct WhatsApp Chat Action */}
-              {whatsappInvoice.whatsapp_sent ? (
-                <div className="space-y-2">
-                  <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold text-center flex items-center justify-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>Bill Sent on WhatsApp (Two Blue Ticks ✓✓)</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleMarkWhatsappSent(whatsappInvoice.id)}
-                    className="w-full py-2.5 px-3 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Resend to Customer on WhatsApp ↗</span>
-                  </button>
-                </div>
-              ) : (
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
                 <button
                   type="button"
-                  onClick={() => handleMarkWhatsappSent(whatsappInvoice.id)}
-                  disabled={sendingWhatsapp}
-                  className="w-full py-3 px-4 rounded-xl bg-[#25d366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {sendingWhatsapp ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                  <span>{sendingWhatsapp ? 'Opening WhatsApp...' : 'Send Bill to Customer on WhatsApp ➔'}</span>
-                </button>
-              )}
-
-              {/* Secondary Actions: Direct PDF Download & Web Receipt */}
-              <div className="pt-2 border-t border-neutral-200/60 dark:border-[#2A3942] grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={handleDownloadPdfClick}
+                  onClick={() => handleDownloadPdfClick(whatsappInvoice)}
                   disabled={downloadingPdf}
-                  className="py-2.5 px-3 rounded-xl bg-white dark:bg-[#1F2C34] hover:bg-neutral-50 dark:hover:bg-[#2A3942] text-neutral-800 dark:text-neutral-100 text-xs font-bold border border-neutral-300 dark:border-[#2A3942] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95 disabled:opacity-50"
+                  className="py-2.5 px-3 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  {downloadingPdf ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#D4A77F]" />
-                  ) : (
-                    <Download className="w-3.5 h-3.5 text-[#D4A77F]" />
-                  )}
-                  <span>{downloadingPdf ? 'Saving...' : '📥 Download PDF'}</span>
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download PDF</span>
                 </button>
-
                 <a
                   href={`/b/${whatsappInvoice.receipt_token || whatsappInvoice.number}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-2.5 px-3 rounded-xl bg-white dark:bg-[#1F2C34] hover:bg-neutral-50 dark:hover:bg-[#2A3942] text-neutral-800 dark:text-neutral-100 text-xs font-bold border border-neutral-300 dark:border-[#2A3942] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95 text-center"
+                  className="py-2.5 px-3 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer text-center"
                 >
-                  <Printer className="w-3.5 h-3.5 text-neutral-600 dark:text-neutral-300" />
-                  <span>🖨️ View &amp; Print ↗</span>
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Receipt ↗</span>
                 </a>
               </div>
             </div>
           </div>
         </div>
       )}
-      {/* ================= MODAL: FULL BILL RECEIPT ================= */}
-      {viewInvoice && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto p-2 sm:p-4 flex min-h-full items-start sm:items-center justify-center">
-          <div className="relative bg-white dark:bg-[#141926] rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] shadow-2xl max-w-md w-full my-auto flex flex-col max-h-[calc(100vh-1rem)] sm:max-h-[90vh] overflow-hidden animate-in zoom-in-95">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-neutral-100 dark:border-[#2A2F3A] shrink-0 bg-white dark:bg-[#141926]">
-              <span className="text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-                Official Bill Receipt
-              </span>
-              <button
-                onClick={() => setViewInvoice(null)}
-                className="text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer p-1"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Printable Receipt Body */}
-            <div className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto touch-scroll">
-              {/* Salon Brand Header */}
-              <div className="text-center pb-3 border-b border-dashed border-neutral-200 dark:border-[#2A2F3A]">
-                <h2 className="text-xl font-black text-[#1F2937] dark:text-white tracking-tight">
-                  SALON BILL RECEIPT
-                </h2>
-                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                  Authorized Payment Receipt
-                </p>
-                <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                  Tax Invoice & Client Statement
-                </p>
-              </div>
-
-              {/* Invoice & Client Info */}
-              <div className="bg-neutral-50 dark:bg-[#10141F] p-3 rounded-xl border border-neutral-200/80 dark:border-[#2A2F3A] text-xs space-y-1 font-mono">
-                <div className="flex justify-between">
-                  <span className="text-neutral-500 dark:text-neutral-400">Invoice:</span>
-                  <span className="font-bold text-[#D4A77F]">{viewInvoice.number}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-500 dark:text-neutral-400">Date & Time:</span>
-                  <span className="text-neutral-800 dark:text-neutral-200">
-                    {new Date(viewInvoice.created_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' })} · {new Date(viewInvoice.created_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-500 dark:text-neutral-400">Client:</span>
-                  <span className="font-semibold text-neutral-900 dark:text-white">{viewInvoice.customer_name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-500 dark:text-neutral-400">Mobile:</span>
-                  <span className="text-neutral-800 dark:text-neutral-200">+91 {viewInvoice.customer_mobile}</span>
-                </div>
-                <div className="flex justify-between pt-1 border-t border-neutral-200 dark:border-[#2A2F3A]">
-                  <span className="text-neutral-500 dark:text-neutral-400">Status:</span>
-                  <span className={`font-bold uppercase ${viewInvoice.status === 'paid' ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                    {viewInvoice.status}
-                  </span>
-                </div>
-              </div>
-
-              {/* Items Table */}
-              <div>
-                <div className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wide mb-2">
-                  Services & Products:
-                </div>
-                {viewInvoice.items && viewInvoice.items.length > 0 ? (
-                  <div className="divide-y divide-neutral-100 dark:divide-[#2A2F3A] text-xs">
-                    {viewInvoice.items.map((item, idx) => (
-                      <div key={idx} className="py-2 flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold text-neutral-800 dark:text-neutral-100">{item.name}</p>
-                          <p className="text-[10px] text-neutral-400 dark:text-neutral-500">
-                            Qty: {item.qty} × ₹{item.unit_price}
-                          </p>
-                        </div>
-                        <span className="font-bold text-neutral-900 dark:text-white">
-                          ₹{Number(item.unit_price) * Number(item.qty)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-neutral-400 dark:text-neutral-500 py-2">
-                    Standard Salon Treatment Service
-                  </p>
-                )}
-              </div>
-
-              {/* Bill Totals */}
-              <div className="pt-3 border-t border-dashed border-neutral-200 dark:border-[#2A2F3A] space-y-1.5 text-xs">
-                <div className="flex justify-between text-neutral-600 dark:text-neutral-400">
-                  <span>Subtotal:</span>
-                  <span className="text-neutral-800 dark:text-neutral-200">₹{viewInvoice.subtotal}</span>
-                </div>
-                {Number(viewInvoice.discount_amount) > 0 && (
-                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
-                    <span>Discount Applied:</span>
-                    <span>-₹{viewInvoice.discount_amount}</span>
-                  </div>
-                )}
-                <div className="flex justify-between font-black text-sm text-[#1F2937] dark:text-white pt-1 border-t border-neutral-200 dark:border-[#2A2F3A]">
-                  <span>Net Bill Total:</span>
-                  <span className="text-[#D4A77F]">₹{Number(viewInvoice.total).toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-semibold">
-                  <span>Amount Paid:</span>
-                  <span>₹{Number(viewInvoice.paid_amount).toLocaleString('en-IN')}</span>
-                </div>
-                {Number(viewInvoice.due_amount) > 0 && (
-                  <div className="flex justify-between text-red-600 dark:text-red-400 font-bold">
-                    <span>Balance Due:</span>
-                    <span>₹{Number(viewInvoice.due_amount).toLocaleString('en-IN')}</span>
-                  </div>
-                )}
-              </div>
-
-              <p className="text-[11px] text-neutral-400 dark:text-neutral-500 text-center pt-2">
-                &quot;Thank you for your visit!&quot;
-              </p>
-            </div>
-
-            {/* Modal Actions */}
-            <div className="p-4 sm:p-5 border-t border-neutral-100 dark:border-[#2A2F3A] flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-neutral-200 dark:border-[#2A2F3A] text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-[#1C2230] text-xs font-semibold cursor-pointer"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print Bill</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewInvoice(null)}
-                className="px-4 py-2 text-xs font-semibold bg-[#10141F] dark:bg-[#D4A77F] text-white dark:text-[#080B12] hover:bg-[#3f2248] dark:hover:bg-[#e0b892] rounded-xl cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Export Modal */}
+      {exportModalOpen && (
+        <ReportExportModal
+          isOpen={exportModalOpen}
+          onClose={() => setExportModalOpen(false)}
+          role="owner"
+          salonName={salonInfo?.name || 'Salon Workspace'}
+        />
       )}
-
-      {/* Export Reports Modal */}
-      <ReportExportModal
-        isOpen={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-        role="owner"
-        salonName="SalonPro"
-      />
     </div>
   );
 }

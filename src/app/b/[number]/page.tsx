@@ -13,15 +13,15 @@ import {
 } from '@/lib/auth';
 import PrintReceiptButton from '@/components/receipt/PrintReceiptButton';
 import { generateUpiQrDataUrl, buildGPayUrl, buildPhonePeUrl, buildPaytmUrl, buildUpiPayUrl } from '@/lib/upi';
-import { QrCode, Smartphone } from 'lucide-react';
+import { QrCode, Smartphone, CheckCircle, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Invoice Receipt - SalonPro',
-  description: 'View your digital salon receipt',
+  title: 'Tax Invoice - SalonPro Luxury Billing',
+  description: 'Verified Commercial Digital Salon Invoice & Tax Receipt',
 };
 
 function formatFullMobile(mobile: string | null | undefined): string {
-  if (!mobile) return '';
+  if (!mobile) return 'N/A';
   const digits = mobile.replace(/\D/g, '');
   if (digits.length === 10) {
     return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
@@ -45,7 +45,7 @@ export default async function PublicBillPage({
     `SELECT i.*, 
             s.name as salon_name, s.address as salon_address, s.phone as salon_phone, s.logo_url as salon_logo_url,
             s.upi_id as salon_upi_id, s.upi_number as salon_upi_number, s.upi_qr_url as salon_upi_qr_url,
-            c.name as customer_name, c.mobile as customer_mobile
+            c.id as customer_uuid, c.name as customer_name, c.mobile as customer_mobile
      FROM invoices i
      JOIN salons s ON i.salon_id = s.id
      JOIN customers c ON i.customer_id = c.id
@@ -125,7 +125,6 @@ export default async function PublicBillPage({
   const dueAmount = Math.max(0, totalAmount - totalPaid);
 
   // Inclusive GST calculation (18% total: 9% CGST + 9% SGST)
-  // Tax = Total * 18 / 118
   const totalTax = totalAmount > 0 ? (totalAmount * 18) / 118 : 0;
   const cgst = totalTax / 2;
   const sgst = totalTax / 2;
@@ -134,7 +133,7 @@ export default async function PublicBillPage({
   const status =
     dueAmount <= 0 ? 'PAID' : totalPaid > 0 ? 'PARTIAL' : 'PENDING';
 
-  // Pre-generate dynamic UPI payment QR and links if balance is due and salon has UPI configured
+  // Pre-generate dynamic UPI payment QR if balance is due
   let clientUpiQrDataUrl: string | null = null;
   const salonUpiId = invoice.salon_upi_id;
   if (dueAmount > 0 && salonUpiId) {
@@ -151,334 +150,413 @@ export default async function PublicBillPage({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-[#080B12] flex flex-col justify-start items-center print:bg-white print:p-0 transition-colors duration-200">
-      {/* Universal Sticky Top Header for Receipt Page */}
-      <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-2xs print:hidden mb-6 sm:mb-8">
+    <div className="min-h-screen bg-neutral-100 dark:bg-[#0A0A0A] text-neutral-900 dark:text-neutral-100 flex flex-col justify-start items-center print:bg-white print:p-0 transition-colors duration-200 py-6 sm:py-10 px-3 sm:px-6">
+      
+      {/* Universal Top Navigation Header (Hidden on Hardware Print) */}
+      <header className="w-full max-w-3xl flex items-center justify-between pb-6 border-b border-neutral-200 dark:border-neutral-800 mb-6 print:hidden">
         <Link href="/portal" className="flex items-center gap-2 group min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xs text-[#D4A77F] shrink-0">
-            ✂
+          <div className="w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+            SP
           </div>
           <div className="min-w-0">
-            <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-white tracking-tight block leading-tight truncate">
-              Salon<span className="text-[#8C5E2E] dark:text-[#D4A77F]">Pro</span>
+            <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-white block leading-tight">
+              SalonPro <span className="font-normal text-xs text-neutral-500">Official Invoice</span>
             </span>
-            <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
+            <span className="text-[10px] text-neutral-400 block -mt-0.5 font-mono">
               Verified Digital Receipt
             </span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
           <ThemeToggle />
           <Link
             href="/portal"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold shadow-xs transition-all active:scale-95 whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold shadow-xs transition-all active:scale-95 whitespace-nowrap"
           >
-            <span>My Bookings ➔</span>
+            <span>My Portal ➔</span>
           </Link>
         </div>
       </header>
 
-      <div id="invoice-receipt-card" className="w-full max-w-lg bg-white dark:bg-[#141926] rounded-3xl shadow-xl border border-neutral-200 dark:border-[#2A2F3A] overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none">
-        
-        {/* Top Header Brand Banner */}
-        <div className="bg-neutral-900 dark:bg-[#0B0F19] text-white p-6 sm:p-8 text-center relative border-b dark:border-[#2A2F3A]">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#D4A77F]/20 text-[#D4A77F] font-bold text-2xl mb-3 border border-[#D4A77F]/30 overflow-hidden">
+      {/* Main Luxury A4 Invoice Document Container */}
+      <div
+        id="invoice-receipt-card"
+        className="w-full max-w-3xl bg-white dark:bg-[#111111] border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xl shadow-neutral-200/50 dark:shadow-none overflow-hidden print:shadow-none print:border-none print:w-full print:max-w-none print:rounded-none p-6 sm:p-10 space-y-6"
+      >
+        {/* ================= 1. HEADER SECTION ================= */}
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 pb-6 border-b border-neutral-200 dark:border-neutral-800">
+          {/* Left: Salon Branding */}
+          <div className="flex items-start gap-4">
             {invoice.salon_logo_url ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={invoice.salon_logo_url} alt={invoice.salon_name} className="w-full h-full object-cover" />
-            ) : (
-              invoice.salon_name?.charAt(0) || 'G'
-            )}
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">{invoice.salon_name}</h1>
-          <p className="text-xs text-neutral-400 mt-1 max-w-xs mx-auto">
-            {invoice.salon_address || 'Boutique Salon & Spa'}
-          </p>
-          {invoice.salon_phone && (
-            <p className="text-xs text-neutral-400 mt-0.5">Ph: {invoice.salon_phone}</p>
-          )}
-
-          {/* Status Badge */}
-          <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase border border-white/10 backdrop-blur-sm bg-white/5">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                status === 'PAID'
-                  ? 'bg-emerald-400'
-                  : status === 'PARTIAL'
-                  ? 'bg-amber-400'
-                  : 'bg-rose-400'
-              }`}
-            />
-            <span
-              className={
-                status === 'PAID'
-                  ? 'text-emerald-300'
-                  : status === 'PARTIAL'
-                  ? 'text-amber-300'
-                  : 'text-rose-300'
-              }
-            >
-              {status}
-            </span>
-          </div>
-        </div>
-
-        {/* Invoice Metadata bar */}
-        <div className="bg-neutral-50 dark:bg-[#10141F] border-b border-neutral-200 dark:border-[#2A2F3A] px-6 py-4 flex flex-wrap justify-between items-center text-xs text-neutral-600 dark:text-neutral-300 gap-2">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">Tax Invoice</span>
-            </div>
-            <span className="text-neutral-400 block text-[10px] uppercase font-bold tracking-wider">Invoice No</span>
-            <span className="font-mono font-bold text-neutral-800 dark:text-white text-sm">{invoice.number}</span>
-          </div>
-          <div className="text-right">
-            <span className="text-neutral-400 block text-[10px] uppercase font-bold tracking-wider">Date & Time</span>
-            <span className="font-medium text-neutral-800 dark:text-neutral-200">
-              {new Date(invoice.created_at).toLocaleDateString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}{' '}
-              ·{' '}
-              {new Date(invoice.created_at).toLocaleTimeString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </span>
-          </div>
-        </div>
-
-        {/* Customer Information */}
-        <div className="p-6 border-b border-neutral-100 dark:border-[#2A2F3A]">
-          <div className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-1">
-            Billed To
-          </div>
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="font-bold text-neutral-900 dark:text-white text-base">{invoice.customer_name}</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">{formatFullMobile(invoice.customer_mobile)}</div>
-            </div>
-            <div className="text-right text-xs text-neutral-400">
-              Verified Client
-            </div>
-          </div>
-        </div>
-
-        {/* Items Table */}
-        <div className="p-6">
-          <div className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-3">
-            Services & Products
-          </div>
-
-          <div className="space-y-3">
-            {items.map((item, idx) => (
-              <div key={idx} className="flex justify-between items-start text-sm">
-                <div className="flex-1 pr-3">
-                  <div className="font-medium text-neutral-900 dark:text-neutral-100">{item.name}</div>
-                  <div className="text-xs text-neutral-400 capitalize">
-                    {item.kind} {item.qty > 1 ? `× ${item.qty}` : ''}
-                  </div>
-                </div>
-                <div className="font-semibold text-neutral-900 dark:text-white text-right">
-                  ₹{(Number(item.unit_price) * (item.qty || 1)).toLocaleString('en-IN')}
-                </div>
+              <div className="w-14 h-14 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shrink-0 bg-neutral-50 dark:bg-neutral-800 flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={invoice.salon_logo_url}
+                  alt={invoice.salon_name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            ))}
+            ) : (
+              <div className="w-14 h-14 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-bold text-xl shrink-0">
+                {(invoice.salon_name?.charAt(0) || 'S').toUpperCase()}
+              </div>
+            )}
+            <div className="space-y-1">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-neutral-900 dark:text-white uppercase">
+                {invoice.salon_name}
+              </h1>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs leading-relaxed">
+                {invoice.salon_address || 'Premium Hair, Beauty & Wellness Studio'}
+              </p>
+              {invoice.salon_phone && (
+                <p className="text-xs text-neutral-600 dark:text-neutral-300 font-mono">
+                  Tel: {invoice.salon_phone}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Pricing Calculation Breakdown */}
-          <div className="mt-6 pt-4 border-t border-dashed border-neutral-200 dark:border-[#2A2F3A] space-y-2 text-xs">
-            <div className="flex justify-between text-neutral-600 dark:text-neutral-300">
-              <span>Subtotal</span>
-              <span>₹{Number(invoice.subtotal).toLocaleString('en-IN')}</span>
+          {/* Right: Tax Invoice Title & Metadata */}
+          <div className="sm:text-right space-y-2">
+            <div className="inline-block">
+              <span className="text-xs font-black uppercase tracking-wider text-neutral-400 block">
+                Official Document
+              </span>
+              <span className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
+                TAX INVOICE
+              </span>
             </div>
 
-            {Number(invoice.discount_amount) > 0 && (
-              <div className="flex justify-between text-pink-600 dark:text-pink-400 font-medium">
+            <div className="text-xs space-y-0.5 text-neutral-600 dark:text-neutral-300 font-mono">
+              <div>
+                <span className="text-neutral-400">Invoice No: </span>
+                <span className="font-bold text-neutral-900 dark:text-white">{invoice.number}</span>
+              </div>
+              <div>
+                <span className="text-neutral-400">Date: </span>
                 <span>
-                  Discount{' '}
-                  {invoice.discount_type === 'pct' ? `(${invoice.discount_value}%)` : ''}
+                  {new Date(invoice.created_at).toLocaleDateString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                  {' · '}
+                  {new Date(invoice.created_at).toLocaleTimeString('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
-                <span>-₹{Number(invoice.discount_amount).toLocaleString('en-IN')}</span>
               </div>
-            )}
-
-            <div className="flex justify-between text-neutral-400 pt-1 border-t border-neutral-100 dark:border-[#2A2F3A]">
-              <span>Taxable Value</span>
-              <span>₹{taxableSubtotal.toFixed(2)}</span>
             </div>
 
-            <div className="flex justify-between text-neutral-400">
-              <span>CGST (9%)</span>
-              <span>₹{cgst.toFixed(2)}</span>
+            {/* Minimalist Status Badge */}
+            <div className="pt-1">
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase border ${
+                  status === 'PAID'
+                    ? 'border-neutral-900 text-neutral-900 dark:border-white dark:text-white bg-neutral-100 dark:bg-neutral-800'
+                    : 'border-neutral-400 text-neutral-600 dark:text-neutral-300 bg-transparent'
+                }`}
+              >
+                {status === 'PAID' ? 'PAID [ ✓ ]' : status === 'PARTIAL' ? 'PARTIAL PAYMENT' : 'PAYMENT DUE'}
+              </span>
             </div>
+          </div>
+        </div>
 
-            <div className="flex justify-between text-neutral-400">
-              <span>SGST (9%)</span>
-              <span>₹{sgst.toFixed(2)}</span>
+        {/* ================= 2. CLIENT & REFERENCE METADATA CARD ================= */}
+        <div className="bg-neutral-50 dark:bg-[#161616] p-4 sm:p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          {/* Column 1: Customer */}
+          <div>
+            <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 block mb-1">
+              Billed To (Customer)
+            </span>
+            <div className="font-bold text-sm text-neutral-900 dark:text-white">
+              {invoice.customer_name}
             </div>
-
-            <div className="flex justify-between items-baseline pt-3 border-t-2 border-neutral-900 dark:border-neutral-200 text-neutral-900 dark:text-white font-bold text-lg">
-              <span>Grand Total</span>
-              <span className="text-xl">₹{totalAmount.toLocaleString('en-IN')}</span>
+            <div className="text-xs text-neutral-500 font-mono mt-0.5">
+              {formatFullMobile(invoice.customer_mobile)}
             </div>
           </div>
 
-          {/* Payments Section */}
-          <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-[#2A2F3A]">
-            <div className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 mb-2">
-              Payment Summary
+          {/* Column 2: Reference Details */}
+          <div>
+            <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 block mb-1">
+              Reference Details
+            </span>
+            <div className="text-neutral-700 dark:text-neutral-300">
+              <span className="text-neutral-400 font-mono">Customer ID: </span>
+              <span className="font-mono font-medium">
+                {invoice.customer_uuid ? invoice.customer_uuid.slice(0, 8).toUpperCase() : 'CUST-WALKIN'}
+              </span>
             </div>
-            
-            {payments.length === 0 ? (
-              <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800/50 font-medium">
-                No payment recorded yet. Total Due: ₹{totalAmount.toLocaleString('en-IN')}
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                {payments.map((p, idx) => (
-                  <div
-                    key={idx}
-                    className="flex justify-between items-center text-xs bg-neutral-50 dark:bg-[#10141F] px-3 py-2 rounded-lg border border-transparent dark:border-[#2A2F3A]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      <span className="font-semibold uppercase text-neutral-800 dark:text-neutral-200">{p.method}</span>
-                      {p.reference && (
-                        <span className="text-[10px] text-neutral-400 font-mono">({p.reference})</span>
-                      )}
-                    </div>
-                    <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                      ₹{Number(p.amount).toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                ))}
+            <div className="text-neutral-700 dark:text-neutral-300 mt-0.5">
+              <span className="text-neutral-400 font-mono">Booking Ref: </span>
+              <span className="font-mono font-medium">
+                {invoice.session_id ? `#SES-${invoice.session_id.slice(0, 6).toUpperCase()}` : 'POS Direct'}
+              </span>
+            </div>
+          </div>
 
-                <div className="flex justify-between items-center text-xs font-bold pt-2 px-1">
-                  <span className="text-neutral-600 dark:text-neutral-400">Paid so far</span>
-                  <span className="text-emerald-700 dark:text-emerald-400">₹{totalPaid.toLocaleString('en-IN')}</span>
-                </div>
+          {/* Column 3: Operational Context */}
+          <div className="sm:text-right">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 block mb-1">
+              Operational Context
+            </span>
+            <div className="text-neutral-700 dark:text-neutral-300">
+              <span className="text-neutral-400">Attended By: </span>
+              <span className="font-medium text-neutral-900 dark:text-white">Salon Stylist Team</span>
+            </div>
+            <div className="text-neutral-700 dark:text-neutral-300 mt-0.5">
+              <span className="text-neutral-400">Payment: </span>
+              <span className="font-semibold uppercase text-neutral-900 dark:text-white">
+                {payments.length > 0 ? payments[0].method : 'UPI / Cash'}
+              </span>
+            </div>
+          </div>
+        </div>
 
-                {dueAmount > 0 && (
-                  <div className="flex justify-between items-center text-xs font-bold text-rose-600 dark:text-rose-400 px-1">
-                    <span>Balance Due</span>
-                    <span>₹{dueAmount.toLocaleString('en-IN')}</span>
-                  </div>
+        {/* ================= 3. ITEMIZED SERVICES & PRODUCTS TABLE ================= */}
+        <div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-t border-b border-neutral-900 dark:border-white bg-neutral-50 dark:bg-neutral-800/60 text-neutral-900 dark:text-white font-bold uppercase tracking-wider text-[11px]">
+                  <th className="py-2.5 px-3 w-12 text-center">#</th>
+                  <th className="py-2.5 px-3">Service / Product Description</th>
+                  <th className="py-2.5 px-3 w-24 text-center">Type</th>
+                  <th className="py-2.5 px-3 w-16 text-center">Qty</th>
+                  <th className="py-2.5 px-3 w-28 text-right">Unit Price</th>
+                  <th className="py-2.5 px-3 w-28 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                {items.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-4 px-3 text-center text-neutral-400 font-mono">
+                      Salon Service & Beauty Styling Session
+                    </td>
+                  </tr>
+                ) : (
+                  items.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
+                      <td className="py-3 px-3 text-center font-mono text-neutral-400 text-xs">
+                        {String(idx + 1).padStart(2, '0')}
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm">
+                          {item.name}
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">
+                          {item.kind || 'service'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono text-neutral-700 dark:text-neutral-300">
+                        {item.qty || 1}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono text-neutral-700 dark:text-neutral-300">
+                        ₹{Number(item.unit_price).toFixed(2)}
+                      </td>
+                      <td className="py-3 px-3 text-right font-mono font-bold text-neutral-900 dark:text-white">
+                        ₹{(Number(item.unit_price) * (item.qty || 1)).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))
                 )}
-              </div>
-            )}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-            {/* Direct 1-Tap UPI Payment Option for Outstanding Balance */}
-            {dueAmount > 0 && salonUpiId && (
-              <div className="mt-5 p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 space-y-3 print:hidden">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 font-bold text-xs text-[#8C5E2E] dark:text-[#D4A77F]">
-                    <QrCode className="w-4 h-4" />
-                    <span>Pay Balance Online (0% Fee)</span>
-                  </div>
-                  <span className="font-mono text-[11px] text-neutral-500 font-bold">
-                    UPI: {salonUpiId}
-                  </span>
+        {/* ================= 4. SETTLEMENT & FINANCIAL BREAKDOWN ================= */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+          
+          {/* Left Column: Settlement & UPI QR Code */}
+          <div className="space-y-4">
+            {dueAmount > 0 && salonUpiId ? (
+              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 space-y-3">
+                <div className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider text-neutral-900 dark:text-white">
+                  <QrCode className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
+                  <span>Scan to Settle Balance (UPI)</span>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-[#141926] p-3 rounded-xl border border-neutral-200 dark:border-[#2A2F3A]">
+                <div className="flex items-center gap-4">
                   {clientUpiQrDataUrl && (
-                    <div className="w-28 h-28 bg-white p-1 rounded-xl border border-neutral-200 shrink-0 shadow-xs flex items-center justify-center">
+                    <div className="w-24 h-24 bg-white p-1 rounded-lg border border-neutral-300 shrink-0 flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={clientUpiQrDataUrl}
-                        alt="Pay Outstanding Balance QR"
+                        alt="Pay Balance UPI QR"
                         className="w-full h-full object-contain"
                       />
                     </div>
                   )}
-
-                  <div className="space-y-1.5 flex-1 text-center sm:text-left w-full">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 inline-block">
-                      Exact Amount: ₹{dueAmount.toLocaleString('en-IN')}
-                    </span>
-                    <p className="text-xs font-bold text-neutral-900 dark:text-white">
-                      Scan or tap below to pay with any UPI App
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1">
-                      <a
-                        href={buildGPayUrl({
-                          upiId: salonUpiId,
-                          name: invoice.salon_name || 'Salon',
-                          amount: dueAmount,
-                          note: `Invoice ${invoice.number}`,
-                        })}
-                        className="px-2.5 py-1.5 rounded-lg bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] shadow-2xs"
-                      >
-                        <span className="text-blue-500 font-black">G</span>Pay
-                      </a>
-                      <a
-                        href={buildPhonePeUrl({
-                          upiId: salonUpiId,
-                          name: invoice.salon_name || 'Salon',
-                          amount: dueAmount,
-                          note: `Invoice ${invoice.number}`,
-                        })}
-                        className="px-2.5 py-1.5 rounded-lg bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] shadow-2xs"
-                      >
-                        <span className="text-purple-600 font-black">पे</span> PhonePe
-                      </a>
-                      <a
-                        href={buildPaytmUrl({
-                          upiId: salonUpiId,
-                          name: invoice.salon_name || 'Salon',
-                          amount: dueAmount,
-                          note: `Invoice ${invoice.number}`,
-                        })}
-                        className="px-2.5 py-1.5 rounded-lg bg-neutral-50 dark:bg-[#1C2230] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-[#D4A77F] shadow-2xs"
-                      >
-                        <span className="text-sky-500 font-black">Pay</span>tm
-                      </a>
-                      <a
-                        href={buildUpiPayUrl({
-                          upiId: salonUpiId,
-                          name: invoice.salon_name || 'Salon',
-                          amount: dueAmount,
-                          note: `Invoice ${invoice.number}`,
-                        })}
-                        className="px-2.5 py-1.5 rounded-lg bg-[#D4A77F]/15 border border-[#D4A77F]/40 text-[#8C5E2E] dark:text-[#D4A77F] font-bold text-[11px] flex items-center justify-center gap-1 shadow-2xs"
-                      >
-                        <Smartphone className="w-3 h-3" />
-                        <span>Any UPI</span>
-                      </a>
+                  <div className="space-y-1 text-xs">
+                    <div className="font-bold text-neutral-900 dark:text-white">
+                      Outstanding: ₹{dueAmount.toFixed(2)}
                     </div>
+                    <div className="font-mono text-[11px] text-neutral-500">
+                      UPI ID: {salonUpiId}
+                    </div>
+                    <p className="text-[10px] text-neutral-400">
+                      Scan with Google Pay, PhonePe, Paytm or any UPI App
+                    </p>
                   </div>
+                </div>
+
+                {/* Direct App Deep Links */}
+                <div className="grid grid-cols-4 gap-1.5 pt-1 print:hidden">
+                  <a
+                    href={buildGPayUrl({
+                      upiId: salonUpiId,
+                      name: invoice.salon_name || 'Salon',
+                      amount: dueAmount,
+                      note: `Invoice ${invoice.number}`,
+                    })}
+                    className="px-2 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-neutral-900"
+                  >
+                    GPay
+                  </a>
+                  <a
+                    href={buildPhonePeUrl({
+                      upiId: salonUpiId,
+                      name: invoice.salon_name || 'Salon',
+                      amount: dueAmount,
+                      note: `Invoice ${invoice.number}`,
+                    })}
+                    className="px-2 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-neutral-900"
+                  >
+                    PhonePe
+                  </a>
+                  <a
+                    href={buildPaytmUrl({
+                      upiId: salonUpiId,
+                      name: invoice.salon_name || 'Salon',
+                      amount: dueAmount,
+                      note: `Invoice ${invoice.number}`,
+                    })}
+                    className="px-2 py-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-bold text-[11px] flex items-center justify-center gap-1 hover:border-neutral-900"
+                  >
+                    Paytm
+                  </a>
+                  <a
+                    href={buildUpiPayUrl({
+                      upiId: salonUpiId,
+                      name: invoice.salon_name || 'Salon',
+                      amount: dueAmount,
+                      note: `Invoice ${invoice.number}`,
+                    })}
+                    className="px-2 py-1.5 rounded-lg bg-neutral-900 text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow-xs"
+                  >
+                    <Smartphone className="w-3 h-3" />
+                    <span>Pay</span>
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#161616] border border-neutral-200 dark:border-neutral-800 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
+                  <ShieldCheck className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
+                  <span>Payment Settlement Authorization</span>
+                </div>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Payment for this invoice has been fully authorized and recorded into the salon&apos;s ledger. No further settlement is required.
+                </p>
+                <div className="font-mono text-[11px] text-neutral-400 pt-1">
+                  Verified by SalonPro Cloud ERP Core
                 </div>
               </div>
             )}
           </div>
+
+          {/* Right Column: Financial Calculation Breakdown */}
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between text-neutral-600 dark:text-neutral-400">
+              <span>Gross Subtotal</span>
+              <span className="font-mono">₹{Number(invoice.subtotal).toFixed(2)}</span>
+            </div>
+
+            {Number(invoice.discount_amount) > 0 && (
+              <div className="flex justify-between text-neutral-900 dark:text-white font-semibold">
+                <span>Promotional Discount</span>
+                <span className="font-mono">- ₹{Number(invoice.discount_amount).toFixed(2)}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between text-neutral-500 pt-1 border-t border-neutral-100 dark:border-neutral-800">
+              <span>Taxable Value</span>
+              <span className="font-mono">₹{taxableSubtotal.toFixed(2)}</span>
+            </div>
+
+            <div className="flex justify-between text-neutral-500">
+              <span>CGST (9.0%)</span>
+              <span className="font-mono">₹{cgst.toFixed(2)}</span>
+            </div>
+
+            <div className="flex justify-between text-neutral-500">
+              <span>SGST (9.0%)</span>
+              <span className="font-mono">₹{sgst.toFixed(2)}</span>
+            </div>
+
+            {/* Grand Total Black Solid Bar */}
+            <div className="flex justify-between items-center py-2.5 px-3 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-bold text-sm mt-2">
+              <span className="tracking-wide">GRAND TOTAL</span>
+              <span className="font-mono text-base">₹{totalAmount.toFixed(2)}</span>
+            </div>
+
+            {/* Paid vs Due Amount */}
+            <div className="flex justify-between items-center pt-2 px-1 text-xs">
+              <span className="font-semibold text-neutral-600 dark:text-neutral-400">Paid Amount</span>
+              <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                ₹{totalPaid.toFixed(2)}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center px-1 text-xs font-bold">
+              <span className={dueAmount > 0 ? 'text-neutral-900 dark:text-white' : 'text-neutral-500'}>
+                Remaining Balance
+              </span>
+              <span className="font-mono">
+                {dueAmount > 0 ? `₹${dueAmount.toFixed(2)}` : '₹0.00 [ Settled ]'}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Footer info & Print Button */}
-        <div className="bg-neutral-50 dark:bg-[#10141F] p-6 border-t border-neutral-200 dark:border-[#2A2F3A] text-center">
-          <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-            Thank You! Please Visit Again ✨
-          </p>
+        {/* ================= 5. TERMS & COMMERCIAL FOOTER ================= */}
+        <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <div className="space-y-1 text-center sm:text-left">
+            <p className="font-bold text-neutral-900 dark:text-white">
+              Thank you for choosing {invoice.salon_name}.
+            </p>
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+              Terms: 1. Goods/Services billed are subject to boutique policy. 2. Please retain this invoice for your records.
+            </p>
+          </div>
 
-          <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center print:hidden">
+          <div className="shrink-0 print:hidden">
             <PrintReceiptButton
               salon={{
                 name: invoice.salon_name,
                 address: invoice.salon_address,
                 phone: invoice.salon_phone,
                 logo_url: invoice.salon_logo_url,
+                upi_id: invoice.salon_upi_id,
               }}
               invoice={{
                 number: invoice.number,
                 created_at: invoice.created_at,
                 customer_name: invoice.customer_name,
                 customer_mobile: invoice.customer_mobile,
+                customer_id: invoice.customer_uuid,
                 subtotal: invoice.subtotal,
                 discount_amount: invoice.discount_amount,
+                tax_amount: totalTax,
                 total: invoice.total,
               }}
               items={items}

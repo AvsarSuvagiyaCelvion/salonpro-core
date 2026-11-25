@@ -30,6 +30,7 @@ export async function GET(request: Request) {
               working_days, min_advance_hours, max_advance_days, send_reminders,
               cancel_policy_hours, invoice_prefix,
               upi_id, upi_number, upi_qr_url,
+              whatsapp_mode, whatsapp_phone_number_id, whatsapp_cloud_token, whatsapp_waba_id,
               trial_ends_at, subscription_status, subscription_ends_at, subscription_plan_id
        FROM salons
        WHERE id = $1
@@ -111,6 +112,10 @@ async function handleUpdateSettings(request: Request) {
       upi_id,
       upi_number,
       upi_qr_url,
+      whatsapp_mode,
+      whatsapp_phone_number_id,
+      whatsapp_cloud_token,
+      whatsapp_waba_id,
     } = body;
 
     // 5.3 Validations on settings updates
@@ -324,8 +329,12 @@ async function handleUpdateSettings(request: Request) {
            invoice_prefix = CASE WHEN $18::boolean THEN $19::text ELSE invoice_prefix END,
            upi_id = CASE WHEN $20::boolean THEN $21::text ELSE upi_id END,
            upi_number = CASE WHEN $22::boolean THEN $23::text ELSE upi_number END,
-           upi_qr_url = CASE WHEN $24::boolean THEN $25::text ELSE upi_qr_url END
-       WHERE id = $26::uuid
+           upi_qr_url = CASE WHEN $24::boolean THEN $25::text ELSE upi_qr_url END,
+           whatsapp_mode = CASE WHEN $26::boolean THEN $27::text ELSE whatsapp_mode END,
+           whatsapp_phone_number_id = CASE WHEN $28::boolean THEN $29::text ELSE whatsapp_phone_number_id END,
+           whatsapp_cloud_token = CASE WHEN $30::boolean THEN $31::text ELSE whatsapp_cloud_token END,
+           whatsapp_waba_id = CASE WHEN $32::boolean THEN $33::text ELSE whatsapp_waba_id END
+       WHERE id = $34::uuid
        RETURNING *`,
       [
         name,
@@ -353,6 +362,14 @@ async function handleUpdateSettings(request: Request) {
         upi_number ? String(upi_number).trim() : null,
         upi_qr_url !== undefined,
         upi_qr_url ? String(upi_qr_url).trim() : null,
+        whatsapp_mode !== undefined,
+        whatsapp_mode ? String(whatsapp_mode).trim() : 'direct',
+        whatsapp_phone_number_id !== undefined,
+        whatsapp_phone_number_id ? String(whatsapp_phone_number_id).trim() : null,
+        whatsapp_cloud_token !== undefined,
+        whatsapp_cloud_token ? String(whatsapp_cloud_token).trim() : null,
+        whatsapp_waba_id !== undefined,
+        whatsapp_waba_id ? String(whatsapp_waba_id).trim() : null,
         salonId,
       ]
     );

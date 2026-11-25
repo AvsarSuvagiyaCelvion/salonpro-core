@@ -147,9 +147,27 @@ export async function sendWhatsAppInvoiceReceipt(
     `📄 *View & Download Digital Bill / PDF:*\n${receiptUrl}\n\n` +
     `Need assistance? Reply directly or visit us again soon! 💇‍♀️💅`;
 
-  // 1. Check for Meta WhatsApp Cloud API credentials
-  const cloudApiToken = process.env.WHATSAPP_CLOUD_API_TOKEN;
-  const cloudPhoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  // 0. Check for Salon-specific custom WhatsApp Cloud API credentials
+  let salonCustomToken: string | null = null;
+  let salonCustomPhoneId: string | null = null;
+
+  try {
+    const sRes = await query(
+      `SELECT whatsapp_mode, whatsapp_phone_number_id, whatsapp_cloud_token FROM salons WHERE id = $1 LIMIT 1`,
+      [salonId]
+    );
+    if (sRes.rows.length > 0) {
+      const sRow = sRes.rows[0];
+      if (sRow.whatsapp_mode === 'own_api' && sRow.whatsapp_phone_number_id && sRow.whatsapp_cloud_token) {
+        salonCustomToken = sRow.whatsapp_cloud_token;
+        salonCustomPhoneId = sRow.whatsapp_phone_number_id;
+      }
+    }
+  } catch {}
+
+  // 1. Check for Meta WhatsApp Cloud API credentials (Salon custom API preferred, then environment)
+  const cloudApiToken = salonCustomToken || process.env.WHATSAPP_CLOUD_API_TOKEN;
+  const cloudPhoneNumberId = salonCustomPhoneId || process.env.WHATSAPP_PHONE_NUMBER_ID;
 
   // 2. Check for Twilio WhatsApp credentials
   const twilioSid = process.env.TWILIO_ACCOUNT_SID;

@@ -35,6 +35,7 @@ import {
   EyeOff,
   Lock,
   ShieldCheck,
+  MessageSquare,
 } from 'lucide-react';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { MAX_GALLERY_PHOTOS } from '@/lib/storage-constants';
@@ -104,8 +105,15 @@ export default function SettingsPage() {
   const [upiNumber, setUpiNumber] = useState('');
   const [upiQrUrl, setUpiQrUrl] = useState<string | null>(null);
 
+  // WhatsApp Dispatch & API settings
+  const [whatsappMode, setWhatsappMode] = useState<'direct' | 'own_api' | 'platform'>('direct');
+  const [whatsappPhoneNumberId, setWhatsappPhoneNumberId] = useState('');
+  const [whatsappCloudToken, setWhatsappCloudToken] = useState('');
+  const [whatsappWabaId, setWhatsappWabaId] = useState('');
+  const [showToken, setShowToken] = useState(false);
+
   // Active section tab
-  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'invoicing' | 'payments' | 'holidays' | 'security'>('salon');
+  const [activeSection, setActiveSection] = useState<'salon' | 'booking' | 'invoicing' | 'payments' | 'whatsapp' | 'holidays' | 'security'>('salon');
 
   // Security & Password change state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -303,6 +311,10 @@ export default function SettingsPage() {
           setUpiId(s.upi_id || '');
           setUpiNumber(s.upi_number || '');
           setUpiQrUrl(s.upi_qr_url || null);
+          setWhatsappMode(s.whatsapp_mode || 'direct');
+          setWhatsappPhoneNumberId(s.whatsapp_phone_number_id || '');
+          setWhatsappCloudToken(s.whatsapp_cloud_token || '');
+          setWhatsappWabaId(s.whatsapp_waba_id || '');
 
           if (typeof window !== 'undefined') {
             try {
@@ -445,6 +457,10 @@ export default function SettingsPage() {
         upi_id: upiId.trim() || null,
         upi_number: upiNumber.trim() || null,
         upi_qr_url: upiQrUrl,
+        whatsapp_mode: whatsappMode,
+        whatsapp_phone_number_id: whatsappPhoneNumberId.trim() || null,
+        whatsapp_cloud_token: whatsappCloudToken.trim() || null,
+        whatsapp_waba_id: whatsappWabaId.trim() || null,
       };
 
       const res = await fetch('/api/settings', {
@@ -554,6 +570,7 @@ export default function SettingsPage() {
           { id: 'booking', label: 'Booking & Timings', icon: Calendar },
           { id: 'invoicing', label: 'Invoice & Receipts', icon: Receipt },
           { id: 'payments', label: 'UPI & QR Payment', icon: QrCode },
+          { id: 'whatsapp', label: 'WhatsApp Dispatch', icon: MessageSquare },
           { id: 'holidays', label: 'Holidays & Closures', icon: Palmtree },
           { id: 'security', label: 'Security & Password', icon: KeyRound },
         ].map((tab) => {
@@ -1200,6 +1217,218 @@ export default function SettingsPage() {
                 Money paid by your clients via this QR code goes directly into your bank account in real-time. Zero gateway charges, zero commission deductions, and zero payment hold.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* ================= SECTION: WHATSAPP DISPATCH & API ================= */}
+        {activeSection === 'whatsapp' && (
+          <div className="bg-white dark:bg-[#141926] p-4 sm:p-8 rounded-3xl border border-neutral-200 dark:border-[#2A2F3A] shadow-sm space-y-6 transition-colors duration-200">
+            <div>
+              <h2 className="text-base font-bold text-[#1F2937] dark:text-white flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-[#D4A77F]" />
+                <span>WhatsApp Messaging & Dispatch Architecture</span>
+              </h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                Choose how digital invoices, payment receipts, and marketing broadcasts are sent to your salon clients.
+              </p>
+            </div>
+
+            {/* 3 Interactive Mode Selector Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Option 1: Direct Device WhatsApp (Free) */}
+              <div
+                onClick={() => setWhatsappMode('direct')}
+                className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                  whatsappMode === 'direct'
+                    ? 'border-[#D4A77F] bg-[#D4A77F]/10 shadow-sm ring-1 ring-[#D4A77F]'
+                    : 'border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#1A2030]/40 hover:border-neutral-300 dark:hover:border-neutral-600'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      <Smartphone className="w-5 h-5" />
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                      100% Free
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                    Direct Device WhatsApp
+                  </h3>
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
+                    Opens WhatsApp directly on your staff's mobile or computer with pre-formatted bills and payment links.
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-neutral-200/60 dark:border-neutral-700/60 text-[11px] text-neutral-600 dark:text-neutral-300 font-medium flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>No setup, zero cost, instant</span>
+                </div>
+              </div>
+
+              {/* Option 2: Connect My Own Meta API (Pro) */}
+              <div
+                onClick={() => setWhatsappMode('own_api')}
+                className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                  whatsappMode === 'own_api'
+                    ? 'border-[#D4A77F] bg-[#D4A77F]/10 shadow-sm ring-1 ring-[#D4A77F]'
+                    : 'border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#1A2030]/40 hover:border-neutral-300 dark:hover:border-neutral-600'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      <KeyRound className="w-5 h-5" />
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                      Salon Number
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                    Own Meta Cloud API
+                  </h3>
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
+                    Automated messages sent directly from your own salon phone number via your Facebook Developer account.
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-neutral-200/60 dark:border-neutral-700/60 text-[11px] text-neutral-600 dark:text-neutral-300 font-medium flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Bypasses platform wallet fees</span>
+                </div>
+              </div>
+
+              {/* Option 3: StudioDesk Managed Gateway */}
+              <div
+                onClick={() => setWhatsappMode('platform')}
+                className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                  whatsappMode === 'platform'
+                    ? 'border-[#D4A77F] bg-[#D4A77F]/10 shadow-sm ring-1 ring-[#D4A77F]'
+                    : 'border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#1A2030]/40 hover:border-neutral-300 dark:hover:border-neutral-600'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                      <Sparkles className="w-5 h-5" />
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                      Managed Gateway
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                    StudioDesk Gateway
+                  </h3>
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1 leading-relaxed">
+                    Automated bulk broadcasts from verified platform gateway. Recharged at direct Meta cost (₹0.85/msg) via Razorpay.
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-neutral-200/60 dark:border-neutral-700/60 text-[11px] text-neutral-600 dark:text-neutral-300 font-medium flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Zero technical API setup needed</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Meta API Credentials Input Block (Only shown when Option 2 is selected) */}
+            {whatsappMode === 'own_api' && (
+              <div className="p-5 rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 space-y-4 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-bold text-blue-950 dark:text-blue-200 uppercase tracking-wider">
+                      Meta Cloud API Credentials (Salon Owned)
+                    </h4>
+                    <p className="text-[11px] text-blue-700 dark:text-blue-300 mt-0.5">
+                      Obtain these from your Meta Developer Dashboard (developers.facebook.com &gt; WhatsApp &gt; API Setup)
+                    </p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-600 text-white">
+                    Active Mode
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Phone Number ID */}
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1">
+                      Phone Number ID <span className="text-[#D4A77F]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 104829375019283"
+                      value={whatsappPhoneNumberId}
+                      onChange={(e) => setWhatsappPhoneNumberId(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl text-xs bg-white dark:bg-[#10141F] border border-neutral-300 dark:border-[#2A2F3A] text-neutral-900 dark:text-white font-mono focus:outline-hidden focus:border-[#D4A77F]"
+                    />
+                    <p className="text-[10px] text-neutral-500 mt-1">Unique ID of your registered WhatsApp business phone</p>
+                  </div>
+
+                  {/* WABA ID */}
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1">
+                      WhatsApp Business Account ID (WABA ID)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 109283746591029"
+                      value={whatsappWabaId}
+                      onChange={(e) => setWhatsappWabaId(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl text-xs bg-white dark:bg-[#10141F] border border-neutral-300 dark:border-[#2A2F3A] text-neutral-900 dark:text-white font-mono focus:outline-hidden focus:border-[#D4A77F]"
+                    />
+                    <p className="text-[10px] text-neutral-500 mt-1">Found in your Meta Business Settings</p>
+                  </div>
+
+                  {/* Permanent System User Token */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1">
+                      Permanent Access Token (System User Token) <span className="text-[#D4A77F]">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showToken ? 'text' : 'password'}
+                        placeholder="EAABw..."
+                        value={whatsappCloudToken}
+                        onChange={(e) => setWhatsappCloudToken(e.target.value)}
+                        className="w-full px-3.5 py-2 pr-10 rounded-xl text-xs bg-white dark:bg-[#10141F] border border-neutral-300 dark:border-[#2A2F3A] text-neutral-900 dark:text-white font-mono focus:outline-hidden focus:border-[#D4A77F]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowToken(!showToken)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 cursor-pointer"
+                      >
+                        {showToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-neutral-500 mt-1">Never share this token. It is encrypted and used only for your salon's automated dispatches.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Direct Mode Helpful Guidance */}
+            {whatsappMode === 'direct' && (
+              <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 text-xs space-y-1.5 text-neutral-700 dark:text-neutral-300">
+                <div className="font-bold flex items-center gap-1.5 text-neutral-900 dark:text-white">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Direct Device Mode is Active</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-neutral-500 dark:text-neutral-400">
+                  When billing your clients, clicking "Share via WhatsApp" will instantly trigger WhatsApp Web on your desktop or the WhatsApp App on your phone/tablet with the full receipt pre-filled. No technical configuration or Meta credentials required.
+                </p>
+              </div>
+            )}
+
+            {/* Managed Platform Gateway Helpful Guidance */}
+            {whatsappMode === 'platform' && (
+              <div className="p-4 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900/40 text-xs space-y-1.5 text-purple-900 dark:text-purple-200">
+                <div className="font-bold flex items-center gap-1.5 text-purple-950 dark:text-purple-100">
+                  <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <span>Managed Gateway Active</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-purple-700 dark:text-purple-300">
+                  Your marketing broadcasts and background receipts will be delivered via StudioDesk's verified Meta API gateway. You can recharge your marketing wallet at direct cost (₹0.85/credit) anytime under the Marketing tab.
+                </p>
+              </div>
+            )}
           </div>
         )}
 

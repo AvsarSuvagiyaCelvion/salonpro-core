@@ -240,37 +240,54 @@ export async function POST(request: NextRequest) {
 
     const requiredCredits = validRecipients.length;
 
-    // 2. Check and deduct wallet credits atomically
-    const walletRes = await query(
-      `SELECT id, credits_count, balance_inr FROM salon_wallets WHERE salon_id = $1 FOR UPDATE`,
+    // Check if salon has its own Meta Cloud API credentials configured
+    const salonConfigRes = await query(
+      `SELECT whatsapp_mode, whatsapp_phone_number_id, whatsapp_cloud_token FROM salons WHERE id = $1 LIMIT 1`,
       [salonId]
     );
+    const sRow = salonConfigRes.rows[0] || {};
+    const hasOwnApi =
+      sRow.whatsapp_mode === 'own_api' &&
+      Boolean(sRow.whatsapp_phone_number_id) &&
+      Boolean(sRow.whatsapp_cloud_token);
 
-    const wallet = walletRes.rows[0];
-    const availableCredits = wallet ? parseInt(wallet.credits_count || '0', 10) : 0;
+    let creditsDeducted = 0;
+    let availableCredits = 0;
 
-    if (availableCredits < requiredCredits) {
-      return NextResponse.json(
-        {
-          error: `Insufficient WhatsApp credits. Required: ${requiredCredits} credits, Available: ${availableCredits} credits. Please recharge your wallet at direct cost (₹0.85/credit).`,
-          requiredCredits,
-          availableCredits,
-          creditsNeeded: requiredCredits - availableCredits,
-          ratePerMsg: 0.85,
-        },
-        { status: 402 }
+    if (!hasOwnApi) {
+      // 2. Check and deduct wallet credits atomically (for platform gateway mode)
+      const walletRes = await query(
+        `SELECT id, credits_count, balance_inr FROM salon_wallets WHERE salon_id = $1 FOR UPDATE`,
+        [salonId]
       );
-    }
 
-    // Deduct credits
-    await query(
-      `UPDATE salon_wallets 
-       SET credits_count = credits_count - $1, 
-           total_messages_sent = total_messages_sent + $1,
-           updated_at = NOW()
-       WHERE salon_id = $2`,
-      [requiredCredits, salonId]
-    );
+      const wallet = walletRes.rows[0];
+      availableCredits = wallet ? parseInt(wallet.credits_count || '0', 10) : 0;
+
+      if (availableCredits < requiredCredits) {
+        return NextResponse.json(
+          {
+            error: `Insufficient WhatsApp credits. Required: ${requiredCredits} credits, Available: ${availableCredits} credits. Please recharge your wallet at direct cost (₹0.85/credit), or connect your own Meta WhatsApp API in Settings.`,
+            requiredCredits,
+            availableCredits,
+            creditsNeeded: requiredCredits - availableCredits,
+            ratePerMsg: 0.85,
+          },
+          { status: 402 }
+        );
+      }
+
+      // Deduct credits
+      await query(
+        `UPDATE salon_wallets 
+         SET credits_count = credits_count - $1, 
+             total_messages_sent = total_messages_sent + $1,
+             updated_at = NOW()
+         WHERE salon_id = $2`,
+        [requiredCredits, salonId]
+      );
+      creditsDeducted = requiredCredits;
+    }
 
     // 3. Create campaign record
     const campaignRes = await query(
@@ -288,7 +305,7 @@ export async function POST(request: NextRequest) {
         validRecipients.length,
         validRecipients.length,
         0,
-        requiredCredits,
+        creditsDeducted,
       ]
     );
 
@@ -309,9 +326,12 @@ export async function POST(request: NextRequest) {
       totalRecipients: validRecipients.length,
       deliveredCount: validRecipients.length,
       failedCount: 0,
-      creditsDeducted: requiredCredits,
-      remainingCredits: availableCredits - requiredCredits,
-      message: `Successfully dispatched WhatsApp bulk message to ${validRecipients.length} clients!`,
+      creditsDeducted,
+      remainingCredits: hasOwnApi ? availableCredits : availableCredits - requiredCredits,
+      dispatchMode: hasOwnApi ? 'own_api' : 'platform_gateway',
+      message: hasOwnApi
+        ? `Successfully dispatched WhatsApp bulk message to ${validRecipients.length} clients via your own Meta WhatsApp number!`
+        : `Successfully dispatched WhatsApp bulk message to ${validRecipients.length} clients!`,
     });
   } catch (error: any) {
     return serverError(error, 'src/app/api/marketing/campaigns/route.ts:POST');

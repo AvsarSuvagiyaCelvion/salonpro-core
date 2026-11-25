@@ -81,7 +81,7 @@ export default function AdminOverviewPage() {
       }
       if (typeof localStorage !== 'undefined' && data.salon) {
         localStorage.setItem(
-          'salonpro_salon_info',
+          'studiodesk_salon_info',
           JSON.stringify({
             name: data.salon.name,
             slug: data.salon.slug,
@@ -562,7 +562,7 @@ export default function AdminOverviewPage() {
         isOpen={exportModalOpen}
         onClose={() => setExportModalOpen(false)}
         role="admin"
-        salonName="SalonPro Master Governance"
+        salonName="StudioDesk Master Governance"
       />
     </div>
   );

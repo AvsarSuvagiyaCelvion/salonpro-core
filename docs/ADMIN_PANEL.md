@@ -6,7 +6,7 @@
 ---
 
 ## 1. Purpose and Users
-The Platform Admin Panel provides Google DeepMind / SalonPro platform super administrators with multi-tenant oversight: tenant salon provisioning, subscription and plan configuration, custom domain verification, platform-wide analytics (MRR, churn, total revenue), and administrative security controls.
+The Platform Admin Panel provides Google DeepMind / StudioDesk platform super administrators with multi-tenant oversight: tenant salon provisioning, subscription and plan configuration, custom domain verification, platform-wide analytics (MRR, churn, total revenue), and administrative security controls.
 
 ---
 
@@ -29,17 +29,17 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 
 | Endpoint | Methods | File Path | Auth Required | What It Does |
 |---|---|---|---|---|
-| `/api/admin/auth` | `GET`, `POST` | `src/app/api/admin/auth/route.ts` | None for `POST`; `salonpro_admin_session` for `GET` | Authenticates super admin using email/password (or environment fallback `ADMIN_EMAIL`/`ADMIN_PASSWORD`); sets `salonpro_admin_session` cookie. |
-| `/api/admin/logout` | `POST` | `src/app/api/admin/logout/route.ts` | `salonpro_admin_session` | Clears `salonpro_admin_session` cookie. |
-| `/api/admin/overview` | `GET` | `src/app/api/admin/overview/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Aggregates high-level metrics (active salons, trial salons, revenue, total appointments). |
-| `/api/admin/salons` | `GET`, `POST` | `src/app/api/admin/salons/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Lists all tenant salons with plan and owner details, or provisions a new salon manually. |
-| `/api/admin/salons/[id]` | `PATCH`, `DELETE` | `src/app/api/admin/salons/[id]/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Modifies salon plan, toggles active status, verifies custom domain, or purges salon. |
-| `/api/admin/plans` | `GET`, `POST` | `src/app/api/admin/plans/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Lists all SaaS pricing plans and feature flags. |
-| `/api/admin/plans/[id]` | `PATCH`, `DELETE` | `src/app/api/admin/plans/[id]/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Updates plan limits, pricing, and feature flags. |
-| `/api/admin/admins` | `GET`, `POST`, `DELETE` | `src/app/api/admin/admins/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Manages platform administrator accounts in `platform_admins`. |
-| `/api/admin/export` | `GET` | `src/app/api/admin/export/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Exports platform-wide salons directories, SaaS subscription payments, and executive platform overview snapshots as CSV & PDF. Accessible from `/admin`, `/admin/salons`, and `/admin/analytics`. |
-| `/api/admin/broadcast` | `GET`, `POST` | `src/app/api/admin/broadcast/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Lists registered salons and past admin broadcasts; dispatches bulk WhatsApp broadcasts to filtered salon partners. |
-| `/api/admin/impersonate` | `POST` | `src/app/api/admin/impersonate/route.ts` | `salonpro_admin_session` (Role: `super_admin`) | Mints temporary tenant JWT session for any salon owner account and sets impersonation cookie so super admin can log in without password for support. |
+| `/api/admin/auth` | `GET`, `POST` | `src/app/api/admin/auth/route.ts` | None for `POST`; `StudioDesk_admin_session` for `GET` | Authenticates super admin using email/password (or environment fallback `ADMIN_EMAIL`/`ADMIN_PASSWORD`); sets `StudioDesk_admin_session` cookie. |
+| `/api/admin/logout` | `POST` | `src/app/api/admin/logout/route.ts` | `StudioDesk_admin_session` | Clears `StudioDesk_admin_session` cookie. |
+| `/api/admin/overview` | `GET` | `src/app/api/admin/overview/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Aggregates high-level metrics (active salons, trial salons, revenue, total appointments). |
+| `/api/admin/salons` | `GET`, `POST` | `src/app/api/admin/salons/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Lists all tenant salons with plan and owner details, or provisions a new salon manually. |
+| `/api/admin/salons/[id]` | `PATCH`, `DELETE` | `src/app/api/admin/salons/[id]/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Modifies salon plan, toggles active status, verifies custom domain, or purges salon. |
+| `/api/admin/plans` | `GET`, `POST` | `src/app/api/admin/plans/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Lists all SaaS pricing plans and feature flags. |
+| `/api/admin/plans/[id]` | `PATCH`, `DELETE` | `src/app/api/admin/plans/[id]/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Updates plan limits, pricing, and feature flags. |
+| `/api/admin/admins` | `GET`, `POST`, `DELETE` | `src/app/api/admin/admins/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Manages platform administrator accounts in `platform_admins`. |
+| `/api/admin/export` | `GET` | `src/app/api/admin/export/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Exports platform-wide salons directories, SaaS subscription payments, and executive platform overview snapshots as CSV & PDF. Accessible from `/admin`, `/admin/salons`, and `/admin/analytics`. |
+| `/api/admin/broadcast` | `GET`, `POST` | `src/app/api/admin/broadcast/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Lists registered salons and past admin broadcasts; dispatches bulk WhatsApp broadcasts to filtered salon partners. |
+| `/api/admin/impersonate` | `POST` | `src/app/api/admin/impersonate/route.ts` | `StudioDesk_admin_session` (Role: `super_admin`) | Mints temporary tenant JWT session for any salon owner account and sets impersonation cookie so super admin can log in without password for support. |
 | `/api/admin/exit-impersonation` | `POST` | `src/app/api/admin/exit-impersonation/route.ts` | None / Authenticated | Clears impersonation and tenant session cookies, returning super admin back to `/admin/salons`. |
 
 ---
@@ -72,16 +72,16 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 ### Flow 1: Super Admin Authentication
 1. **Visit `/admin/login`**: IP rate limiting is checked via `checkRateLimit('admin_auth_ip:<ip>', 10, 900)`.
 2. **Submit Credentials**: Calls `POST /api/admin/auth`.
-   - Checks `platform_admins` table for matching email (seeded super admins: `adminsalonpro@gmail.com` and `avsarsuvagiya968@gmail.com` with password `Admin@123`).
+   - Checks `platform_admins` table for matching email (seeded super admins: `adminStudioDesk@gmail.com` and `avsarsuvagiya968@gmail.com` with password `Admin@123`).
    - Compares password using `bcrypt.compare`.
    - If not in table, verifies against fallback environment variables `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
-   - On success: signs JWT with `role: 'super_admin'`, sets HTTP-only cookie `salonpro_admin_session` (8-hour expiration).
+   - On success: signs JWT with `role: 'super_admin'`, sets HTTP-only cookie `StudioDesk_admin_session` (8-hour expiration).
 3. **Redirect**: Directs admin to `/admin`.
 
 ### Flow 2: Custom Domain Verification
 1. **Tenant Request**: A Premium salon requests a custom domain (e.g. `booking.glamstudio.com`).
 2. **Admin Verification**: Super admin visits `/admin/salons` and locates the tenant.
-3. **Verify DNS**: Admin verifies that DNS CNAME points to SalonPro, then clicks "Verify Domain".
+3. **Verify DNS**: Admin verifies that DNS CNAME points to StudioDesk, then clicks "Verify Domain".
 4. **Update DB**: Calls `PATCH /api/admin/salons/[id]` with `{ custom_domain_verified: true }`.
 5. **Proxy Activation**: In `src/proxy.ts`, `resolveCustomDomain` reads the verified domain and immediately maps incoming HTTP traffic to that salon's booking pages.
 
@@ -107,7 +107,7 @@ The Platform Admin Panel provides Google DeepMind / SalonPro platform super admi
 
 ## 8. Shared Dependencies
 - `src/lib/api-auth.ts`: `requireAdmin`.
-- `src/lib/auth.ts`: `ADMIN_COOKIE_NAME` (`salonpro_admin_session`), `verifyAdminSessionToken`, `createAdminSessionToken`.
+- `src/lib/auth.ts`: `ADMIN_COOKIE_NAME` (`StudioDesk_admin_session`), `verifyAdminSessionToken`, `createAdminSessionToken`.
 - `src/lib/plan.ts`: `invalidateSalonPlanCache`.
 - `src/proxy.ts`: Intercepts all requests to `/admin/*` and redirects unauthenticated requests to `/admin/login`.
 

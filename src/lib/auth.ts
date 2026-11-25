@@ -10,7 +10,7 @@ function getSecretKey(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export const COOKIE_NAME = 'salonpro_session';
+export const COOKIE_NAME = 'studiodesk_session';
 
 export interface TenantSessionPayload {
   email: string;
@@ -38,7 +38,7 @@ export async function verifySessionToken(token: string): Promise<TenantSessionPa
   }
 }
 
-export const CUSTOMER_COOKIE_NAME = 'salonpro_customer_session';
+export const CUSTOMER_COOKIE_NAME = 'studiodesk_customer_session';
 
 export async function createCustomerSessionToken(payload: {
   customerId: string;
@@ -72,7 +72,7 @@ export async function verifyCustomerSessionToken(token: string) {
 // -------------------------------------------------------------
 // MAIN ADMIN (SUPER ADMIN) AUTHENTICATION REALM
 // -------------------------------------------------------------
-export const ADMIN_COOKIE_NAME = 'salonpro_admin_session';
+export const ADMIN_COOKIE_NAME = 'studiodesk_admin_session';
 
 export async function createAdminSessionToken(payload: { email: string; role?: string }) {
   const role = payload.role === 'super_admin' ? 'super_admin' : 'platform_admin';

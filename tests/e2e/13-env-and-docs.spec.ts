@@ -29,7 +29,7 @@ test.describe('Task 7: Environment settings, documentation, and cleanup', () => 
     expect(fs.existsSync(readmePath)).toBe(true);
 
     const content = fs.readFileSync(readmePath, 'utf8');
-    expect(content).toContain('SalonPro');
+    expect(content).toContain('StudioDesk');
     expect(content).toContain('SESSION_SECRET');
     expect(content).not.toContain('JWT_SECRET');
     expect(content).toContain('Client Booking');

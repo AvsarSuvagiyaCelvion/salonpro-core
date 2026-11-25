@@ -12,7 +12,7 @@ test.describe('STEP 1: Salon Owner Panel Functional & E2E Testing', () => {
     await page.goto('/login');
 
     // Verify Title & Brand
-    await expect(page.locator('h1')).toContainText('SalonPro');
+    await expect(page.locator('h1')).toContainText('StudioDesk');
 
     // Fill Credentials
     await page.fill('input[type="email"]', ownerEmail);

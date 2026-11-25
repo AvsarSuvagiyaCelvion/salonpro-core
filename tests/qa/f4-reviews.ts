@@ -26,19 +26,19 @@ export async function runFeature4Tests(fixtures: QADataFixtures): Promise<TestRe
   };
 
   const customerAClient = new QAClient();
-  customerAClient.setCookie('salonpro_customer_session', fixtures.customerA.token);
+  customerAClient.setCookie('StudioDesk_customer_session', fixtures.customerA.token);
 
   const customerBClient = new QAClient();
-  customerBClient.setCookie('salonpro_customer_session', fixtures.customerB.token);
+  customerBClient.setCookie('StudioDesk_customer_session', fixtures.customerB.token);
 
   const owner1Client = new QAClient();
-  owner1Client.setCookie('salonpro_session', fixtures.owner1.token);
+  owner1Client.setCookie('StudioDesk_session', fixtures.owner1.token);
 
   const owner2Client = new QAClient();
-  owner2Client.setCookie('salonpro_session', fixtures.owner2.token);
+  owner2Client.setCookie('StudioDesk_session', fixtures.owner2.token);
 
   const staff1Client = new QAClient();
-  staff1Client.setCookie('salonpro_session', fixtures.staff1.token);
+  staff1Client.setCookie('StudioDesk_session', fixtures.staff1.token);
 
   const anonClient = new QAClient();
 

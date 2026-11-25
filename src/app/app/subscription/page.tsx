@@ -74,7 +74,7 @@ export default function SalonSubscriptionPage() {
         try {
           const qrUrl = await generateUpiQrDataUrl({
             upiId: platformPaymentDetails.platform_upi_id,
-            name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+            name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
             amount: showDirectPayModal.price,
             note: `${showDirectPayModal.plan.name} Plan`,
           });
@@ -151,6 +151,22 @@ export default function SalonSubscriptionPage() {
     setMessage(null);
 
     try {
+      /* =========================================================================
+       * [RAZORPAY_TEMPORARILY_COMMENTED_OUT - 1 MONTH PAUSE]
+       * Razorpay subscription activation is paused for 1 month per owner request.
+       * Salons can use the "Direct UPI / Bank Transfer (0% Fee)" button.
+       * To re-activate Razorpay checkout:
+       *   1. Remove the notice and early return below
+       *   2. Uncomment the Razorpay block below
+       * ========================================================================= */
+      setMessage({
+        type: 'error',
+        text: 'Online payment via Razorpay is temporarily paused. Please use "Direct UPI / Bank Transfer (0% Fee)" to upgrade your plan.',
+      });
+      setActivatingPlanId(null);
+      return;
+
+      /* [UNCOMMENT AFTER 1 MONTH TO RE-ENABLE RAZORPAY CHECKOUT]
       // 1. Ensure Razorpay script is ready
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
@@ -177,7 +193,7 @@ export default function SalonSubscriptionPage() {
         key: orderData.keyId,
         amount: orderData.amount, // in paise
         currency: orderData.currency || 'INR',
-        name: 'SalonPro Cloud ERP',
+        name: 'StudioDesk Cloud ERP',
         description: `Plan: ${orderData.planName} (${interval === 'yearly' ? 'Annual Billing' : 'Monthly Billing'})`,
         order_id: orderData.orderId,
         prefill: {
@@ -242,6 +258,7 @@ export default function SalonSubscriptionPage() {
       });
 
       razorpay.open();
+      [END OF RAZORPAY UNCOMMENT BLOCK] */
     } catch (err: any) {
       console.error('handleActivatePlan error:', err);
       const errMsg = err.message || 'Payment processing error.';
@@ -764,7 +781,8 @@ export default function SalonSubscriptionPage() {
                     <span>Direct UPI / Bank Transfer (0% Fee)</span>
                   </button>
 
-                  {/* Option B: Razorpay (Cards / NetBanking) */}
+                  {/* Option B: Razorpay (Cards / NetBanking) - COMMENTED OUT FOR 1 MONTH */}
+                  {/* To re-activate Razorpay checkout button after 1 month, uncomment the block below:
                   <button
                     type="button"
                     onClick={() => handleActivatePlan(plan.id)}
@@ -789,6 +807,7 @@ export default function SalonSubscriptionPage() {
                       </>
                     )}
                   </button>
+                  */}
                 </div>
               </div>
             );
@@ -1087,7 +1106,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildGPayUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1098,7 +1117,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildPhonePeUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1109,7 +1128,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildPaytmUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1120,7 +1139,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildUpiPayUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1208,7 +1227,7 @@ export default function SalonSubscriptionPage() {
               <div className="pt-2">
                 <a
                   href={`https://wa.me/${platformPaymentDetails.platform_support_whatsapp || '918320653782'}?text=${encodeURIComponent(
-                    `Hi, I have completed direct payment of ₹${showDirectPayModal.price} for the ${showDirectPayModal.plan.name} (${interval}) on SalonPro. Please verify and activate my subscription!`
+                    `Hi, I have completed direct payment of ₹${showDirectPayModal.price} for the ${showDirectPayModal.plan.name} (${interval}) on StudioDesk. Please verify and activate my subscription!`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showForgotNotice, setShowForgotNotice] = useState(false);
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,12 +43,12 @@ export default function LoginPage() {
       if (typeof window !== 'undefined') {
         if (data.salon) {
           try {
-            localStorage.setItem('salonpro_salon_info', JSON.stringify(data.salon));
+            localStorage.setItem('studiodesk_salon_info', JSON.stringify(data.salon));
           } catch {}
         }
         if (data.user) {
           try {
-            localStorage.setItem('salonpro_user_info', JSON.stringify(data.user));
+            localStorage.setItem('studiodesk_user_info', JSON.stringify(data.user));
           } catch {}
         }
       }
@@ -76,12 +76,9 @@ export default function LoginPage() {
       {/* Top Navbar - Matching Register Salon Header for Site-Wide Consistency */}
       <nav className="w-full border-b border-[#E5E7EB] dark:border-[#2A2F3A] bg-white/95 dark:bg-[#080B12]/95 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3.5 sticky top-0 z-50 transition-colors">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-xs group-hover:rotate-12 transition-transform">
-              ✂
-            </div>
-            <span className="font-extrabold text-base sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
-              Salon<span className="text-[#D4A77F]">Pro</span>
+          <Link href="/" className="inline-flex items-center shrink-0 group">
+            <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-white tracking-tight">
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>
 
@@ -105,14 +102,11 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Brand Card Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#D4A77F] text-[#080B12] shadow-xl shadow-[#D4A77F]/20 mb-3 sm:mb-4 ring-4 ring-[#D4A77F]/20">
-              <Sparkles className="w-7 h-7 sm:w-8 sm:h-8" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
-              SalonPro
+            <h1 className="text-3xl sm:text-4xl font-black text-[#1F2937] dark:text-white tracking-tight">
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </h1>
-            <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-1">
-              Salon Operating System &amp; Manager Portal
+            <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-1.5 font-medium">
+              Salon &amp; Studio Operating System &amp; Manager Portal
             </p>
           </div>
 
@@ -261,7 +255,7 @@ export default function LoginPage() {
                         <span>💬 WhatsApp (+91 {supportPhone})</span>
                       </a>
                       <a
-                        href={`mailto:${supportEmail}?subject=SalonPro%20Owner%20Password%20Reset%20Request&body=Hello%20Platform%20Support,%0D%0A%0D%0AI%20am%20requesting%20a%20password%20reset%20for%20my%20salon%20owner%20account:%20${encodeURIComponent(
+                        href={`mailto:${supportEmail}?subject=StudioDesk%20Owner%20Password%20Reset%20Request&body=Hello%20Platform%20Support,%0D%0A%0D%0AI%20am%20requesting%20a%20password%20reset%20for%20my%20salon%20owner%20account:%20${encodeURIComponent(
                           email || ''
                         )}`}
                         className="flex-1 py-2 px-3 rounded-xl bg-[#F8F9FA] dark:bg-[#1C2230] hover:bg-neutral-100 text-[#1F2937] dark:text-white border border-[#E5E7EB] dark:border-[#2A2F3A] font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"
@@ -302,21 +296,6 @@ export default function LoginPage() {
                 >
                   Create Account &amp; Start 7-Day Free Trial ➔
                 </Link>
-              </div>
-
-              {/* 1-Click Salon Owner ERP Demo Test-Drive */}
-              <div className="mt-4 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-[#1F2937] dark:text-[#FFFFFF] flex items-center justify-between gap-2 shadow-xs">
-                <div className="flex items-center gap-1.5 font-medium truncate">
-                  <span className="text-amber-500 shrink-0">⚡</span>
-                  <span className="truncate">Want to test-drive without credentials?</span>
-                </div>
-                <a
-                  href="/api/demo/owner-login"
-                  className="font-extrabold text-amber-600 dark:text-amber-400 hover:underline shrink-0 text-xs inline-flex items-center gap-0.5"
-                >
-                  <span>1-Click Owner Demo</span>
-                  <span>➔</span>
-                </a>
               </div>
             </form>
 

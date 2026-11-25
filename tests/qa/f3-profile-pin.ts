@@ -25,13 +25,13 @@ export async function runFeature3Tests(fixtures: QADataFixtures): Promise<TestRe
   };
 
   const customerAClient = new QAClient();
-  customerAClient.setCookie('salonpro_customer_session', fixtures.customerA.token);
+  customerAClient.setCookie('StudioDesk_customer_session', fixtures.customerA.token);
 
   const customerBClient = new QAClient();
-  customerBClient.setCookie('salonpro_customer_session', fixtures.customerB.token);
+  customerBClient.setCookie('StudioDesk_customer_session', fixtures.customerB.token);
 
   const ownerClient = new QAClient();
-  ownerClient.setCookie('salonpro_session', fixtures.owner1.token);
+  ownerClient.setCookie('StudioDesk_session', fixtures.owner1.token);
 
   const anonClient = new QAClient();
 

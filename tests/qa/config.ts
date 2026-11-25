@@ -37,7 +37,7 @@ for (const [k, v] of Object.entries(testEnv)) {
 
 export const BASE_URL = process.env.BASE_URL || testEnv.BASE_URL || 'http://localhost:3100';
 export const TEST_DB_URL = testEnv.DATABASE_URL || process.env.DATABASE_URL || '';
-export const SESSION_SECRET = testEnv.SESSION_SECRET || process.env.SESSION_SECRET || 'supersecret-session-key-salonpro-2026-xyz';
+export const SESSION_SECRET = testEnv.SESSION_SECRET || process.env.SESSION_SECRET || 'supersecret-session-key-StudioDesk-2026-xyz';
 export const SUPABASE_URL = testEnv.SUPABASE_URL || process.env.SUPABASE_URL || 'https://mneftepouqtsyfwgfsyb.supabase.co';
 export const SUPABASE_SERVICE_ROLE_KEY = testEnv.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
@@ -56,7 +56,7 @@ export function runSafetyGuard(): void {
     console.error(
       '❌ [QA SAFETY GUARD ERROR] Refusing to run: DATABASE_URL in .env.test is IDENTICAL to .env.local!'
     );
-    console.error('   Tests must run against an isolated test database (e.g. /salonpro_test) to protect development data.');
+    console.error('   Tests must run against an isolated test database (e.g. /StudioDesk_test) to protect development data.');
     process.exit(1);
   }
 
@@ -69,7 +69,7 @@ export function runSafetyGuard(): void {
       console.error(
         `❌ [QA SAFETY GUARD ERROR] Refusing to run: Database target "${dbName}" does not look like a test database.`
       );
-      console.error('   Database name must contain "test" (e.g. /salonpro_test). Target was: ' + dbName);
+      console.error('   Database name must contain "test" (e.g. /StudioDesk_test). Target was: ' + dbName);
       process.exit(1);
     }
   } catch (err: any) {

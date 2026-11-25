@@ -24,7 +24,6 @@ import StatsCounter from '@/components/landing/StatsCounter';
 import InteractiveProductPreview from '@/components/landing/InteractiveProductPreview';
 
 import SmoothScroll from '@/components/animations/SmoothScroll';
-import PageLoader from '@/components/animations/PageLoader';
 import Reveal from '@/components/animations/Reveal';
 import Typewriter from '@/components/animations/Typewriter';
 import AuroraBackground from '@/components/animations/AuroraBackground';
@@ -40,7 +39,7 @@ import CalendarSlotsDemo from '@/components/animations/CalendarSlotsDemo';
 import SalonMarquee from '@/components/animations/SalonMarquee';
 
 export default function LandingPageClient() {
-  const [pageReady, setPageReady] = useState(false);
+  const [pageReady, setPageReady] = useState(true);
   const [typewriterDone, setTypewriterDone] = useState<boolean>(false);
 
   React.useEffect(() => {
@@ -53,13 +52,8 @@ export default function LandingPageClient() {
 
   return (
     <SmoothScroll>
-      {/* High-Performance Branded Scissors Page Loader that reveals first on every page load/reload */}
-      <PageLoader onComplete={() => setPageReady(true)} minDurationMs={1200} />
-
       <div
-        className={`min-h-screen bg-white dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] font-sans selection:bg-[#D4A77F] selection:text-[#080B12] w-full max-w-full overflow-x-hidden relative transition-opacity duration-500 ${
-          pageReady ? 'opacity-100' : 'opacity-0'
-        }`}
+        className="min-h-screen bg-white dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] font-sans selection:bg-[#D4A77F] selection:text-[#080B12] w-full max-w-full overflow-x-hidden relative"
       >
         {/* Animated Aurora Gradient Background with Desktop Cursor Spotlight */}
         <AuroraBackground />
@@ -113,28 +107,11 @@ export default function LandingPageClient() {
               </MagneticButton>
 
               <Link
-                href="/dixa-beauty-salon"
-                target="_blank"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-sans font-semibold text-[15px] tracking-normal shadow-md shadow-emerald-950/20 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-              >
-                <span>⚡ Live Booking Demo</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">Client</span>
-              </Link>
-
-              <a
-                href="/api/demo/owner-login"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-400 font-sans font-semibold text-[15px] tracking-normal border border-amber-500/30 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-              >
-                <span>🖥️ Owner ERP Demo</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300">1-Click</span>
-              </a>
-
-              <Link
                 href="/login"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#141926] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF] font-sans font-semibold text-[15px] tracking-normal border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#141926] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF] font-sans font-semibold text-[15px] tracking-normal border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
                 <Lock className="w-4 h-4 text-[#D4A77F]" />
-                <span>Owner Portal</span>
+                <span>Salon Owner Portal</span>
               </Link>
             </div>
 
@@ -179,7 +156,7 @@ export default function LandingPageClient() {
               </h3>
               <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Traditional salons waste hours on manual registers and lose clients due to poor booking coordination.
-                Flip each card to see how SalonPro eliminates every pain point:
+                Flip each card to see how StudioDesk eliminates every pain point:
               </p>
             </div>
           </Reveal>
@@ -191,7 +168,7 @@ export default function LandingPageClient() {
                 headacheTitle="Double-Bookings & Angry Walk-Ins"
                 headacheDesc="Two clients show up for the same hair stylist at 4:00 PM. Stylists are stressed, waiting areas are packed, and clients leave bad reviews."
                 solutionTitle="Overlap-Protected Bookings"
-                solutionDesc="Automated exclusion engine serializes concurrent requests and computes stylist buffers automatically. 100% overlap prevention."
+                solutionDesc="Automated database transaction locks serialize concurrent requests and compute stylist buffers automatically to prevent double-bookings."
               />
 
               <HeadacheFlipCard
@@ -231,7 +208,7 @@ export default function LandingPageClient() {
             <div className="text-center mb-10 sm:mb-14">
               <h2 className="font-sans font-semibold text-xs sm:text-[13px] tracking-[0.08em] uppercase text-[#D4A77F] mb-2.5">Simple Multi-Tenant Workflow</h2>
               <h3 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
-                How SalonPro Works in Your Salon (Example: &quot;Priya Salon&quot;)
+                How StudioDesk Works in Your Salon (Example: &quot;Priya Salon&quot;)
               </h3>
               <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Clean segregation between your internal salon operations and what your customers see.
@@ -436,7 +413,7 @@ export default function LandingPageClient() {
                 Ready to Automate Your Salon Operations?
               </h3>
               <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
-                Join hundreds of forward-thinking salons running with SalonPro. Setup takes under 3 minutes.
+                Join forward-thinking salons and studios running with StudioDesk. Setup takes under 3 minutes.
               </p>
 
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">

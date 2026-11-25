@@ -412,7 +412,7 @@ export default function CustomerPortalPage() {
       ) {
         setActiveTab(tabParam);
       }
-      const slug = params.get('salon') || params.get('slug') || localStorage.getItem('salonpro_last_salon');
+      const slug = params.get('salon') || params.get('slug') || localStorage.getItem('studiodesk_last_salon');
       if (slug) setLastSalonSlug(slug);
     }
 
@@ -543,7 +543,7 @@ export default function CustomerPortalPage() {
       return;
     }
 
-    const lastSalon = typeof window !== 'undefined' ? localStorage.getItem('salonpro_last_salon') : null;
+    const lastSalon = typeof window !== 'undefined' ? localStorage.getItem('studiodesk_last_salon') : null;
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const salonSlugParam = urlParams?.get('salon') || urlParams?.get('slug') || lastSalon || undefined;
 
@@ -584,7 +584,7 @@ export default function CustomerPortalPage() {
       }
 
       if (data.customer?.salon_slug && typeof window !== 'undefined') {
-        localStorage.setItem('salonpro_last_salon', data.customer.salon_slug);
+        localStorage.setItem('studiodesk_last_salon', data.customer.salon_slug);
       }
 
       setLoggedIn(true);
@@ -624,7 +624,7 @@ export default function CustomerPortalPage() {
                 <span>Select a Salon to Book Slot</span>
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                Choose any registered beauty studio on SalonPro
+                Choose any registered beauty studio on StudioDesk
               </p>
             </div>
             <button
@@ -685,7 +685,7 @@ export default function CustomerPortalPage() {
                   <a
                     href={`/${salon.slug}`}
                     onClick={() => {
-                      try { localStorage.setItem('salonpro_last_salon', salon.slug); } catch {}
+                      try { localStorage.setItem('studiodesk_last_salon', salon.slug); } catch {}
                     }}
                     className="px-3.5 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold transition-all shadow-xs shrink-0 whitespace-nowrap active:scale-95"
                   >
@@ -750,7 +750,7 @@ export default function CustomerPortalPage() {
                       <a
                         href={`/${s.slug}`}
                         onClick={() => {
-                          try { localStorage.setItem('salonpro_last_salon', s.slug); } catch {}
+                          try { localStorage.setItem('studiodesk_last_salon', s.slug); } catch {}
                         }}
                         className="px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-[#D4A77F] dark:bg-white/10 dark:hover:bg-[#D4A77F] text-[#1F2937] hover:text-[#080B12] dark:text-white dark:hover:text-[#080B12] text-xs font-bold transition-all shrink-0 whitespace-nowrap active:scale-95"
                       >
@@ -792,7 +792,7 @@ export default function CustomerPortalPage() {
               </div>
               <div className="min-w-0">
                 <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate">
-                  Salon<span className="text-[#8C5E2E] dark:text-[#D4A77F]">Pro</span>
+                  Studio<span className="text-[#8C5E2E] dark:text-[#D4A77F]">Desk</span>
                 </span>
                 <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
                   Client Portal
@@ -1040,12 +1040,9 @@ export default function CustomerPortalPage() {
             href={salon?.slug ? `/${salon.slug}` : lastSalonSlug ? `/${lastSalonSlug}` : '/'}
             className="flex items-center gap-2 group min-w-0"
           >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-sm shrink-0 group-hover:rotate-12 transition-transform duration-300">
-              ✂
-            </div>
             <div className="min-w-0">
               <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate max-w-[140px] xs:max-w-xs sm:max-w-md">
-                {salon?.name || 'SalonPro'}
+                {salon?.name || 'StudioDesk'}
               </span>
               <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
                 Customer Portal

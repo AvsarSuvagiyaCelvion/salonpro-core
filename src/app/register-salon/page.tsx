@@ -26,9 +26,25 @@ import {
   X,
   Eye,
   EyeOff,
+  QrCode,
+  Smartphone,
+  Building,
+  Copy,
+  MessageSquare,
 } from 'lucide-react';
 
 import ThemeToggle from '@/components/landing/ThemeToggle';
+import { generateUpiQrDataUrl, buildGPayUrl, buildPhonePeUrl, buildPaytmUrl, buildUpiPayUrl } from '@/lib/upi';
+
+const PLATFORM_PAYMENT_DETAILS = {
+  platform_upi_id: '8320653782@okaxis',
+  platform_upi_number: '8320653782',
+  platform_account_name: 'Avsar Suvagiya',
+  platform_bank_name: 'State Bank of India',
+  platform_account_number: 'XXXXXX1234',
+  platform_ifsc_code: 'SBIN0001234',
+  platform_support_whatsapp: '918320653782',
+};
 
 export default function RegisterSalonPage() {
   const router = useRouter();
@@ -52,6 +68,34 @@ export default function RegisterSalonPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [registeredSalon, setRegisteredSalon] = useState<{ id: string; name: string; slug: string } | null>(null);
+
+  // Direct UPI & Google Pay Payment State
+  const [showPaymentModal, setShowPaymentModal] = useState<{
+    salon: { id: string; name: string; slug: string };
+    plan: any;
+    price: number;
+  } | null>(null);
+  const [dynamicQrUrl, setDynamicQrUrl] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function makeQr() {
+      if (showPaymentModal && showPaymentModal.price > 0) {
+        try {
+          const qr = await generateUpiQrDataUrl({
+            upiId: PLATFORM_PAYMENT_DETAILS.platform_upi_id,
+            name: PLATFORM_PAYMENT_DETAILS.platform_account_name || 'StudioDesk Platform',
+            amount: showPaymentModal.price,
+            note: `${showPaymentModal.plan?.name || 'StudioDesk'} Plan`,
+          });
+          setDynamicQrUrl(qr);
+        } catch {
+          setDynamicQrUrl(null);
+        }
+      }
+    }
+    makeQr();
+  }, [showPaymentModal]);
 
   useEffect(() => {
     // 1. Fetch available plans from DB
@@ -149,14 +193,36 @@ export default function RegisterSalonPage() {
       if (selectedPlanId === 'trial') {
         setRegisteredSalon(regData.salon);
         setRegisteredPlanName('7-Day Free Trial');
+        setShowPaymentModal(null);
         setLoading(false);
         return;
       }
 
-      // 2. Paid Plan selected: Trigger Razorpay Order Creation
+      // 2. Paid Plan selected: Trigger Direct UPI / Google Pay Payment Step!
       const chosenPlan = plans.find((p) => p.id === selectedPlanId);
       const chosenPlanName = chosenPlan?.name || 'Selected Plan';
+      const chosenPrice = Number(chosenPlan?.price || 0);
 
+      setRegisteredSalon(regData.salon);
+      setRegisteredPlanName(chosenPlanName);
+      setShowPaymentModal({
+        salon: regData.salon,
+        plan: chosenPlan,
+        price: chosenPrice,
+      });
+      setLoading(false);
+      return;
+
+      /* =========================================================================
+       * [RAZORPAY_TEMPORARILY_COMMENTED_OUT - 1 MONTH PAUSE]
+       * Razorpay subscription payment during registration is paused for 1 month.
+       * New salons pay via Direct UPI / Google Pay or get immediate access.
+       * To re-activate Razorpay checkout after 1 month:
+       *   1. Remove the Direct UPI trigger above
+       *   2. Uncomment the Razorpay block below
+       * ========================================================================= */
+
+      /* [UNCOMMENT AFTER 1 MONTH TO RE-ENABLE RAZORPAY CHECKOUT]
       const orderRes = await fetch('/api/subscription/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -193,7 +259,7 @@ export default function RegisterSalonPage() {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency || 'INR',
-        name: 'SalonPro Cloud ERP',
+        name: 'StudioDesk Cloud ERP',
         description: `${chosenPlanName} Subscription`,
         order_id: orderData.orderId,
         prefill: {
@@ -251,14 +317,235 @@ export default function RegisterSalonPage() {
       });
 
       rzp.open();
+      [END OF RAZORPAY UNCOMMENT BLOCK] */
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please check your details.');
       setLoading(false);
     }
   }
 
-  // ================= SUCCESS STATE =================
+  // ================= SUCCESS / PAYMENT STATE =================
   if (registeredSalon) {
+    if (showPaymentModal) {
+      return (
+        <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex items-center justify-center p-3 sm:p-6 py-10 transition-colors">
+          <div className="w-full max-w-xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 sm:p-8 shadow-2xl animate-scale-in space-y-5">
+            {/* Header */}
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#D4A77F] to-amber-300 text-[#080B12] flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#D4A77F]/20">
+                <QrCode className="w-8 h-8" />
+              </div>
+              <span className="px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30 inline-block mb-1">
+                Zero Gateway Fee · Instant Activation
+              </span>
+              <h1 className="text-2xl font-black text-[#1F2937] dark:text-white">
+                Complete Payment via UPI / Google Pay
+              </h1>
+              <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mt-1">
+                Welcome, <strong className="text-[#1F2937] dark:text-white">{ownerName}</strong>! Your salon <strong className="text-[#1F2937] dark:text-white">{registeredSalon.name}</strong> is created. Pay below to activate your plan.
+              </p>
+            </div>
+
+            {/* Plan Summary Card */}
+            <div className="p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Selected Plan:</p>
+                <p className="text-sm font-black text-[#1F2937] dark:text-white">
+                  👑 {showPaymentModal.plan?.name || registeredPlanName}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] text-neutral-500 dark:text-neutral-400">Payable Amount:</p>
+                <p className="text-xl font-black text-[#8C5E2E] dark:text-[#D4A77F]">
+                  ₹{Number(showPaymentModal.price).toLocaleString('en-IN')}
+                </p>
+              </div>
+            </div>
+
+            {/* Option 1: Dynamic QR Code & UPI details */}
+            <div className="p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2F3A] bg-[#F9FAFB] dark:bg-[#10141F] space-y-4">
+              <div className="flex items-center gap-2 font-bold text-xs text-[#1F2937] dark:text-white">
+                <Smartphone className="w-4 h-4 text-[#D4A77F]" />
+                <span>Option 1: Scan &amp; Pay with Any UPI App</span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                {dynamicQrUrl ? (
+                  <div className="w-36 h-36 bg-white p-2 rounded-2xl border-2 border-emerald-500/40 shrink-0 shadow-sm flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={dynamicQrUrl}
+                      alt="UPI QR Code"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-36 h-36 rounded-2xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 bg-white dark:bg-[#141926] flex flex-col items-center justify-center text-center p-2 shrink-0">
+                    <QrCode className="w-8 h-8 text-[#D4A77F] mb-1 animate-pulse" />
+                    <span className="text-[10px] text-neutral-400">Loading QR...</span>
+                  </div>
+                )}
+
+                <div className="space-y-2 flex-1 w-full text-center sm:text-left text-xs">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 inline-block mb-0.5">
+                    Amount Locked: ₹{Number(showPaymentModal.price).toLocaleString('en-IN')}
+                  </span>
+                  <div>
+                    <span className="text-[10px] text-neutral-400 block">Platform UPI ID:</span>
+                    <div className="flex items-center justify-center sm:justify-start gap-2 mt-0.5">
+                      <span className="font-mono font-black text-xs text-[#8C5E2E] dark:text-[#D4A77F] bg-[#D4A77F]/10 px-2 py-0.5 rounded-lg">
+                        {PLATFORM_PAYMENT_DETAILS.platform_upi_id}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(PLATFORM_PAYMENT_DETAILS.platform_upi_id);
+                          setCopiedKey('upi');
+                          setTimeout(() => setCopiedKey(null), 2000);
+                        }}
+                        className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-md cursor-pointer transition-colors"
+                        title="Copy UPI ID"
+                      >
+                        {copiedKey === 'upi' ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5 text-neutral-500" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] text-neutral-400 block">PhonePe / GPay Number:</span>
+                    <span className="font-mono font-bold text-xs text-[#1F2937] dark:text-white">
+                      {PLATFORM_PAYMENT_DETAILS.platform_upi_number}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 1-Tap Deep Link Buttons for Mobile */}
+              <div className="space-y-1.5 pt-1">
+                <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 block">
+                  ⚡ 1-Tap Open Payment App on Your Phone:
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <a
+                    href={buildGPayUrl({
+                      upiId: PLATFORM_PAYMENT_DETAILS.platform_upi_id,
+                      name: PLATFORM_PAYMENT_DETAILS.platform_account_name,
+                      amount: showPaymentModal.price,
+                      note: `${showPaymentModal.plan?.name || 'StudioDesk'} Plan`,
+                    })}
+                    className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#141926] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer active:scale-95"
+                  >
+                    <span className="text-blue-500 font-black">G</span>Pay
+                  </a>
+                  <a
+                    href={buildPhonePeUrl({
+                      upiId: PLATFORM_PAYMENT_DETAILS.platform_upi_id,
+                      name: PLATFORM_PAYMENT_DETAILS.platform_account_name,
+                      amount: showPaymentModal.price,
+                      note: `${showPaymentModal.plan?.name || 'StudioDesk'} Plan`,
+                    })}
+                    className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#141926] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer active:scale-95"
+                  >
+                    <span className="text-purple-600 font-black">पे</span> PhonePe
+                  </a>
+                  <a
+                    href={buildPaytmUrl({
+                      upiId: PLATFORM_PAYMENT_DETAILS.platform_upi_id,
+                      name: PLATFORM_PAYMENT_DETAILS.platform_account_name,
+                      amount: showPaymentModal.price,
+                      note: `${showPaymentModal.plan?.name || 'StudioDesk'} Plan`,
+                    })}
+                    className="px-2.5 py-2 rounded-xl bg-white dark:bg-[#141926] border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:border-[#D4A77F] transition-all shadow-2xs cursor-pointer active:scale-95"
+                  >
+                    <span className="text-sky-500 font-black">Pay</span>tm
+                  </a>
+                  <a
+                    href={buildUpiPayUrl({
+                      upiId: PLATFORM_PAYMENT_DETAILS.platform_upi_id,
+                      name: PLATFORM_PAYMENT_DETAILS.platform_account_name,
+                      amount: showPaymentModal.price,
+                      note: `${showPaymentModal.plan?.name || 'StudioDesk'} Plan`,
+                    })}
+                    className="px-2.5 py-2 rounded-xl bg-[#D4A77F]/15 border border-[#D4A77F]/40 text-[#8C5E2E] dark:text-[#D4A77F] font-extrabold text-xs flex items-center justify-center gap-1 hover:bg-[#D4A77F]/25 transition-all shadow-2xs cursor-pointer active:scale-95"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>Any UPI</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Option 2: Bank NEFT / IMPS Transfer Details */}
+            <div className="p-3.5 rounded-2xl border border-neutral-200 dark:border-[#2A2F3A] bg-neutral-50/50 dark:bg-[#10141F] space-y-1.5 text-xs">
+              <div className="flex items-center gap-1.5 font-bold text-neutral-700 dark:text-neutral-300">
+                <Building className="w-3.5 h-3.5 text-[#D4A77F]" />
+                <span>Option 2: Direct IMPS / NEFT Bank Transfer</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-neutral-600 dark:text-neutral-300 pt-1">
+                <div>
+                  <span className="text-neutral-400 block text-[10px]">Account Name:</span>
+                  <span className="font-bold">{PLATFORM_PAYMENT_DETAILS.platform_account_name}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block text-[10px]">Bank:</span>
+                  <span className="font-bold">{PLATFORM_PAYMENT_DETAILS.platform_bank_name}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block text-[10px]">Account Number:</span>
+                  <span className="font-mono font-bold">{PLATFORM_PAYMENT_DETAILS.platform_account_number}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-400 block text-[10px]">IFSC Code:</span>
+                  <span className="font-mono font-bold">{PLATFORM_PAYMENT_DETAILS.platform_ifsc_code}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-1">
+              <a
+                href={`https://wa.me/${PLATFORM_PAYMENT_DETAILS.platform_support_whatsapp || '918320653782'}?text=${encodeURIComponent(
+                  `Hi, I have registered my salon "${salonName || registeredSalon.name}" and completed payment of ₹${showPaymentModal.price} for the ${showPaymentModal.plan?.name || registeredPlanName} plan on StudioDesk. Please verify and activate my subscription!`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all active:scale-95"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>I Have Paid — Send Screenshot on WhatsApp</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => router.push('/app')}
+                  className="flex-1 py-3 px-4 rounded-2xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-black text-xs flex items-center justify-center gap-1.5 shadow-sm cursor-pointer transition-all active:scale-95"
+                >
+                  <span>Launch Salon Dashboard ➔</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPaymentModal(null)}
+                  className="py-3 px-4 rounded-2xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-[#1F2937] dark:text-neutral-300 font-bold text-xs transition-colors cursor-pointer"
+                >
+                  <span>View Booking Details</span>
+                </button>
+              </div>
+
+              <p className="text-[10px] text-center text-neutral-400">
+                Your salon workspace is already provisioned. You can explore your dashboard immediately while payment verification completes!
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex items-center justify-center p-4">
         <div className="w-full max-w-lg bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-8 sm:p-10 shadow-2xl text-center animate-scale-in">
@@ -274,7 +561,7 @@ export default function RegisterSalonPage() {
             Welcome, {ownerName}!
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-2 max-w-md mx-auto">
-            <strong className="text-[#1F2937] dark:text-white">{registeredSalon.name}</strong> is now live on SalonPro Cloud. Your cloud POS, staff scheduler, and online booking engine are ready.
+            <strong className="text-[#1F2937] dark:text-white">{registeredSalon.name}</strong> is now live on StudioDesk Cloud. Your cloud POS, staff scheduler, and online booking engine are ready.
           </p>
 
           <div className="mt-4 p-3 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 text-xs font-bold text-[#8C5E35] dark:text-[#D4A77F] flex items-center justify-center gap-2">
@@ -282,9 +569,27 @@ export default function RegisterSalonPage() {
             <span>
               {registeredPlanName === '7-Day Free Trial'
                 ? '🎁 7-Day Free Trial Active (Full access until 7 days)'
-                : `👑 ${registeredPlanName} Subscription Active`}
+                : `👑 ${registeredPlanName} Subscription`}
             </span>
           </div>
+
+          {registeredPlanName !== '7-Day Free Trial' && (
+            <button
+              type="button"
+              onClick={() => {
+                const chosenPlan = plans.find((p) => p.id === selectedPlanId);
+                setShowPaymentModal({
+                  salon: registeredSalon,
+                  plan: chosenPlan,
+                  price: Number(chosenPlan?.price || 0),
+                });
+              }}
+              className="mt-3 w-full py-2.5 rounded-xl bg-[#D4A77F]/15 border border-[#D4A77F]/40 text-[#8C5E2E] dark:text-[#D4A77F] font-bold text-xs flex items-center justify-center gap-2 cursor-pointer hover:bg-[#D4A77F]/25 transition-all"
+            >
+              <QrCode className="w-4 h-4" />
+              <span>Pay via UPI / Google Pay (Scan QR)</span>
+            </button>
+          )}
 
           <div className="mt-6 p-4 rounded-2xl bg-[#F8F9FA] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] text-left">
             <div className="text-[11px] font-bold text-[#D4A77F] uppercase tracking-wider mb-1">
@@ -334,12 +639,9 @@ export default function RegisterSalonPage() {
       {/* Top Navbar - Fully Adaptive to Light and Dark Mode & 320px Responsive */}
       <nav className="border-b border-[#E5E7EB] dark:border-[#2A2F3A] bg-white/95 dark:bg-[#080B12]/95 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3.5 sticky top-0 z-50 transition-colors">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-xs group-hover:rotate-12 transition-transform">
-              ✂
-            </div>
-            <span className="font-extrabold text-base sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
-              Salon<span className="text-[#D4A77F]">Pro</span>
+          <Link href="/" className="inline-flex items-center shrink-0 group">
+            <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-white tracking-tight">
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>
 
@@ -670,7 +972,7 @@ export default function RegisterSalonPage() {
                 Your customers will book appointments directly at:
               </p>
               <div className="mt-3 p-3 rounded-2xl bg-black/40 backdrop-blur-md border border-[#D4A77F]/30 text-xs font-mono font-bold text-[#D4A77F] break-all">
-                domain.com/{slugPreview}
+                studiodeskapp.com/{slugPreview}
               </div>
             </div>
 

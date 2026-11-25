@@ -7,12 +7,9 @@ export default function NotFound() {
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-[#FFFFFF] flex flex-col items-center justify-center p-4 sm:p-6 text-center transition-colors duration-250">
       {/* Top Header Bar */}
       <div className="w-full max-w-md flex items-center justify-between mb-4 px-1">
-        <Link href="/" className="inline-flex items-center gap-2 group">
-          <div className="w-7 h-7 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xs text-[#D4A77F]">
-            ✂
-          </div>
-          <span className="font-extrabold text-sm text-[#1F2937] dark:text-white">
-            Salon<span className="text-[#D4A77F]">Pro</span>
+        <Link href="/" className="inline-flex items-center group">
+          <span className="font-black text-base text-[#1F2937] dark:text-white tracking-tight">
+            Studio<span className="text-[#D4A77F]">Desk</span>
           </span>
         </Link>
         <div className="scale-90 origin-right">
@@ -60,7 +57,7 @@ export default function NotFound() {
 
       <div className="mt-8 flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#747D8D]">
         <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
-        <span>SalonPro · Operating with Excellence</span>
+        <span>StudioDesk · Operating with Excellence</span>
       </div>
     </div>
   );

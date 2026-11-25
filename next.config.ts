@@ -9,6 +9,9 @@ import type { NextConfig } from "next";
  * Always build using `next build` (Turbopack).
  */
 const nextConfig: NextConfig = {
+  experimental: {
+    agentUpgrade: "security",
+  },
   turbopack: {
     rules: {
       "*.css": {

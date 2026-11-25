@@ -27,16 +27,16 @@ export async function runFeature1Tests(fixtures: QADataFixtures): Promise<TestRe
   };
 
   const ownerClient = new QAClient();
-  ownerClient.setCookie('salonpro_session', fixtures.owner1.token);
+  ownerClient.setCookie('StudioDesk_session', fixtures.owner1.token);
 
   const customerAClient = new QAClient();
-  customerAClient.setCookie('salonpro_customer_session', fixtures.customerA.token);
+  customerAClient.setCookie('StudioDesk_customer_session', fixtures.customerA.token);
 
   const customerBClient = new QAClient();
-  customerBClient.setCookie('salonpro_customer_session', fixtures.customerB.token);
+  customerBClient.setCookie('StudioDesk_customer_session', fixtures.customerB.token);
 
   const customerCClient = new QAClient();
-  customerCClient.setCookie('salonpro_customer_session', fixtures.customerC.token);
+  customerCClient.setCookie('StudioDesk_customer_session', fixtures.customerC.token);
 
   const anonClient = new QAClient();
 
@@ -447,7 +447,7 @@ export async function runFeature1Tests(fixtures: QADataFixtures): Promise<TestRe
       // 3. Expired cookie -> 401
       const expiredToken = await createExpiredToken({ customerId: fixtures.customerA.id, role: 'customer' });
       const expiredClient = new QAClient();
-      expiredClient.setCookie('salonpro_customer_session', expiredToken);
+      expiredClient.setCookie('StudioDesk_customer_session', expiredToken);
       const expiredRes = await expiredClient.patch(`/api/customer/appointments/${fixtures.apptFutureA.id}`, {
         action: 'cancel',
       });
@@ -455,7 +455,7 @@ export async function runFeature1Tests(fixtures: QADataFixtures): Promise<TestRe
       // 4. Tampered cookie -> 401
       const tamperedToken = await createTamperedToken({ customerId: fixtures.customerA.id, role: 'customer' });
       const tamperedClient = new QAClient();
-      tamperedClient.setCookie('salonpro_customer_session', tamperedToken);
+      tamperedClient.setCookie('StudioDesk_customer_session', tamperedToken);
       const tamperedRes = await tamperedClient.patch(`/api/customer/appointments/${fixtures.apptFutureA.id}`, {
         action: 'cancel',
       });
@@ -510,7 +510,7 @@ export async function runFeature1Tests(fixtures: QADataFixtures): Promise<TestRe
         name: 'Demo Visitor',
         salonId: '00000000-0000-0000-0000-000000000001',
       });
-      demoClient.setCookie('salonpro_customer_session', demoCustomerToken);
+      demoClient.setCookie('StudioDesk_customer_session', demoCustomerToken);
 
       // Reschedule attempt on demo
       const res = await demoClient.patch(`/api/customer/appointments/${mockApptId}`, {

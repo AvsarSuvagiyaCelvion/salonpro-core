@@ -54,19 +54,19 @@ const ADMIN_TEMPLATES = [
     id: 'trial_reminder',
     name: 'Trial Expiring Soon (Renew Pass)',
     title: 'Trial Expiry & Seamless Upgrade Notice',
-    body: '👋 Hi {owner_name}, your 14-day SalonPro Pro trial for {salon_name} is concluding in 3 days. To keep your online booking, billing POS, and live queue running without interruption, upgrade your plan today at https://salonpro.in/app/subscription. Need help? Reply directly to this message!',
+    body: '👋 Hi {owner_name}, your 14-day StudioDesk Pro trial for {salon_name} is concluding in 3 days. To keep your online booking, billing POS, and live queue running without interruption, upgrade your plan today at https://studiodeskapp.com/app/subscription. Need help? Reply directly to this message!',
   },
   {
     id: 'new_feature',
     name: 'New Feature Announcement (WhatsApp & Expenses)',
     title: 'New Feature Announcement for Salon Partners',
-    body: '🎉 Good news for {salon_name}! We just launched 2 major upgrades on your SalonPro dashboard: (1) WhatsApp Bulk Marketing to boost client re-visits at zero markup, and (2) Real-Time Petty Cash & Net Profit tracker. Log in now at https://salonpro.in/app to explore!',
+    body: '🎉 Good news for {salon_name}! We just launched 2 major upgrades on your StudioDesk dashboard: (1) WhatsApp Bulk Marketing to boost client re-visits at zero markup, and (2) Real-Time Petty Cash & Net Profit tracker. Log in now at https://studiodeskapp.com/app to explore!',
   },
   {
     id: 'weekend_tips',
     name: 'Peak Weekend Booking Preparation',
     title: 'Weekend Booking Maximizer Tips',
-    body: '✨ Dear {owner_name}, weekend client appointments are surging! Check your stylist duty roster and ensure all services are active on your public booking link at https://salonpro.in/book/{slug}. Have a profitable weekend with SalonPro!',
+    body: '✨ Dear {owner_name}, weekend client appointments are surging! Check your stylist duty roster and ensure all services are active on your public booking link at https://studiodeskapp.com/book/{slug}. Have a profitable weekend with StudioDesk!',
   },
 ];
 

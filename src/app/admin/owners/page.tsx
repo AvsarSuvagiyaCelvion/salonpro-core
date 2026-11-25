@@ -37,7 +37,7 @@ export default function AdminOwnersPage() {
       }
       if (typeof localStorage !== 'undefined' && data.salon) {
         localStorage.setItem(
-          'salonpro_salon_info',
+          'studiodesk_salon_info',
           JSON.stringify({
             name: data.salon.name,
             slug: data.salon.slug,

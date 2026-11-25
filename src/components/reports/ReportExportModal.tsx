@@ -42,7 +42,7 @@ export default function ReportExportModal({
   isOpen,
   onClose,
   role,
-  salonName = 'SalonPro',
+  salonName = 'StudioDesk',
 }: ReportExportModalProps) {
   // Preset report configurations
   const ownerReports: ReportConfig[] = [

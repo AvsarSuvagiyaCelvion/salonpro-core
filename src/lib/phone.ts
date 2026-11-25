@@ -1,5 +1,5 @@
 /**
- * Canonical helper to normalize mobile numbers across SalonPro.
+ * Canonical helper to normalize mobile numbers across StudioDesk.
  * - Strips all non-digit characters
  * - Drops leading country code (91) if 12 digits
  * - Drops leading 0 if 11 digits

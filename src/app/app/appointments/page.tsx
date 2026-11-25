@@ -89,7 +89,7 @@ export default function AppointmentsPage() {
   const [operatingHours, setOperatingHours] = useState<{ start: number; end: number }>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const s = localStorage.getItem('salonpro_salon_info');
+        const s = localStorage.getItem('studiodesk_salon_info');
         if (s) {
           const parsed = JSON.parse(s);
           if (parsed.open_time && parsed.close_time) {

@@ -97,7 +97,7 @@ export async function cleanTestData(): Promise<void> {
     // 9. Delete users
     await query(`
       DELETE FROM users 
-      WHERE email LIKE '%@salonpro.test'
+      WHERE email LIKE '%@StudioDesk.test'
          OR salon_id IN (SELECT id FROM salons WHERE name LIKE 'TEST_%' OR slug LIKE 'test-%')
     `);
 
@@ -161,9 +161,9 @@ export async function seedTestData(): Promise<QADataFixtures> {
   await query(`
     INSERT INTO users (id, salon_id, full_name, email, password_hash, role, is_active)
     VALUES 
-      ($1::uuid, $2::uuid, 'Test Owner 1', 'test_owner1@salonpro.test', $3::text, 'owner', true),
-      ($4::uuid, $2::uuid, 'Test Staff 1', 'test_staff1@salonpro.test', $3::text, 'staff', true),
-      ($5::uuid, $6::uuid, 'Test Owner 2', 'test_owner2@salonpro.test', $3::text, 'owner', true)
+      ($1::uuid, $2::uuid, 'Test Owner 1', 'test_owner1@StudioDesk.test', $3::text, 'owner', true),
+      ($4::uuid, $2::uuid, 'Test Staff 1', 'test_staff1@StudioDesk.test', $3::text, 'staff', true),
+      ($5::uuid, $6::uuid, 'Test Owner 2', 'test_owner2@StudioDesk.test', $3::text, 'owner', true)
   `, [owner1Id, salon1Id, passwordHash, staff1Id, owner2Id, salon2Id]);
 
   // 3. Staff members
@@ -288,7 +288,7 @@ export async function seedTestData(): Promise<QADataFixtures> {
   const owner1Token = await createOwnerToken({
     userId: owner1Id,
     salonId: salon1Id,
-    email: 'test_owner1@salonpro.test',
+    email: 'test_owner1@StudioDesk.test',
     role: 'owner',
     salonSlug: 'test-salon-1',
   });
@@ -296,7 +296,7 @@ export async function seedTestData(): Promise<QADataFixtures> {
   const staff1Token = await createOwnerToken({
     userId: staff1Id,
     salonId: salon1Id,
-    email: 'test_staff1@salonpro.test',
+    email: 'test_staff1@StudioDesk.test',
     role: 'staff',
     salonSlug: 'test-salon-1',
   });
@@ -304,7 +304,7 @@ export async function seedTestData(): Promise<QADataFixtures> {
   const owner2Token = await createOwnerToken({
     userId: owner2Id,
     salonId: salon2Id,
-    email: 'test_owner2@salonpro.test',
+    email: 'test_owner2@StudioDesk.test',
     role: 'owner',
     salonSlug: 'test-salon-2',
   });
@@ -352,21 +352,21 @@ export async function seedTestData(): Promise<QADataFixtures> {
     owner1: {
       id: owner1Id,
       salon_id: salon1Id,
-      email: 'test_owner1@salonpro.test',
+      email: 'test_owner1@StudioDesk.test',
       role: 'owner',
       token: owner1Token,
     },
     staff1: {
       id: staff1Id,
       salon_id: salon1Id,
-      email: 'test_staff1@salonpro.test',
+      email: 'test_staff1@StudioDesk.test',
       role: 'staff',
       token: staff1Token,
     },
     owner2: {
       id: owner2Id,
       salon_id: salon2Id,
-      email: 'test_owner2@salonpro.test',
+      email: 'test_owner2@StudioDesk.test',
       role: 'owner',
       token: owner2Token,
     },

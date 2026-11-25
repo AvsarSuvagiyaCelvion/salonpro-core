@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       startedAt: Date.now(),
     });
 
-    response.cookies.set('salonpro_impersonation', impersonationData, {
+    response.cookies.set('studiodesk_impersonation', impersonationData, {
       httpOnly: false,
       secure: isProd,
       sameSite: 'lax',

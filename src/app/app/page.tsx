@@ -69,7 +69,7 @@ export default function DashboardPage() {
   const [salonSlug, setSalonSlug] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const s = localStorage.getItem('salonpro_salon_info');
+        const s = localStorage.getItem('studiodesk_salon_info');
         if (s) return JSON.parse(s).slug || '';
       } catch {}
     }
@@ -78,7 +78,7 @@ export default function DashboardPage() {
   const [subscription, setSubscription] = useState<any>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const s = localStorage.getItem('salonpro_subscription_info');
+        const s = localStorage.getItem('studiodesk_subscription_info');
         if (s) return JSON.parse(s);
       } catch {}
     }
@@ -87,7 +87,7 @@ export default function DashboardPage() {
   const [salonHours, setSalonHours] = useState<{ open: string; close: string }>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const s = localStorage.getItem('salonpro_salon_info');
+        const s = localStorage.getItem('studiodesk_salon_info');
         if (s) {
           const parsed = JSON.parse(s);
           if (parsed.open_time && parsed.close_time) {

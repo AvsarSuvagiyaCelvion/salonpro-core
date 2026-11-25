@@ -56,7 +56,7 @@ function recordTest(testName, passed, details) {
 
 async function runSecurityTests() {
   console.log('\n======================================================');
-  console.log('   SALONPRO AUTOMATED SECURITY VERIFICATION SUITE     ');
+  console.log('   StudioDesk AUTOMATED SECURITY VERIFICATION SUITE     ');
   console.log('======================================================\n');
 
   // -----------------------------------------------------------------
@@ -66,8 +66,8 @@ async function runSecurityTests() {
   try {
     // 1.1 Web Proxy logic simulation
     const fakeLoggedOutCookieStore = { get: () => undefined };
-    const hasAdminToken = Boolean(fakeLoggedOutCookieStore.get('salonpro_admin_session')?.value);
-    const hasOwnerToken = Boolean(fakeLoggedOutCookieStore.get('salonpro_session')?.value);
+    const hasAdminToken = Boolean(fakeLoggedOutCookieStore.get('StudioDesk_admin_session')?.value);
+    const hasOwnerToken = Boolean(fakeLoggedOutCookieStore.get('StudioDesk_session')?.value);
 
     // Unauthenticated access to /admin must redirect
     const adminBlocked = !hasAdminToken;

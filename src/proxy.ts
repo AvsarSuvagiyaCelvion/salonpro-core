@@ -46,7 +46,7 @@ const PUBLIC_API_PREFIXES = [
  * Extracts the tenant slug from the Host header.
  * Supports:
  * - Localhost dev: <slug>.localhost:3000
- * - Production: <slug>.salonpro.in
+ * - Production: <slug>.studiodeskapp.com
  * - Vercel previews: <slug>.<project>.vercel.app
  */
 export function extractTenantFromHost(host: string | null): string | null {
@@ -63,19 +63,22 @@ export function extractTenantFromHost(host: string | null): string | null {
     return null;
   }
 
-  // 2. Production root domain: e.g. priya.salonpro.in
-  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'salonpro.in').toLowerCase();
-  if (hostname.endsWith(`.${rootDomain}`)) {
-    const sub = hostname.slice(0, -(rootDomain.length + 1));
-    const parts = sub.split('.');
-    const tenantSlug = parts[parts.length - 1];
-    if (tenantSlug && !RESERVED_SUBDOMAINS.has(tenantSlug)) {
-      return tenantSlug;
+  // 2. Production root domain: e.g. priya.studiodeskapp.com
+  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'studiodeskapp.com').toLowerCase();
+  const candidateRoots = Array.from(new Set([rootDomain, 'studiodeskapp.com']));
+  for (const candidate of candidateRoots) {
+    if (hostname.endsWith(`.${candidate}`)) {
+      const sub = hostname.slice(0, -(candidate.length + 1));
+      const parts = sub.split('.');
+      const tenantSlug = parts[parts.length - 1];
+      if (tenantSlug && !RESERVED_SUBDOMAINS.has(tenantSlug)) {
+        return tenantSlug;
+      }
+      return null;
     }
-    return null;
   }
 
-  // 3. Vercel deployment preview: e.g. priya.salonpro.vercel.app
+  // 3. Vercel deployment preview: e.g. priya.studiodeskapp.vercel.app
   if (hostname.endsWith('.vercel.app')) {
     const parts = hostname.split('.');
     if (parts.length >= 4) {
@@ -117,7 +120,14 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const host = request.headers.get('host') || '';
   const hostname = host.split(':')[0].toLowerCase();
-  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'salonpro.in').toLowerCase();
+  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'studiodeskapp.com').toLowerCase();
+
+  // Redirect any incoming *.vercel.app requests to the canonical custom domain
+  if (hostname.endsWith('.vercel.app')) {
+    const targetUrl = new URL(pathname + request.nextUrl.search, `https://${rootDomain}`);
+    return NextResponse.redirect(targetUrl, 308);
+  }
+
   let tenantSlug = extractTenantFromHost(host);
 
   // When host is not a subdomain of ROOT_DOMAIN, look up verified custom domain
@@ -127,6 +137,9 @@ export async function proxy(request: NextRequest) {
       hostname === '127.0.0.1' ||
       hostname === rootDomain ||
       hostname === `www.${rootDomain}` ||
+      hostname === 'studiodeskapp.com' ||
+      hostname === 'www.studiodeskapp.com' ||
+      hostname.endsWith('.studiodeskapp.com') ||
       hostname.endsWith('.vercel.app') ||
       hostname.endsWith(`.${rootDomain}`) ||
       hostname.endsWith('.localhost');
@@ -215,7 +228,12 @@ export async function proxy(request: NextRequest) {
 
           const isAllowedOrigin =
             originHost === reqHost ||
+            originHost === rootDomain ||
+            originHost === `www.${rootDomain}` ||
             originHost.endsWith(`.${rootDomain}`) ||
+            originHost === 'studiodeskapp.com' ||
+            originHost === 'www.studiodeskapp.com' ||
+            originHost.endsWith('.studiodeskapp.com') ||
             originHost.endsWith('.vercel.app') ||
             originHost === 'localhost' ||
             originHost.endsWith('.localhost') ||
@@ -283,7 +301,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // 4. TENANT SUBDOMAIN REWRITES
-  // When a visitor hits <slug>.salonpro.in or <slug>.localhost:3000
+  // When a visitor hits <slug>.studiodeskapp.com or <slug>.localhost:3000
   if (tenantSlug) {
     // Path "/" -> rewrite to tenant showcase & booking page "/[slug]"
     if (pathname === '/') {

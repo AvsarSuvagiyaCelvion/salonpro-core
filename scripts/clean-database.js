@@ -59,7 +59,7 @@ async function cleanDatabase() {
   ];
 
   console.log('======================================================');
-  console.log('       SALONPRO DATABASE CLEANUP & RESET              ');
+  console.log('       StudioDesk DATABASE CLEANUP & RESET              ');
   console.log('======================================================');
   console.log('Target: Remove all tenant, customer, and booking data.');
   console.log('Preserving: platform_admins and subscription_plans.\n');

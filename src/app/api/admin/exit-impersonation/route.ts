@@ -21,7 +21,7 @@ export async function POST() {
     });
 
     // Clear impersonation indicator cookie
-    response.cookies.set('salonpro_impersonation', '', {
+    response.cookies.set('studiodesk_impersonation', '', {
       httpOnly: false,
       secure: isProd,
       sameSite: 'lax',

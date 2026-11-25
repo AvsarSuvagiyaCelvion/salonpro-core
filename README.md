@@ -1,6 +1,6 @@
-# SalonPro Cloud ERP & Multi-Tenant Booking SaaS
+# StudioDesk Cloud ERP & Multi-Tenant Booking SaaS
 
-SalonPro is a full-featured, multi-tenant SaaS platform built for salons, spas, and beauty studios. It includes three interconnected portals:
+StudioDesk is a full-featured, multi-tenant SaaS platform built for salons, spas, and beauty studios. It includes three interconnected portals:
 
 1. **Client Booking & Self-Service Portal**: Mobile-first 4-step appointment booking wizard with real-time slot computation, stylist selection, appointment history, review ratings, and digital receipt view.
 2. **Salon Owner & Staff ERP**: Live studio kanban board, appointment calendar, POS checkout & billing, inventory management, staff commissions, revenue analytics, and branding settings.
@@ -50,7 +50,7 @@ Key environment variables:
 
 ### 3. Supabase Storage Setup (`salon-media`)
 
-SalonPro uses a public-read Supabase Storage bucket for salon logos, branding images, and gallery photos:
+StudioDesk uses a public-read Supabase Storage bucket for salon logos, branding images, and gallery photos:
 1. In your **Supabase Dashboard**, navigate to **Storage** → **New Bucket**.
 2. Set **Bucket Name** to: `salon-media`.
 3. Toggle **Public Bucket** to **ON** (Allows public reads of images via CDN URLs without requiring query tokens).
@@ -87,7 +87,7 @@ npm run start
 
 ## 🧪 Automated Testing
 
-SalonPro includes a comprehensive Playwright E2E test suite covering security, concurrency, auth rate-limiting, responsive layout, and billing workflows:
+StudioDesk includes a comprehensive Playwright E2E test suite covering security, concurrency, auth rate-limiting, responsive layout, and billing workflows:
 
 ```bash
 # Run all end-to-end tests

@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 import BookingWizard from '@/components/booking/BookingWizard';
 
 export const metadata = {
-  title: 'Book Appointment - SalonPro',
-  description: 'Book your salon appointment online in seconds',
+  title: 'Book Appointment - StudioDesk',
+  description: 'Book your appointment online in seconds',
 };
 
 export default async function PublicBookingAliasPage({

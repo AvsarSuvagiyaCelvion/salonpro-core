@@ -58,7 +58,7 @@ export default function AdminLoginPage() {
             ✂
           </div>
           <span className="font-extrabold text-sm text-[#1F2937] dark:text-white">
-            Salon<span className="text-[#D4A77F]">Pro</span>
+            Studio<span className="text-[#D4A77F]">Desk</span>
           </span>
         </Link>
         <div className="scale-90 origin-right">

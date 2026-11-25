@@ -63,7 +63,7 @@ export default function SalonMarquee() {
         </h3>
 
         <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
-          From single-chair boutique studios to multi-chair luxury lounges, SalonPro adapts to your workflow.
+          From single-chair boutique studios to multi-chair luxury lounges, StudioDesk adapts to your workflow.
         </p>
       </div>
 

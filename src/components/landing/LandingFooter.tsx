@@ -16,7 +16,7 @@ import {
 
 export default function LandingFooter() {
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   return (
     <footer className="relative z-10 bg-white dark:bg-[#080B12] text-[#6B7280] dark:text-[#A0A8B8] pt-16 sm:pt-20 pb-12 border-t border-[#E5E7EB] dark:border-[#2A2F3A] transition-colors duration-300">
@@ -28,18 +28,13 @@ export default function LandingFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 sm:gap-12 pb-14 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
           {/* Column 1: Brand & Overview (Spans 2 cols on desktop) */}
           <div className="lg:col-span-2 space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
-            <Link href="/" className="flex items-center justify-center md:justify-start gap-2.5 inline-flex">
-              <div className="w-10 h-10 rounded-2xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xl text-[#D4A77F] shadow-md shadow-black/10">
-                ✂
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-none">
-                  SalonPro
-                </span>
-                <span className="text-xs text-[#D4A77F] font-semibold tracking-wider uppercase mt-1">
-                  Operating System for Salons
-                </span>
-              </div>
+            <Link href="/" className="flex flex-col text-left inline-flex">
+              <span className="font-black text-2xl sm:text-3xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-none">
+                Studio<span className="text-[#D4A77F]">Desk</span>
+              </span>
+              <span className="text-xs text-[#D4A77F] font-semibold tracking-wider uppercase mt-1.5">
+                Operating System for Salons &amp; Studios
+              </span>
             </Link>
 
             <p className="text-sm sm:text-[15px] text-[#6B7280] dark:text-[#A0A8B8] leading-relaxed max-w-sm mx-auto md:mx-0">
@@ -49,7 +44,7 @@ export default function LandingFooter() {
             {/* Direct Contact Pills */}
             <div className="space-y-2.5 pt-2 flex flex-col items-center md:items-start w-full">
               <a
-                href={`https://wa.me/91${supportPhone}?text=Hello%20SalonPro%20Team,%20I%20am%20interested%20in%20a%20live%20walkthrough.`}
+                href={`https://wa.me/91${supportPhone}?text=Hello%20StudioDesk%20Team,%20I%20am%20interested%20in%20a%20live%20walkthrough.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center md:justify-start gap-2 text-sm sm:text-[15px] font-semibold text-[#10B981] hover:opacity-85 transition-opacity"
@@ -128,28 +123,9 @@ export default function LandingFooter() {
           {/* Column 3: Live Portals & Demos */}
           <div className="space-y-4 text-center md:text-left">
             <h4 className="text-sm font-extrabold uppercase tracking-wider text-[#1F2937] dark:text-[#FFFFFF]">
-              Live Portals
+              Portals &amp; Access
             </h4>
             <ul className="space-y-3 text-sm sm:text-[15px] flex flex-col items-center md:items-start">
-              <li>
-                <Link
-                  href="/dixa-beauty-salon"
-                  target="_blank"
-                  className="text-[#10B981] font-semibold inline-flex items-center justify-center md:justify-start gap-1 hover:underline"
-                >
-                  <span>⚡ Live Booking Demo</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="/api/demo/owner-login"
-                  className="text-amber-500 font-semibold inline-flex items-center justify-center md:justify-start gap-1 hover:underline"
-                >
-                  <span>🖥️ Owner ERP Demo (1-Click)</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </li>
               <li>
                 <Link href="/salon-owner" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start gap-1">
                   <Lock className="w-3.5 h-3.5 text-[#6B7280] dark:text-[#A0A8B8]" />
@@ -164,11 +140,6 @@ export default function LandingFooter() {
               <li>
                 <Link href="/portal" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
                   Customer Appointment Portal
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin/login" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors text-[#6B7280] dark:text-[#A0A8B8] inline-flex items-center justify-center md:justify-start">
-                  Platform Admin Access
                 </Link>
               </li>
             </ul>
@@ -218,7 +189,7 @@ export default function LandingFooter() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm sm:text-[15px] text-[#6B7280] dark:text-[#A0A8B8] text-center sm:text-left">
           <div className="space-y-1 text-center sm:text-left">
             <p className="text-[#1F2937] dark:text-[#FFFFFF] font-semibold">
-              © 2026 SalonPro. All rights reserved.
+              © 2026 StudioDesk. All rights reserved.
             </p>
             <p className="text-xs sm:text-[13px] text-[#6B7280] dark:text-[#A0A8B8]">
               Designed &amp; engineered for modern salons, studios, and wellness spas.

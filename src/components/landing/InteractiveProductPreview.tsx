@@ -47,8 +47,8 @@ export default function InteractiveProductPreview() {
   const demoAppointments: DemoAppointment[] = [
     {
       id: 'd1',
-      customerName: 'Ananya Iyer',
-      phone: '98201 45890',
+      customerName: 'Ananya Iyer (Demo)',
+      phone: '99999 00001',
       service: 'Hydra-Gloss Hair Spa',
       stylist: 'Priya Sharma',
       time: '10:00 AM - 11:00 AM',
@@ -61,8 +61,8 @@ export default function InteractiveProductPreview() {
     },
     {
       id: 'd2',
-      customerName: 'Rhea Kapoor',
-      phone: '98190 32145',
+      customerName: 'Rhea Kapoor (Demo)',
+      phone: '99999 00002',
       service: 'Champagne Balayage & Gloss',
       stylist: 'Neha Patel',
       time: '10:30 AM - 12:30 PM',
@@ -75,8 +75,8 @@ export default function InteractiveProductPreview() {
     },
     {
       id: 'd3',
-      customerName: 'Vikram Malhotra',
-      phone: '98700 88219',
+      customerName: 'Vikram Malhotra (Demo)',
+      phone: '99999 00003',
       service: 'Royal Beard Sculpt & Fade',
       stylist: 'Rahul Verma',
       time: '11:00 AM - 11:45 AM',
@@ -89,8 +89,8 @@ export default function InteractiveProductPreview() {
     },
     {
       id: 'd4',
-      customerName: 'Sneha Desai',
-      phone: '98212 90123',
+      customerName: 'Sneha Desai (Demo)',
+      phone: '99999 00004',
       service: 'Keratin Smooth Infusion',
       stylist: 'Priya Sharma',
       time: '01:00 PM - 02:30 PM',
@@ -103,8 +103,8 @@ export default function InteractiveProductPreview() {
     },
     {
       id: 'd5',
-      customerName: 'Pooja Mehta',
-      phone: '99205 67431',
+      customerName: 'Pooja Mehta (Demo)',
+      phone: '99999 00005',
       service: 'Bridal Radiance Facial',
       stylist: 'Neha Patel',
       time: '02:00 PM - 03:15 PM',
@@ -117,8 +117,8 @@ export default function InteractiveProductPreview() {
     },
     {
       id: 'd6',
-      customerName: 'Arjun Singh',
-      phone: '98330 11299',
+      customerName: 'Arjun Singh (Demo)',
+      phone: '99999 00006',
       service: 'Precision Fade & Scalp Refresh',
       stylist: 'Rahul Verma',
       time: '02:30 PM - 03:15 PM',
@@ -148,7 +148,7 @@ export default function InteractiveProductPreview() {
             </div>
             <div className="hidden sm:flex items-center gap-2 ml-2 px-2.5 py-1 rounded-xl bg-black/30 text-[#A0A8B8] text-xs font-mono truncate">
               <span className="text-[#10B981]">https://</span>
-              <span>salonpro.in/app/appointments</span>
+              <span>studiodeskapp.com/app/appointments</span>
             </div>
           </div>
 
@@ -865,7 +865,7 @@ export default function InteractiveProductPreview() {
                 <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl p-5 shadow-xs flex flex-col items-center justify-center text-center space-y-3">
                   <div className="w-32 h-32 rounded-2xl bg-[#080B12] p-2 flex items-center justify-center border-2 border-[#D4A77F]">
                     <div className="w-full h-full bg-white rounded-xl p-2 flex flex-col items-center justify-center">
-                      <div className="text-[10px] font-black tracking-tighter text-black">SALONPRO UPI</div>
+                      <div className="text-[10px] font-black tracking-tighter text-black">STUDIODESK UPI</div>
                       <div className="text-[32px] leading-none my-1">🏁</div>
                       <div className="text-[9px] font-mono font-bold text-black">SCAN TO PAY ₹2,124</div>
                     </div>
@@ -936,7 +936,7 @@ export default function InteractiveProductPreview() {
             <span className="hidden sm:inline">·</span>
             <span className="hidden sm:flex items-center gap-1">
               <ShieldCheck className="w-4 h-4 text-[#D4A77F]" />
-              <span>99.9% Uptime · Multi-Stylist Tracking</span>
+              <span>High-Availability Cloud · Multi-Stylist Tracking</span>
             </span>
           </div>
 

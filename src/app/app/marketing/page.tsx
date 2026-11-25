@@ -33,6 +33,19 @@ interface WalletData {
   total_messages_sent: number;
 }
 
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') return resolve(false);
+    if ((window as any).Razorpay) return resolve(true);
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 interface AudienceCounts {
   all: number;
   inactive_30d: number;
@@ -198,21 +211,97 @@ export default function MarketingPage() {
   async function handleRechargeSubmit() {
     setRecharging(true);
     try {
-      const res = await fetch('/api/marketing/wallet/recharge', {
+      /* =========================================================================
+       * [RAZORPAY_TEMPORARILY_COMMENTED_OUT - 1 MONTH PAUSE]
+       * Razorpay wallet recharge checkout is paused for 1 month per owner request.
+       * To re-activate Razorpay checkout:
+       *   1. Remove the notice and early return below
+       *   2. Uncomment the Razorpay block below
+       * ========================================================================= */
+      showToast('Online wallet recharge via Razorpay is temporarily paused. Please contact admin to add WhatsApp credits.', 'info');
+      setRechargeModalOpen(false);
+      return;
+
+      /* [UNCOMMENT AFTER 1 MONTH TO RE-ENABLE RAZORPAY CHECKOUT]
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error('Unable to load Razorpay payment gateway. Please check your internet connection.');
+      }
+
+      // 1. Create Razorpay order on server
+      const orderRes = await fetch('/api/marketing/wallet/recharge/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credits: selectedPackCredits }),
       });
 
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Recharge failed.');
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) {
+        throw new Error(orderData.error || 'Failed to initialize payment.');
+      }
 
-      showToast(`Wallet recharged! Added ${selectedPackCredits} credits at direct cost price.`, 'success');
-      setRechargeModalOpen(false);
-      fetchData();
+      // 2. Open Razorpay Checkout modal
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount, // in paise
+        currency: orderData.currency || 'INR',
+        name: 'StudioDesk',
+        description: `Recharge ${selectedPackCredits} WhatsApp Marketing Credits`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: orderData.salonName || '',
+          contact: orderData.salonPhone || '',
+          email: orderData.salonEmail || '',
+        },
+        theme: {
+          color: '#111111',
+        },
+        modal: {
+          ondismiss: function () {
+            setRecharging(false);
+          },
+        },
+        handler: async function (response: any) {
+          try {
+            // 3. Verify signature on server and credit wallet
+            const verifyRes = await fetch('/api/marketing/wallet/recharge/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                credits: selectedPackCredits,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok) {
+              showToast(`Wallet recharged! Added ${selectedPackCredits} credits.`, 'success');
+              setRechargeModalOpen(false);
+              fetchData();
+            } else {
+              showToast(verifyData.error || 'Payment verification failed.', 'error');
+            }
+          } catch (vErr: any) {
+            showToast(vErr.message || 'Payment verification error.', 'error');
+          } finally {
+            setRecharging(false);
+          }
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.on('payment.failed', function (resp: any) {
+        const errMsg = resp.error?.description || resp.error?.reason || 'Transaction could not be completed.';
+        showToast(`Payment Failed: ${errMsg}`, 'error');
+        setRecharging(false);
+      });
+
+      razorpay.open();
+      [END OF RAZORPAY UNCOMMENT BLOCK] */
     } catch (err: any) {
       showToast(err.message || 'Error during recharge', 'error');
-    } finally {
       setRecharging(false);
     }
   }
@@ -621,7 +710,7 @@ export default function MarketingPage() {
               </h2>
               <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                 Unlike competitors who add hefty 100% to 200% markups (charging ₹1.50 to ₹2.50 per WhatsApp message), 
-                <strong> SalonPro passes 100% of Meta’s official cost directly to your salon at ₹0.85 per marketing message with ₹0 platform surcharge</strong>.
+                <strong> StudioDesk passes 100% of Meta’s official cost directly to your salon at ₹0.85 per marketing message with ₹0 platform surcharge</strong>.
               </p>
             </div>
 
@@ -632,7 +721,7 @@ export default function MarketingPage() {
                 <div className="text-[11px] text-neutral-500 mt-1">Direct Meta India Cloud API rate</div>
               </div>
               <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40">
-                <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">SalonPro Markup</div>
+                <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">StudioDesk Markup</div>
                 <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">₹0.00</div>
                 <div className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 mt-1">0% commission & 0 monthly fees</div>
               </div>

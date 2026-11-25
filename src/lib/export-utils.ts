@@ -1,5 +1,5 @@
 /**
- * SalonPro Report Export Utilities
+ * StudioDesk Report Export Utilities
  * Provides seamless, client-side CSV and vector PDF document generation.
  */
 
@@ -73,7 +73,7 @@ export function exportToCSV(
   }
 
   const title = options?.title || 'Report Export';
-  const salonName = options?.salonName || 'SalonPro Workspace';
+  const salonName = options?.salonName || 'StudioDesk Workspace';
   const dateRangeText = options?.dateRangeText || 'All Time';
   const generatedAt = new Date().toLocaleDateString('en-IN', {
     day: '2-digit',
@@ -86,7 +86,7 @@ export function exportToCSV(
   const csvLines: string[] = [];
 
   // Top Metadata Block for Excel / Sheets
-  csvLines.push(`"SALONPRO ENTERPRISE BUSINESS INTELLIGENCE"`);
+  csvLines.push(`"STUDIODESK ENTERPRISE BUSINESS INTELLIGENCE"`);
   csvLines.push(`"Report Title:","${title.replace(/"/g, '""')}"`);
   csvLines.push(`"Salon / Workspace:","${salonName.replace(/"/g, '""')}"`);
   csvLines.push(`"Period / Date Range:","${dateRangeText.replace(/"/g, '""')}"`);
@@ -165,12 +165,12 @@ export async function exportToPDF(options: PDFExportOptions) {
   const {
     title,
     subtitle = 'Official Audited Multi-Tenant Business Report',
-    salonName = 'SalonPro',
+    salonName = 'StudioDesk',
     dateRangeText,
     columns,
     data,
     summaryKPIs = [],
-    filename = 'SalonPro_Report',
+    filename = 'StudioDesk_Report',
   } = options;
 
   if (!data || data.length === 0) {
@@ -209,7 +209,7 @@ export async function exportToPDF(options: PDFExportOptions) {
       doc.setTextColor(212, 167, 127);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.text(`SALONPRO ENTERPRISE · ${salonName.toUpperCase()}`, margin, 11);
+      doc.text(`STUDIODESK ENTERPRISE · ${salonName.toUpperCase()}`, margin, 11);
 
       // Report Title
       doc.setTextColor(255, 255, 255);
@@ -502,12 +502,12 @@ export async function exportToPDF(options: PDFExportOptions) {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(148, 163, 184);
-  doc.text('DIGITALLY AUDITED TRANSACTION RECORD · SALONPRO SECURE MULTI-TENANT CLOUD ERP', margin, currentY);
+  doc.text('DIGITALLY AUDITED TRANSACTION RECORD · STUDIODESK SECURE MULTI-TENANT CLOUD ERP', margin, currentY);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('Prepared by: SalonPro Automated Engine', margin, currentY + 6);
+  doc.text('Prepared by: StudioDesk Automated Engine', margin, currentY + 6);
   doc.text('Authorized Signatory: ____________________________________', pageWidth - margin, currentY + 6, {
     align: 'right',
   });
@@ -525,7 +525,7 @@ export async function exportToPDF(options: PDFExportOptions) {
     doc.setFontSize(7);
     doc.setTextColor(148, 163, 184); // slate-400
     doc.text(
-      `SalonPro Confidential Document · Page ${i} of ${totalPages} · Strictly for Internal & Tax Auditing`,
+      `StudioDesk Confidential Document · Page ${i} of ${totalPages} · Strictly for Internal & Tax Auditing`,
       pageWidth / 2,
       pageHeight - 4.5,
       { align: 'center' }

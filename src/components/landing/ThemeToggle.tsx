@@ -11,7 +11,7 @@ export default function ThemeToggle() {
   useEffect(() => {
     setMounted(true);
     // By default Light mode is active unless user explicitly saved 'dark'
-    const saved = localStorage.getItem('salonpro_theme');
+    const saved = localStorage.getItem('studiodesk_theme') || localStorage.getItem('studiodesk_theme');
     if (saved === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
@@ -25,7 +25,7 @@ export default function ThemeToggle() {
     const next = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
     try {
-      localStorage.setItem('salonpro_theme', next);
+      localStorage.setItem('studiodesk_theme', next);
     } catch {}
 
     if (next === 'dark') {

@@ -122,7 +122,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Appointment not found.' }, { status: 404 });
     }
 
-    // Must be completed (in SalonPro DB, completed status is 'done' or 'completed')
+    // Must be completed (in StudioDesk DB, completed status is 'done' or 'completed')
     if (appt.status !== 'done' && appt.status !== 'completed') {
       return NextResponse.json(
         { error: 'Reviews can only be submitted for completed appointments.' },

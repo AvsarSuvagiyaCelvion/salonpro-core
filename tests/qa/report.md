@@ -1,4 +1,4 @@
-# SalonPro QA Automation Test Report
+# StudioDesk QA Automation Test Report
 
 > **Generated At:** 2026-11-07T09:55:53.598Z  
 > **Base URL:** http://localhost:3100  

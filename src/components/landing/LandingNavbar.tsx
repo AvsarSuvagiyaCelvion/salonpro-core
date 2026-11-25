@@ -26,7 +26,7 @@ export default function LandingNavbar() {
           7-Day Free Trial
         </span>
         <span className="hidden md:inline">
-          Test-drive SalonPro free for 7 days with zero upfront payment &amp; no credit card required!
+          Try StudioDesk free for 7 days with zero upfront payment &amp; no credit card required!
         </span>
         <span className="md:hidden text-[10px] text-white/90 truncate max-w-[180px]">
           Zero Upfront Payment
@@ -47,13 +47,10 @@ export default function LandingNavbar() {
         } px-3 sm:px-6`}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
-          {/* 1. Left: Brand Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-sm shrink-0 group-hover:rotate-12 transition-transform duration-300">
-              ✂
-            </div>
-            <span className="font-bold text-lg sm:text-xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
-              Salon<span className="text-[#D4A77F]">Pro</span>
+          {/* 1. Left: Brand Wordmark (Clean Pure Typography) */}
+          <Link href="/" className="inline-flex items-center shrink-0 group">
+            <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>
 
@@ -147,7 +144,7 @@ export default function LandingNavbar() {
                     ✂
                   </div>
                   <span className="font-bold text-base text-[#1F2937] dark:text-[#FFFFFF]">
-                    Salon<span className="text-[#D4A77F]">Pro</span>
+                    Studio<span className="text-[#D4A77F]">Desk</span>
                   </span>
                 </div>
                 <button
@@ -176,31 +173,6 @@ export default function LandingNavbar() {
                   </div>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-
-                <Link
-                  href="/dixa-beauty-salon"
-                  target="_blank"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] font-semibold text-xs"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span>⚡</span>
-                    <span>Try Live Booking Demo</span>
-                  </div>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </Link>
-
-                <a
-                  href="/api/demo/owner-login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-500 font-semibold text-xs"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span>🖥️</span>
-                    <span>Try Owner Dashboard Demo</span>
-                  </div>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
 
                 <Link
                   href="/salon-owner"
@@ -263,7 +235,7 @@ export default function LandingNavbar() {
             <div className="pt-4 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
               <p>Need setup assistance?</p>
               <a
-                href="https://wa.me/918320653782?text=Hello%20SalonPro%20Team,%20I%20need%20help%20setting%20up%20my%20salon."
+                href="https://wa.me/918320653782?text=Hello%20StudioDesk%20Team,%20I%20need%20help%20setting%20up%20my%20salon."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-bold text-[#10B981] hover:underline inline-flex items-center gap-1 mt-0.5"

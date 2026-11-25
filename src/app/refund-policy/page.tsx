@@ -18,13 +18,13 @@ import LandingNavbar from '@/components/landing/LandingNavbar';
 import LandingFooter from '@/components/landing/LandingFooter';
 
 export const metadata = {
-  title: 'Refund & Cancellation Policy | SalonPro Cloud OS',
-  description: 'Refund, cancellation, and payment dispute policy for SalonPro subscription plans and salon client appointments.',
+  title: 'Refund & Cancellation Policy | StudioDesk Cloud OS',
+  description: 'Refund, cancellation, and payment dispute policy for StudioDesk subscription plans and salon client appointments.',
 };
 
 export default function RefundPolicyPage() {
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   const sections = [
     { id: 'trial-model', title: '1. 7-Day Evaluation Model' },
@@ -146,7 +146,7 @@ export default function RefundPolicyPage() {
               <div className="mt-6 pt-4 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-xs">
                 <div className="text-slate-500 dark:text-slate-400 mb-1">Billing questions?</div>
                 <a
-                  href={`https://wa.me/91${supportPhone}?text=Hello%20SalonPro%20Billing%20Support`}
+                  href={`https://wa.me/91${supportPhone}?text=Hello%20StudioDesk%20Billing%20Support`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-bold text-[#10B981] hover:underline inline-flex items-center gap-1"
@@ -170,7 +170,7 @@ export default function RefundPolicyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  To ensure complete satisfaction and eliminate financial uncertainty, SalonPro provides a full-featured, zero-risk <strong>7-Day Free Trial</strong> for every new salon workspace.
+                  To ensure complete satisfaction and eliminate financial uncertainty, StudioDesk provides a full-featured, zero-risk <strong>7-Day Free Trial</strong> for every new salon workspace.
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>No credit card, debit card, or advance security deposit is required during registration.</li>
@@ -233,7 +233,7 @@ export default function RefundPolicyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  Because SalonPro operates as a Software-as-a-Service (SaaS) platform with real-time multi-tenant database provisioning and dedicated telecom SMS/WhatsApp gateway resources allocated immediately upon payment:
+                  Because StudioDesk operates as a Software-as-a-Service (SaaS) platform with real-time multi-tenant database provisioning and dedicated telecom SMS/WhatsApp gateway resources allocated immediately upon payment:
                 </p>
                 <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -254,7 +254,7 @@ export default function RefundPolicyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  We stand firmly behind the reliability of SalonPro. You are eligible for a <strong>100% full refund</strong> of your most recent subscription charge if:
+                  We stand firmly behind the reliability of StudioDesk. You are eligible for a <strong>100% full refund</strong> of your most recent subscription charge if:
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>Our software experiences an unresolvable server failure, data corruption, or verified continuous platform downtime exceeding 48 consecutive business hours; AND</li>
@@ -321,12 +321,12 @@ export default function RefundPolicyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  <strong>Important Distinction:</strong> SalonPro is a B2B SaaS software provider. Payments collected by salons from their walk-in customers or clients (for haircuts, facial treatments, spa sessions, retail shampoos) are direct commercial transactions between the salon and the consumer.
+                  <strong>Important Distinction:</strong> StudioDesk is a B2B SaaS software provider. Payments collected by salons from their walk-in customers or clients (for haircuts, facial treatments, spa sessions, retail shampoos) are direct commercial transactions between the salon and the consumer.
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>Client cancellations and advance appointment refund requests are governed by each salon&apos;s individual policy configured in `/app/settings`.</li>
                   <li>Clients can cancel or reschedule appointments within the allowed policy hours via the Customer Portal (`/portal`).</li>
-                  <li>SalonPro does not hold client appointment payments in escrow and does not adjudicate disputes regarding in-salon service quality.</li>
+                  <li>StudioDesk does not hold client appointment payments in escrow and does not adjudicate disputes regarding in-salon service quality.</li>
                 </ul>
               </div>
             </section>
@@ -365,7 +365,7 @@ export default function RefundPolicyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  If you notice an unrecognized charge from SalonPro on your bank statement, please contact us first before initiating a bank dispute or chargeback. We resolve legitimate billing inquiries swiftly and avoid unnecessary banking dispute fees for both parties.
+                  If you notice an unrecognized charge from StudioDesk on your bank statement, please contact us first before initiating a bank dispute or chargeback. We resolve legitimate billing inquiries swiftly and avoid unnecessary banking dispute fees for both parties.
                 </p>
               </div>
             </section>
@@ -382,7 +382,7 @@ export default function RefundPolicyPage() {
                 <div className="p-5 rounded-2xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <div className="font-extrabold text-[#1F2937] dark:text-white text-sm">
-                      SalonPro Customer Success &amp; Billing Desk
+                      StudioDesk Customer Success &amp; Billing Desk
                     </div>
                     <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                       Billing Email: <a href={`mailto:${supportEmail}`} className="text-[#8C5E2E] dark:text-[#D4A77F] font-semibold hover:underline">{supportEmail}</a>
@@ -396,7 +396,7 @@ export default function RefundPolicyPage() {
                   </div>
 
                   <a
-                    href={`https://wa.me/91${supportPhone}?text=Hello%20SalonPro%20Team,%20I%20have%20a%20billing%20question.`}
+                    href={`https://wa.me/91${supportPhone}?text=Hello%20StudioDesk%20Team,%20I%20have%20a%20billing%20question.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-bold text-xs shadow-sm inline-flex items-center justify-center gap-1.5 transition-all shrink-0 active:scale-95"

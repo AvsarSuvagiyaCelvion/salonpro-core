@@ -988,7 +988,7 @@ export default function CustomersPage() {
         isOpen={exportModalOpen}
         onClose={() => setExportModalOpen(false)}
         role="owner"
-        salonName="SalonPro"
+        salonName="StudioDesk"
       />
     </div>
   );

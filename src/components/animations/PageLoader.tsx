@@ -65,18 +65,10 @@ export default function PageLoader({
             }}
           />
 
-          {/* Centered Brand Icon Box with Silky Smooth Scissors Rotation */}
+          {/* Centered Brand Text Box */}
           <div className="absolute inset-0 m-auto w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-[#10141F] border border-[#D4A77F]/60 flex items-center justify-center shadow-2xl shadow-black/80 ring-4 ring-[#D4A77F]/15">
-            <span
-              className="text-2xl sm:text-3xl text-[#D4A77F] inline-block font-black select-none"
-              style={{
-                display: 'inline-block',
-                transformOrigin: 'center center',
-                animation: 'smoothScissorsSpin 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite',
-                willChange: 'transform',
-              }}
-            >
-              ✂
+            <span className="text-xl sm:text-2xl text-[#D4A77F] font-black select-none">
+              SD
             </span>
           </div>
         </div>
@@ -84,11 +76,11 @@ export default function PageLoader({
         {/* Brand Title */}
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center justify-center gap-1.5">
-            <span>Salon</span>
-            <span className="text-[#D4A77F]">Pro</span>
+            <span>Studio</span>
+            <span className="text-[#D4A77F]">Desk</span>
           </h2>
           <p className="text-[10px] text-[#A0A8B8] font-bold uppercase tracking-[0.22em] mt-1">
-            Modern Salon Operating System
+            Modern Salon &amp; Studio Operating System
           </p>
         </div>
 

@@ -85,7 +85,7 @@ const VALID_JPEG_BUFFER = Buffer.from([
 
 async function runEndToEndVerification() {
   console.log('\n================================================================');
-  console.log('   SALONPRO END-TO-END (A TO Z) COMPLETE SYSTEM VERIFICATION     ');
+  console.log('   StudioDesk END-TO-END (A TO Z) COMPLETE SYSTEM VERIFICATION     ');
   console.log('================================================================\n');
 
   let testSalonId = null;

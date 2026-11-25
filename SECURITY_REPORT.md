@@ -1,8 +1,8 @@
-# SalonPro Comprehensive Application Security Audit & Remediation Report
+# StudioDesk Comprehensive Application Security Audit & Remediation Report
 
 **Date of Audit & Fixes:** November 8, 2026  
 **Auditor:** Senior Application Security Engineer & Penetration Testing Team  
-**Scope:** Full-stack codebase (`salonpro`), including Next.js frontend pages, API route handlers, authentication/session management, multi-tenant isolation, database schema/RLS, payment gateways, file storage, proxy middleware, and dependencies.  
+**Scope:** Full-stack codebase (`StudioDesk`), including Next.js frontend pages, API route handlers, authentication/session management, multi-tenant isolation, database schema/RLS, payment gateways, file storage, proxy middleware, and dependencies.  
 **Audit Standard:** OWASP Top 10 (2021/2025), ASVS 4.0, CWE/SANS Top 25.
 
 ---
@@ -79,16 +79,16 @@
 | `GET /api/plans` | Public | Public | **Yes** | Public pricing tiers for registration page. |
 | `POST /api/register` | Public | Public | **Yes** | Rate-limited (5/hr/IP). Bcrypt cost 12, CSRF protected. |
 | `POST /api/login` | Public | Public | **Yes** | Rate-limited (20/15m/IP, 5/15m/acct). Bcrypt cost 12, CSRF protected. |
-| `POST /api/logout` | Logged-in Tenant | Public | **Yes** | Clears `salonpro_session` cookie (`httpOnly`, `maxAge: 0`). |
+| `POST /api/logout` | Logged-in Tenant | Public | **Yes** | Clears `StudioDesk_session` cookie (`httpOnly`, `maxAge: 0`). |
 | `GET /api/public/[slug]` | Public | Public | **Yes** | Returns public salon profile & active service list. |
 | `GET /api/public/[slug]/slots` | Public | Public | **Yes** | Returns computed available appointment slots. |
 | `POST /api/public/[slug]/book` | Public | Public | **Yes** | Honeypot protection, advisory xact locks, IP rate limits, CSRF protected. |
 | `POST /api/subscription/razorpay/webhook` | Razorpay Gateway | Anyone with valid Razorpay HMAC | **Yes** | Verified with `crypto.timingSafeEqual(expected, actual)`. |
 | `GET /api/demo/owner-login` | Public Demo | Public Demo | **Yes** *(FIXED)* | Isolated 1-click test-drive session strictly sandboxed to DEMO_SALON_ID. |
 | `POST /api/demo/owner-login` | Public Demo | Public Demo | **Yes** *(FIXED)* | Isolated 1-click test-drive session strictly sandboxed to DEMO_SALON_ID. |
-| `GET /api/customer/auth` | Customer | Anyone | **Yes** | Validates `salonpro_customer_session` JWT. |
+| `GET /api/customer/auth` | Customer | Anyone | **Yes** | Validates `StudioDesk_customer_session` JWT. |
 | `POST /api/customer/auth` | Public | Public | **Yes** | Customer Login/Signup. Rate-limited (20/15m/IP, 5/15m/acct), Bcrypt 12. |
-| `POST /api/customer/logout` | Customer | Anyone | **Yes** | Clears `salonpro_customer_session` cookie with `httpOnly: true`. |
+| `POST /api/customer/logout` | Customer | Anyone | **Yes** | Clears `StudioDesk_customer_session` cookie with `httpOnly: true`. |
 | `GET /api/customer/profile` | Customer | Customer | **Yes** | Verified via `verifyCustomerSessionToken`. |
 | `PATCH /api/customer/profile` | Customer | Customer | **Yes** | Rate-limited (20/15m/customer). CSRF protected. |
 | `POST /api/customer/profile/pin` | Customer | Customer | **Yes** | Rate-limited (5/15m/customer+IP). Bcrypt cost 12. |
@@ -96,9 +96,9 @@
 | `PATCH /api/customer/appointments/[id]` | Customer | Customer | **Yes** | IDOR safe: checks `appt.customer_id === customerId`. |
 | `GET /api/customer/reviews` | Customer | Customer | **Yes** | IDOR safe: filtered by `customer_id = $1`. |
 | `POST /api/customer/reviews` | Customer | Customer | **Yes** | Verifies appointment completed and belongs to customer. |
-| `GET /api/admin/auth` | Super Admin | Super Admin | **Yes** | Validates `salonpro_admin_session` JWT. |
+| `GET /api/admin/auth` | Super Admin | Super Admin | **Yes** | Validates `StudioDesk_admin_session` JWT. |
 | `POST /api/admin/auth` | Super Admin | Public Login | **Yes** | Rate-limited (20/15m/IP, 5/15m/acct). Production env fallback removed. |
-| `POST /api/admin/logout` | Super Admin | Super Admin | **Yes** | Clears `salonpro_admin_session` with `httpOnly: true, secure`. |
+| `POST /api/admin/logout` | Super Admin | Super Admin | **Yes** | Clears `StudioDesk_admin_session` with `httpOnly: true, secure`. |
 | `GET /api/admin/overview` | Super Admin | Super Admin | **Yes** | Blocked at proxy & verified via `requireAdmin`. |
 | `GET /api/admin/admins` | Super Admin | Super Admin | **Yes** | Blocked at proxy & verified via `requireAdmin`. |
 | `POST /api/admin/admins` | Super Admin | Super Admin | **Yes** | Creates new platform admin with bcrypt cost 12. |
@@ -319,7 +319,7 @@ Automated test runner executed via `node scripts/run-security-tests.js`:
 
 ```text
 ======================================================
-   SALONPRO AUTOMATED SECURITY VERIFICATION SUITE     
+   StudioDesk AUTOMATED SECURITY VERIFICATION SUITE     
 ======================================================
 
 --- TEST 1: Unauthenticated Route & API Protection ---

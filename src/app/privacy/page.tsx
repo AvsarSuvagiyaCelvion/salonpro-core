@@ -23,7 +23,7 @@ export const metadata = {
 
 export default function PrivacyPage() {
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   const sections = [
     { id: 'overview', title: '1. Overview & Scope' },

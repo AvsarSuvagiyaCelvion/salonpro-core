@@ -24,7 +24,7 @@ export const metadata = {
 
 export default function TermsPage() {
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   const sections = [
     { id: 'acceptance', title: '1. Acceptance & Eligibility' },

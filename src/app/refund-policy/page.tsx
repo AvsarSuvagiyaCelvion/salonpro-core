@@ -24,7 +24,7 @@ export const metadata = {
 
 export default function RefundPolicyPage() {
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   const sections = [
     { id: 'trial-model', title: '1. 7-Day Evaluation Model' },

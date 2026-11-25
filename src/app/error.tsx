@@ -16,7 +16,7 @@ export default function GlobalErrorPage({ error, reset }: ErrorProps) {
     console.error('[Application Runtime Error]:', error);
   }, [error]);
 
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
 
   return (

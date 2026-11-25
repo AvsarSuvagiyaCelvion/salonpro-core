@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showForgotNotice, setShowForgotNotice] = useState(false);
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

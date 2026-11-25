@@ -16,7 +16,7 @@ import {
 
 export default function LandingFooter() {
   const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '8320653782';
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'avsarsuvagiya968@gmail.com';
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'studiodeskapp@gmail.com';
 
   return (
     <footer className="relative z-10 bg-white dark:bg-[#080B12] text-[#6B7280] dark:text-[#A0A8B8] pt-16 sm:pt-20 pb-12 border-t border-[#E5E7EB] dark:border-[#2A2F3A] transition-colors duration-300">

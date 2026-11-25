@@ -201,7 +201,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `RAZORPAY_WEBHOOK_SECRET` | Optional | — | Webhook signing secret for subscription lifecycle events. |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Optional | — | Client-side Razorpay key for checkout modal. |
 | `NEXT_PUBLIC_SUPPORT_PHONE` | Optional | `8320653782` | Contact support phone number displayed on landing and login. |
-| `NEXT_PUBLIC_SUPPORT_EMAIL` | Optional | `avsarsuvagiya968@gmail.com` | Contact support email. |
+| `NEXT_PUBLIC_SUPPORT_EMAIL` | Optional | `studiodeskapp@gmail.com` | Contact support email. |
 | `SUPABASE_URL` | Optional | `https://mneftepouqtsyfwgfsyb.supabase.co` | Supabase project URL for Storage REST API operations. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Optional | — | Supabase service-role secret key (Server-only) for storage uploads and deletions. |
 

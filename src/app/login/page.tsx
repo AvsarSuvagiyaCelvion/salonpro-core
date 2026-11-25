@@ -297,21 +297,6 @@ export default function LoginPage() {
                   Create Account &amp; Start 7-Day Free Trial ➔
                 </Link>
               </div>
-
-              {/* 1-Click Salon Owner ERP Demo Test-Drive */}
-              <div className="mt-4 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-[#1F2937] dark:text-[#FFFFFF] flex items-center justify-between gap-2 shadow-xs">
-                <div className="flex items-center gap-1.5 font-medium truncate">
-                  <span className="text-amber-500 shrink-0">⚡</span>
-                  <span className="truncate">Want to test-drive without credentials?</span>
-                </div>
-                <a
-                  href="/api/demo/owner-login"
-                  className="font-extrabold text-amber-600 dark:text-amber-400 hover:underline shrink-0 text-xs inline-flex items-center gap-0.5"
-                >
-                  <span>1-Click Owner Demo</span>
-                  <span>➔</span>
-                </a>
-              </div>
             </form>
 
             {/* Footer Info & Panel Nav */}

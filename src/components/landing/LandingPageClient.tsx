@@ -24,7 +24,6 @@ import StatsCounter from '@/components/landing/StatsCounter';
 import InteractiveProductPreview from '@/components/landing/InteractiveProductPreview';
 
 import SmoothScroll from '@/components/animations/SmoothScroll';
-import PageLoader from '@/components/animations/PageLoader';
 import Reveal from '@/components/animations/Reveal';
 import Typewriter from '@/components/animations/Typewriter';
 import AuroraBackground from '@/components/animations/AuroraBackground';

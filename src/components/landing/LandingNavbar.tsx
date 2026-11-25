@@ -26,7 +26,7 @@ export default function LandingNavbar() {
           7-Day Free Trial
         </span>
         <span className="hidden md:inline">
-          Test-drive StudioDesk free for 7 days with zero upfront payment &amp; no credit card required!
+          Try StudioDesk free for 7 days with zero upfront payment &amp; no credit card required!
         </span>
         <span className="md:hidden text-[10px] text-white/90 truncate max-w-[180px]">
           Zero Upfront Payment

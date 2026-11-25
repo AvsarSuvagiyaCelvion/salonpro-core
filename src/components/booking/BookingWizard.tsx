@@ -653,29 +653,6 @@ export default function BookingWizard({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080B12] text-[#1F2937] dark:text-neutral-100 flex flex-col font-sans selection:bg-[#D4A77F] selection:text-[#080B12] transition-colors duration-200">
-      {/* Live Demo Sandbox Beacon (Zero data stored in DB) */}
-      {slug.toLowerCase().trim() === 'dixa-beauty-salon' && (
-        <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-pink-500/20 border-b border-amber-500/30 px-3 py-2.5 text-center text-xs text-amber-200">
-          <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-left">
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-extrabold text-[10px] uppercase tracking-wider shrink-0">
-                🧪 Live Booking Demo
-              </span>
-              <span className="text-[11px] text-amber-100">
-                Test booking freely! Zero records or personal data are stored in database.
-              </span>
-            </div>
-            <a
-              href="/api/demo/owner-login"
-              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#080B12] font-bold text-[11px] shadow-sm transition-all whitespace-nowrap inline-flex items-center gap-1 shrink-0 active:scale-95"
-            >
-              <span>⚡ Test Owner ERP Dashboard</span>
-              <span>➔</span>
-            </a>
-          </div>
-        </div>
-      )}
-
       {/* Universal Sticky Top Header for Public Salon Page */}
       <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-[#10141F]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#2A2F3A] px-3.5 sm:px-6 h-14 sm:h-16 flex items-center justify-between shadow-xs transition-colors duration-250">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -1605,27 +1582,6 @@ export default function BookingWizard({ slug }: { slug: string }) {
                 ? 'This was an interactive demonstration. Zero data was saved to our database.'
                 : 'Your appointment has been reserved directly in the salon scheduling system.'}
             </p>
-
-            {/* Demo Sandbox Alert Callout */}
-            {confirmedBooking.isDemo && (
-              <div className="mt-4 mb-2 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 max-w-md mx-auto text-center">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold text-xs uppercase mb-2">
-                  <span>🧪 Zero Database Storage</span>
-                </span>
-                <p className="text-xs text-amber-700 dark:text-amber-200">
-                  Are you a salon owner? See how this appointment instantly shows up on the manager dashboard and calendar:
-                </p>
-                <div className="mt-3">
-                  <a
-                    href="/api/demo/owner-login"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#080B12] text-xs font-bold transition-all shadow-md active:scale-95"
-                  >
-                    <span>⚡ Test-Drive Salon Owner ERP Dashboard</span>
-                    <span>➔</span>
-                  </a>
-                </div>
-              </div>
-            )}
 
             {/* Appointment Card */}
             <div className="mt-6 bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-3xl p-6 text-left max-w-md mx-auto shadow-xl">

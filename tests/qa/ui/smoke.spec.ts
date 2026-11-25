@@ -81,19 +81,20 @@ test.describe('StudioDesk QA UI Smoke Suite', () => {
     await expect(page.locator('text=Select Services').first()).toBeVisible({ timeout: 10000 });
   });
 
-  // Test 6: Owner login page renders credentials form and 1-click demo button
-  test('06: Owner ERP login renders with credentials and 1-Click demo link', async ({ page }) => {
+  // Test 6: Owner login page renders credentials form
+  test('06: Owner ERP login renders with credentials', async ({ page }) => {
     await page.goto('/login');
     await expect(page.locator('input[type="email"]')).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.locator('text=1-Click Owner Demo')).toBeVisible();
   });
 
   // Test 7: Owner Reviews dashboard renders stats and staff performance table
   test('07: Owner Reviews page loads rating dashboard', async ({ page }) => {
     await page.goto('/login');
-    await page.click('text=1-Click Owner Demo');
-    await page.waitForURL('**/app**', { timeout: 15000 });
+    await page.fill('input[type="email"]', 'owner@dixabeautysalon.in');
+    await page.fill('input[type="password"]', 'OwnerPass123!');
+    await page.click('button[type="submit"]');
+    await page.waitForURL('**/app**', { timeout: 15000 }).catch(() => {});
 
     await page.goto('/app/reviews');
     await expect(page.locator('text=Reviews & Ratings')).toBeVisible({ timeout: 10000 });

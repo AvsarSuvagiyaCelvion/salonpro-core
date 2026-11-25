@@ -15,8 +15,8 @@ export async function GET(request: Request) {
             id: 'wait-demo-1',
             created_at: new Date(Date.now() - 600000).toISOString(),
             customer_id: 'cust-2',
-            customer_name: 'Ritu Sharma',
-            customer_mobile: '9825100002',
+            customer_name: 'Ritu Sharma (Demo)',
+            customer_mobile: '9999900002',
           },
         ],
         sessions: [
@@ -25,8 +25,8 @@ export async function GET(request: Request) {
             started_at: new Date(Date.now() - 1800000).toISOString(),
             status: 'active',
             customer_id: 'cust-1',
-            customer_name: 'Diya Joshi',
-            customer_mobile: '9825100001',
+            customer_name: 'Diya Joshi (Demo)',
+            customer_mobile: '9999900001',
             items: [
               {
                 id: 'item-demo-1',

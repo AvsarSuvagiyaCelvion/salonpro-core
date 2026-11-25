@@ -144,7 +144,7 @@ export default function LandingNavbar() {
                     ✂
                   </div>
                   <span className="font-bold text-base text-[#1F2937] dark:text-[#FFFFFF]">
-                    Salon<span className="text-[#D4A77F]">Pro</span>
+                    Studio<span className="text-[#D4A77F]">Desk</span>
                   </span>
                 </div>
                 <button

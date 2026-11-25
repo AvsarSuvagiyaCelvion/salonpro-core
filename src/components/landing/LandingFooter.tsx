@@ -142,16 +142,6 @@ export default function LandingFooter() {
                   Customer Appointment Portal
                 </Link>
               </li>
-              <li>
-                <Link href="/admin/login" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors text-[#6B7280] dark:text-[#A0A8B8] inline-flex items-center justify-center md:justify-start">
-                  Customer Appointment Portal
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin/login" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors text-[#6B7280] dark:text-[#A0A8B8] inline-flex items-center justify-center md:justify-start">
-                  Platform Admin Access
-                </Link>
-              </li>
             </ul>
           </div>
 

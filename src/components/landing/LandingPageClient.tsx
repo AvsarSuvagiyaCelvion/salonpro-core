@@ -168,7 +168,7 @@ export default function LandingPageClient() {
                 headacheTitle="Double-Bookings & Angry Walk-Ins"
                 headacheDesc="Two clients show up for the same hair stylist at 4:00 PM. Stylists are stressed, waiting areas are packed, and clients leave bad reviews."
                 solutionTitle="Overlap-Protected Bookings"
-                solutionDesc="Automated exclusion engine serializes concurrent requests and computes stylist buffers automatically. 100% overlap prevention."
+                solutionDesc="Automated database transaction locks serialize concurrent requests and compute stylist buffers automatically to prevent double-bookings."
               />
 
               <HeadacheFlipCard
@@ -413,7 +413,7 @@ export default function LandingPageClient() {
                 Ready to Automate Your Salon Operations?
               </h3>
               <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
-                Join hundreds of forward-thinking salons running with StudioDesk. Setup takes under 3 minutes.
+                Join forward-thinking salons and studios running with StudioDesk. Setup takes under 3 minutes.
               </p>
 
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">

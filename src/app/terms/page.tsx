@@ -116,7 +116,7 @@ export default function TermsPage() {
               <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm mb-2">
                 ⚡
               </div>
-              <h2 className="text-xs font-bold text-[#1F2937] dark:text-white">99.9% Uptime Target</h2>
+              <h2 className="text-xs font-bold text-[#1F2937] dark:text-white">High-Availability Cloud</h2>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1 leading-normal">
                 Enterprise cloud uptime with automatic multi-datacenter failover and backups.
               </p>
@@ -305,7 +305,7 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  StudioDesk aims for an operational uptime target of <strong>99.9%</strong>. Scheduled maintenance, cloud provider migrations, or emergency security patching are conducted during off-peak Indian Standard Time (IST) hours with advance notice published via in-app banners.
+                  StudioDesk operates on high-availability cloud architecture with continuous automated database backups. Scheduled maintenance, provider migrations, or emergency security patching are conducted during off-peak Indian Standard Time (IST) hours with advance notice published via in-app banners.
                 </p>
               </div>
             </section>

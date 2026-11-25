@@ -792,7 +792,7 @@ export default function CustomerPortalPage() {
               </div>
               <div className="min-w-0">
                 <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate">
-                  Salon<span className="text-[#8C5E2E] dark:text-[#D4A77F]">Pro</span>
+                  Studio<span className="text-[#8C5E2E] dark:text-[#D4A77F]">Desk</span>
                 </span>
                 <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
                   Client Portal

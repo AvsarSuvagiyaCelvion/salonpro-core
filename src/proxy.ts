@@ -121,6 +121,13 @@ export async function proxy(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const hostname = host.split(':')[0].toLowerCase();
   const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'studiodeskapp.com').toLowerCase();
+
+  // Redirect any incoming *.vercel.app requests to the canonical custom domain
+  if (hostname.endsWith('.vercel.app')) {
+    const targetUrl = new URL(pathname + request.nextUrl.search, `https://${rootDomain}`);
+    return NextResponse.redirect(targetUrl, 308);
+  }
+
   let tenantSlug = extractTenantFromHost(host);
 
   // When host is not a subdomain of ROOT_DOMAIN, look up verified custom domain

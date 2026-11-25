@@ -39,7 +39,7 @@ async function cleanup() {
 
   // Delete test users and admin if any remain
   await pool.query("DELETE FROM users WHERE email IN ('owner.aura@auraglamour.in', 'owner.velvet@velvetluxe.in')");
-  await pool.query("DELETE FROM platform_admins WHERE email = 'superadmin@platform.salonpro.in'");
+  await pool.query("DELETE FROM platform_admins WHERE email = 'superadmin@platform.studiodeskapp.com'");
   await pool.query("DELETE FROM customers WHERE mobile IN ('9825100001', '9825100002', '9825100003', '9825100004', '9825100005')");
   await pool.query("UPDATE services SET description = 'Professional haircut and styling blowdry' WHERE description ILIKE '%demo%'");
 

@@ -113,28 +113,11 @@ export default function LandingPageClient() {
               </MagneticButton>
 
               <Link
-                href="/dixa-beauty-salon"
-                target="_blank"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-sans font-semibold text-[15px] tracking-normal shadow-md shadow-emerald-950/20 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-              >
-                <span>⚡ Live Booking Demo</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">Client</span>
-              </Link>
-
-              <a
-                href="/api/demo/owner-login"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-400 font-sans font-semibold text-[15px] tracking-normal border border-amber-500/30 transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-              >
-                <span>🖥️ Owner ERP Demo</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300">1-Click</span>
-              </a>
-
-              <Link
                 href="/login"
-                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#141926] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF] font-sans font-semibold text-[15px] tracking-normal border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white dark:bg-[#141926] hover:bg-[#F3F4F6] dark:hover:bg-[#1C2230] text-[#1F2937] dark:text-[#FFFFFF] font-sans font-semibold text-[15px] tracking-normal border border-[#E5E7EB] dark:border-[#2A2F3A] transition-all shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
               >
                 <Lock className="w-4 h-4 text-[#D4A77F]" />
-                <span>Owner Portal</span>
+                <span>Salon Owner Portal</span>
               </Link>
             </div>
 

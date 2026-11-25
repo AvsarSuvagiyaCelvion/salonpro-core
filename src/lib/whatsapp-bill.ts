@@ -133,7 +133,7 @@ export async function generateInvoicePdfDoc(invoice: InvoiceBillData): Promise<a
   // Retrieve stored salon information from localStorage if not explicitly passed
   if (typeof window !== 'undefined') {
     try {
-      const stored = localStorage.getItem('salonpro_salon_info');
+      const stored = localStorage.getItem('studiodesk_salon_info');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (!salonName && parsed.name) salonName = parsed.name;
@@ -719,7 +719,7 @@ export function buildInvoiceWhatsAppMessage(
   let salonName = invoice.salon_name;
   if (typeof window !== 'undefined' && !salonName) {
     try {
-      const stored = localStorage.getItem('salonpro_salon_info');
+      const stored = localStorage.getItem('studiodesk_salon_info');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed.name) salonName = parsed.name;

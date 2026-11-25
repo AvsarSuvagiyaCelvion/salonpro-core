@@ -34,13 +34,13 @@ The Customer Panel enables salon clients to discover salon services, select styl
 | `/api/public/[slug]` | `GET` | `src/app/api/public/[slug]/route.ts` | None (Public) | Fetches salon details, brand logo, gallery photos (`salon_photos`), service list, active staff, and working days for the booking wizard. |
 | `/api/public/[slug]/slots` | `GET` | `src/app/api/public/[slug]/slots/route.ts` | None (Public) | Computes real-time available time slots for a given date, service, and optional staff member. |
 | `/api/public/[slug]/book` | `POST` | `src/app/api/public/[slug]/book/route.ts` | None (Public with rate limit; PIN required only for unauthenticated guests, bypassed automatically when logged in via customer portal session) | Validates customer PIN (or authenticates customer session cookie), checks concurrency via PostgreSQL advisory locks, and books appointment atomically without locking authenticated users. |
-| `/api/customer/auth` | `GET`, `POST` | `src/app/api/customer/auth/route.ts` | Cookie for `GET`; None for `POST` | Checks customer session or signs in / registers a new customer using 10-digit mobile & 4-digit PIN. Supports unified cross-salon mobile login (with priority matching for requested salon), automatic PIN creation for existing walk-in / staff-created clients with unset PIN (`canSetPin`), smart mode toggle on existing accounts (`requiresLogin`), and fallback to active salon on direct `/portal` signups. Sets `salonpro_customer_session`. |
-| `/api/customer/logout` | `POST` | `src/app/api/customer/logout/route.ts` | `salonpro_customer_session` | Clears the `salonpro_customer_session` HTTP-only cookie. |
-| `/api/customer/records` | `GET`, `PATCH` | `src/app/api/customer/records/route.ts` | `salonpro_customer_session` | Fetches customer profile, upcoming/past appointments, invoices, active VIP plans, and cancellation policy hours. |
-| `/api/customer/appointments/[id]` | `PATCH` | `src/app/api/customer/appointments/[id]/route.ts` | `salonpro_customer_session` | Handles customer self-service `cancel` or `reschedule` within the salon's cancellation window. Prevents duplicate booking via advisory lock. |
-| `/api/customer/profile` | `GET`, `PATCH` | `src/app/api/customer/profile/route.ts` | `salonpro_customer_session` | `GET` returns logged-in client profile. `PATCH` updates name (2-60 chars), email, address (max 250), and avatar_url (strictly within customer's own folder in `salon-media` bucket). Phone is read-only. Rate-limited to 20 updates / 15 min. |
-| `/api/customer/profile/pin` | `POST` | `src/app/api/customer/profile/pin/route.ts` | `salonpro_customer_session` | Updates customer 4-digit PIN. Requires current PIN, new 4-digit PIN (must differ), and confirm PIN. Verifies current PIN via bcryptjs and hashes new PIN. Protected by strict brute-force rate limit (5 attempts / 15 min per customer + IP). |
-| `/api/customer/reviews` | `GET`, `POST` | `src/app/api/customer/reviews/route.ts` | `salonpro_customer_session` | `GET` lists all reviews submitted by the authenticated customer. `POST` submits review for a completed appointment within 30 days (1-5 stars, optional comment max 500 chars). Rate-limited to 10 submissions / 15 min. Simulates success for demo salon `dixa-beauty-salon`. |
+| `/api/customer/auth` | `GET`, `POST` | `src/app/api/customer/auth/route.ts` | Cookie for `GET`; None for `POST` | Checks customer session or signs in / registers a new customer using 10-digit mobile & 4-digit PIN. Supports unified cross-salon mobile login (with priority matching for requested salon), automatic PIN creation for existing walk-in / staff-created clients with unset PIN (`canSetPin`), smart mode toggle on existing accounts (`requiresLogin`), and fallback to active salon on direct `/portal` signups. Sets `StudioDesk_customer_session`. |
+| `/api/customer/logout` | `POST` | `src/app/api/customer/logout/route.ts` | `StudioDesk_customer_session` | Clears the `StudioDesk_customer_session` HTTP-only cookie. |
+| `/api/customer/records` | `GET`, `PATCH` | `src/app/api/customer/records/route.ts` | `StudioDesk_customer_session` | Fetches customer profile, upcoming/past appointments, invoices, active VIP plans, and cancellation policy hours. |
+| `/api/customer/appointments/[id]` | `PATCH` | `src/app/api/customer/appointments/[id]/route.ts` | `StudioDesk_customer_session` | Handles customer self-service `cancel` or `reschedule` within the salon's cancellation window. Prevents duplicate booking via advisory lock. |
+| `/api/customer/profile` | `GET`, `PATCH` | `src/app/api/customer/profile/route.ts` | `StudioDesk_customer_session` | `GET` returns logged-in client profile. `PATCH` updates name (2-60 chars), email, address (max 250), and avatar_url (strictly within customer's own folder in `salon-media` bucket). Phone is read-only. Rate-limited to 20 updates / 15 min. |
+| `/api/customer/profile/pin` | `POST` | `src/app/api/customer/profile/pin/route.ts` | `StudioDesk_customer_session` | Updates customer 4-digit PIN. Requires current PIN, new 4-digit PIN (must differ), and confirm PIN. Verifies current PIN via bcryptjs and hashes new PIN. Protected by strict brute-force rate limit (5 attempts / 15 min per customer + IP). |
+| `/api/customer/reviews` | `GET`, `POST` | `src/app/api/customer/reviews/route.ts` | `StudioDesk_customer_session` | `GET` lists all reviews submitted by the authenticated customer. `POST` submits review for a completed appointment within 30 days (1-5 stars, optional comment max 500 chars). Rate-limited to 10 submissions / 15 min. Simulates success for demo salon `dixa-beauty-salon`. |
 | `/api/salons` | `GET` | `src/app/api/salons/route.ts` | None (Public) | Returns all active salons on the platform (`id`, `name`, `slug`, `address`, `phone`, `brand_color`, `logo_url`) for customer discovery and multi-salon slot booking selector. |
 
 ---
@@ -91,7 +91,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
    - Re-checks slot availability with `tstzrange` conflict check.
    - Inserts or verifies customer PIN using `bcrypt`.
    - Inserts appointment with `source = 'online'`, `status = 'scheduled'`.
-   - Sets HTTP-only cookie `salonpro_customer_session`.
+   - Sets HTTP-only cookie `StudioDesk_customer_session`.
    - Returns appointment confirmation + prefilled WhatsApp link. Cleans up stored booking session keys.
 
 ### Flow 2: Customer Self-Service Cancellation
@@ -166,7 +166,7 @@ The Customer Panel enables salon clients to discover salon services, select styl
 - `src/lib/rate-limit.ts`: Throttling booking submissions, customer PIN attempts, and profile edits.
 - `src/lib/storage.ts`: Storage path validation and Supabase Storage client for customer avatar uploads.
 - `src/lib/holidays.ts`: `checkDateHoliday` to disable closed holiday slots.
-- `src/proxy.ts`: Subdomain rewrite from `tenant.salonpro.in/` to `/[slug]`.
+- `src/proxy.ts`: Subdomain rewrite from `tenant.studiodeskapp.com/` to `/[slug]`.
 
 ---
 

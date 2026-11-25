@@ -1,6 +1,6 @@
-# SalonPro QA Automated Test Suite Guide
+# StudioDesk QA Automated Test Suite Guide
 
-Welcome to the automated QA test suite for SalonPro! This document provides beginner-friendly, step-by-step instructions for running API and UI automation tests on Windows.
+Welcome to the automated QA test suite for StudioDesk! This document provides beginner-friendly, step-by-step instructions for running API and UI automation tests on Windows.
 
 ---
 
@@ -33,10 +33,10 @@ Ensure `.env.test` points to your dedicated test PostgreSQL database:
 ```env
 PORT=3100
 BASE_URL=http://localhost:3100
-DATABASE_URL=postgresql://postgres.mneftepouqtsyfwgfsyb:Av$@rSuvagiya2136@aws-0-ap-northeast-2.pooler.supabase.com:6543/salonpro_test
+DATABASE_URL=postgresql://postgres.mneftepouqtsyfwgfsyb:Av$@rSuvagiya2136@aws-0-ap-northeast-2.pooler.supabase.com:6543/StudioDesk_test
 SUPABASE_URL=https://mneftepouqtsyfwgfsyb.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=
-SESSION_SECRET=supersecret-session-key-salonpro-2026-xyz-qa-test
+SESSION_SECRET=supersecret-session-key-StudioDesk-2026-xyz-qa-test
 ```
 
 ### Step 2: Build the Application

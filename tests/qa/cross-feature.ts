@@ -27,7 +27,7 @@ export async function runCrossFeatureTests(fixtures: QADataFixtures): Promise<Te
 
   const anonClient = new QAClient();
   const ownerClient = new QAClient();
-  ownerClient.setCookie('salonpro_session', fixtures.owner1.token);
+  ownerClient.setCookie('StudioDesk_session', fixtures.owner1.token);
 
   // --------------------------------------------------------------------------
   // CROSS-01: Complete End-to-End Lifecycle Flow
@@ -54,11 +54,11 @@ export async function runCrossFeatureTests(fixtures: QADataFixtures): Promise<Te
       });
 
       const apptId = bookRes.data?.appointment_id || bookRes.data?.appointment?.id;
-      const clientSessionCookie = anonClient.getCookie('salonpro_customer_session');
+      const clientSessionCookie = anonClient.getCookie('StudioDesk_customer_session');
 
       const customerClient = new QAClient();
       if (clientSessionCookie) {
-        customerClient.setCookie('salonpro_customer_session', clientSessionCookie);
+        customerClient.setCookie('StudioDesk_customer_session', clientSessionCookie);
       }
 
       // If cookie was not in headers, log in manually

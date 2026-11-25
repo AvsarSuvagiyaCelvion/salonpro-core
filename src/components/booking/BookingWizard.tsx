@@ -158,7 +158,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
   // Check if customer is already logged in & sync theme state
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('salonpro_theme');
+      const savedTheme = localStorage.getItem('studiodesk_theme');
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
       } else if (savedTheme === 'light') {
@@ -193,7 +193,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
         const data = await res.json();
         setSalon(data.salon);
         if (slug && typeof window !== 'undefined') {
-          try { localStorage.setItem('salonpro_last_salon', slug); } catch {}
+          try { localStorage.setItem('studiodesk_last_salon', slug); } catch {}
         }
         setPhotos(data.photos || []);
         const fetchedServices = data.services || [];
@@ -212,7 +212,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
         if (typeof window !== 'undefined') {
           try {
             const urlParams = new URLSearchParams(window.location.search);
-            const storedSvcId = urlParams.get('service') || sessionStorage.getItem(`salonpro_${slug}_svc_id`);
+            const storedSvcId = urlParams.get('service') || sessionStorage.getItem(`studiodesk_${slug}_svc_id`);
             const matched = fetchedServices.find((s: Service) => s.id === storedSvcId);
             if (matched) {
               setSelectedService(matched);
@@ -220,7 +220,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               setSelectedService(fetchedServices[0]);
             }
 
-            const storedStaffId = urlParams.get('staff') || sessionStorage.getItem(`salonpro_${slug}_staff_id`);
+            const storedStaffId = urlParams.get('staff') || sessionStorage.getItem(`studiodesk_${slug}_staff_id`);
             if (storedStaffId) {
               if (storedStaffId === 'anyone' || (data.staff || []).some((st: Staff) => st.id === storedStaffId)) {
                 setSelectedStaffId(storedStaffId);
@@ -273,7 +273,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
     if (typeof window !== 'undefined') {
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const savedDate = urlParams.get('date') || sessionStorage.getItem(`salonpro_${slug}_date`);
+        const savedDate = urlParams.get('date') || sessionStorage.getItem(`studiodesk_${slug}_date`);
         if (savedDate) {
           const matchedDate = dates.find((d) => d.dateStr === savedDate && !d.isClosed);
           if (matchedDate) {
@@ -337,7 +337,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
               setSelectedDate(nextOpen.dateStr);
               if (typeof window !== 'undefined') {
                 try {
-                  sessionStorage.setItem(`salonpro_${slug}_date`, nextOpen.dateStr);
+                  sessionStorage.setItem(`studiodesk_${slug}_date`, nextOpen.dateStr);
                   const url = new URL(window.location.href);
                   url.searchParams.set('date', nextOpen.dateStr);
                   window.history.replaceState(null, '', url.toString());
@@ -513,7 +513,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
     setSelectedService(svc);
     if (typeof window !== 'undefined') {
       try {
-        sessionStorage.setItem(`salonpro_${slug}_svc_id`, svc.id);
+        sessionStorage.setItem(`studiodesk_${slug}_svc_id`, svc.id);
         const url = new URL(window.location.href);
         url.searchParams.set('service', svc.id);
         window.history.replaceState(null, '', url.toString());
@@ -525,7 +525,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
     setSelectedStaffId(staffId);
     if (typeof window !== 'undefined') {
       try {
-        sessionStorage.setItem(`salonpro_${slug}_staff_id`, staffId);
+        sessionStorage.setItem(`studiodesk_${slug}_staff_id`, staffId);
         const url = new URL(window.location.href);
         if (staffId && staffId !== 'anyone') {
           url.searchParams.set('staff', staffId);
@@ -542,7 +542,7 @@ export default function BookingWizard({ slug }: { slug: string }) {
     setSelectedSlot(null);
     if (typeof window !== 'undefined') {
       try {
-        sessionStorage.setItem(`salonpro_${slug}_date`, dateStr);
+        sessionStorage.setItem(`studiodesk_${slug}_date`, dateStr);
         const url = new URL(window.location.href);
         url.searchParams.set('date', dateStr);
         window.history.replaceState(null, '', url.toString());
@@ -633,9 +633,9 @@ export default function BookingWizard({ slug }: { slug: string }) {
       showToast('Appointment booked successfully! Confirmation receipt dispatched.', 'success');
       if (typeof window !== 'undefined') {
         try {
-          sessionStorage.removeItem(`salonpro_${slug}_svc_id`);
-          sessionStorage.removeItem(`salonpro_${slug}_staff_id`);
-          sessionStorage.removeItem(`salonpro_${slug}_date`);
+          sessionStorage.removeItem(`studiodesk_${slug}_svc_id`);
+          sessionStorage.removeItem(`studiodesk_${slug}_staff_id`);
+          sessionStorage.removeItem(`studiodesk_${slug}_date`);
           const url = new URL(window.location.href);
           url.searchParams.delete('service');
           url.searchParams.delete('staff');

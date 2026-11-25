@@ -1,6 +1,6 @@
-# SalonPro SaaS — Complete Commercial Acquisition & Handover Package
+# StudioDesk SaaS — Complete Commercial Acquisition & Handover Package
 
-This document is prepared for **Business Buyers, IT Agencies, Software Resellers, and SaaS Investors** acquiring the complete intellectual property, production source code, and white-label distribution rights for **SalonPro**.
+This document is prepared for **Business Buyers, IT Agencies, Software Resellers, and SaaS Investors** acquiring the complete intellectual property, production source code, and white-label distribution rights for **StudioDesk**.
 
 ---
 
@@ -8,9 +8,9 @@ This document is prepared for **Business Buyers, IT Agencies, Software Resellers
 
 | Attribute | Details |
 |---|---|
-| **Product Name** | **SalonPro Cloud ERP & Multi-Tenant Booking Suite** |
+| **Product Name** | **StudioDesk Cloud ERP & Multi-Tenant Booking Suite** |
 | **Technology Stack** | Next.js 15 (React 19, Turbopack, App Router), PostgreSQL, Supabase, Tailwind CSS v4, Jose JWT |
-| **Live Production Demo** | [https://salonpro-plum.vercel.app](https://salonpro-plum.vercel.app) *(1-Click Demo Sandbox built-in)* |
+| **Live Production Demo** | [https://StudioDesk-plum.vercel.app](https://StudioDesk-plum.vercel.app) *(1-Click Demo Sandbox built-in)* |
 | **Target Customers** | Independent Salons, Luxury Spas, Barbershop Chains, Beauty Parlours, Nail & Skin Studios |
 | **Ownership Rights Transferred** | **100% Full Source Code, Complete IP, Database Schemas, Zero Royalty / Resale Rights** |
 | **Target Acquisition Price** | ₹35,000 – ₹50,000 (Immediate Buyout) |
@@ -40,7 +40,7 @@ If you are an IT Agency, Freelancer, or Tech Entrepreneur, here is the proven mo
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                          SALONPRO ARCHITECTURE                         │
+│                          StudioDesk ARCHITECTURE                         │
 ├────────────────────┬────────────────────┬──────────────────────────────┤
 │ 1. Platform Admin  │ 2. Tenant ERP      │ 3. Client & Public Portal    │
 │    (/admin)        │    (/app)          │    (/book, /portal, /b)      │
@@ -64,12 +64,12 @@ If you are an IT Agency, Freelancer, or Tech Entrepreneur, here is the proven mo
 
 ## 4. 5-Minute Zero-Downtime Deployment Guide
 
-Deploying SalonPro requires zero expensive servers. It runs entirely on free/hobby tiers of **Vercel** and **Supabase**:
+Deploying StudioDesk requires zero expensive servers. It runs entirely on free/hobby tiers of **Vercel** and **Supabase**:
 
 ### Step 1: Clone & Install Dependencies
 ```bash
 git clone <your-private-repo-url>
-cd salonpro
+cd StudioDesk
 npm install
 ```
 

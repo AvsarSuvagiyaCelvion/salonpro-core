@@ -11,9 +11,9 @@ StudioDesk operates three strictly isolated authentication realms powered by `jo
 
 | Cookie Name | Exported Constant | Realm / Role | Expiration | Key Payload Fields | Verification Function |
 |---|---|---|---|---|---|
-| `salonpro_session` | `COOKIE_NAME` | Tenant Owner & Staff | 7 days | `email`, `role`, `salonId`, `userId`, `salonSlug` | `verifySessionToken()` in `src/lib/auth.ts`, `requireTenant()` in `src/lib/api-auth.ts` |
-| `salonpro_customer_session` | `CUSTOMER_COOKIE_NAME` | Client / Customer | 30 days | `customerId`, `mobile`, `name`, `salonId`, `role: 'customer'` | `verifyCustomerSessionToken()` in `src/lib/auth.ts` |
-| `salonpro_admin_session` | `ADMIN_COOKIE_NAME` | Platform Super Admin | 8 hours | `email`, `role: 'super_admin'` | `verifyAdminSessionToken()` in `src/lib/auth.ts`, `requireAdmin()` in `src/lib/api-auth.ts` |
+| `StudioDesk_session` | `COOKIE_NAME` | Tenant Owner & Staff | 7 days | `email`, `role`, `salonId`, `userId`, `salonSlug` | `verifySessionToken()` in `src/lib/auth.ts`, `requireTenant()` in `src/lib/api-auth.ts` |
+| `StudioDesk_customer_session` | `CUSTOMER_COOKIE_NAME` | Client / Customer | 30 days | `customerId`, `mobile`, `name`, `salonId`, `role: 'customer'` | `verifyCustomerSessionToken()` in `src/lib/auth.ts` |
+| `StudioDesk_admin_session` | `ADMIN_COOKIE_NAME` | Platform Super Admin | 8 hours | `email`, `role: 'super_admin'` | `verifyAdminSessionToken()` in `src/lib/auth.ts`, `requireAdmin()` in `src/lib/api-auth.ts` |
 
 ### Security Golden Rule
 > **CRITICAL**: Never read or trust `salon_id` or `customer_id` from the request body or query parameters in authenticated endpoints. Always derive `salonId` and `userId`/`customerId` exclusively from the verified JWT cookie via `requireTenant` or `verifyCustomerSessionToken`.
@@ -24,7 +24,7 @@ StudioDesk operates three strictly isolated authentication realms powered by `jo
 The proxy middleware intercepts every incoming HTTP request and performs:
 1. **Subdomain Extraction**: Resolves tenant slugs from headers:
    - Local development: `<slug>.localhost:3000`
-   - Production root domain: `<slug>.studiodeskapp.com` (or `<slug>.salonpro.in`)
+   - Production root domain: `<slug>.studiodeskapp.com` (or `<slug>.studiodeskapp.com`)
    - Vercel preview URLs: `<slug>.<project>.vercel.app`
 2. **Custom Domain Resolution**: Resolves third-party vanity domains (e.g. `booking.salonglam.com`) against `salons.custom_domain` with `custom_domain_verified = true` (backed by a 60-second in-memory cache).
 3. **Internal URL Rewriting**:
@@ -34,8 +34,8 @@ The proxy middleware intercepts every incoming HTTP request and performs:
    - `x-tenant-slug`: The resolved salon slug.
    - `x-current-host`: The incoming Host header.
 5. **Route Protection**:
-   - `/admin/*`: Redirects to `/admin/login` if `salonpro_admin_session` is missing.
-   - `/app/*`: Redirects to `/login` if `salonpro_session` is missing.
+   - `/admin/*`: Redirects to `/admin/login` if `StudioDesk_admin_session` is missing.
+   - `/app/*`: Redirects to `/login` if `StudioDesk_session` is missing.
    - `/api/*`: Checks `PUBLIC_API_PREFIXES` whitelist; otherwise requires a valid tenant or admin session.
 
 ---
@@ -195,7 +195,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `SESSION_SECRET` | **Yes** | — | Secret key used by `jose` to sign and verify all JWT tokens. |
 | `ADMIN_EMAIL` | Optional | — | Super admin fallback login email. |
 | `ADMIN_PASSWORD` | Optional | — | Super admin fallback login password. |
-| `NEXT_PUBLIC_ROOT_DOMAIN` | Optional | `studiodeskapp.com` | Root domain used for tenant subdomain extraction in proxy (supports `studiodeskapp.com` and `salonpro.in`). |
+| `NEXT_PUBLIC_ROOT_DOMAIN` | Optional | `studiodeskapp.com` | Root domain used for tenant subdomain extraction in proxy (supports `studiodeskapp.com` and `studiodeskapp.com`). |
 | `RAZORPAY_KEY_ID` | Optional | — | Razorpay API key for subscription payments. |
 | `RAZORPAY_KEY_SECRET` | Optional | — | Razorpay API secret key. |
 | `RAZORPAY_WEBHOOK_SECRET` | Optional | — | Webhook signing secret for subscription lifecycle events. |
@@ -243,7 +243,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 
 ## 13. Automated QA Test Suite (`tests/qa/`)
 
-SalonPro includes a comprehensive automated QA test suite running against an isolated test PostgreSQL database:
+StudioDesk includes a comprehensive automated QA test suite running against an isolated test PostgreSQL database:
 
 ### Commands
 - `npm run qa:api`: Boots test server on port 3100, seeds `TEST_` fixtures, executes all 29 API integration tests (< 1 min), and generates `tests/qa/report.md`.

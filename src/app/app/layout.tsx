@@ -71,7 +71,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   } | null>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const s = localStorage.getItem('salonpro_salon_info');
+        const s = localStorage.getItem('studiodesk_salon_info');
         if (s) return JSON.parse(s);
       } catch {}
     }
@@ -80,7 +80,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<{ email: string; role: string } | null>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const u = localStorage.getItem('salonpro_user_info');
+        const u = localStorage.getItem('studiodesk_user_info');
         if (u) return JSON.parse(u);
       } catch {}
     }
@@ -102,7 +102,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   } | null>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const s = localStorage.getItem('salonpro_subscription_info');
+        const s = localStorage.getItem('studiodesk_subscription_info');
         if (s) return JSON.parse(s);
       } catch {}
     }
@@ -126,7 +126,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      const match = document.cookie.match(/(?:^|;\s*)salonpro_impersonation=([^;]*)/);
+      const match = document.cookie.match(/(?:^|;\s*)studiodesk_impersonation=([^;]*)/);
       if (match && match[1]) {
         try {
           const decoded = decodeURIComponent(match[1]);
@@ -142,8 +142,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       await fetch('/api/admin/exit-impersonation', { method: 'POST' });
     } catch {}
     try {
-      localStorage.removeItem('salonpro_salon_info');
-      localStorage.removeItem('salonpro_user_info');
+      localStorage.removeItem('studiodesk_salon_info');
+      localStorage.removeItem('studiodesk_user_info');
     } catch {}
     window.location.href = '/admin/salons';
   }
@@ -221,13 +221,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             };
             setSalon(sInfo);
             try {
-              localStorage.setItem('salonpro_salon_info', JSON.stringify(sInfo));
+              localStorage.setItem('studiodesk_salon_info', JSON.stringify(sInfo));
             } catch {}
           }
           if (data.user) {
             setUser(data.user);
             try {
-              localStorage.setItem('salonpro_user_info', JSON.stringify(data.user));
+              localStorage.setItem('studiodesk_user_info', JSON.stringify(data.user));
             } catch {}
           }
         }
@@ -237,7 +237,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           if (subData.subscription) {
             setSubscription(subData.subscription);
             try {
-              localStorage.setItem('salonpro_subscription_info', JSON.stringify(subData.subscription));
+              localStorage.setItem('studiodesk_subscription_info', JSON.stringify(subData.subscription));
             } catch {}
           }
         }

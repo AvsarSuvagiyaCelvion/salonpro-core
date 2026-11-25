@@ -412,7 +412,7 @@ export default function CustomerPortalPage() {
       ) {
         setActiveTab(tabParam);
       }
-      const slug = params.get('salon') || params.get('slug') || localStorage.getItem('salonpro_last_salon');
+      const slug = params.get('salon') || params.get('slug') || localStorage.getItem('studiodesk_last_salon');
       if (slug) setLastSalonSlug(slug);
     }
 
@@ -543,7 +543,7 @@ export default function CustomerPortalPage() {
       return;
     }
 
-    const lastSalon = typeof window !== 'undefined' ? localStorage.getItem('salonpro_last_salon') : null;
+    const lastSalon = typeof window !== 'undefined' ? localStorage.getItem('studiodesk_last_salon') : null;
     const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const salonSlugParam = urlParams?.get('salon') || urlParams?.get('slug') || lastSalon || undefined;
 
@@ -584,7 +584,7 @@ export default function CustomerPortalPage() {
       }
 
       if (data.customer?.salon_slug && typeof window !== 'undefined') {
-        localStorage.setItem('salonpro_last_salon', data.customer.salon_slug);
+        localStorage.setItem('studiodesk_last_salon', data.customer.salon_slug);
       }
 
       setLoggedIn(true);
@@ -685,7 +685,7 @@ export default function CustomerPortalPage() {
                   <a
                     href={`/${salon.slug}`}
                     onClick={() => {
-                      try { localStorage.setItem('salonpro_last_salon', salon.slug); } catch {}
+                      try { localStorage.setItem('studiodesk_last_salon', salon.slug); } catch {}
                     }}
                     className="px-3.5 py-1.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] text-xs font-bold transition-all shadow-xs shrink-0 whitespace-nowrap active:scale-95"
                   >
@@ -750,7 +750,7 @@ export default function CustomerPortalPage() {
                       <a
                         href={`/${s.slug}`}
                         onClick={() => {
-                          try { localStorage.setItem('salonpro_last_salon', s.slug); } catch {}
+                          try { localStorage.setItem('studiodesk_last_salon', s.slug); } catch {}
                         }}
                         className="px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-[#D4A77F] dark:bg-white/10 dark:hover:bg-[#D4A77F] text-[#1F2937] hover:text-[#080B12] dark:text-white dark:hover:text-[#080B12] text-xs font-bold transition-all shrink-0 whitespace-nowrap active:scale-95"
                       >

@@ -153,7 +153,7 @@ function writeMarkdownReport(results: TestResult[], totalTimeMs: number): void {
   const failed = results.filter((r) => r.status === 'FAIL').length;
   const skipped = results.filter((r) => r.status === 'SKIP').length;
 
-  let md = `# SalonPro QA Automation Test Report\n\n`;
+  let md = `# StudioDesk QA Automation Test Report\n\n`;
   md += `> **Generated At:** ${now}  \n`;
   md += `> **Base URL:** ${BASE_URL}  \n`;
   md += `> **Total Duration:** ${(totalTimeMs / 1000).toFixed(2)}s  \n`;
@@ -237,7 +237,7 @@ async function main(): Promise<void> {
 
     if (!isUIOnly) {
       console.log(`\n${BOLD}======================================================================${RESET}`);
-      console.log(`${BOLD}           SALONPRO AUTOMATED QA TEST SUITE EXECUTION                ${RESET}`);
+      console.log(`${BOLD}           StudioDesk AUTOMATED QA TEST SUITE EXECUTION                ${RESET}`);
       console.log(`${BOLD}======================================================================${RESET}\n`);
 
       if (!featureArg || featureArg === '1') {

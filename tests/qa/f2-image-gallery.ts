@@ -61,13 +61,13 @@ export async function runFeature2Tests(fixtures: QADataFixtures): Promise<TestRe
   };
 
   const ownerClient = new QAClient();
-  ownerClient.setCookie('salonpro_session', fixtures.owner1.token);
+  ownerClient.setCookie('StudioDesk_session', fixtures.owner1.token);
 
   const owner2Client = new QAClient();
-  owner2Client.setCookie('salonpro_session', fixtures.owner2.token);
+  owner2Client.setCookie('StudioDesk_session', fixtures.owner2.token);
 
   const customerClient = new QAClient();
-  customerClient.setCookie('salonpro_customer_session', fixtures.customerA.token);
+  customerClient.setCookie('StudioDesk_customer_session', fixtures.customerA.token);
 
   const anonClient = new QAClient();
 
@@ -82,11 +82,11 @@ export async function runFeature2Tests(fixtures: QADataFixtures): Promise<TestRe
       const demoToken = await (await import('./client.ts')).createOwnerToken({
         userId: crypto.randomUUID(),
         salonId: '00000000-0000-0000-0000-000000000001',
-        email: 'demo@salonpro.test',
+        email: 'demo@StudioDesk.test',
         role: 'owner',
         salonSlug: 'dixa-beauty-salon',
       });
-      demoOwnerClient.setCookie('salonpro_session', demoToken);
+      demoOwnerClient.setCookie('StudioDesk_session', demoToken);
 
       const fd = new FormData();
       const blob = new Blob([new Uint8Array(createMinimalJpeg())], { type: 'image/jpeg' });

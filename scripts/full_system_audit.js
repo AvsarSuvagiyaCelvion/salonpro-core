@@ -2,7 +2,7 @@ const { chromium } = require('@playwright/test');
 const fs = require('fs');
 const path = require('path');
 
-const BASE_URL = 'https://salonpro-plum.vercel.app';
+const BASE_URL = 'https://StudioDesk-plum.vercel.app';
 const SCREENSHOT_DIR = path.join(__dirname, '..', 'audit_screenshots');
 const ARTIFACT_DIR = 'C:\\Users\\hp\\.gemini\\antigravity\\brain\\91e0305b-2513-4873-9270-baab6bb254be';
 
@@ -17,7 +17,7 @@ const VIEWPORTS = {
 };
 
 async function runAudit() {
-  console.log('🚀 Starting Full SalonPro System Audit & Visual Verification...');
+  console.log('🚀 Starting Full StudioDesk System Audit & Visual Verification...');
   console.log(`Target: ${BASE_URL}\n`);
 
   const browser = await chromium.launch({
@@ -50,7 +50,7 @@ async function runAudit() {
       // Set theme in localStorage before navigation
       await page.addInitScript((t) => {
         try {
-          localStorage.setItem('salonpro_theme', t);
+          localStorage.setItem('StudioDesk_theme', t);
           if (t === 'dark') {
             document.documentElement.classList.add('dark');
           } else {

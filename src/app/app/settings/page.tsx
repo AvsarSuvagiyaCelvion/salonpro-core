@@ -319,7 +319,7 @@ export default function SettingsPage() {
           if (typeof window !== 'undefined') {
             try {
               localStorage.setItem(
-                'salonpro_salon_info',
+                'studiodesk_salon_info',
                 JSON.stringify({
                   name: s.name,
                   slug: s.slug,
@@ -485,7 +485,7 @@ export default function SettingsPage() {
       if (typeof window !== 'undefined') {
         if (data.salon) {
           try {
-            localStorage.setItem('salonpro_salon_info', JSON.stringify(data.salon));
+            localStorage.setItem('studiodesk_salon_info', JSON.stringify(data.salon));
           } catch {}
         }
         window.dispatchEvent(new CustomEvent('salon-settings-updated', { detail: data.salon }));

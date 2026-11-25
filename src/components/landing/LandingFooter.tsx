@@ -123,28 +123,9 @@ export default function LandingFooter() {
           {/* Column 3: Live Portals & Demos */}
           <div className="space-y-4 text-center md:text-left">
             <h4 className="text-sm font-extrabold uppercase tracking-wider text-[#1F2937] dark:text-[#FFFFFF]">
-              Live Portals
+              Portals &amp; Access
             </h4>
             <ul className="space-y-3 text-sm sm:text-[15px] flex flex-col items-center md:items-start">
-              <li>
-                <Link
-                  href="/dixa-beauty-salon"
-                  target="_blank"
-                  className="text-[#10B981] font-semibold inline-flex items-center justify-center md:justify-start gap-1 hover:underline"
-                >
-                  <span>⚡ Live Booking Demo</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="/api/demo/owner-login"
-                  className="text-amber-500 font-semibold inline-flex items-center justify-center md:justify-start gap-1 hover:underline"
-                >
-                  <span>🖥️ Owner ERP Demo (1-Click)</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </li>
               <li>
                 <Link href="/salon-owner" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start gap-1">
                   <Lock className="w-3.5 h-3.5 text-[#6B7280] dark:text-[#A0A8B8]" />
@@ -158,6 +139,11 @@ export default function LandingFooter() {
               </li>
               <li>
                 <Link href="/portal" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors inline-flex items-center justify-center md:justify-start">
+                  Customer Appointment Portal
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/login" className="hover:text-[#1F2937] dark:hover:text-[#FFFFFF] transition-colors text-[#6B7280] dark:text-[#A0A8B8] inline-flex items-center justify-center md:justify-start">
                   Customer Appointment Portal
                 </Link>
               </li>

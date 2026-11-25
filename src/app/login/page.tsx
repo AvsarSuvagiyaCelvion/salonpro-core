@@ -43,12 +43,12 @@ export default function LoginPage() {
       if (typeof window !== 'undefined') {
         if (data.salon) {
           try {
-            localStorage.setItem('salonpro_salon_info', JSON.stringify(data.salon));
+            localStorage.setItem('studiodesk_salon_info', JSON.stringify(data.salon));
           } catch {}
         }
         if (data.user) {
           try {
-            localStorage.setItem('salonpro_user_info', JSON.stringify(data.user));
+            localStorage.setItem('studiodesk_user_info', JSON.stringify(data.user));
           } catch {}
         }
       }

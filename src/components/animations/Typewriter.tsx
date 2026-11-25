@@ -52,7 +52,7 @@ export default function Typewriter({
     let hasTriggeredOnComplete = false;
 
     // Check if previously completed in this session
-    if (typeof window !== 'undefined' && sessionStorage.getItem('salonpro_typewriter_done') === 'true') {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('studiodesk_typewriter_done') === 'true') {
       hasTriggeredOnComplete = true;
       onComplete?.();
     }
@@ -70,7 +70,7 @@ export default function Typewriter({
           if (!hasTriggeredOnComplete) {
             hasTriggeredOnComplete = true;
             try {
-              sessionStorage.setItem('salonpro_typewriter_done', 'true');
+              sessionStorage.setItem('studiodesk_typewriter_done', 'true');
             } catch {}
             onComplete?.();
           }

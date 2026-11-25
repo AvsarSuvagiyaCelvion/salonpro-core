@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('SalonPro QA UI Smoke Suite', () => {
+test.describe('StudioDesk QA UI Smoke Suite', () => {
 
   // Test 1: Customer Portal login page renders with phone & PIN inputs
   test('01: Customer Portal login renders with mobile and PIN inputs', async ({ page }) => {

@@ -45,7 +45,7 @@ async function prompt(question: string, hidden = false): Promise<string> {
 
 async function main() {
   console.log('\n======================================================');
-  console.log('  SalonPro Platform: Create / Provision Super Admin   ');
+  console.log('  StudioDesk Platform: Create / Provision Super Admin   ');
   console.log('======================================================\n');
 
   const dbUrl = getDatabaseUrl();

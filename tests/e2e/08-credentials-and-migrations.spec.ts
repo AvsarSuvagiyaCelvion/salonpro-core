@@ -33,7 +33,7 @@ test.describe('Task 2: Hardcoded credentials removal and env configuration', () 
       expect(content).toContain('process.env.');
       expect(content).not.toContain('Pooja@123');
       expect(content).not.toContain('Admin@123');
-      expect(content).not.toContain('adminsalonpro@gmail.com');
+      expect(content).not.toContain('adminStudioDesk@gmail.com');
     }
   });
 });

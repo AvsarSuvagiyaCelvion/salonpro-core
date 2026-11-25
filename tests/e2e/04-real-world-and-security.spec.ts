@@ -130,7 +130,7 @@ test.describe('STEP 4: Real-World Scenarios, Concurrency & Security', () => {
     await page.goto('/login');
 
     // Test SQL injection payload formatted to pass browser email regex
-    await page.fill('input[type="email"]', "admin'OR'1'='1@salonpro.in");
+    await page.fill('input[type="email"]', "admin'OR'1'='1@studiodeskapp.com");
     await page.fill('input[type="password"]', "' OR '1'='1");
     await page.click('button[type="submit"]');
 

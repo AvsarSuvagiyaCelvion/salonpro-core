@@ -246,7 +246,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 ---
 
 ## 10. Known Gaps / TODO / UNVERIFIED Items
-- Razorpay Checkout Triggers (`/register-salon`, `/app/subscription`, `/app/marketing` wallet recharge): Temporarily commented out for a 1-month pause per owner request. Direct UPI / Bank Transfer (`8320653782@okaxis` with dynamic QR code & deep links) and salon POS UPI/Cash/Card payments remain 100% active. Razorpay checkout can be re-enabled after 1 month by uncommenting the designated blocks.
+- Razorpay Checkout Triggers (`/register-salon`, `/app/subscription`, `/app/marketing` wallet recharge): Temporarily commented out for a 1-month pause per owner request. Direct UPI / Bank Transfer (`8320653782@okaxis` with dynamic QR code & deep links) is integrated into `/register-salon` and `/app/subscription`, and salon POS UPI/Cash/Card payments remain 100% active. Razorpay checkout can be re-enabled after 1 month by uncommenting the designated blocks.
 - Razorpay Webhook endpoint (`/api/subscription/razorpay/webhook`) expects `RAZORPAY_WEBHOOK_SECRET` in production; in local development, it operates in test mode.
 - Inventory restocking purchase-order management is not yet built (stock is updated directly via product edit or POS checkout).
 

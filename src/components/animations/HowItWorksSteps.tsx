@@ -18,7 +18,7 @@ const steps: StepData[] = [
   {
     number: 1,
     title: 'Salon Owner Portal',
-    urlPath: 'domain.com/salon-owner',
+    urlPath: 'studiodeskapp.com/salon-owner',
     badge: 'Strictly Private to Salon Staff',
     badgeIcon: '🔒',
     description:
@@ -27,7 +27,7 @@ const steps: StepData[] = [
   {
     number: 2,
     title: 'Unique Customer Link',
-    urlPath: 'studiodeskapp.com/dixa-beauty-salon',
+    urlPath: 'studiodeskapp.com/priya-salon',
     badge: 'Public Client Booking Page',
     badgeIcon: '🌐',
     description:
@@ -37,7 +37,7 @@ const steps: StepData[] = [
   {
     number: 3,
     title: 'Instant Client Sync',
-    urlPath: 'domain.com/portal',
+    urlPath: 'studiodeskapp.com/portal',
     badge: 'Permanent Client Records',
     badgeIcon: '✨',
     description:

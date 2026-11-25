@@ -667,7 +667,7 @@ export default function RegisterSalonPage() {
                 Your customers will book appointments directly at:
               </p>
               <div className="mt-3 p-3 rounded-2xl bg-black/40 backdrop-blur-md border border-[#D4A77F]/30 text-xs font-mono font-bold text-[#D4A77F] break-all">
-                domain.com/{slugPreview}
+                studiodeskapp.com/{slugPreview}
               </div>
             </div>
 

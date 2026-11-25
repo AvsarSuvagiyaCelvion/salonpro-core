@@ -33,6 +33,19 @@ interface WalletData {
   total_messages_sent: number;
 }
 
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') return resolve(false);
+    if ((window as any).Razorpay) return resolve(true);
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 interface AudienceCounts {
   all: number;
   inactive_30d: number;
@@ -198,21 +211,84 @@ export default function MarketingPage() {
   async function handleRechargeSubmit() {
     setRecharging(true);
     try {
-      const res = await fetch('/api/marketing/wallet/recharge', {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error('Unable to load Razorpay payment gateway. Please check your internet connection.');
+      }
+
+      // 1. Create Razorpay order on server
+      const orderRes = await fetch('/api/marketing/wallet/recharge/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credits: selectedPackCredits }),
       });
 
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Recharge failed.');
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) {
+        throw new Error(orderData.error || 'Failed to initialize payment.');
+      }
 
-      showToast(`Wallet recharged! Added ${selectedPackCredits} credits at direct cost price.`, 'success');
-      setRechargeModalOpen(false);
-      fetchData();
+      // 2. Open Razorpay Checkout modal
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount, // in paise
+        currency: orderData.currency || 'INR',
+        name: 'StudioDesk',
+        description: `Recharge ${selectedPackCredits} WhatsApp Marketing Credits`,
+        order_id: orderData.orderId,
+        prefill: {
+          name: orderData.salonName || '',
+          contact: orderData.salonPhone || '',
+          email: orderData.salonEmail || '',
+        },
+        theme: {
+          color: '#111111',
+        },
+        modal: {
+          ondismiss: function () {
+            setRecharging(false);
+          },
+        },
+        handler: async function (response: any) {
+          try {
+            // 3. Verify signature on server and credit wallet
+            const verifyRes = await fetch('/api/marketing/wallet/recharge/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                credits: selectedPackCredits,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyRes.ok) {
+              showToast(`Wallet recharged! Added ${selectedPackCredits} credits.`, 'success');
+              setRechargeModalOpen(false);
+              fetchData();
+            } else {
+              showToast(verifyData.error || 'Payment verification failed.', 'error');
+            }
+          } catch (vErr: any) {
+            showToast(vErr.message || 'Payment verification error.', 'error');
+          } finally {
+            setRecharging(false);
+          }
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.on('payment.failed', function (resp: any) {
+        const errMsg = resp.error?.description || resp.error?.reason || 'Transaction could not be completed.';
+        showToast(`Payment Failed: ${errMsg}`, 'error');
+        setRecharging(false);
+      });
+
+      razorpay.open();
     } catch (err: any) {
       showToast(err.message || 'Error during recharge', 'error');
-    } finally {
       setRecharging(false);
     }
   }

@@ -151,6 +151,22 @@ export default function SalonSubscriptionPage() {
     setMessage(null);
 
     try {
+      /* =========================================================================
+       * [RAZORPAY_TEMPORARILY_COMMENTED_OUT - 1 MONTH PAUSE]
+       * Razorpay subscription activation is paused for 1 month per owner request.
+       * Salons can use the "Direct UPI / Bank Transfer (0% Fee)" button.
+       * To re-activate Razorpay checkout:
+       *   1. Remove the notice and early return below
+       *   2. Uncomment the Razorpay block below
+       * ========================================================================= */
+      setMessage({
+        type: 'error',
+        text: 'Online payment via Razorpay is temporarily paused. Please use "Direct UPI / Bank Transfer (0% Fee)" to upgrade your plan.',
+      });
+      setActivatingPlanId(null);
+      return;
+
+      /* [UNCOMMENT AFTER 1 MONTH TO RE-ENABLE RAZORPAY CHECKOUT]
       // 1. Ensure Razorpay script is ready
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
@@ -242,6 +258,7 @@ export default function SalonSubscriptionPage() {
       });
 
       razorpay.open();
+      [END OF RAZORPAY UNCOMMENT BLOCK] */
     } catch (err: any) {
       console.error('handleActivatePlan error:', err);
       const errMsg = err.message || 'Payment processing error.';
@@ -764,7 +781,8 @@ export default function SalonSubscriptionPage() {
                     <span>Direct UPI / Bank Transfer (0% Fee)</span>
                   </button>
 
-                  {/* Option B: Razorpay (Cards / NetBanking) */}
+                  {/* Option B: Razorpay (Cards / NetBanking) - COMMENTED OUT FOR 1 MONTH */}
+                  {/* To re-activate Razorpay checkout button after 1 month, uncomment the block below:
                   <button
                     type="button"
                     onClick={() => handleActivatePlan(plan.id)}
@@ -789,6 +807,7 @@ export default function SalonSubscriptionPage() {
                       </>
                     )}
                   </button>
+                  */}
                 </div>
               </div>
             );

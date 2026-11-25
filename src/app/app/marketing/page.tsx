@@ -211,6 +211,18 @@ export default function MarketingPage() {
   async function handleRechargeSubmit() {
     setRecharging(true);
     try {
+      /* =========================================================================
+       * [RAZORPAY_TEMPORARILY_COMMENTED_OUT - 1 MONTH PAUSE]
+       * Razorpay wallet recharge checkout is paused for 1 month per owner request.
+       * To re-activate Razorpay checkout:
+       *   1. Remove the notice and early return below
+       *   2. Uncomment the Razorpay block below
+       * ========================================================================= */
+      showToast('Online wallet recharge via Razorpay is temporarily paused. Please contact admin to add WhatsApp credits.', 'info');
+      setRechargeModalOpen(false);
+      return;
+
+      /* [UNCOMMENT AFTER 1 MONTH TO RE-ENABLE RAZORPAY CHECKOUT]
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
         throw new Error('Unable to load Razorpay payment gateway. Please check your internet connection.');
@@ -287,6 +299,7 @@ export default function MarketingPage() {
       });
 
       razorpay.open();
+      [END OF RAZORPAY UNCOMMENT BLOCK] */
     } catch (err: any) {
       showToast(err.message || 'Error during recharge', 'error');
       setRecharging(false);

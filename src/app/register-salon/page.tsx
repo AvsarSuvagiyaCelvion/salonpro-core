@@ -153,10 +153,24 @@ export default function RegisterSalonPage() {
         return;
       }
 
-      // 2. Paid Plan selected: Trigger Razorpay Order Creation
+      // 2. Paid Plan selected:
       const chosenPlan = plans.find((p) => p.id === selectedPlanId);
       const chosenPlanName = chosenPlan?.name || 'Selected Plan';
 
+      /* =========================================================================
+       * [RAZORPAY_TEMPORARILY_COMMENTED_OUT - 1 MONTH PAUSE]
+       * Razorpay subscription payment during registration is paused for 1 month.
+       * New salons get immediate access to their chosen plan with trial setup.
+       * To re-activate Razorpay checkout:
+       *   1. Remove the 4 lines below (setRegisteredSalon through return)
+       *   2. Uncomment the Razorpay block below
+       * ========================================================================= */
+      setRegisteredSalon(regData.salon);
+      setRegisteredPlanName(chosenPlanName);
+      setLoading(false);
+      return;
+
+      /* [UNCOMMENT AFTER 1 MONTH TO RE-ENABLE RAZORPAY CHECKOUT]
       const orderRes = await fetch('/api/subscription/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -251,6 +265,7 @@ export default function RegisterSalonPage() {
       });
 
       rzp.open();
+      [END OF RAZORPAY UNCOMMENT BLOCK] */
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please check your details.');
       setLoading(false);

@@ -109,6 +109,7 @@ export default function SettingsPage() {
   const [whatsappMode, setWhatsappMode] = useState<'direct' | 'own_api' | 'platform'>('direct');
   const [whatsappPhoneNumberId, setWhatsappPhoneNumberId] = useState('');
   const [whatsappCloudToken, setWhatsappCloudToken] = useState('');
+  const [whatsappCloudTokenSet, setWhatsappCloudTokenSet] = useState(false);
   const [whatsappWabaId, setWhatsappWabaId] = useState('');
   const [showToken, setShowToken] = useState(false);
 
@@ -314,6 +315,7 @@ export default function SettingsPage() {
           setWhatsappMode(s.whatsapp_mode || 'direct');
           setWhatsappPhoneNumberId(s.whatsapp_phone_number_id || '');
           setWhatsappCloudToken(s.whatsapp_cloud_token || '');
+          setWhatsappCloudTokenSet(Boolean(s.whatsapp_cloud_token_set));
           setWhatsappWabaId(s.whatsapp_waba_id || '');
 
           if (typeof window !== 'undefined') {
@@ -459,7 +461,7 @@ export default function SettingsPage() {
         upi_qr_url: upiQrUrl,
         whatsapp_mode: whatsappMode,
         whatsapp_phone_number_id: whatsappPhoneNumberId.trim() || null,
-        whatsapp_cloud_token: whatsappCloudToken.trim() || null,
+        whatsapp_cloud_token: (whatsappCloudToken.startsWith('••••') || whatsappCloudToken.includes('••••')) ? undefined : (whatsappCloudToken.trim() || null),
         whatsapp_waba_id: whatsappWabaId.trim() || null,
       };
 
@@ -479,6 +481,8 @@ export default function SettingsPage() {
         if (data.salon.close_time) setCloseTime(data.salon.close_time.slice(0, 5));
         if (data.salon.name) setName(data.salon.name);
         if (data.salon.invoice_prefix !== undefined) setInvoicePrefix(data.salon.invoice_prefix || '');
+        if (data.salon.whatsapp_cloud_token !== undefined) setWhatsappCloudToken(data.salon.whatsapp_cloud_token || '');
+        if (data.salon.whatsapp_cloud_token_set !== undefined) setWhatsappCloudTokenSet(Boolean(data.salon.whatsapp_cloud_token_set));
       }
 
       // Notify layout and other components of updated timing & settings
@@ -1379,13 +1383,20 @@ export default function SettingsPage() {
 
                   {/* Permanent System User Token */}
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200 mb-1">
-                      Permanent Access Token (System User Token) <span className="text-[#D4A77F]">*</span>
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-200">
+                        Permanent Access Token (System User Token) <span className="text-[#D4A77F]">*</span>
+                      </label>
+                      {whatsappCloudTokenSet && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
+                          <CheckCircle2 className="w-3 h-3" /> Token saved
+                        </span>
+                      )}
+                    </div>
                     <div className="relative">
                       <input
                         type={showToken ? 'text' : 'password'}
-                        placeholder="EAABw..."
+                        placeholder={whatsappCloudTokenSet ? "Enter new token to replace existing..." : "EAABw..."}
                         value={whatsappCloudToken}
                         onChange={(e) => setWhatsappCloudToken(e.target.value)}
                         className="w-full px-3.5 py-2 pr-10 rounded-xl text-xs bg-white dark:bg-[#10141F] border border-neutral-300 dark:border-[#2A2F3A] text-neutral-900 dark:text-white font-mono focus:outline-hidden focus:border-[#D4A77F]"
@@ -1398,7 +1409,7 @@ export default function SettingsPage() {
                         {showToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                       </button>
                     </div>
-                    <p className="text-[10px] text-neutral-500 mt-1">Never share this token. It is encrypted and used only for your salon's automated dispatches.</p>
+                    <p className="text-[10px] text-neutral-500 mt-1">Never share this token. It is masked and encrypted at rest, and used only for your salon's automated dispatches.</p>
                   </div>
                 </div>
               </div>

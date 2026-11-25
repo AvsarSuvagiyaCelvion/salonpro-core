@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { requireTenant, requireRole } from '@/lib/api-auth';
 import { query } from '@/lib/db';
 import { serverError } from '@/lib/http';
-import { verifyRazorpayPaymentSignature } from '@/lib/razorpay';
-import { AT_COST_RATE_PER_MSG } from '../route';
+import { verifyRazorpayPaymentSignature, fetchRazorpayPayment } from '@/lib/razorpay';
+import { processWalletRechargeFromPayment } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
@@ -15,11 +15,12 @@ export async function POST(request: Request) {
 
     const salonId = auth.session.salonId;
     const body = await request.json().catch(() => ({}));
+
+    // Take ONLY razorpay_order_id, razorpay_payment_id and razorpay_signature from body (ignore credits from body)
     const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      credits,
     } = body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -29,53 +30,87 @@ export async function POST(request: Request) {
       );
     }
 
-    const creditsCount = parseInt(String(credits), 10);
-    if (isNaN(creditsCount) || creditsCount < 50) {
+    // 1. Load the wallet_recharges row WHERE razorpay_order_id = $1 AND salon_id = session.salonId. If missing, return 404.
+    const rechargeRes = await query(
+      `SELECT * FROM wallet_recharges 
+       WHERE razorpay_order_id = $1 AND salon_id = $2 
+       LIMIT 1`,
+      [razorpay_order_id, salonId]
+    );
+
+    if (rechargeRes.rows.length === 0) {
       return NextResponse.json(
-        { error: 'Invalid credit quantity.' },
-        { status: 400 }
+        { error: 'Wallet recharge order not found for this salon.' },
+        { status: 404 }
       );
     }
 
-    // 1. Verify HMAC SHA-256 signature
-    const isValid = verifyRazorpayPaymentSignature({
+    const storedRecharge = rechargeRes.rows[0];
+
+    // If row is already captured, return idempotent success
+    if (storedRecharge.status === 'captured') {
+      const result = await processWalletRechargeFromPayment({
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        expectedSalonId: salonId,
+      });
+      return NextResponse.json(result, { status: 200 });
+    }
+
+    // 2. Verify HMAC SHA-256 signature
+    const isValidSignature = verifyRazorpayPaymentSignature({
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
       signature: razorpay_signature,
     });
 
-    if (!isValid) {
+    if (!isValidSignature) {
+      await query(
+        "UPDATE wallet_recharges SET status = 'failed' WHERE razorpay_order_id = $1 AND status = 'created'",
+        [razorpay_order_id]
+      );
       return NextResponse.json(
         { error: 'Invalid payment signature. Transaction could not be verified.' },
         { status: 400 }
       );
     }
 
-    const totalCostINR = Math.round(creditsCount * AT_COST_RATE_PER_MSG * 100) / 100;
+    // 3. Fetch payment from Razorpay REST API and check status, order_id, amount
+    try {
+      const razorpayPayment = await fetchRazorpayPayment(razorpay_payment_id);
+      const expectedPaise = Math.round(Number(storedRecharge.amount_inr) * 100);
 
-    // 2. Upsert salon wallet atomically upon verified payment
-    const updateRes = await query(
-      `INSERT INTO salon_wallets (salon_id, balance_inr, credits_count, rate_per_msg, total_recharged_inr)
-       VALUES ($1, $2, $3, $4, $2)
-       ON CONFLICT (salon_id) DO UPDATE SET
-         balance_inr = salon_wallets.balance_inr + EXCLUDED.balance_inr,
-         credits_count = salon_wallets.credits_count + EXCLUDED.credits_count,
-         total_recharged_inr = salon_wallets.total_recharged_inr + EXCLUDED.balance_inr,
-         updated_at = NOW()
-       RETURNING balance_inr, credits_count, rate_per_msg`,
-      [salonId, totalCostINR, creditsCount, AT_COST_RATE_PER_MSG]
-    );
+      const isValidStatus = razorpayPayment.status === 'captured' || razorpayPayment.status === 'authorized';
+      const isMatchingAmount = Number(razorpayPayment.amount) === expectedPaise;
+      const isMatchingCurrency = razorpayPayment.currency?.toUpperCase() === 'INR';
+      const isMatchingOrder = razorpayPayment.order_id === razorpay_order_id;
 
-    const updated = updateRes.rows[0];
+      if (!isValidStatus || !isMatchingAmount || !isMatchingCurrency || !isMatchingOrder) {
+        await query(
+          "UPDATE wallet_recharges SET status = 'failed' WHERE razorpay_order_id = $1 AND status = 'created'",
+          [razorpay_order_id]
+        );
+        return NextResponse.json(
+          { error: 'Payment details could not be verified with Razorpay.' },
+          { status: 400 }
+        );
+      }
+    } catch (err: any) {
+      console.error('Failed to verify payment with Razorpay REST API:', err);
+      return NextResponse.json(
+        { error: 'Could not communicate with payment gateway to verify status.' },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({
-      success: true,
-      creditsAdded: creditsCount,
-      newCreditsCount: parseInt(updated.credits_count, 10),
-      amountChargedINR: totalCostINR,
-      ratePerMsg: AT_COST_RATE_PER_MSG,
-      message: `Payment verified! Added ${creditsCount} WhatsApp marketing credits.`,
+    // 4. In a DB transaction: UPDATE wallet_recharges SET status='captured'... and upsert salon_wallets
+    const result = await processWalletRechargeFromPayment({
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      expectedSalonId: salonId,
     });
+
+    return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
     return serverError(error, 'src/app/api/marketing/wallet/recharge/verify/route.ts:POST');
   }

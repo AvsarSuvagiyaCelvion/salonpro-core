@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireTenant, requireRole } from '@/lib/api-auth';
 import { query } from '@/lib/db';
 import { serverError } from '@/lib/http';
-import { normalizeIndianPhone } from '@/lib/whatsapp';
+import { normalizeIndianPhone, decryptWhatsAppToken } from '@/lib/whatsapp';
 
 export async function GET(request: NextRequest) {
   try {
@@ -246,10 +246,11 @@ export async function POST(request: NextRequest) {
       [salonId]
     );
     const sRow = salonConfigRes.rows[0] || {};
+    const decryptedToken = decryptWhatsAppToken(sRow.whatsapp_cloud_token);
     const hasOwnApi =
       sRow.whatsapp_mode === 'own_api' &&
       Boolean(sRow.whatsapp_phone_number_id) &&
-      Boolean(sRow.whatsapp_cloud_token);
+      Boolean(decryptedToken);
 
     let creditsDeducted = 0;
     let availableCredits = 0;

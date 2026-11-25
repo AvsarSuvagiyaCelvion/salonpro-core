@@ -3,7 +3,7 @@ import { requireTenant, requireRole } from '@/lib/api-auth';
 import { query } from '@/lib/db';
 import { serverError } from '@/lib/http';
 import { createRazorpayOrder, getRazorpayKeys } from '@/lib/razorpay';
-import { AT_COST_RATE_PER_MSG } from '../route';
+import { AT_COST_RATE_PER_MSG } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
@@ -18,9 +18,9 @@ export async function POST(request: Request) {
     const { credits = 500 } = body;
 
     const creditsCount = parseInt(String(credits), 10);
-    if (isNaN(creditsCount) || creditsCount < 50) {
+    if (isNaN(creditsCount) || creditsCount < 50 || creditsCount > 100000) {
       return NextResponse.json(
-        { error: 'Invalid credit quantity. Minimum 50 credits.' },
+        { error: 'Invalid credit quantity. Minimum 50, maximum 100,000 credits.' },
         { status: 400 }
       );
     }
@@ -45,6 +45,13 @@ export async function POST(request: Request) {
         rate_per_msg: String(AT_COST_RATE_PER_MSG),
       },
     });
+
+    // Record created order in wallet_recharges with salonId from session (never from request body)
+    await query(
+      `INSERT INTO wallet_recharges (salon_id, razorpay_order_id, credits, amount_inr, status)
+       VALUES ($1, $2, $3, $4, 'created')`,
+      [salonId, order.id, creditsCount, totalCostINR]
+    );
 
     return NextResponse.json({
       success: true,

@@ -193,12 +193,13 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `DATABASE_CA_CERT` | Optional | — | SSL Root Certificate Authority for self-hosted or strict Postgres SSL. |
 | `DB_POOL_MAX` | Optional | `3` | Maximum active connections per serverless instance pool. |
 | `SESSION_SECRET` | **Yes** | — | Secret key used by `jose` to sign and verify all JWT tokens. |
+| `WHATSAPP_TOKEN_ENC_KEY` | Optional | — | 32-byte encryption key for AES-256-GCM encryption of salon Meta Cloud tokens at rest. |
 | `ADMIN_EMAIL` | Optional | — | Super admin fallback login email. |
 | `ADMIN_PASSWORD` | Optional | — | Super admin fallback login password. |
 | `NEXT_PUBLIC_ROOT_DOMAIN` | Optional | `studiodeskapp.com` | Root domain used for tenant subdomain extraction in proxy (supports `studiodeskapp.com` and `studiodeskapp.com`). |
-| `RAZORPAY_KEY_ID` | Optional | — | Razorpay API key for subscription payments. |
+| `RAZORPAY_KEY_ID` | Optional | — | Razorpay API key (must use `rzp_live_*` in production; `rzp_test_*` in dev). |
 | `RAZORPAY_KEY_SECRET` | Optional | — | Razorpay API secret key. |
-| `RAZORPAY_WEBHOOK_SECRET` | Optional | — | Webhook signing secret for subscription lifecycle events. |
+| `RAZORPAY_WEBHOOK_SECRET` | Optional | — | Webhook signing secret for subscription & wallet recharge lifecycle events. |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Optional | — | Client-side Razorpay key for checkout modal. |
 | `NEXT_PUBLIC_SUPPORT_PHONE` | Optional | `8320653782` | Contact support phone number displayed on landing and login. |
 | `NEXT_PUBLIC_SUPPORT_EMAIL` | Optional | `studiodeskapp@gmail.com` | Contact support email. |
@@ -238,6 +239,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `025_salon_daily_expenses.sql` | Creates `expenses` table (`id`, `salon_id`, `title`, `category`, `amount`, `payment_mode`, `notes`, `expense_date`, `created_at`) with indexes for tracking daily petty cash outflows and calculating real-time daily Net Profit (Gross Sales - Expenses). |
 | `026_whatsapp_bulk_and_wallets.sql` | Creates `salon_wallets` (at-cost prepaid credits), `whatsapp_campaigns` (campaign audit logs), and `whatsapp_campaign_recipients` with RLS and indexes for owner marketing and admin platform broadcasts. |
 | `027_salon_custom_whatsapp_settings.sql` | Adds `whatsapp_mode`, `whatsapp_phone_number_id`, `whatsapp_cloud_token`, `whatsapp_waba_id` to `salons` for salon-owned Meta Cloud API credentials and 3-tier dispatch mode selection in Settings. |
+| `028_wallet_recharges.sql` | Creates `wallet_recharges` table (`id`, `salon_id`, `razorpay_order_id`, `razorpay_payment_id`, `credits`, `amount_inr`, `status`, `created_at`, `captured_at`) with RLS and compound indexes for secure, replay-proof prepaid WhatsApp marketing wallet recharges. |
 
 ---
 

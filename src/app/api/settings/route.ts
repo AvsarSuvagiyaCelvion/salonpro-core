@@ -5,6 +5,7 @@ import { requireTenant, requireRole, invalidateUserAuthCache } from '@/lib/api-a
 import { requireFeature, invalidateSalonPlanCache } from '@/lib/plan';
 import { isAllowedSalonImageUrl, deleteFromStorage, BUCKET_NAME } from '@/lib/storage';
 import { DEMO_SALON, DEMO_PHOTOS, DEMO_OWNER_EMAIL } from '@/lib/demo-data';
+import { maskWhatsAppToken, encryptWhatsAppToken } from '@/lib/whatsapp';
 
 export async function GET(request: Request) {
   try {
@@ -14,7 +15,11 @@ export async function GET(request: Request) {
     // Static Demo Settings
     if (auth.session.salonSlug === 'dixa-beauty-salon') {
       return NextResponse.json({
-        salon: DEMO_SALON,
+        salon: {
+          ...DEMO_SALON,
+          whatsapp_cloud_token: '••••••••demo',
+          whatsapp_cloud_token_set: true,
+        },
         photos: DEMO_PHOTOS,
         user: {
           email: DEMO_OWNER_EMAIL,
@@ -42,6 +47,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Salon not found' }, { status: 404 });
     }
 
+    const salonRow = { ...res.rows[0] };
+    const { masked, isSet } = maskWhatsAppToken(salonRow.whatsapp_cloud_token);
+    salonRow.whatsapp_cloud_token = masked;
+    salonRow.whatsapp_cloud_token_set = isSet;
+
     const photosRes = await query(
       `SELECT id, url, storage_path, sort_order, created_at
        FROM salon_photos
@@ -52,7 +62,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(
       {
-        salon: res.rows[0],
+        salon: salonRow,
         photos: photosRes.rows,
         user: {
           email: auth.session.email,
@@ -308,6 +318,20 @@ async function handleUpdateSettings(request: Request) {
     const cleanedOpenTime = cleanTime(open_time);
     const cleanedCloseTime = cleanTime(close_time);
 
+    // Secure handling of whatsapp_cloud_token:
+    // If empty/undefined or equals masked value (or starts with '••••'), keep stored token unchanged.
+    // Only update when a genuinely new token is sent.
+    let shouldUpdateToken = false;
+    let encryptedTokenValue: string | null = null;
+    if (whatsapp_cloud_token !== undefined && whatsapp_cloud_token !== null) {
+      const trimmedToken = String(whatsapp_cloud_token).trim();
+      const isMasked = trimmedToken.startsWith('••••') || trimmedToken.includes('••••');
+      if (trimmedToken !== '' && !isMasked) {
+        shouldUpdateToken = true;
+        encryptedTokenValue = encryptWhatsAppToken(trimmedToken);
+      }
+    }
+
     const res = await query(
       `UPDATE salons
        SET name = COALESCE($1, name),
@@ -366,8 +390,8 @@ async function handleUpdateSettings(request: Request) {
         whatsapp_mode ? String(whatsapp_mode).trim() : 'direct',
         whatsapp_phone_number_id !== undefined,
         whatsapp_phone_number_id ? String(whatsapp_phone_number_id).trim() : null,
-        whatsapp_cloud_token !== undefined,
-        whatsapp_cloud_token ? String(whatsapp_cloud_token).trim() : null,
+        shouldUpdateToken,
+        encryptedTokenValue,
         whatsapp_waba_id !== undefined,
         whatsapp_waba_id ? String(whatsapp_waba_id).trim() : null,
         salonId,
@@ -376,9 +400,14 @@ async function handleUpdateSettings(request: Request) {
 
     invalidateSalonPlanCache(salonId);
 
+    const updatedSalon = { ...res.rows[0] };
+    const { masked, isSet } = maskWhatsAppToken(updatedSalon.whatsapp_cloud_token);
+    updatedSalon.whatsapp_cloud_token = masked;
+    updatedSalon.whatsapp_cloud_token_set = isSet;
+
     return NextResponse.json({
       success: true,
-      salon: res.rows[0],
+      salon: updatedSalon,
       message: 'Salon settings saved successfully',
     });
   } catch (error: any) {

@@ -1,4 +1,72 @@
+import crypto from 'crypto';
 import { query } from './db';
+
+/**
+ * Derives a 32-byte AES-256 key from WHATSAPP_TOKEN_ENC_KEY or fallback secrets.
+ */
+function getWhatsAppTokenEncKey(): Buffer {
+  const secret = process.env.WHATSAPP_TOKEN_ENC_KEY || process.env.SESSION_SECRET || 'studiodesk-default-enc-secret-key-32b';
+  return crypto.createHash('sha256').update(secret).digest();
+}
+
+/**
+ * Encrypts a WhatsApp Cloud API token at rest using AES-256-GCM.
+ * Stored format: "enc:<iv_hex>:<tag_hex>:<ciphertext_hex>"
+ */
+export function encryptWhatsAppToken(token: string | null | undefined): string | null {
+  if (!token || !token.trim()) return null;
+  const clean = token.trim();
+  if (clean.startsWith('enc:')) return clean; // Already encrypted
+  try {
+    const key = getWhatsAppTokenEncKey();
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    let encrypted = cipher.update(clean, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    const tag = cipher.getAuthTag().toString('hex');
+    return `enc:${iv.toString('hex')}:${tag}:${encrypted}`;
+  } catch (err) {
+    console.error('Failed to encrypt WhatsApp token, falling back to plaintext:', err);
+    return clean;
+  }
+}
+
+/**
+ * Decrypts a WhatsApp Cloud API token.
+ * If not prefixed with "enc:", returns value as-is for 100% backwards compatibility with plaintext.
+ */
+export function decryptWhatsAppToken(stored: string | null | undefined): string {
+  if (!stored) return '';
+  const trimmed = stored.trim();
+  if (!trimmed.startsWith('enc:')) return trimmed; // Backwards compatible with existing plaintext
+  try {
+    const parts = trimmed.split(':');
+    if (parts.length !== 4) return trimmed;
+    const [, ivHex, tagHex, encryptedHex] = parts;
+    const key = getWhatsAppTokenEncKey();
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(ivHex, 'hex'));
+    decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
+    let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  } catch (err) {
+    console.error('Failed to decrypt WhatsApp token:', err);
+    return '';
+  }
+}
+
+/**
+ * Returns a masked representation of the WhatsApp token (e.g. "••••••••abcd")
+ * and whether a token is currently configured, preventing browser leakage.
+ */
+export function maskWhatsAppToken(rawOrEncrypted: string | null | undefined): { masked: string; isSet: boolean } {
+  if (!rawOrEncrypted) return { masked: '', isSet: false };
+  const decrypted = decryptWhatsAppToken(rawOrEncrypted);
+  if (!decrypted || !decrypted.trim()) return { masked: '', isSet: false };
+  const token = decrypted.trim();
+  const masked = token.length > 4 ? `••••••••${token.slice(-4)}` : '••••••••';
+  return { masked, isSet: true };
+}
 
 export interface PhoneNormalizationResult {
   valid: boolean;
@@ -114,7 +182,7 @@ export async function sendWhatsAppInvoiceReceipt(
   const phone = normalizeIndianPhone(customerMobile);
   const appBaseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://salonpro-plum.vercel.app');
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.studiodeskapp.com');
   
   const receiptUrl = `${appBaseUrl}/b/${encodeURIComponent(params.receiptToken || params.invoiceNumber || '')}`;
 
@@ -147,9 +215,27 @@ export async function sendWhatsAppInvoiceReceipt(
     `📄 *View & Download Digital Bill / PDF:*\n${receiptUrl}\n\n` +
     `Need assistance? Reply directly or visit us again soon! 💇‍♀️💅`;
 
-  // 1. Check for Meta WhatsApp Cloud API credentials
-  const cloudApiToken = process.env.WHATSAPP_CLOUD_API_TOKEN;
-  const cloudPhoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  // 0. Check for Salon-specific custom WhatsApp Cloud API credentials
+  let salonCustomToken: string | null = null;
+  let salonCustomPhoneId: string | null = null;
+
+  try {
+    const sRes = await query(
+      `SELECT whatsapp_mode, whatsapp_phone_number_id, whatsapp_cloud_token FROM salons WHERE id = $1 LIMIT 1`,
+      [salonId]
+    );
+    if (sRes.rows.length > 0) {
+      const sRow = sRes.rows[0];
+      if (sRow.whatsapp_mode === 'own_api' && sRow.whatsapp_phone_number_id && sRow.whatsapp_cloud_token) {
+        salonCustomToken = decryptWhatsAppToken(sRow.whatsapp_cloud_token);
+        salonCustomPhoneId = sRow.whatsapp_phone_number_id;
+      }
+    }
+  } catch {}
+
+  // 1. Check for Meta WhatsApp Cloud API credentials (Salon custom API preferred, then environment)
+  const cloudApiToken = salonCustomToken || process.env.WHATSAPP_CLOUD_API_TOKEN;
+  const cloudPhoneNumberId = salonCustomPhoneId || process.env.WHATSAPP_PHONE_NUMBER_ID;
 
   // 2. Check for Twilio WhatsApp credentials
   const twilioSid = process.env.TWILIO_ACCOUNT_SID;

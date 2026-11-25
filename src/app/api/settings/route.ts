@@ -5,6 +5,7 @@ import { requireTenant, requireRole, invalidateUserAuthCache } from '@/lib/api-a
 import { requireFeature, invalidateSalonPlanCache } from '@/lib/plan';
 import { isAllowedSalonImageUrl, deleteFromStorage, BUCKET_NAME } from '@/lib/storage';
 import { DEMO_SALON, DEMO_PHOTOS, DEMO_OWNER_EMAIL } from '@/lib/demo-data';
+import { maskWhatsAppToken, encryptWhatsAppToken } from '@/lib/whatsapp';
 
 export async function GET(request: Request) {
   try {
@@ -14,7 +15,11 @@ export async function GET(request: Request) {
     // Static Demo Settings
     if (auth.session.salonSlug === 'dixa-beauty-salon') {
       return NextResponse.json({
-        salon: DEMO_SALON,
+        salon: {
+          ...DEMO_SALON,
+          whatsapp_cloud_token: '••••••••demo',
+          whatsapp_cloud_token_set: true,
+        },
         photos: DEMO_PHOTOS,
         user: {
           email: DEMO_OWNER_EMAIL,
@@ -30,6 +35,7 @@ export async function GET(request: Request) {
               working_days, min_advance_hours, max_advance_days, send_reminders,
               cancel_policy_hours, invoice_prefix,
               upi_id, upi_number, upi_qr_url,
+              whatsapp_mode, whatsapp_phone_number_id, whatsapp_cloud_token, whatsapp_waba_id,
               trial_ends_at, subscription_status, subscription_ends_at, subscription_plan_id
        FROM salons
        WHERE id = $1
@@ -41,6 +47,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Salon not found' }, { status: 404 });
     }
 
+    const salonRow = { ...res.rows[0] };
+    const { masked, isSet } = maskWhatsAppToken(salonRow.whatsapp_cloud_token);
+    salonRow.whatsapp_cloud_token = masked;
+    salonRow.whatsapp_cloud_token_set = isSet;
+
     const photosRes = await query(
       `SELECT id, url, storage_path, sort_order, created_at
        FROM salon_photos
@@ -51,7 +62,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(
       {
-        salon: res.rows[0],
+        salon: salonRow,
         photos: photosRes.rows,
         user: {
           email: auth.session.email,
@@ -111,6 +122,10 @@ async function handleUpdateSettings(request: Request) {
       upi_id,
       upi_number,
       upi_qr_url,
+      whatsapp_mode,
+      whatsapp_phone_number_id,
+      whatsapp_cloud_token,
+      whatsapp_waba_id,
     } = body;
 
     // 5.3 Validations on settings updates
@@ -303,6 +318,20 @@ async function handleUpdateSettings(request: Request) {
     const cleanedOpenTime = cleanTime(open_time);
     const cleanedCloseTime = cleanTime(close_time);
 
+    // Secure handling of whatsapp_cloud_token:
+    // If empty/undefined or equals masked value (or starts with '••••'), keep stored token unchanged.
+    // Only update when a genuinely new token is sent.
+    let shouldUpdateToken = false;
+    let encryptedTokenValue: string | null = null;
+    if (whatsapp_cloud_token !== undefined && whatsapp_cloud_token !== null) {
+      const trimmedToken = String(whatsapp_cloud_token).trim();
+      const isMasked = trimmedToken.startsWith('••••') || trimmedToken.includes('••••');
+      if (trimmedToken !== '' && !isMasked) {
+        shouldUpdateToken = true;
+        encryptedTokenValue = encryptWhatsAppToken(trimmedToken);
+      }
+    }
+
     const res = await query(
       `UPDATE salons
        SET name = COALESCE($1, name),
@@ -324,8 +353,12 @@ async function handleUpdateSettings(request: Request) {
            invoice_prefix = CASE WHEN $18::boolean THEN $19::text ELSE invoice_prefix END,
            upi_id = CASE WHEN $20::boolean THEN $21::text ELSE upi_id END,
            upi_number = CASE WHEN $22::boolean THEN $23::text ELSE upi_number END,
-           upi_qr_url = CASE WHEN $24::boolean THEN $25::text ELSE upi_qr_url END
-       WHERE id = $26::uuid
+           upi_qr_url = CASE WHEN $24::boolean THEN $25::text ELSE upi_qr_url END,
+           whatsapp_mode = CASE WHEN $26::boolean THEN $27::text ELSE whatsapp_mode END,
+           whatsapp_phone_number_id = CASE WHEN $28::boolean THEN $29::text ELSE whatsapp_phone_number_id END,
+           whatsapp_cloud_token = CASE WHEN $30::boolean THEN $31::text ELSE whatsapp_cloud_token END,
+           whatsapp_waba_id = CASE WHEN $32::boolean THEN $33::text ELSE whatsapp_waba_id END
+       WHERE id = $34::uuid
        RETURNING *`,
       [
         name,
@@ -353,15 +386,28 @@ async function handleUpdateSettings(request: Request) {
         upi_number ? String(upi_number).trim() : null,
         upi_qr_url !== undefined,
         upi_qr_url ? String(upi_qr_url).trim() : null,
+        whatsapp_mode !== undefined,
+        whatsapp_mode ? String(whatsapp_mode).trim() : 'direct',
+        whatsapp_phone_number_id !== undefined,
+        whatsapp_phone_number_id ? String(whatsapp_phone_number_id).trim() : null,
+        shouldUpdateToken,
+        encryptedTokenValue,
+        whatsapp_waba_id !== undefined,
+        whatsapp_waba_id ? String(whatsapp_waba_id).trim() : null,
         salonId,
       ]
     );
 
     invalidateSalonPlanCache(salonId);
 
+    const updatedSalon = { ...res.rows[0] };
+    const { masked, isSet } = maskWhatsAppToken(updatedSalon.whatsapp_cloud_token);
+    updatedSalon.whatsapp_cloud_token = masked;
+    updatedSalon.whatsapp_cloud_token_set = isSet;
+
     return NextResponse.json({
       success: true,
-      salon: res.rows[0],
+      salon: updatedSalon,
       message: 'Salon settings saved successfully',
     });
   } catch (error: any) {

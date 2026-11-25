@@ -7,13 +7,13 @@
 
 ## 1. Authentication & JWT Session Cookies
 
-SalonPro operates three strictly isolated authentication realms powered by `jose` (HS256 signed JWTs) using `SESSION_SECRET`:
+StudioDesk operates three strictly isolated authentication realms powered by `jose` (HS256 signed JWTs) using `SESSION_SECRET`:
 
 | Cookie Name | Exported Constant | Realm / Role | Expiration | Key Payload Fields | Verification Function |
 |---|---|---|---|---|---|
-| `salonpro_session` | `COOKIE_NAME` | Tenant Owner & Staff | 7 days | `email`, `role`, `salonId`, `userId`, `salonSlug` | `verifySessionToken()` in `src/lib/auth.ts`, `requireTenant()` in `src/lib/api-auth.ts` |
-| `salonpro_customer_session` | `CUSTOMER_COOKIE_NAME` | Client / Customer | 30 days | `customerId`, `mobile`, `name`, `salonId`, `role: 'customer'` | `verifyCustomerSessionToken()` in `src/lib/auth.ts` |
-| `salonpro_admin_session` | `ADMIN_COOKIE_NAME` | Platform Super Admin | 8 hours | `email`, `role: 'super_admin'` | `verifyAdminSessionToken()` in `src/lib/auth.ts`, `requireAdmin()` in `src/lib/api-auth.ts` |
+| `StudioDesk_session` | `COOKIE_NAME` | Tenant Owner & Staff | 7 days | `email`, `role`, `salonId`, `userId`, `salonSlug` | `verifySessionToken()` in `src/lib/auth.ts`, `requireTenant()` in `src/lib/api-auth.ts` |
+| `StudioDesk_customer_session` | `CUSTOMER_COOKIE_NAME` | Client / Customer | 30 days | `customerId`, `mobile`, `name`, `salonId`, `role: 'customer'` | `verifyCustomerSessionToken()` in `src/lib/auth.ts` |
+| `StudioDesk_admin_session` | `ADMIN_COOKIE_NAME` | Platform Super Admin | 8 hours | `email`, `role: 'super_admin'` | `verifyAdminSessionToken()` in `src/lib/auth.ts`, `requireAdmin()` in `src/lib/api-auth.ts` |
 
 ### Security Golden Rule
 > **CRITICAL**: Never read or trust `salon_id` or `customer_id` from the request body or query parameters in authenticated endpoints. Always derive `salonId` and `userId`/`customerId` exclusively from the verified JWT cookie via `requireTenant` or `verifyCustomerSessionToken`.
@@ -24,7 +24,7 @@ SalonPro operates three strictly isolated authentication realms powered by `jose
 The proxy middleware intercepts every incoming HTTP request and performs:
 1. **Subdomain Extraction**: Resolves tenant slugs from headers:
    - Local development: `<slug>.localhost:3000`
-   - Production root domain: `<slug>.salonpro.in`
+   - Production root domain: `<slug>.studiodeskapp.com` (or `<slug>.studiodeskapp.com`)
    - Vercel preview URLs: `<slug>.<project>.vercel.app`
 2. **Custom Domain Resolution**: Resolves third-party vanity domains (e.g. `booking.salonglam.com`) against `salons.custom_domain` with `custom_domain_verified = true` (backed by a 60-second in-memory cache).
 3. **Internal URL Rewriting**:
@@ -34,8 +34,8 @@ The proxy middleware intercepts every incoming HTTP request and performs:
    - `x-tenant-slug`: The resolved salon slug.
    - `x-current-host`: The incoming Host header.
 5. **Route Protection**:
-   - `/admin/*`: Redirects to `/admin/login` if `salonpro_admin_session` is missing.
-   - `/app/*`: Redirects to `/login` if `salonpro_session` is missing.
+   - `/admin/*`: Redirects to `/admin/login` if `StudioDesk_admin_session` is missing.
+   - `/app/*`: Redirects to `/login` if `StudioDesk_session` is missing.
    - `/api/*`: Checks `PUBLIC_API_PREFIXES` whitelist; otherwise requires a valid tenant or admin session.
 
 ---
@@ -193,15 +193,16 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `DATABASE_CA_CERT` | Optional | — | SSL Root Certificate Authority for self-hosted or strict Postgres SSL. |
 | `DB_POOL_MAX` | Optional | `3` | Maximum active connections per serverless instance pool. |
 | `SESSION_SECRET` | **Yes** | — | Secret key used by `jose` to sign and verify all JWT tokens. |
+| `WHATSAPP_TOKEN_ENC_KEY` | Optional | — | 32-byte encryption key for AES-256-GCM encryption of salon Meta Cloud tokens at rest. |
 | `ADMIN_EMAIL` | Optional | — | Super admin fallback login email. |
 | `ADMIN_PASSWORD` | Optional | — | Super admin fallback login password. |
-| `NEXT_PUBLIC_ROOT_DOMAIN` | Optional | `salonpro.in` | Root domain used for tenant subdomain extraction in proxy. |
-| `RAZORPAY_KEY_ID` | Optional | — | Razorpay API key for subscription payments. |
+| `NEXT_PUBLIC_ROOT_DOMAIN` | Optional | `studiodeskapp.com` | Root domain used for tenant subdomain extraction in proxy (supports `studiodeskapp.com` and `studiodeskapp.com`). |
+| `RAZORPAY_KEY_ID` | Optional | — | Razorpay API key (must use `rzp_live_*` in production; `rzp_test_*` in dev). |
 | `RAZORPAY_KEY_SECRET` | Optional | — | Razorpay API secret key. |
-| `RAZORPAY_WEBHOOK_SECRET` | Optional | — | Webhook signing secret for subscription lifecycle events. |
+| `RAZORPAY_WEBHOOK_SECRET` | Optional | — | Webhook signing secret for subscription & wallet recharge lifecycle events. |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Optional | — | Client-side Razorpay key for checkout modal. |
 | `NEXT_PUBLIC_SUPPORT_PHONE` | Optional | `8320653782` | Contact support phone number displayed on landing and login. |
-| `NEXT_PUBLIC_SUPPORT_EMAIL` | Optional | `avsarsuvagiya968@gmail.com` | Contact support email. |
+| `NEXT_PUBLIC_SUPPORT_EMAIL` | Optional | `studiodeskapp@gmail.com` | Contact support email. |
 | `SUPABASE_URL` | Optional | `https://mneftepouqtsyfwgfsyb.supabase.co` | Supabase project URL for Storage REST API operations. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Optional | — | Supabase service-role secret key (Server-only) for storage uploads and deletions. |
 
@@ -237,12 +238,14 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `024_upi_payment_settings.sql` | Adds `upi_id`, `upi_number`, `upi_qr_url` to `salons` for direct 0%-fee POS payments; creates `platform_settings` table for super admin direct UPI and bank transfer checkout. |
 | `025_salon_daily_expenses.sql` | Creates `expenses` table (`id`, `salon_id`, `title`, `category`, `amount`, `payment_mode`, `notes`, `expense_date`, `created_at`) with indexes for tracking daily petty cash outflows and calculating real-time daily Net Profit (Gross Sales - Expenses). |
 | `026_whatsapp_bulk_and_wallets.sql` | Creates `salon_wallets` (at-cost prepaid credits), `whatsapp_campaigns` (campaign audit logs), and `whatsapp_campaign_recipients` with RLS and indexes for owner marketing and admin platform broadcasts. |
+| `027_salon_custom_whatsapp_settings.sql` | Adds `whatsapp_mode`, `whatsapp_phone_number_id`, `whatsapp_cloud_token`, `whatsapp_waba_id` to `salons` for salon-owned Meta Cloud API credentials and 3-tier dispatch mode selection in Settings. |
+| `028_wallet_recharges.sql` | Creates `wallet_recharges` table (`id`, `salon_id`, `razorpay_order_id`, `razorpay_payment_id`, `credits`, `amount_inr`, `status`, `created_at`, `captured_at`) with RLS and compound indexes for secure, replay-proof prepaid WhatsApp marketing wallet recharges. |
 
 ---
 
 ## 13. Automated QA Test Suite (`tests/qa/`)
 
-SalonPro includes a comprehensive automated QA test suite running against an isolated test PostgreSQL database:
+StudioDesk includes a comprehensive automated QA test suite running against an isolated test PostgreSQL database:
 
 ### Commands
 - `npm run qa:api`: Boots test server on port 3100, seeds `TEST_` fixtures, executes all 29 API integration tests (< 1 min), and generates `tests/qa/report.md`.

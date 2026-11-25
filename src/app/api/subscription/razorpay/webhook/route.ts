@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
+import { query } from '@/lib/db';
 import { verifyRazorpayWebhookSignature } from '@/lib/razorpay';
 import { activateSubscriptionFromPayment } from '@/lib/subscription';
+import { processWalletRechargeFromPayment } from '@/lib/wallet';
 
 export async function POST(request: Request) {
   try {
@@ -36,13 +38,27 @@ export async function POST(request: Request) {
 
       if (orderId) {
         try {
-          const result = await activateSubscriptionFromPayment({
-            razorpayOrderId: orderId,
-            razorpayPaymentId: paymentId,
-          });
-          console.log(`Razorpay webhook ${eventType} handled for order ${orderId}:`, result.message);
+          // Check if order belongs to subscription_payments
+          const subCheck = await query('SELECT id FROM subscription_payments WHERE razorpay_order_id = $1 LIMIT 1', [orderId]);
+          if (subCheck.rows.length > 0) {
+            const result = await activateSubscriptionFromPayment({
+              razorpayOrderId: orderId,
+              razorpayPaymentId: paymentId,
+            });
+            console.log(`Razorpay webhook ${eventType} handled for subscription order ${orderId}:`, result.message);
+          } else {
+            // Check if order belongs to wallet_recharges
+            const walletCheck = await query('SELECT id FROM wallet_recharges WHERE razorpay_order_id = $1 LIMIT 1', [orderId]);
+            if (walletCheck.rows.length > 0) {
+              const wResult = await processWalletRechargeFromPayment({
+                razorpayOrderId: orderId,
+                razorpayPaymentId: paymentId,
+              });
+              console.log(`Razorpay webhook ${eventType} handled for wallet order ${orderId}:`, wResult.message);
+            }
+          }
         } catch (activationErr) {
-          console.error(`Error activating subscription from webhook for order ${orderId}:`, activationErr);
+          console.error(`Error processing webhook for order ${orderId}:`, activationErr);
         }
       }
     }
@@ -54,4 +70,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Webhook processing error' }, { status: 500 });
   }
 }
-

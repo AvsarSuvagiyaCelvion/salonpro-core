@@ -31,7 +31,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 | `/app/marketing` | `src/app/app/marketing/page.tsx` | WhatsApp Marketing & Broadcast Hub: direct Meta Cloud API messaging at 100% cost-price (₹0.85/msg, 0% markup), audience segmentation (All, Inactive 30d+, VIP spenders, Today), live phone preview, campaign history, and prepaid wallet recharge. | Phone preview mockup, Recharge modal, Template loader |
 | `/app/reports` | `src/app/app/reports/page.tsx` | Analytics and export: revenue breakdowns, staff commission statements, and CSV/PDF export. | `ReportExportModal`, `BarComparisonChart`, `DonutDistributionChart`, `HourlyRushChart` |
 | `/app/reviews` | `src/app/app/reviews/page.tsx` | Reviews & ratings hub: aggregate rating, 5-star distribution, stylist rating leaderboard, client reviews feed, owner reply drawer/modal, and visibility toggle (`visible`/`hidden`). Gated by `reviews` plan flag (Pro/Premium). | Reviews dashboard, Star rating bars, Reply modal |
-| `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, custom invoice prefix management with live format preview, holiday closures, and Security & Password management (changing login/temporary password with brute-force rate limit protection). Gated with owner role validation; displays a read-only informational banner and disables save actions when accessed by operational staff. | Settings tab panels |
+| `/app/settings` | `src/app/app/settings/page.tsx` | Salon configuration: business details, logo upload, operating hours, slot intervals, buffer gaps, advance booking limits, cancellation policy hours, custom invoice prefix management with live format preview, holiday closures, 3-tier WhatsApp Dispatch settings (Direct Device Free, Own Meta Cloud API, StudioDesk Managed Gateway), and Security & Password management (changing login/temporary password with brute-force rate limit protection). Gated with owner role validation; displays a read-only informational banner and disables save actions when accessed by operational staff. | Settings tab panels |
 | `/app/subscription` | `src/app/app/subscription/page.tsx` | Plan management: current subscription tier, trial status, feature matrix, and Razorpay upgrade/renewal. | Plan cards & Razorpay checkout |
 | `/app/benefits` | `src/app/app/benefits/page.tsx` | Plan comparison matrix showing feature gates between Basic, Pro, and Premium. | Feature comparison table |
 
@@ -41,58 +41,59 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 
 | Endpoint | Methods | File Path | Auth Required | What It Does |
 |---|---|---|---|---|
-| `/api/login` | `POST` | `src/app/api/login/route.ts` | None | Authenticates salon owner/staff via email and password; sets `salonpro_session` cookie. |
+| `/api/login` | `POST` | `src/app/api/login/route.ts` | None | Authenticates salon owner/staff via email and password; sets `StudioDesk_session` cookie. |
 | `/api/register` | `POST` | `src/app/api/register/route.ts` | None | Provisions new salon workspace on automated 7-day free trial, creates owner user, seeds default staff member and 4 starter services for instant POS testing, and signs JWT session. |
-| `/api/logout` | `POST` | `src/app/api/logout/route.ts` | `salonpro_session` | Clears `salonpro_session` cookie. |
+| `/api/logout` | `POST` | `src/app/api/logout/route.ts` | `StudioDesk_session` | Clears `StudioDesk_session` cookie. |
 | `/api/demo/owner-login` | `GET`, `POST` | `src/app/api/demo/owner-login/route.ts` | None (Public Demo) | Logs user into demo salon workspace (`dixa-beauty-salon`) as owner without credentials. |
-| `/api/dashboard/stats` | `GET` | `src/app/api/dashboard/stats/route.ts` | `salonpro_session` | Returns analytical metrics (revenue, appointments, waiting clients, `totalProducts`, and `lowStockProducts`). |
-| `/api/appointments` | `GET`, `POST` | `src/app/api/appointments/route.ts` | `salonpro_session` | Lists filtered appointments or creates new internal owner booking. |
-| `/api/appointments/[id]` | `PATCH`, `DELETE` | `src/app/api/appointments/[id]/route.ts` | `salonpro_session` | Updates appointment status (`arrived`, `cancelled`, `done`) or removes it. |
-| `/api/appointments/[id]/start-session` | `POST` | `src/app/api/appointments/[id]/start-session/route.ts` | `salonpro_session` | Converts scheduled appointment into an active in-chair beauty session. |
-| `/api/live` | `GET` | `src/app/api/live/route.ts` | `salonpro_session` | Returns combined waiting list and active in-chair sessions. |
-| `/api/live/waiting` | `GET`, `POST` | `src/app/api/live/waiting/route.ts` | `salonpro_session` | Adds walk-in client to waiting list. |
-| `/api/live/waiting/[id]` | `DELETE` | `src/app/api/live/waiting/[id]/route.ts` | `salonpro_session` | Removes client from waiting list. |
-| `/api/live/sessions` | `GET`, `POST` | `src/app/api/live/sessions/route.ts` | `salonpro_session` | Creates or lists active in-chair sessions. |
-| `/api/live/sessions/[id]/items` | `GET`, `POST` | `src/app/api/live/sessions/[id]/items/route.ts` | `salonpro_session` | Adds service or product line item to an active session. |
-| `/api/live/sessions/[id]/items/[itemId]` | `DELETE` | `src/app/api/live/sessions/[id]/items/[itemId]/route.ts` | `salonpro_session` | Deletes a line item from an active session. |
-| `/api/live/sessions/[id]/complete` | `POST` | `src/app/api/live/sessions/[id]/complete/route.ts` | `salonpro_session` | Completes session, creates invoice, records payments, updates stock, and awards commission. |
-| `/api/billing` | `GET`, `POST` | `src/app/api/billing/route.ts` | `salonpro_session` | Lists past invoices or creates manual direct POS invoice. |
-| `/api/billing/pay` | `POST` | `src/app/api/billing/pay/route.ts` | `salonpro_session` | Records partial or full payment against an outstanding invoice. |
-| `/api/billing/whatsapp` | `POST` | `src/app/api/billing/whatsapp/route.ts` | `salonpro_session` | Triggers digital receipt WhatsApp message via Cloud API or Twilio. |
-| `/api/customers` | `GET`, `POST` | `src/app/api/customers/route.ts` | `salonpro_session` | Searches/lists clients or creates new customer profile. |
-| `/api/customers/[id]` | `GET`, `PATCH`, `DELETE` | `src/app/api/customers/[id]/route.ts` | `salonpro_session` | Fetches client details, updates profile/notes, or removes client. |
-| `/api/customers/[id]/invoices` | `GET` | `src/app/api/customers/[id]/invoices/route.ts` | `salonpro_session` | Lists all billing history for a specific customer. |
-| `/api/services` | `GET`, `POST` | `src/app/api/services/route.ts` | `salonpro_session` | Lists or creates salon services. Enforces plan service limits. |
-| `/api/services/[id]` | `PATCH`, `DELETE` | `src/app/api/services/[id]/route.ts` | `salonpro_session` | Updates service details/pricing or deletes service. |
-| `/api/products` | `GET`, `POST` | `src/app/api/products/route.ts` | `salonpro_session` | Lists inventory products or adds new retail product. |
-| `/api/products/[id]` | `PATCH`, `DELETE` | `src/app/api/products/[id]/route.ts` | `salonpro_session` | Updates product inventory levels, price, or details. |
-| `/api/products/sell` | `POST` | `src/app/api/products/sell/route.ts` | `salonpro_session` | Direct POS sale for retail products without service session. |
-| `/api/staff` | `GET`, `POST` | `src/app/api/staff/route.ts` | `salonpro_session` | Lists staff or creates new stylist profile. Enforces plan staff limits. |
-| `/api/staff/[id]` | `PATCH`, `DELETE` | `src/app/api/staff/[id]/route.ts` | `salonpro_session` | Updates stylist roles, commission percentages, or deletes staff. |
-| `/api/staff/[id]/shifts` | `GET`, `PUT` | `src/app/api/staff/[id]/shifts/route.ts` | `salonpro_session` (Role: `owner`) | `GET` fetches 7-day weekly shifts for a stylist (falls back to salon hours if not set) and salon operating window. `PUT` updates weekly shifts (0=Sunday to 6=Saturday), validates shifts lie within salon operating hours, and returns a non-destructive warning list of existing appointments conflicting with shortened shifts / off days. Rate-limited to 30 requests / 15 min. |
-| `/api/staff/[id]/leaves` | `GET`, `POST`, `DELETE` | `src/app/api/staff/[id]/leaves/route.ts` | `salonpro_session` (Role: `owner`) | `GET` lists planned leaves for a stylist. `POST` adds leave (`from_date`, `to_date`, `reason` max 120 chars) and returns existing scheduled appointment conflicts as non-destructive warnings. `DELETE` removes a planned leave by `leaveId`. Rate-limited to 30 requests / 15 min. |
-| `/api/staff/availability` | `GET` | `src/app/api/staff/availability/route.ts` | `salonpro_session` | Returns consolidated daily or date-range working windows (`isWorking`, `start`, `end`, reason) for all active salon staff, combining salon working days, salon holidays, staff shifts, and staff leaves. |
-| `/api/memberships` | `GET`, `POST` | `src/app/api/memberships/route.ts` | `salonpro_session` (Feature: `memberships`) | Lists or creates VIP membership plans. Gated by plan feature. |
-| `/api/marketing/campaigns` | `GET`, `POST` | `src/app/api/marketing/campaigns/route.ts` | `salonpro_session` (Role: `owner`) | Fetches wallet balance and audience segmentation counts; dispatches bulk WhatsApp campaigns and deducts credits atomically. |
-| `/api/marketing/wallet/recharge` | `POST` | `src/app/api/marketing/wallet/recharge/route.ts` | `salonpro_session` (Role: `owner`) | Recharges prepaid WhatsApp marketing wallet at 100% direct cost (₹0.85/credit, 0% markup). |
-| `/api/memberships/assign` | `POST` | `src/app/api/memberships/assign/route.ts` | `salonpro_session` (Feature: `memberships`) | Assigns VIP plan to customer. |
-| `/api/reports` | `GET` | `src/app/api/reports/route.ts` | `salonpro_session` | Aggregates daily/monthly revenue, staff commission reports, and cash summary. |
-| `/api/expenses` | `GET`, `POST` | `src/app/api/expenses/route.ts` | `salonpro_session` (Role: `owner`, `staff`) | `GET` lists salon expenses filtered by date range and category, returns total expenses. `POST` records new daily expense with title, category, amount, payment mode, and date. |
-| `/api/expenses/[id]` | `DELETE` | `src/app/api/expenses/[id]/route.ts` | `salonpro_session` (Role: `owner`) | Deletes an expense record scoped to salon. |
-| `/api/reviews` | `GET` | `src/app/api/reviews/route.ts` | `salonpro_session` (Feature: `reviews`) | Lists paginated reviews for the salon with status (`all`/`visible`/`hidden`), star (1-5), and staff filters. Computes overall average, total count, 5-to-1 star distribution breakdown, and staff average ratings. Returns `planAllowed`. |
-| `/api/reviews/[id]` | `PATCH` | `src/app/api/reviews/[id]/route.ts` | `salonpro_session` (Feature: `reviews`) | Adds or updates an owner reply (max 300 chars, records `owner_replied_at`) or toggles status (`visible`/`hidden`). Scoped to salon owner/staff; rate-limited to 30 requests / 15 min. |
-| `/api/export` | `GET` | `src/app/api/export/route.ts` | `salonpro_session` (Feature: `export`) | Exports clients, invoices, staff commissions, services, appointments, or products as CSV/PDF. Gated by plan (unlocked for Pro, Premium, and sandbox demo). Accessible from `/app/reports`, `/app/billing`, and `/app/customers`. |
-| `/api/settings` | `GET`, `PUT`, `PATCH` | `src/app/api/settings/route.ts` | `salonpro_session` (Role: `owner`) | Reads and saves salon operating rules, buffer gap, advance notice, cancellation policy, and branding. |
-| `/api/settings/change-password` | `POST` | `src/app/api/settings/change-password/route.ts` | `salonpro_session` | Changes salon owner or staff login password. Validates current/temporary password via bcrypt, enforces minimum 6 chars and differing new password, updates `users.password_hash`, and guards against brute-force (5 attempts / 15 min). |
-| `/api/settings/photos` | `GET`, `POST`, `DELETE` | `src/app/api/settings/photos/route.ts` | `salonpro_session` (Role: `owner`) | Fetches, adds, or deletes salon gallery photos. Supports both single photo upload and multi-photo batch upload (`photos: [...]`). Enforces `MAX_GALLERY_PHOTOS = 5`. |
-| `/api/upload` | `POST`, `DELETE` | `src/app/api/upload/route.ts` | `salonpro_session` or `salonpro_customer_session` | Authenticated file upload with dual-layer resilient storage (Supabase Storage + PostgreSQL `storage_objects` backup). Validates magic bytes, enforces <=400KB server size limit, rate limits requests, and manages object deletion. |
+| `/api/dashboard/stats` | `GET` | `src/app/api/dashboard/stats/route.ts` | `StudioDesk_session` | Returns analytical metrics (revenue, appointments, waiting clients, `totalProducts`, and `lowStockProducts`). |
+| `/api/appointments` | `GET`, `POST` | `src/app/api/appointments/route.ts` | `StudioDesk_session` | Lists filtered appointments or creates new internal owner booking. |
+| `/api/appointments/[id]` | `PATCH`, `DELETE` | `src/app/api/appointments/[id]/route.ts` | `StudioDesk_session` | Updates appointment status (`arrived`, `cancelled`, `done`) or removes it. |
+| `/api/appointments/[id]/start-session` | `POST` | `src/app/api/appointments/[id]/start-session/route.ts` | `StudioDesk_session` | Converts scheduled appointment into an active in-chair beauty session. |
+| `/api/live` | `GET` | `src/app/api/live/route.ts` | `StudioDesk_session` | Returns combined waiting list and active in-chair sessions. |
+| `/api/live/waiting` | `GET`, `POST` | `src/app/api/live/waiting/route.ts` | `StudioDesk_session` | Adds walk-in client to waiting list. |
+| `/api/live/waiting/[id]` | `DELETE` | `src/app/api/live/waiting/[id]/route.ts` | `StudioDesk_session` | Removes client from waiting list. |
+| `/api/live/sessions` | `GET`, `POST` | `src/app/api/live/sessions/route.ts` | `StudioDesk_session` | Creates or lists active in-chair sessions. |
+| `/api/live/sessions/[id]/items` | `GET`, `POST` | `src/app/api/live/sessions/[id]/items/route.ts` | `StudioDesk_session` | Adds service or product line item to an active session. |
+| `/api/live/sessions/[id]/items/[itemId]` | `DELETE` | `src/app/api/live/sessions/[id]/items/[itemId]/route.ts` | `StudioDesk_session` | Deletes a line item from an active session. |
+| `/api/live/sessions/[id]/complete` | `POST` | `src/app/api/live/sessions/[id]/complete/route.ts` | `StudioDesk_session` | Completes session, creates invoice, records payments, updates stock, and awards commission. |
+| `/api/billing` | `GET`, `POST` | `src/app/api/billing/route.ts` | `StudioDesk_session` | Lists past invoices or creates manual direct POS invoice. |
+| `/api/billing/pay` | `POST` | `src/app/api/billing/pay/route.ts` | `StudioDesk_session` | Records partial or full payment against an outstanding invoice. |
+| `/api/billing/whatsapp` | `POST` | `src/app/api/billing/whatsapp/route.ts` | `StudioDesk_session` | Triggers digital receipt WhatsApp message via Cloud API or Twilio. |
+| `/api/customers` | `GET`, `POST` | `src/app/api/customers/route.ts` | `StudioDesk_session` | Searches/lists clients or creates new customer profile. |
+| `/api/customers/[id]` | `GET`, `PATCH`, `DELETE` | `src/app/api/customers/[id]/route.ts` | `StudioDesk_session` | Fetches client details, updates profile/notes, or removes client. |
+| `/api/customers/[id]/invoices` | `GET` | `src/app/api/customers/[id]/invoices/route.ts` | `StudioDesk_session` | Lists all billing history for a specific customer. |
+| `/api/services` | `GET`, `POST` | `src/app/api/services/route.ts` | `StudioDesk_session` | Lists or creates salon services. Enforces plan service limits. |
+| `/api/services/[id]` | `PATCH`, `DELETE` | `src/app/api/services/[id]/route.ts` | `StudioDesk_session` | Updates service details/pricing or deletes service. |
+| `/api/products` | `GET`, `POST` | `src/app/api/products/route.ts` | `StudioDesk_session` | Lists inventory products or adds new retail product. |
+| `/api/products/[id]` | `PATCH`, `DELETE` | `src/app/api/products/[id]/route.ts` | `StudioDesk_session` | Updates product inventory levels, price, or details. |
+| `/api/products/sell` | `POST` | `src/app/api/products/sell/route.ts` | `StudioDesk_session` | Direct POS sale for retail products without service session. |
+| `/api/staff` | `GET`, `POST` | `src/app/api/staff/route.ts` | `StudioDesk_session` | Lists staff or creates new stylist profile. Enforces plan staff limits. |
+| `/api/staff/[id]` | `PATCH`, `DELETE` | `src/app/api/staff/[id]/route.ts` | `StudioDesk_session` | Updates stylist roles, commission percentages, or deletes staff. |
+| `/api/staff/[id]/shifts` | `GET`, `PUT` | `src/app/api/staff/[id]/shifts/route.ts` | `StudioDesk_session` (Role: `owner`) | `GET` fetches 7-day weekly shifts for a stylist (falls back to salon hours if not set) and salon operating window. `PUT` updates weekly shifts (0=Sunday to 6=Saturday), validates shifts lie within salon operating hours, and returns a non-destructive warning list of existing appointments conflicting with shortened shifts / off days. Rate-limited to 30 requests / 15 min. |
+| `/api/staff/[id]/leaves` | `GET`, `POST`, `DELETE` | `src/app/api/staff/[id]/leaves/route.ts` | `StudioDesk_session` (Role: `owner`) | `GET` lists planned leaves for a stylist. `POST` adds leave (`from_date`, `to_date`, `reason` max 120 chars) and returns existing scheduled appointment conflicts as non-destructive warnings. `DELETE` removes a planned leave by `leaveId`. Rate-limited to 30 requests / 15 min. |
+| `/api/staff/availability` | `GET` | `src/app/api/staff/availability/route.ts` | `StudioDesk_session` | Returns consolidated daily or date-range working windows (`isWorking`, `start`, `end`, reason) for all active salon staff, combining salon working days, salon holidays, staff shifts, and staff leaves. |
+| `/api/memberships` | `GET`, `POST` | `src/app/api/memberships/route.ts` | `StudioDesk_session` (Feature: `memberships`) | Lists or creates VIP membership plans. Gated by plan feature. |
+| `/api/marketing/campaigns` | `GET`, `POST` | `src/app/api/marketing/campaigns/route.ts` | `StudioDesk_session` (Role: `owner`) | Fetches wallet balance and audience segmentation counts; dispatches bulk WhatsApp campaigns and deducts credits atomically. |
+| `/api/marketing/wallet/recharge/create-order` | `POST` | `src/app/api/marketing/wallet/recharge/create-order/route.ts` | `StudioDesk_session` (Role: `owner`) | Validates requested credits (50 to 100,000), generates Razorpay Order ID for prepaid WhatsApp marketing wallet recharge, and inserts an audit record in `wallet_recharges` linked to the verified session salon ID. |
+| `/api/marketing/wallet/recharge/verify` | `POST` | `src/app/api/marketing/wallet/recharge/verify/route.ts` | `StudioDesk_session` (Role: `owner`) | Verifies Razorpay payment signature and REST API details against `wallet_recharges`, idempotently credits the salon's wallet via PostgreSQL transaction, and prevents replay attacks or client-forged credit counts. |
+| `/api/memberships/assign` | `POST` | `src/app/api/memberships/assign/route.ts` | `StudioDesk_session` (Feature: `memberships`) | Assigns VIP plan to customer. |
+| `/api/reports` | `GET` | `src/app/api/reports/route.ts` | `StudioDesk_session` | Aggregates daily/monthly revenue, staff commission reports, and cash summary. |
+| `/api/expenses` | `GET`, `POST` | `src/app/api/expenses/route.ts` | `StudioDesk_session` (Role: `owner`, `staff`) | `GET` lists salon expenses filtered by date range and category, returns total expenses. `POST` records new daily expense with title, category, amount, payment mode, and date. |
+| `/api/expenses/[id]` | `DELETE` | `src/app/api/expenses/[id]/route.ts` | `StudioDesk_session` (Role: `owner`) | Deletes an expense record scoped to salon. |
+| `/api/reviews` | `GET` | `src/app/api/reviews/route.ts` | `StudioDesk_session` (Feature: `reviews`) | Lists paginated reviews for the salon with status (`all`/`visible`/`hidden`), star (1-5), and staff filters. Computes overall average, total count, 5-to-1 star distribution breakdown, and staff average ratings. Returns `planAllowed`. |
+| `/api/reviews/[id]` | `PATCH` | `src/app/api/reviews/[id]/route.ts` | `StudioDesk_session` (Feature: `reviews`) | Adds or updates an owner reply (max 300 chars, records `owner_replied_at`) or toggles status (`visible`/`hidden`). Scoped to salon owner/staff; rate-limited to 30 requests / 15 min. |
+| `/api/export` | `GET` | `src/app/api/export/route.ts` | `StudioDesk_session` (Feature: `export`) | Exports clients, invoices, staff commissions, services, appointments, or products as CSV/PDF. Gated by plan (unlocked for Pro, Premium, and sandbox demo). Accessible from `/app/reports`, `/app/billing`, and `/app/customers`. |
+| `/api/settings` | `GET`, `PUT`, `PATCH` | `src/app/api/settings/route.ts` | `StudioDesk_session` (Role: `owner`) | Reads and saves salon operating rules, buffer gap, advance notice, cancellation policy, branding, and custom Meta WhatsApp credentials (tokens are masked and encrypted at rest with AES-256-GCM, never exposed to client). |
+| `/api/settings/change-password` | `POST` | `src/app/api/settings/change-password/route.ts` | `StudioDesk_session` | Changes salon owner or staff login password. Validates current/temporary password via bcrypt, enforces minimum 6 chars and differing new password, updates `users.password_hash`, and guards against brute-force (5 attempts / 15 min). |
+| `/api/settings/photos` | `GET`, `POST`, `DELETE` | `src/app/api/settings/photos/route.ts` | `StudioDesk_session` (Role: `owner`) | Fetches, adds, or deletes salon gallery photos. Supports both single photo upload and multi-photo batch upload (`photos: [...]`). Enforces `MAX_GALLERY_PHOTOS = 5`. |
+| `/api/upload` | `POST`, `DELETE` | `src/app/api/upload/route.ts` | `StudioDesk_session` or `StudioDesk_customer_session` | Authenticated file upload with dual-layer resilient storage (Supabase Storage + PostgreSQL `storage_objects` backup). Validates magic bytes, enforces <=400KB server size limit, rate limits requests, and manages object deletion. |
 | `/api/media/[...path]` | `GET` | `src/app/api/media/[...path]/route.ts` | Public Asset | Public media asset endpoint serving stored salon logos, avatars, and gallery photos directly with immutable HTTP caching. |
-| `/api/holidays` | `GET`, `POST` | `src/app/api/holidays/route.ts` | `salonpro_session` (Role: `owner`) | Lists or adds temporary salon closures and holidays. |
-| `/api/holidays/[id]` | `DELETE` | `src/app/api/holidays/[id]/route.ts` | `salonpro_session` (Role: `owner`) | Deletes a salon closure date. |
-| `/api/subscription` | `GET` | `src/app/api/subscription/route.ts` | `salonpro_session` | Fetches active subscription details and trial status. |
-| `/api/subscription/payments` | `GET` | `src/app/api/subscription/payments/route.ts` | `salonpro_session` | Fetches Razorpay payment history for the salon. |
-| `/api/subscription/razorpay/create-order` | `POST` | `src/app/api/subscription/razorpay/create-order/route.ts` | `salonpro_session` | Generates Razorpay Order ID for subscription payment. |
-| `/api/subscription/razorpay/verify` | `POST` | `src/app/api/subscription/razorpay/verify/route.ts` | `salonpro_session` | Verifies Razorpay payment signature and updates plan in database. |
+| `/api/holidays` | `GET`, `POST` | `src/app/api/holidays/route.ts` | `StudioDesk_session` (Role: `owner`) | Lists or adds temporary salon closures and holidays. |
+| `/api/holidays/[id]` | `DELETE` | `src/app/api/holidays/[id]/route.ts` | `StudioDesk_session` (Role: `owner`) | Deletes a salon closure date. |
+| `/api/subscription` | `GET` | `src/app/api/subscription/route.ts` | `StudioDesk_session` | Fetches active subscription details and trial status. |
+| `/api/subscription/payments` | `GET` | `src/app/api/subscription/payments/route.ts` | `StudioDesk_session` | Fetches Razorpay payment history for the salon. |
+| `/api/subscription/razorpay/create-order` | `POST` | `src/app/api/subscription/razorpay/create-order/route.ts` | `StudioDesk_session` | Generates Razorpay Order ID for subscription payment. |
+| `/api/subscription/razorpay/verify` | `POST` | `src/app/api/subscription/razorpay/verify/route.ts` | `StudioDesk_session` | Verifies Razorpay payment signature and updates plan in database. |
 | `/api/subscription/razorpay/webhook` | `POST` | `src/app/api/subscription/razorpay/webhook/route.ts` | Webhook Signature | Receives Razorpay asynchronous subscription event notifications. |
 
 ---
@@ -228,7 +229,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 
 ## 8. Shared Dependencies
 - `src/lib/api-auth.ts`: `requireTenant`, `requireRole`, `invalidateUserAuthCache`.
-- `src/lib/auth.ts`: `COOKIE_NAME` (`salonpro_session`), `verifySessionToken`.
+- `src/lib/auth.ts`: `COOKIE_NAME` (`StudioDesk_session`), `verifySessionToken`.
 - `src/lib/availability.ts`: `getStaffWorkingWindow`, `getStaffWorkingWindowsForDate`, `findConflictingAppointmentsForShifts`, `findConflictingAppointmentsForLeave`.
 - `src/lib/plan.ts`: `getSalonPlan`, `requireFeature`, `requireLimit`.
 - `src/proxy.ts`: Directs authenticated owners hitting `/login` or `/` to `/app`.
@@ -244,6 +245,7 @@ The Owner Panel is the operational ERP system for salon owners, managers, and st
 ---
 
 ## 10. Known Gaps / TODO / UNVERIFIED Items
+- Razorpay Checkout Triggers (`/register-salon`, `/app/subscription`, `/app/marketing` wallet recharge): Temporarily commented out for a 1-month pause per owner request. Direct UPI / Bank Transfer (`8320653782@okaxis` with dynamic QR code & deep links) is integrated into `/register-salon` and `/app/subscription`, and salon POS UPI/Cash/Card payments remain 100% active. Razorpay checkout can be re-enabled after 1 month by uncommenting the designated blocks.
 - Razorpay Webhook endpoint (`/api/subscription/razorpay/webhook`) expects `RAZORPAY_WEBHOOK_SECRET` in production; in local development, it operates in test mode.
 - Inventory restocking purchase-order management is not yet built (stock is updated directly via product edit or POS checkout).
 

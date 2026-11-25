@@ -6,14 +6,27 @@ declare global {
 
 const poolMax = process.env.DB_POOL_MAX ? parseInt(process.env.DB_POOL_MAX, 10) : 20;
 
-const sslConfig = process.env.DATABASE_CA_CERT
-  ? {
-      rejectUnauthorized: true,
-      ca: process.env.DATABASE_CA_CERT,
-    }
-  : {
-      rejectUnauthorized: false,
-    };
+const isProd = process.env.NODE_ENV === 'production';
+
+let sslConfig: any;
+if (process.env.DATABASE_CA_CERT) {
+  sslConfig = {
+    rejectUnauthorized: true,
+    ca: process.env.DATABASE_CA_CERT,
+  };
+} else if (!isProd) {
+  sslConfig = {
+    rejectUnauthorized: false,
+  };
+} else {
+  // In production without DATABASE_CA_CERT: log a clear warning (do not crash)
+  console.warn(
+    '⚠️ [DATABASE SSL WARNING] Running in production without DATABASE_CA_CERT. Using rejectUnauthorized: false. Provide DATABASE_CA_CERT for strict SSL verification.'
+  );
+  sslConfig = {
+    rejectUnauthorized: false,
+  };
+}
 
 const pool =
   global.__dbPool ||

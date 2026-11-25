@@ -10,25 +10,6 @@ export interface RateLimitCheckResult {
 // In-memory fallback / speed cache
 const memoryLimits = new Map<string, { attempts: number; lockedUntil?: number; lastUpdated?: number }>();
 
-let tableEnsured = false;
-async function ensureRateLimitTable() {
-  if (tableEnsured) return;
-  try {
-    await query(`
-      CREATE TABLE IF NOT EXISTS auth_rate_limits (
-        key TEXT PRIMARY KEY,
-        failed_attempts INT NOT NULL DEFAULT 0,
-        locked_until TIMESTAMPTZ,
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      );
-      CREATE INDEX IF NOT EXISTS idx_auth_rate_limits_locked ON auth_rate_limits (locked_until);
-    `);
-    tableEnsured = true;
-  } catch (err) {
-    console.error('Notice: ensureRateLimitTable fallback to in-memory:', err);
-  }
-}
-
 /**
  * Extracts client IP safely from request headers.
  * Prioritizes Vercel Edge / Reverse Proxy authoritative headers (x-vercel-forwarded-for, x-real-ip)
@@ -96,7 +77,6 @@ export async function checkRateLimit(
   }
 
   // 2. Database check
-  await ensureRateLimitTable();
   try {
     const res = await query(
       `SELECT failed_attempts, locked_until, updated_at 
@@ -159,7 +139,6 @@ export async function recordFailedAttempt(
   lockoutDurationSeconds = 900 // 15 minutes
 ): Promise<RateLimitCheckResult> {
   const now = Date.now();
-  await ensureRateLimitTable();
 
   let newAttempts = 1;
   let isLocked = false;
@@ -236,7 +215,6 @@ export async function recordFailedAttempt(
 export async function resetRateLimit(key: string): Promise<void> {
   memoryLimits.delete(key);
   try {
-    await ensureRateLimitTable();
     await query('DELETE FROM auth_rate_limits WHERE key = $1', [key]);
   } catch {}
 }

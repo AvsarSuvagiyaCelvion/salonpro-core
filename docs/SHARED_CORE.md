@@ -24,7 +24,7 @@ SalonPro operates three strictly isolated authentication realms powered by `jose
 The proxy middleware intercepts every incoming HTTP request and performs:
 1. **Subdomain Extraction**: Resolves tenant slugs from headers:
    - Local development: `<slug>.localhost:3000`
-   - Production root domain: `<slug>.salonpro.in`
+   - Production root domain: `<slug>.studiodeskapp.com` (or `<slug>.salonpro.in`)
    - Vercel preview URLs: `<slug>.<project>.vercel.app`
 2. **Custom Domain Resolution**: Resolves third-party vanity domains (e.g. `booking.salonglam.com`) against `salons.custom_domain` with `custom_domain_verified = true` (backed by a 60-second in-memory cache).
 3. **Internal URL Rewriting**:
@@ -195,7 +195,7 @@ Slot availability and collision prevention are governed by `src/lib/slots.ts`, `
 | `SESSION_SECRET` | **Yes** | — | Secret key used by `jose` to sign and verify all JWT tokens. |
 | `ADMIN_EMAIL` | Optional | — | Super admin fallback login email. |
 | `ADMIN_PASSWORD` | Optional | — | Super admin fallback login password. |
-| `NEXT_PUBLIC_ROOT_DOMAIN` | Optional | `salonpro.in` | Root domain used for tenant subdomain extraction in proxy. |
+| `NEXT_PUBLIC_ROOT_DOMAIN` | Optional | `studiodeskapp.com` | Root domain used for tenant subdomain extraction in proxy (supports `studiodeskapp.com` and `salonpro.in`). |
 | `RAZORPAY_KEY_ID` | Optional | — | Razorpay API key for subscription payments. |
 | `RAZORPAY_KEY_SECRET` | Optional | — | Razorpay API secret key. |
 | `RAZORPAY_WEBHOOK_SECRET` | Optional | — | Webhook signing secret for subscription lifecycle events. |

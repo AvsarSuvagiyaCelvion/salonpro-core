@@ -189,7 +189,7 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  Upon registration at `/register-salon`, you will be assigned a unique logical workspace identified by your chosen salon slug (e.g. `your-salon.salonpro.in`).
+                  Upon registration at `/register-salon`, you will be assigned a unique logical workspace identified by your chosen salon slug (e.g. `your-salon.studiodeskapp.com`).
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>You are exclusively responsible for safeguarding the confidentiality of your owner and staff credentials.</li>

@@ -27,7 +27,7 @@ const steps: StepData[] = [
   {
     number: 2,
     title: 'Unique Customer Link',
-    urlPath: 'salonpro.in/dixa-beauty-salon',
+    urlPath: 'studiodeskapp.com/dixa-beauty-salon',
     badge: 'Public Client Booking Page',
     badgeIcon: '🌐',
     description:

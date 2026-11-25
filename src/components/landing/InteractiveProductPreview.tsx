@@ -148,7 +148,7 @@ export default function InteractiveProductPreview() {
             </div>
             <div className="hidden sm:flex items-center gap-2 ml-2 px-2.5 py-1 rounded-xl bg-black/30 text-[#A0A8B8] text-xs font-mono truncate">
               <span className="text-[#10B981]">https://</span>
-              <span>salonpro.in/app/appointments</span>
+              <span>studiodeskapp.com/app/appointments</span>
             </div>
           </div>
 

@@ -46,7 +46,7 @@ const PUBLIC_API_PREFIXES = [
  * Extracts the tenant slug from the Host header.
  * Supports:
  * - Localhost dev: <slug>.localhost:3000
- * - Production: <slug>.studiodeskapp.com or <slug>.salonpro.in
+ * - Production: <slug>.studiodeskapp.com
  * - Vercel previews: <slug>.<project>.vercel.app
  */
 export function extractTenantFromHost(host: string | null): string | null {
@@ -63,9 +63,9 @@ export function extractTenantFromHost(host: string | null): string | null {
     return null;
   }
 
-  // 2. Production root domain: e.g. priya.studiodeskapp.com or priya.salonpro.in
+  // 2. Production root domain: e.g. priya.studiodeskapp.com
   const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'studiodeskapp.com').toLowerCase();
-  const candidateRoots = Array.from(new Set([rootDomain, 'studiodeskapp.com', 'salonpro.in']));
+  const candidateRoots = Array.from(new Set([rootDomain, 'studiodeskapp.com']));
   for (const candidate of candidateRoots) {
     if (hostname.endsWith(`.${candidate}`)) {
       const sub = hostname.slice(0, -(candidate.length + 1));
@@ -78,7 +78,7 @@ export function extractTenantFromHost(host: string | null): string | null {
     }
   }
 
-  // 3. Vercel deployment preview: e.g. priya.salonpro.vercel.app
+  // 3. Vercel deployment preview: e.g. priya.studiodeskapp.vercel.app
   if (hostname.endsWith('.vercel.app')) {
     const parts = hostname.split('.');
     if (parts.length >= 4) {
@@ -132,10 +132,7 @@ export async function proxy(request: NextRequest) {
       hostname === `www.${rootDomain}` ||
       hostname === 'studiodeskapp.com' ||
       hostname === 'www.studiodeskapp.com' ||
-      hostname === 'salonpro.in' ||
-      hostname === 'www.salonpro.in' ||
       hostname.endsWith('.studiodeskapp.com') ||
-      hostname.endsWith('.salonpro.in') ||
       hostname.endsWith('.vercel.app') ||
       hostname.endsWith(`.${rootDomain}`) ||
       hostname.endsWith('.localhost');
@@ -230,9 +227,6 @@ export async function proxy(request: NextRequest) {
             originHost === 'studiodeskapp.com' ||
             originHost === 'www.studiodeskapp.com' ||
             originHost.endsWith('.studiodeskapp.com') ||
-            originHost === 'salonpro.in' ||
-            originHost === 'www.salonpro.in' ||
-            originHost.endsWith('.salonpro.in') ||
             originHost.endsWith('.vercel.app') ||
             originHost === 'localhost' ||
             originHost.endsWith('.localhost') ||

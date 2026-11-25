@@ -79,7 +79,7 @@ export default function HeadacheFlipCard({
           </div>
         </div>
 
-        {/* BACK: The Green SalonPro Solution */}
+        {/* BACK: The Green StudioDesk Solution */}
         <div
           className="absolute inset-0 w-full h-full backface-hidden bg-[#F8F9FA] dark:bg-[#10141F] border border-[#10B981]/40 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-md flex flex-col justify-between"
           style={{
@@ -102,7 +102,7 @@ export default function HeadacheFlipCard({
           </div>
 
           <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] flex items-center justify-between text-[11px] text-[#10B981] font-bold">
-            <span>✨ SalonPro Built-In</span>
+            <span>✨ StudioDesk Built-In</span>
             <span className="text-[10px] bg-white dark:bg-[#141926] px-2 py-0.5 rounded-full border border-[#10B981]/30">
               Zero Headache
             </span>

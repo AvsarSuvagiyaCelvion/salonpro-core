@@ -74,7 +74,7 @@ export default function SalonSubscriptionPage() {
         try {
           const qrUrl = await generateUpiQrDataUrl({
             upiId: platformPaymentDetails.platform_upi_id,
-            name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+            name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
             amount: showDirectPayModal.price,
             note: `${showDirectPayModal.plan.name} Plan`,
           });
@@ -177,7 +177,7 @@ export default function SalonSubscriptionPage() {
         key: orderData.keyId,
         amount: orderData.amount, // in paise
         currency: orderData.currency || 'INR',
-        name: 'SalonPro Cloud ERP',
+        name: 'StudioDesk Cloud ERP',
         description: `Plan: ${orderData.planName} (${interval === 'yearly' ? 'Annual Billing' : 'Monthly Billing'})`,
         order_id: orderData.orderId,
         prefill: {
@@ -1087,7 +1087,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildGPayUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1098,7 +1098,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildPhonePeUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1109,7 +1109,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildPaytmUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1120,7 +1120,7 @@ export default function SalonSubscriptionPage() {
                     <a
                       href={buildUpiPayUrl({
                         upiId: platformPaymentDetails.platform_upi_id,
-                        name: platformPaymentDetails.platform_account_name || 'SalonPro Platform',
+                        name: platformPaymentDetails.platform_account_name || 'StudioDesk Platform',
                         amount: showDirectPayModal.price,
                         note: `${showDirectPayModal.plan.name} Plan`,
                       })}
@@ -1208,7 +1208,7 @@ export default function SalonSubscriptionPage() {
               <div className="pt-2">
                 <a
                   href={`https://wa.me/${platformPaymentDetails.platform_support_whatsapp || '918320653782'}?text=${encodeURIComponent(
-                    `Hi, I have completed direct payment of ₹${showDirectPayModal.price} for the ${showDirectPayModal.plan.name} (${interval}) on SalonPro. Please verify and activate my subscription!`
+                    `Hi, I have completed direct payment of ₹${showDirectPayModal.price} for the ${showDirectPayModal.plan.name} (${interval}) on StudioDesk. Please verify and activate my subscription!`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

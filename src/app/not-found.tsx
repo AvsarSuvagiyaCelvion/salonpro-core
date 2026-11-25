@@ -12,7 +12,7 @@ export default function NotFound() {
             ✂
           </div>
           <span className="font-extrabold text-sm text-[#1F2937] dark:text-white">
-            Salon<span className="text-[#D4A77F]">Pro</span>
+            Studio<span className="text-[#D4A77F]">Desk</span>
           </span>
         </Link>
         <div className="scale-90 origin-right">
@@ -60,7 +60,7 @@ export default function NotFound() {
 
       <div className="mt-8 flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#747D8D]">
         <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
-        <span>SalonPro · Operating with Excellence</span>
+        <span>StudioDesk · Operating with Excellence</span>
       </div>
     </div>
   );

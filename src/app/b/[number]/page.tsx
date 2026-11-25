@@ -16,7 +16,7 @@ import { generateUpiQrDataUrl, buildGPayUrl, buildPhonePeUrl, buildPaytmUrl, bui
 import { QrCode, Smartphone, CheckCircle, ShieldCheck } from 'lucide-react';
 
 export const metadata = {
-  title: 'Tax Invoice - SalonPro Luxury Billing',
+  title: 'Tax Invoice - StudioDesk Luxury Billing',
   description: 'Verified Commercial Digital Salon Invoice & Tax Receipt',
 };
 
@@ -156,11 +156,11 @@ export default async function PublicBillPage({
       <header className="w-full max-w-3xl flex items-center justify-between pb-6 border-b border-neutral-200 dark:border-neutral-800 mb-6 print:hidden">
         <Link href="/portal" className="flex items-center gap-2 group min-w-0">
           <div className="w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-            SP
+            SD
           </div>
           <div className="min-w-0">
             <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-white block leading-tight">
-              SalonPro <span className="font-normal text-xs text-neutral-500">Official Invoice</span>
+              StudioDesk <span className="font-normal text-xs text-neutral-500">Official Invoice</span>
             </span>
             <span className="text-[10px] text-neutral-400 block -mt-0.5 font-mono">
               Verified Digital Receipt
@@ -468,7 +468,7 @@ export default async function PublicBillPage({
                   Payment for this invoice has been fully authorized and recorded into the salon&apos;s ledger. No further settlement is required.
                 </p>
                 <div className="font-mono text-[11px] text-neutral-400 pt-1">
-                  Verified by SalonPro Cloud ERP Core
+                  Verified by StudioDesk Cloud ERP Core
                 </div>
               </div>
             )}

@@ -1085,7 +1085,7 @@ export default function SettingsPage() {
             <div className="p-4 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/20 text-xs space-y-1.5 text-neutral-700 dark:text-neutral-300">
               <div className="font-bold text-[#1F2937] dark:text-white flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
-                <span>How SalonPro formats your receipts:</span>
+                <span>How StudioDesk formats your receipts:</span>
               </div>
               <ul className="list-disc pl-5 space-y-1 text-neutral-600 dark:text-neutral-400 text-[11px]">
                 <li>Every invoice sequence starts sequentially per salon and includes the current calendar year.</li>

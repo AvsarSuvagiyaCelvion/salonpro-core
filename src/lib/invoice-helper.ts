@@ -1,5 +1,5 @@
 /**
- * SalonPro Invoice Branding & Numbering Helper
+ * StudioDesk Invoice Branding & Numbering Helper
  * Resolves salon-specific prefixes and formats sequential invoice numbers.
  */
 

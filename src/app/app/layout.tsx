@@ -925,7 +925,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-[#2A2F3A] mb-6 shrink-0">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#D4A77F]">
-                    SalonPro Cloud Subscriptions
+                    StudioDesk Cloud Subscriptions
                   </span>
                   <h3 className="text-xl font-black text-slate-900 dark:text-white">
                     Upgrade or Manage Your Subscription Plan

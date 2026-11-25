@@ -7,7 +7,7 @@
 
 ## 1. Authentication & JWT Session Cookies
 
-SalonPro operates three strictly isolated authentication realms powered by `jose` (HS256 signed JWTs) using `SESSION_SECRET`:
+StudioDesk operates three strictly isolated authentication realms powered by `jose` (HS256 signed JWTs) using `SESSION_SECRET`:
 
 | Cookie Name | Exported Constant | Realm / Role | Expiration | Key Payload Fields | Verification Function |
 |---|---|---|---|---|---|

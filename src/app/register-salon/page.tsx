@@ -193,7 +193,7 @@ export default function RegisterSalonPage() {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency || 'INR',
-        name: 'SalonPro Cloud ERP',
+        name: 'StudioDesk Cloud ERP',
         description: `${chosenPlanName} Subscription`,
         order_id: orderData.orderId,
         prefill: {
@@ -274,7 +274,7 @@ export default function RegisterSalonPage() {
             Welcome, {ownerName}!
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-2 max-w-md mx-auto">
-            <strong className="text-[#1F2937] dark:text-white">{registeredSalon.name}</strong> is now live on SalonPro Cloud. Your cloud POS, staff scheduler, and online booking engine are ready.
+            <strong className="text-[#1F2937] dark:text-white">{registeredSalon.name}</strong> is now live on StudioDesk Cloud. Your cloud POS, staff scheduler, and online booking engine are ready.
           </p>
 
           <div className="mt-4 p-3 rounded-2xl bg-[#D4A77F]/10 border border-[#D4A77F]/30 text-xs font-bold text-[#8C5E35] dark:text-[#D4A77F] flex items-center justify-center gap-2">

@@ -17,8 +17,8 @@ import LandingNavbar from '@/components/landing/LandingNavbar';
 import LandingFooter from '@/components/landing/LandingFooter';
 
 export const metadata = {
-  title: 'Privacy Policy | SalonPro Cloud OS',
-  description: 'Privacy Policy and data protection terms for SalonPro salon operating system, tenant owners, staff, and clients.',
+  title: 'Privacy Policy | StudioDesk Cloud OS',
+  description: 'Privacy Policy and data protection terms for StudioDesk salon and studio operating system, tenant owners, staff, and clients.',
 };
 
 export default function PrivacyPage() {
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
                 Privacy Policy
               </h1>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2 max-w-2xl leading-relaxed">
-                Learn how SalonPro protects your business records, salon client details, payment transactions, and appointment scheduling communications.
+                Learn how StudioDesk protects your business records, salon client details, payment transactions, and appointment scheduling communications.
               </p>
             </div>
 
@@ -168,7 +168,7 @@ export default function PrivacyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  This Privacy Policy describes the policies and procedures of SalonPro (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;), operating under Indian jurisdiction, regarding the collection, use, processing, and disclosure of information when you access or use our multi-tenant salon management software platform, website, tenant subdomains, and customer booking portals.
+                  This Privacy Policy describes the policies and procedures of StudioDesk (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;), operating under Indian jurisdiction, regarding the collection, use, processing, and disclosure of information when you access or use our multi-tenant salon management software platform, website, tenant subdomains, and customer booking portals.
                 </p>
                 <p>
                   This policy applies to:
@@ -256,7 +256,7 @@ export default function PrivacyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  <strong>SalonPro does NOT store credit/debit card numbers, CVVs, net banking credentials, or UPI PINs on its servers.</strong>
+                  <strong>StudioDesk does NOT store credit/debit card numbers, CVVs, net banking credentials, or UPI PINs on its servers.</strong>
                 </p>
                 <p>
                   All online payments for SaaS subscription tiers (Monthly and Yearly plans) are securely processed through <strong>Razorpay Software Private Limited</strong>, an RBI-regulated and PCI-DSS Level 1 compliant payment aggregator.
@@ -277,7 +277,7 @@ export default function PrivacyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  SalonPro integrates with authorized telecom gateways and Meta WhatsApp Cloud API to deliver transactional messages on behalf of salon tenants.
+                  StudioDesk integrates with authorized telecom gateways and Meta WhatsApp Cloud API to deliver transactional messages on behalf of salon tenants.
                 </p>
                 <div className="p-4 rounded-2xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] space-y-2 text-xs">
                   <div className="font-bold text-[#1F2937] dark:text-white">What we send via WhatsApp:</div>
@@ -303,7 +303,7 @@ export default function PrivacyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  SalonPro operates a hardened cloud infrastructure designed specifically for multi-tenant business privacy:
+                  StudioDesk operates a hardened cloud infrastructure designed specifically for multi-tenant business privacy:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <div className="p-3.5 rounded-2xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A]">
@@ -368,12 +368,12 @@ export default function PrivacyPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  SalonPro utilizes essential first-party cookies and local browser storage strictly to ensure security and platform usability:
+                  StudioDesk utilizes essential first-party cookies and local browser storage strictly to ensure security and platform usability:
                 </p>
                 <ul className="list-disc pl-5 space-y-1 text-slate-600 dark:text-slate-400">
-                  <li>`salonpro_session`: Secure HTTP-only JWT for salon owner and staff authentication.</li>
-                  <li>`salonpro_customer_session`: Secure HTTP-only JWT for customer portal verification.</li>
-                  <li>`salonpro_theme`: Local browser storage key preserving your preferred Light or Dark visual mode.</li>
+                  <li>`studiodesk_session`: Secure HTTP-only JWT for salon owner and staff authentication.</li>
+                  <li>`studiodesk_customer_session`: Secure HTTP-only JWT for customer portal verification.</li>
+                  <li>`studiodesk_theme`: Local browser storage key preserving your preferred Light or Dark visual mode.</li>
                   <li>`sessionStorage`: Temporary booking wizard state preserving service, stylist, and date during page refreshes.</li>
                 </ul>
               </div>
@@ -394,7 +394,7 @@ export default function PrivacyPage() {
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>Review and update inaccurate personal information (via the Customer Portal `/portal` or Owner Settings `/app/settings`).</li>
                   <li>Revoke consent for optional promotional marketing communications.</li>
-                  <li>Request a full report of personal information processed by SalonPro.</li>
+                  <li>Request a full report of personal information processed by StudioDesk.</li>
                 </ul>
               </div>
             </section>
@@ -415,7 +415,7 @@ export default function PrivacyPage() {
                 <div className="mt-4 p-5 rounded-2xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <div className="font-extrabold text-[#1F2937] dark:text-white text-sm">
-                      SalonPro Privacy &amp; Compliance Cell
+                      StudioDesk Privacy &amp; Compliance Cell
                     </div>
                     <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                       Support Email: <a href={`mailto:${supportEmail}`} className="text-[#8C5E2E] dark:text-[#D4A77F] font-semibold hover:underline">{supportEmail}</a>
@@ -429,7 +429,7 @@ export default function PrivacyPage() {
                   </div>
 
                   <a
-                    href={`https://wa.me/91${supportPhone}?text=Hello%20SalonPro%20Legal%20Team,%20I%20have%20a%20privacy%20question.`}
+                    href={`https://wa.me/91${supportPhone}?text=Hello%20StudioDesk%20Legal%20Team,%20I%20have%20a%20privacy%20question.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-bold text-xs shadow-sm inline-flex items-center justify-center gap-1.5 transition-all shrink-0 active:scale-95"

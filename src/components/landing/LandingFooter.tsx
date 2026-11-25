@@ -34,10 +34,10 @@ export default function LandingFooter() {
               </div>
               <div className="flex flex-col text-left">
                 <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-none">
-                  SalonPro
+                  StudioDesk
                 </span>
                 <span className="text-xs text-[#D4A77F] font-semibold tracking-wider uppercase mt-1">
-                  Operating System for Salons
+                  Operating System for Salons &amp; Studios
                 </span>
               </div>
             </Link>
@@ -49,7 +49,7 @@ export default function LandingFooter() {
             {/* Direct Contact Pills */}
             <div className="space-y-2.5 pt-2 flex flex-col items-center md:items-start w-full">
               <a
-                href={`https://wa.me/91${supportPhone}?text=Hello%20SalonPro%20Team,%20I%20am%20interested%20in%20a%20live%20walkthrough.`}
+                href={`https://wa.me/91${supportPhone}?text=Hello%20StudioDesk%20Team,%20I%20am%20interested%20in%20a%20live%20walkthrough.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center md:justify-start gap-2 text-sm sm:text-[15px] font-semibold text-[#10B981] hover:opacity-85 transition-opacity"
@@ -218,7 +218,7 @@ export default function LandingFooter() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm sm:text-[15px] text-[#6B7280] dark:text-[#A0A8B8] text-center sm:text-left">
           <div className="space-y-1 text-center sm:text-left">
             <p className="text-[#1F2937] dark:text-[#FFFFFF] font-semibold">
-              © 2026 SalonPro. All rights reserved.
+              © 2026 StudioDesk. All rights reserved.
             </p>
             <p className="text-xs sm:text-[13px] text-[#6B7280] dark:text-[#A0A8B8]">
               Designed &amp; engineered for modern salons, studios, and wellness spas.

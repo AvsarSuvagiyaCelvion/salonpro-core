@@ -18,8 +18,8 @@ import LandingNavbar from '@/components/landing/LandingNavbar';
 import LandingFooter from '@/components/landing/LandingFooter';
 
 export const metadata = {
-  title: 'Terms of Service | SalonPro Cloud OS',
-  description: 'Terms of Service, subscription rules, and customer agreement for SalonPro salon management platform.',
+  title: 'Terms of Service | StudioDesk Cloud OS',
+  description: 'Terms of Service, subscription rules, and customer agreement for StudioDesk salon & studio management platform.',
 };
 
 export default function TermsPage() {
@@ -171,7 +171,7 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  By creating an account, registering a salon workspace, accessing the Owner ERP, or booking through a SalonPro client portal, you confirm that you are at least 18 years of age and legally competent to enter into a binding agreement under the Indian Contract Act, 1872.
+                  By creating an account, registering a salon workspace, accessing the Owner ERP, or booking through a StudioDesk client portal, you confirm that you are at least 18 years of age and legally competent to enter into a binding agreement under the Indian Contract Act, 1872.
                 </p>
                 <p>
                   If you register a workspace on behalf of a partnership, private limited company, LLP, or sole proprietorship, you represent and warrant that you hold authorized legal mandate to bind the business entity to these Terms.
@@ -194,7 +194,7 @@ export default function TermsPage() {
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>You are exclusively responsible for safeguarding the confidentiality of your owner and staff credentials.</li>
                   <li>You agree not to share administrative passwords across non-authorized individuals.</li>
-                  <li>SalonPro must be notified immediately of any suspected unauthorized access or compromise of your workspace.</li>
+                  <li>StudioDesk must be notified immediately of any suspected unauthorized access or compromise of your workspace.</li>
                 </ul>
               </div>
             </section>
@@ -250,7 +250,7 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  <strong>You own your data.</strong> SalonPro does not claim any intellectual property or ownership rights over the client mobile numbers, appointments, staff commission rates, or inventory data that you enter into the platform.
+                  <strong>You own your data.</strong> StudioDesk does not claim any intellectual property or ownership rights over the client mobile numbers, appointments, staff commission rates, or inventory data that you enter into the platform.
                 </p>
                 <div className="p-4 rounded-2xl bg-[#F9FAFB] dark:bg-[#10141F] border border-[#E5E7EB] dark:border-[#2A2F3A] text-xs">
                   <div className="font-bold text-[#1F2937] dark:text-white mb-1">Our Confidentiality Commitment:</div>
@@ -275,7 +275,7 @@ export default function TermsPage() {
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>Clients accessing the self-service Customer Portal (`/portal`) can cancel or reschedule appointments only if the time remaining exceeds the salon&apos;s specified cancellation window.</li>
-                  <li>SalonPro acts solely as the software scheduling platform and is not liable for customer no-shows or disputes regarding in-salon service delivery.</li>
+                  <li>StudioDesk acts solely as the software scheduling platform and is not liable for customer no-shows or disputes regarding in-salon service delivery.</li>
                 </ul>
               </div>
             </section>
@@ -305,7 +305,7 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  SalonPro aims for an operational uptime target of <strong>99.9%</strong>. Scheduled maintenance, cloud provider migrations, or emergency security patching are conducted during off-peak Indian Standard Time (IST) hours with advance notice published via in-app banners.
+                  StudioDesk aims for an operational uptime target of <strong>99.9%</strong>. Scheduled maintenance, cloud provider migrations, or emergency security patching are conducted during off-peak Indian Standard Time (IST) hours with advance notice published via in-app banners.
                 </p>
               </div>
             </section>
@@ -323,7 +323,7 @@ export default function TermsPage() {
                   You agree NOT to:
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
-                  <li>Reverse engineer, decompile, or attempt to extract the source code of the SalonPro software engine.</li>
+                  <li>Reverse engineer, decompile, or attempt to extract the source code of the StudioDesk software engine.</li>
                   <li>Use automated scraping bots or scripted tools to bypass booking slot concurrency controls or rate limits.</li>
                   <li>Transmit unsolicited promotional messages or spam violating Telecom Regulatory Authority of India (TRAI) directives.</li>
                   <li>Upload unlawful, offensive, or infringing media content to salon gallery storage.</li>
@@ -356,7 +356,7 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  To the maximum extent permitted by applicable Indian law, SalonPro and its directors shall not be liable for any indirect, incidental, punitive, or consequential damages resulting from lost salon business profits, telecom network downtime, or third-party payment gateway disruptions. Our aggregate liability under any claim shall not exceed the subscription fees paid by you in the preceding three (3) months.
+                  To the maximum extent permitted by applicable Indian law, StudioDesk and its directors shall not be liable for any indirect, incidental, punitive, or consequential damages resulting from lost salon business profits, telecom network downtime, or third-party payment gateway disruptions. Our aggregate liability under any claim shall not exceed the subscription fees paid by you in the preceding three (3) months.
                 </p>
               </div>
             </section>
@@ -385,7 +385,7 @@ export default function TermsPage() {
                   </div>
 
                   <a
-                    href={`https://wa.me/91${supportPhone}?text=Hello%20SalonPro%20Team,%20I%20am%20interested%20in%20an%20enterprise%20agreement.`}
+                    href={`https://wa.me/91${supportPhone}?text=Hello%20StudioDesk%20Team,%20I%20am%20interested%20in%20an%20enterprise%20agreement.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2.5 rounded-xl bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] font-bold text-xs shadow-sm inline-flex items-center justify-center gap-1.5 transition-all shrink-0 active:scale-95"

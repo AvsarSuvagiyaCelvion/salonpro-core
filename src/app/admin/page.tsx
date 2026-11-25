@@ -562,7 +562,7 @@ export default function AdminOverviewPage() {
         isOpen={exportModalOpen}
         onClose={() => setExportModalOpen(false)}
         role="admin"
-        salonName="SalonPro Master Governance"
+        salonName="StudioDesk Master Governance"
       />
     </div>
   );

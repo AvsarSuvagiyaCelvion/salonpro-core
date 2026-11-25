@@ -34,8 +34,8 @@ const notoGujarati = Noto_Sans_Gujarati({
 });
 
 export const metadata: Metadata = {
-  title: 'SalonPro - Modern Luxury Salon & Spa Management Platform',
-  description: 'Next-generation salon operating system, live studio Kanban, client booking, and 10-second POS billing.',
+  title: 'StudioDesk - Modern Luxury Salon & Spa Management Platform',
+  description: 'Next-generation salon & studio operating system, live floor Kanban, client booking, and 10-second POS billing.',
   icons: {
     icon: '/icon.svg',
     shortcut: '/icon.svg',
@@ -57,7 +57,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('salonpro_theme');if(t==='dark'){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('studiodesk_theme')||localStorage.getItem('salonpro_theme');if(t==='dark'){document.documentElement.classList.add('dark');}else{document.documentElement.classList.remove('dark');}}catch(e){}})();`,
           }}
         />
       </head>

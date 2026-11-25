@@ -26,7 +26,7 @@ export default function LandingNavbar() {
           7-Day Free Trial
         </span>
         <span className="hidden md:inline">
-          Test-drive SalonPro free for 7 days with zero upfront payment &amp; no credit card required!
+          Test-drive StudioDesk free for 7 days with zero upfront payment &amp; no credit card required!
         </span>
         <span className="md:hidden text-[10px] text-white/90 truncate max-w-[180px]">
           Zero Upfront Payment
@@ -53,7 +53,7 @@ export default function LandingNavbar() {
               ✂
             </div>
             <span className="font-bold text-lg sm:text-xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
-              Salon<span className="text-[#D4A77F]">Pro</span>
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>
 
@@ -263,7 +263,7 @@ export default function LandingNavbar() {
             <div className="pt-4 border-t border-[#E5E7EB] dark:border-[#2A2F3A] text-[11px] text-[#6B7280] dark:text-[#A0A8B8]">
               <p>Need setup assistance?</p>
               <a
-                href="https://wa.me/918320653782?text=Hello%20SalonPro%20Team,%20I%20need%20help%20setting%20up%20my%20salon."
+                href="https://wa.me/918320653782?text=Hello%20StudioDesk%20Team,%20I%20need%20help%20setting%20up%20my%20salon."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-bold text-[#10B981] hover:underline inline-flex items-center gap-1 mt-0.5"

@@ -624,7 +624,7 @@ export default function CustomerPortalPage() {
                 <span>Select a Salon to Book Slot</span>
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                Choose any registered beauty studio on SalonPro
+                Choose any registered beauty studio on StudioDesk
               </p>
             </div>
             <button
@@ -1045,7 +1045,7 @@ export default function CustomerPortalPage() {
             </div>
             <div className="min-w-0">
               <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate max-w-[140px] xs:max-w-xs sm:max-w-md">
-                {salon?.name || 'SalonPro'}
+                {salon?.name || 'StudioDesk'}
               </span>
               <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold block -mt-0.5 truncate">
                 Customer Portal

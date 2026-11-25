@@ -256,7 +256,7 @@ export default function AdminSecurityPage() {
             <div>
               <h2 className="text-base font-black text-white">Platform Security Architecture Overview</h2>
               <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
-                SalonPro enforces enterprise-grade zero-trust principles across all tenants, APIs, and platform administrative interfaces.
+                StudioDesk enforces enterprise-grade zero-trust principles across all tenants, APIs, and platform administrative interfaces.
               </p>
             </div>
 

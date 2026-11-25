@@ -300,7 +300,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // 4. TENANT SUBDOMAIN REWRITES
-  // When a visitor hits <slug>.salonpro.in or <slug>.localhost:3000
+  // When a visitor hits <slug>.studiodeskapp.com or <slug>.localhost:3000
   if (tenantSlug) {
     // Path "/" -> rewrite to tenant showcase & booking page "/[slug]"
     if (pathname === '/') {

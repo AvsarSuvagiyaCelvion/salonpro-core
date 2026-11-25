@@ -697,7 +697,7 @@ export default function MarketingPage() {
               </h2>
               <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
                 Unlike competitors who add hefty 100% to 200% markups (charging ₹1.50 to ₹2.50 per WhatsApp message), 
-                <strong> SalonPro passes 100% of Meta’s official cost directly to your salon at ₹0.85 per marketing message with ₹0 platform surcharge</strong>.
+                <strong> StudioDesk passes 100% of Meta’s official cost directly to your salon at ₹0.85 per marketing message with ₹0 platform surcharge</strong>.
               </p>
             </div>
 
@@ -708,7 +708,7 @@ export default function MarketingPage() {
                 <div className="text-[11px] text-neutral-500 mt-1">Direct Meta India Cloud API rate</div>
               </div>
               <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40">
-                <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">SalonPro Markup</div>
+                <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">StudioDesk Markup</div>
                 <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">₹0.00</div>
                 <div className="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 mt-1">0% commission & 0 monthly fees</div>
               </div>

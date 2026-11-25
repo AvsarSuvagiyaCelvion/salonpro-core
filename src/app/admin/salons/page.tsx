@@ -74,7 +74,7 @@ export default function AdminSalonsPage() {
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [broadcastTitle, setBroadcastTitle] = useState('Monthly Platform Subscription Notice');
   const [broadcastMessage, setBroadcastMessage] = useState(
-    'Dear Salon Partner, this is a reminder regarding your active SalonPro Cloud subscription. Please ensure timely renewal to continue uninterrupted online bookings and billing services.'
+    'Dear Salon Partner, this is a reminder regarding your active StudioDesk Cloud subscription. Please ensure timely renewal to continue uninterrupted online bookings and billing services.'
   );
   const [broadcastType, setBroadcastType] = useState<'payment' | 'update' | 'notice'>('payment');
   const [sendingBroadcast, setSendingBroadcast] = useState(false);
@@ -568,7 +568,7 @@ export default function AdminSalonsPage() {
                   </div>
                   {s.phone && (
                     <a
-                      href={`https://wa.me/91${s.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${s.name} team, this is SalonPro Platform Admin.`)}`}
+                      href={`https://wa.me/91${s.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${s.name} team, this is StudioDesk Platform Admin.`)}`}
                       target="_blank"
                       className="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-center text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
                       title="Direct WhatsApp Chat with Salon Owner"
@@ -758,7 +758,7 @@ export default function AdminSalonsPage() {
                         setBroadcastType('payment');
                         setBroadcastTitle('Monthly Platform Subscription Notice');
                         setBroadcastMessage(
-                          'Dear Salon Partner, this is a reminder regarding your active SalonPro Cloud subscription. Please ensure timely renewal to continue uninterrupted online bookings and billing services.'
+                          'Dear Salon Partner, this is a reminder regarding your active StudioDesk Cloud subscription. Please ensure timely renewal to continue uninterrupted online bookings and billing services.'
                         );
                       }}
                       className={`p-2.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
@@ -954,7 +954,7 @@ export default function AdminSalonsPage() {
         isOpen={exportModalOpen}
         onClose={() => setExportModalOpen(false)}
         role="admin"
-        salonName="SalonPro Master Governance"
+        salonName="StudioDesk Master Governance"
       />
     </div>
   );

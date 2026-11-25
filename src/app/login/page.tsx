@@ -81,7 +81,7 @@ export default function LoginPage() {
               ✂
             </div>
             <span className="font-extrabold text-base sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
-              Salon<span className="text-[#D4A77F]">Pro</span>
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>
 
@@ -109,10 +109,10 @@ export default function LoginPage() {
               <Sparkles className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
-              SalonPro
+              StudioDesk
             </h1>
             <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-1">
-              Salon Operating System &amp; Manager Portal
+              Salon &amp; Studio Operating System &amp; Manager Portal
             </p>
           </div>
 
@@ -261,7 +261,7 @@ export default function LoginPage() {
                         <span>💬 WhatsApp (+91 {supportPhone})</span>
                       </a>
                       <a
-                        href={`mailto:${supportEmail}?subject=SalonPro%20Owner%20Password%20Reset%20Request&body=Hello%20Platform%20Support,%0D%0A%0D%0AI%20am%20requesting%20a%20password%20reset%20for%20my%20salon%20owner%20account:%20${encodeURIComponent(
+                        href={`mailto:${supportEmail}?subject=StudioDesk%20Owner%20Password%20Reset%20Request&body=Hello%20Platform%20Support,%0D%0A%0D%0AI%20am%20requesting%20a%20password%20reset%20for%20my%20salon%20owner%20account:%20${encodeURIComponent(
                           email || ''
                         )}`}
                         className="flex-1 py-2 px-3 rounded-xl bg-[#F8F9FA] dark:bg-[#1C2230] hover:bg-neutral-100 text-[#1F2937] dark:text-white border border-[#E5E7EB] dark:border-[#2A2F3A] font-bold text-center text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs"

@@ -16,7 +16,7 @@ function buildUpiQuery(params: UpiIntentParams): string {
   const numAmount = Number(amount);
   const formattedAmount = isNaN(numAmount) || numAmount <= 0 ? '1.00' : numAmount.toFixed(2);
 
-  const cleanName = (name || 'SalonPro').trim().replace(/[^a-zA-Z0-9 ]/g, '');
+  const cleanName = (name || 'StudioDesk').trim().replace(/[^a-zA-Z0-9 ]/g, '');
   const cleanNote = (note || 'Bill Payment').trim().replace(/[^a-zA-Z0-9 -]/g, '');
 
   const queryParams = new URLSearchParams();

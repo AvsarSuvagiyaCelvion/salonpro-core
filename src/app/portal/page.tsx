@@ -1040,9 +1040,6 @@ export default function CustomerPortalPage() {
             href={salon?.slug ? `/${salon.slug}` : lastSalonSlug ? `/${lastSalonSlug}` : '/'}
             className="flex items-center gap-2 group min-w-0"
           >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-sm shrink-0 group-hover:rotate-12 transition-transform duration-300">
-              ✂
-            </div>
             <div className="min-w-0">
               <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight block leading-tight truncate max-w-[140px] xs:max-w-xs sm:max-w-md">
                 {salon?.name || 'StudioDesk'}

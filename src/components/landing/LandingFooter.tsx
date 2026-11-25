@@ -28,18 +28,13 @@ export default function LandingFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 sm:gap-12 pb-14 border-b border-[#E5E7EB] dark:border-[#2A2F3A]">
           {/* Column 1: Brand & Overview (Spans 2 cols on desktop) */}
           <div className="lg:col-span-2 space-y-4 text-center md:text-left flex flex-col items-center md:items-start">
-            <Link href="/" className="flex items-center justify-center md:justify-start gap-2.5 inline-flex">
-              <div className="w-10 h-10 rounded-2xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-xl text-[#D4A77F] shadow-md shadow-black/10">
-                ✂
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-none">
-                  StudioDesk
-                </span>
-                <span className="text-xs text-[#D4A77F] font-semibold tracking-wider uppercase mt-1">
-                  Operating System for Salons &amp; Studios
-                </span>
-              </div>
+            <Link href="/" className="flex flex-col text-left inline-flex">
+              <span className="font-black text-2xl sm:text-3xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-none">
+                Studio<span className="text-[#D4A77F]">Desk</span>
+              </span>
+              <span className="text-xs text-[#D4A77F] font-semibold tracking-wider uppercase mt-1.5">
+                Operating System for Salons &amp; Studios
+              </span>
             </Link>
 
             <p className="text-sm sm:text-[15px] text-[#6B7280] dark:text-[#A0A8B8] leading-relaxed max-w-sm mx-auto md:mx-0">

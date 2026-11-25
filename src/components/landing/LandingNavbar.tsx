@@ -47,12 +47,9 @@ export default function LandingNavbar() {
         } px-3 sm:px-6`}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
-          {/* 1. Left: Brand Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-sm shrink-0 group-hover:rotate-12 transition-transform duration-300">
-              ✂
-            </div>
-            <span className="font-bold text-lg sm:text-xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
+          {/* 1. Left: Brand Wordmark (Clean Pure Typography) */}
+          <Link href="/" className="inline-flex items-center shrink-0 group">
+            <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
               Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>

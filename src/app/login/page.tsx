@@ -76,11 +76,8 @@ export default function LoginPage() {
       {/* Top Navbar - Matching Register Salon Header for Site-Wide Consistency */}
       <nav className="w-full border-b border-[#E5E7EB] dark:border-[#2A2F3A] bg-white/95 dark:bg-[#080B12]/95 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3.5 sticky top-0 z-50 transition-colors">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-xs group-hover:rotate-12 transition-transform">
-              ✂
-            </div>
-            <span className="font-extrabold text-base sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
+          <Link href="/" className="inline-flex items-center shrink-0 group">
+            <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-white tracking-tight">
               Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>
@@ -105,13 +102,10 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Brand Card Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#D4A77F] text-[#080B12] shadow-xl shadow-[#D4A77F]/20 mb-3 sm:mb-4 ring-4 ring-[#D4A77F]/20">
-              <Sparkles className="w-7 h-7 sm:w-8 sm:h-8" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937] dark:text-white tracking-tight">
-              StudioDesk
+            <h1 className="text-3xl sm:text-4xl font-black text-[#1F2937] dark:text-white tracking-tight">
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </h1>
-            <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-1">
+            <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#A0A8B8] mt-1.5 font-medium">
               Salon &amp; Studio Operating System &amp; Manager Portal
             </p>
           </div>

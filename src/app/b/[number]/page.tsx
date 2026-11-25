@@ -154,13 +154,10 @@ export default async function PublicBillPage({
       
       {/* Universal Top Navigation Header (Hidden on Hardware Print) */}
       <header className="w-full max-w-3xl flex items-center justify-between pb-6 border-b border-neutral-200 dark:border-neutral-800 mb-6 print:hidden">
-        <Link href="/portal" className="flex items-center gap-2 group min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-            SD
-          </div>
+        <Link href="/portal" className="flex items-center group min-w-0">
           <div className="min-w-0">
-            <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-white block leading-tight">
-              StudioDesk <span className="font-normal text-xs text-neutral-500">Official Invoice</span>
+            <span className="font-black text-base tracking-tight text-neutral-900 dark:text-white block leading-tight">
+              Studio<span className="text-[#D4A77F]">Desk</span> <span className="font-normal text-xs text-neutral-500 ml-1">Official Invoice</span>
             </span>
             <span className="text-[10px] text-neutral-400 block -mt-0.5 font-mono">
               Verified Digital Receipt

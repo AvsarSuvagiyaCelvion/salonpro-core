@@ -334,12 +334,9 @@ export default function RegisterSalonPage() {
       {/* Top Navbar - Fully Adaptive to Light and Dark Mode & 320px Responsive */}
       <nav className="border-b border-[#E5E7EB] dark:border-[#2A2F3A] bg-white/95 dark:bg-[#080B12]/95 backdrop-blur-md px-3 sm:px-6 py-2.5 sm:py-3.5 sticky top-0 z-50 transition-colors">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#10141F] dark:bg-[#141926] border border-[#2A2F3A] flex items-center justify-center font-black text-sm sm:text-base text-[#D4A77F] shadow-xs group-hover:rotate-12 transition-transform">
-              ✂
-            </div>
-            <span className="font-extrabold text-base sm:text-xl text-[#1F2937] dark:text-white tracking-tight">
-              Salon<span className="text-[#D4A77F]">Pro</span>
+          <Link href="/" className="inline-flex items-center shrink-0 group">
+            <span className="font-black text-xl sm:text-2xl text-[#1F2937] dark:text-white tracking-tight">
+              Studio<span className="text-[#D4A77F]">Desk</span>
             </span>
           </Link>
 

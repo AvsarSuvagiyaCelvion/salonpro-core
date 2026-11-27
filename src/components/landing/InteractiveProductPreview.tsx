@@ -148,7 +148,7 @@ export default function InteractiveProductPreview() {
             </div>
             <div className="hidden sm:flex items-center gap-2 ml-2 px-2.5 py-1 rounded-xl bg-black/30 text-[#A0A8B8] text-xs font-mono truncate">
               <span className="text-[#10B981]">https://</span>
-              <span>studiodeskapp.com/app/appointments</span>
+              <span>salonpro-core.vercel.app/app/appointments</span>
             </div>
           </div>
 
@@ -865,7 +865,7 @@ export default function InteractiveProductPreview() {
                 <div className="bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] rounded-2xl p-5 shadow-xs flex flex-col items-center justify-center text-center space-y-3">
                   <div className="w-32 h-32 rounded-2xl bg-[#080B12] p-2 flex items-center justify-center border-2 border-[#D4A77F]">
                     <div className="w-full h-full bg-white rounded-xl p-2 flex flex-col items-center justify-center">
-                      <div className="text-[10px] font-black tracking-tighter text-black">STUDIODESK UPI</div>
+                      <div className="text-[10px] font-black tracking-tighter text-black">SALONPRO UPI</div>
                       <div className="text-[32px] leading-none my-1">🏁</div>
                       <div className="text-[9px] font-mono font-bold text-black">SCAN TO PAY ₹2,124</div>
                     </div>

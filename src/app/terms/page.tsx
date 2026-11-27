@@ -189,12 +189,12 @@ export default function TermsPage() {
               </h2>
               <div className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                 <p>
-                  Upon registration at `/register-salon`, you will be assigned a unique logical workspace identified by your chosen salon slug (e.g. `your-salon.studiodeskapp.com`).
+                  Upon registration at `/register-salon`, you will be assigned a unique logical workspace identified by your chosen salon slug (e.g. `your-salon.salonpro-core.vercel.app`).
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
                   <li>You are exclusively responsible for safeguarding the confidentiality of your owner and staff credentials.</li>
                   <li>You agree not to share administrative passwords across non-authorized individuals.</li>
-                  <li>StudioDesk must be notified immediately of any suspected unauthorized access or compromise of your workspace.</li>
+                  <li>SalonPro must be notified immediately of any suspected unauthorized access or compromise of your workspace.</li>
                 </ul>
               </div>
             </section>

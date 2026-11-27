@@ -18,7 +18,7 @@ const steps: StepData[] = [
   {
     number: 1,
     title: 'Salon Owner Portal',
-    urlPath: 'studiodeskapp.com/salon-owner',
+    urlPath: 'salonpro-core.vercel.app/salon-owner',
     badge: 'Strictly Private to Salon Staff',
     badgeIcon: '🔒',
     description:
@@ -27,7 +27,7 @@ const steps: StepData[] = [
   {
     number: 2,
     title: 'Unique Customer Link',
-    urlPath: 'studiodeskapp.com/priya-salon',
+    urlPath: 'salonpro-core.vercel.app/priya-salon',
     badge: 'Public Client Booking Page',
     badgeIcon: '🌐',
     description:
@@ -37,7 +37,7 @@ const steps: StepData[] = [
   {
     number: 3,
     title: 'Instant Client Sync',
-    urlPath: 'studiodeskapp.com/portal',
+    urlPath: 'salonpro-core.vercel.app/portal',
     badge: 'Permanent Client Records',
     badgeIcon: '✨',
     description:

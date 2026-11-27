@@ -57,7 +57,7 @@ export default function NotFound() {
 
       <div className="mt-8 flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#747D8D]">
         <Sparkles className="w-3.5 h-3.5 text-[#D4A77F]" />
-        <span>StudioDesk · Operating with Excellence</span>
+        <span>SalonPro · Operating with Excellence</span>
       </div>
     </div>
   );

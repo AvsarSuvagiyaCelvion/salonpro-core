@@ -125,7 +125,7 @@ export default function LandingPageClient() {
               </h3>
               <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Traditional salons waste hours on manual registers and lose clients due to poor booking coordination.
-                Flip each card to see how StudioDesk eliminates every pain point:
+                Flip each card to see how SalonPro eliminates every pain point:
               </p>
             </div>
           </Reveal>
@@ -177,7 +177,7 @@ export default function LandingPageClient() {
             <div className="text-center mb-10 sm:mb-14">
               <h2 className="font-sans font-semibold text-xs sm:text-[13px] tracking-[0.08em] uppercase text-[#D4A77F] mb-2.5">Simple Multi-Tenant Workflow</h2>
               <h3 className="landing-h2 font-heading font-semibold text-[#1F2937] dark:text-[#FFFFFF] tracking-tight">
-                How StudioDesk Works in Your Salon (Example: &quot;Priya Salon&quot;)
+                How SalonPro Works in Your Salon (Example: &quot;Priya Salon&quot;)
               </h3>
               <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
                 Clean segregation between your internal salon operations and what your customers see.
@@ -378,7 +378,7 @@ export default function LandingPageClient() {
                 Ready to Automate Your Salon Operations?
               </h3>
               <p className="font-sans font-normal text-base text-[#6B7280] dark:text-[#A0A8B8] mt-2.5 max-w-[60ch] mx-auto leading-[1.6]">
-                Join forward-thinking salons and studios running with StudioDesk. Setup takes under 3 minutes.
+                Join forward-thinking salons and studios running with SalonPro. Setup takes under 3 minutes.
               </p>
 
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">

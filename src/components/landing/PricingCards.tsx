@@ -24,10 +24,85 @@ interface Plan {
   is_popular?: boolean;
 }
 
+const FALLBACK_PLANS: Plan[] = [
+  {
+    id: 'plan-basic',
+    name: 'Basic Plan',
+    slug: 'basic',
+    description: 'Essential front desk & appointment booking for small salons and independent stylists.',
+    price: 499,
+    yearly_price: 4990,
+    billing_interval: 'monthly',
+    features: [
+      'Up to 3 Staff Members',
+      'Up to 30 Services Catalog',
+      'Conflict-Free Online Client Booking',
+      'Quick POS Checkout with Split Tender',
+      'Client History & Repeat Notes',
+      'Standard Support',
+    ],
+    max_staff: 3,
+    limits: {
+      max_staff: 3,
+      max_services: 30,
+      wa_per_month: 0,
+    },
+  },
+  {
+    id: 'plan-pro',
+    name: 'Pro Studio',
+    slug: 'pro',
+    description: 'For busy salons scaling team productivity, WhatsApp bills, and client retention.',
+    price: 999,
+    yearly_price: 9990,
+    billing_interval: 'monthly',
+    is_popular: true,
+    features: [
+      'Up to 10 Staff Members',
+      'Up to 100 Services Catalog',
+      '200 Automated WhatsApp Invoices/mo',
+      'Live Studio Chair Kanban Queue',
+      'Automated Stylist Commission Tracking',
+      'VIP Annual Memberships & Pre-filled Perks',
+      'Daily Cash & UPI Reconciliation Report',
+      'Salon Logo Upload & Custom Themes',
+    ],
+    max_staff: 10,
+    limits: {
+      max_staff: 10,
+      max_services: 100,
+      wa_per_month: 200,
+    },
+  },
+  {
+    id: 'plan-premium',
+    name: 'Luxury / Enterprise',
+    slug: 'premium',
+    description: 'Maximum capacity, automated WhatsApp marketing and VIP concierge onboarding.',
+    price: 1999,
+    yearly_price: 19990,
+    billing_interval: 'monthly',
+    features: [
+      'Unlimited Staff & Multi-Floor Chairs',
+      'Unlimited Services & Custom Treatments',
+      '1,000+ Automated WhatsApp Invoices/mo',
+      'All Pro Features Included',
+      'Export Unlimited CSV & Tax Audit PDF',
+      'Priority 24/7 Phone & Concierge WhatsApp Support',
+    ],
+    max_staff: 0,
+    limits: {
+      max_staff: 0,
+      max_services: 0,
+      wa_per_month: 1000,
+    },
+  },
+];
+
 export default function PricingCards() {
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [plans, setPlans] = useState<Plan[]>(FALLBACK_PLANS);
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -98,29 +173,8 @@ export default function PricingCards() {
         </button>
       </div>
 
-      {/* Plans Grid or Fallback */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-[#E5E7EB] border-t-[#D4A77F] rounded-full animate-spin" />
-        </div>
-      ) : plans.length === 0 ? (
-        <div className="max-w-md mx-auto p-8 rounded-2xl bg-white dark:bg-[#141926] border border-[#E5E7EB] dark:border-[#2A2F3A] shadow-sm text-center">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[#F3F4F6] dark:bg-[#1C2230] flex items-center justify-center text-[#D4A77F]">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <h3 className="text-base font-bold text-[#1F2937] dark:text-[#FFFFFF] mb-2">Pricing Plans</h3>
-          <p className="text-xs text-[#6B7280] dark:text-[#A0A8B8] mb-6">
-            Explore our subscription tiers or launch your 7-day free trial.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-5 py-2.5 rounded-xl bg-[#D4A77F] text-[#080B12] text-xs font-bold hover:bg-[#B8905F] transition-colors cursor-pointer"
-          >
-            Refresh Plans
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
+      {/* Plans Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 max-w-6xl mx-auto items-stretch">
           {plans.map((plan, index) => {
             const isPro = plan.slug === 'pro' || plan.is_popular;
             const monthlyPrice = Number(plan.price);
@@ -264,7 +318,6 @@ export default function PricingCards() {
             );
           })}
         </div>
-      )}
     </div>
   );
 }

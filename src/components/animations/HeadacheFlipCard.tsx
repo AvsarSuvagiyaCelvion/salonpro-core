@@ -102,7 +102,7 @@ export default function HeadacheFlipCard({
           </div>
 
           <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2F3A] flex items-center justify-between text-[11px] text-[#10B981] font-bold">
-            <span>✨ StudioDesk Built-In</span>
+            <span>✨ SalonPro Built-In</span>
             <span className="text-[10px] bg-white dark:bg-[#141926] px-2 py-0.5 rounded-full border border-[#10B981]/30">
               Zero Headache
             </span>

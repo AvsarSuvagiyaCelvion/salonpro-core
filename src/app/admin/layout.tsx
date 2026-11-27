@@ -143,7 +143,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-sm sm:text-base text-[#1F2937] dark:text-[#FFFFFF] tracking-tight leading-tight truncate">
-                  StudioDesk Admin
+                  SalonPro Admin
                 </span>
                 <span className="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[#D4A77F]/15 text-[#8C5E2E] dark:text-[#D4A77F] border border-[#D4A77F]/30 shrink-0">
                   {isSuperAdmin ? 'Super Admin' : 'Platform Admin'}
@@ -199,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </div>
                   <div>
                     <span className="font-extrabold text-sm text-[#1F2937] dark:text-[#FFFFFF] block leading-tight">
-                      StudioDesk Admin
+                      SalonPro Admin
                     </span>
                     <span className="text-[10px] text-[#8C5E2E] dark:text-[#D4A77F] font-bold bg-[#D4A77F]/15 px-1.5 py-0.5 rounded border border-[#D4A77F]/30">
                       Super Admin Panel

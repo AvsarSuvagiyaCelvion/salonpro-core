@@ -182,7 +182,7 @@ export async function sendWhatsAppInvoiceReceipt(
   const phone = normalizeIndianPhone(customerMobile);
   const appBaseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.studiodeskapp.com');
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
   
   const receiptUrl = `${appBaseUrl}/b/${encodeURIComponent(params.receiptToken || params.invoiceNumber || '')}`;
 

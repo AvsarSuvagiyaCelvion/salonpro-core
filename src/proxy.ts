@@ -63,12 +63,11 @@ export function extractTenantFromHost(host: string | null): string | null {
     return null;
   }
 
-  // 2. Production root domain: e.g. priya.studiodeskapp.com
-  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'studiodeskapp.com').toLowerCase();
-  const candidateRoots = Array.from(new Set([rootDomain, 'studiodeskapp.com']));
-  for (const candidate of candidateRoots) {
-    if (hostname.endsWith(`.${candidate}`)) {
-      const sub = hostname.slice(0, -(candidate.length + 1));
+  // 2. Production root domain: e.g. priya.yourdomain.com
+  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || '').toLowerCase();
+  if (rootDomain) {
+    if (hostname.endsWith(`.${rootDomain}`)) {
+      const sub = hostname.slice(0, -(rootDomain.length + 1));
       const parts = sub.split('.');
       const tenantSlug = parts[parts.length - 1];
       if (tenantSlug && !RESERVED_SUBDOMAINS.has(tenantSlug)) {
@@ -120,13 +119,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const host = request.headers.get('host') || '';
   const hostname = host.split(':')[0].toLowerCase();
-  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'studiodeskapp.com').toLowerCase();
-
-  // Redirect any incoming *.vercel.app requests to the canonical custom domain
-  if (hostname.endsWith('.vercel.app')) {
-    const targetUrl = new URL(pathname + request.nextUrl.search, `https://${rootDomain}`);
-    return NextResponse.redirect(targetUrl, 308);
-  }
+  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || '').toLowerCase();
 
   let tenantSlug = extractTenantFromHost(host);
 
@@ -135,20 +128,15 @@ export async function proxy(request: NextRequest) {
     const isStandardHost =
       hostname === 'localhost' ||
       hostname === '127.0.0.1' ||
-      hostname === rootDomain ||
-      hostname === `www.${rootDomain}` ||
-      hostname === 'studiodeskapp.com' ||
-      hostname === 'www.studiodeskapp.com' ||
-      hostname.endsWith('.studiodeskapp.com') ||
       hostname.endsWith('.vercel.app') ||
-      hostname.endsWith(`.${rootDomain}`) ||
-      hostname.endsWith('.localhost');
+      hostname.endsWith('.localhost') ||
+      (rootDomain && (hostname === rootDomain || hostname === `www.${rootDomain}` || hostname.endsWith(`.${rootDomain}`)));
 
     if (!isStandardHost) {
       tenantSlug = await resolveCustomDomain(hostname);
       if (!tenantSlug && !pathname.startsWith('/api/')) {
-        // If unverified or not found, redirect to the root landing page
-        const redirectUrl = new URL('/', `https://${rootDomain}`);
+        // If unverified or not found, redirect to the root landing page on current host
+        const redirectUrl = new URL('/', request.url);
         return NextResponse.redirect(redirectUrl);
       }
     }

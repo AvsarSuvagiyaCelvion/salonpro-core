@@ -125,7 +125,7 @@ export default function PricingCards() {
             const isPro = plan.slug === 'pro' || plan.is_popular;
             const monthlyPrice = Number(plan.price);
             const yearlyPrice = plan.yearly_price ? Number(plan.yearly_price) : monthlyPrice * 10;
-            const displayPrice = interval === 'yearly' ? Math.round(yearlyPrice / 12) : monthlyPrice;
+            const displayPrice = interval === 'yearly' ? yearlyPrice : monthlyPrice;
             const staffLimit = plan.limits?.max_staff === 0 ? 'Unlimited' : `${plan.limits?.max_staff || plan.max_staff || 3} Staff members`;
             const servicesLimit = plan.limits?.max_services === 0 ? 'Unlimited' : `${plan.limits?.max_services || 30} Services`;
             const waLimit = plan.limits?.wa_per_month === 0 ? '0 WhatsApp bills/mo' : `${plan.limits?.wa_per_month || 200} WhatsApp bills/mo`;
@@ -199,12 +199,12 @@ export default function PricingCards() {
                         </motion.span>
                       </AnimatePresence>
                       <span className={`text-xs font-medium ${isPro ? 'text-[#D4A77F]' : 'text-[#6B7280] dark:text-[#A0A8B8]'}`}>
-                        / month
+                        / {interval === 'yearly' ? 'year' : 'month'}
                       </span>
                     </div>
                     {interval === 'yearly' && (
                       <div className={`text-[10px] sm:text-[11px] font-semibold mt-1 ${isPro ? 'text-[#D4A77F]' : 'text-[#10B981]'}`}>
-                        Billed ₹{yearlyPrice.toLocaleString('en-IN')} annually (2 months free)
+                        Equal to ₹{Math.round(yearlyPrice / 12).toLocaleString('en-IN')}/mo · 2 Months Free!
                       </div>
                     )}
                     {interval === 'monthly' && (
@@ -232,7 +232,9 @@ export default function PricingCards() {
 
                   {/* Features List */}
                   <div className="space-y-2 text-xs pb-5">
-                    {(Array.isArray(plan.features) ? plan.features : []).map((feat, idx) => (
+                    {(Array.isArray(plan.features) ? plan.features : [])
+                      .filter((feat) => !feat.toLowerCase().includes('custom domain'))
+                      .map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2.5">
                         <Check className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isPro ? 'text-[#D4A77F]' : 'text-[#10B981]'}`} />
                         <span className={`text-[11px] sm:text-xs leading-normal ${isPro ? 'text-[#E5E7EB]' : 'text-[#1F2937] dark:text-[#FFFFFF]'}`}>{feat}</span>
@@ -244,7 +246,7 @@ export default function PricingCards() {
                 {/* Action Button */}
                 <div className={`pt-3.5 border-t ${isPro ? 'border-[#2A2F3A]' : 'border-[#E5E7EB] dark:border-[#2A2F3A]'}`}>
                   <Link
-                    href="/register-salon"
+                    href={`/register-salon?plan=${plan.slug}&interval=${interval}`}
                     className={`w-full py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 ${
                       isPro
                         ? 'bg-[#D4A77F] hover:bg-[#B8905F] text-[#080B12] shadow-[#D4A77F]/20'
